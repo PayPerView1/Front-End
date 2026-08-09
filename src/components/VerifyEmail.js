@@ -12,11 +12,10 @@ function handleResend() {
     setTimeout(() => setResent(false), 3000);
 }
     return (
-        <div 
-  dir="rtl" 
-  className="flex flex-col items-center justify-center gap-10 text-center px-16 py-14 rounded-2xl border border-white/[0.07] bg-transparent backdrop-blur-lg"
-  style={{ width: "643px", height: "511px" }}
->
+        <div
+        dir="rtl"
+        className="flex flex-col items-center justify-center gap-6 text-center w-full max-w-[643px] px-6 lg:px-12 py-10 rounded-2xl border border-white/[0.07] bg-white/[0.02] backdrop-blur-lg"
+        >
         {/* أيقونة الإيميل */}
         <div className="w-20 h-20 rounded-full bg-[#F97316] flex items-center justify-center">
             <Message set="bold" size={36} primaryColor="white" />

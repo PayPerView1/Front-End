@@ -33,9 +33,9 @@ function handleSubmit() {
 
     return (
     <div
-    dir="rtl"
-    className="w-full max-w-[520px] flex flex-col gap-4 py-6 px-8 rounded-2xl border border-white/[0.07] bg-white/[0.02] backdrop-blur-lg"
-    >
+  dir="rtl"
+  className="w-full max-w-[520px] flex flex-col gap-4 py-6 px-4 lg:px-8 rounded-2xl border border-white/[0.07] bg-white/[0.02] backdrop-blur-lg mx-4 lg:mx-0"
+>
         {/* العنوان */}
         <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-bold text-right text-[#E1E3E4]">

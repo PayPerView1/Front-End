@@ -33,7 +33,7 @@ export default function StepIndicator({ currentStep = 1 }) {
 
           {/* الخط */}
           {index < steps.length - 1 && (
-            <div className="flex-1 h-px mx-1" />
+            <div className="flex-1 h-px mx-1 bg-white/20" />
           )}
         </div>
       ))}

@@ -72,7 +72,7 @@ function handleNext() {
     return (
     <div
     dir="rtl"
-    className="w-full max-w-[520px] flex flex-col gap-4 py-6 px-8 rounded-2xl border border-white/[0.07] bg-white/[0.02] backdrop-blur-lg"
+    className="w-full max-w-[520px] flex flex-col gap-4 py-6 px-4 lg:px-8 rounded-2xl border border-white/[0.07] bg-white/[0.02] backdrop-blur-lg mx-4 lg:mx-0"
     >
         {/* العنوان */}
         <div className="flex flex-col gap-2">

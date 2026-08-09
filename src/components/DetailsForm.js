@@ -4,22 +4,33 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Camera } from "react-iconly";
 import StepIndicator from "@/components/StepIndicator";
+import worldCountries from "world-countries";
+import Select from "react-select";
 
-const countries = [
-    { name: "الإمارات", code: "AE", dial: "+971" },
-    { name: "السعودية", code: "SA", dial: "+966" },
-    { name: "الأردن", code: "JO", dial: "+962" },
-    { name: "فلسطين", code: "PS", dial: "+970" },
-    { name: "مصر", code: "EG", dial: "+20" },
-    { name: "الكويت", code: "KW", dial: "+965" },
-];
+const countries = worldCountries
+.map((c) => ({
+    name: c.translations.ara?.common || c.name.common,
+    code: c.cca2,
+    dial: c.idd.root + (c.idd.suffixes?.[0] || ""),
+    flag: c.flag,
+}))
+.filter((c) => c.dial && c.dial !== "")
+.sort((a, b) => a.name.localeCompare(b.name, "ar"));
 
+const dialOptions = countries.map((c) => ({
+  value: c.dial,
+  label: `${c.flag} ${c.dial}`,
+}));
+const countryOptions = countries.map((c) => ({
+    value: c.dial,
+    label: `${c.flag} ${c.name} `,
+}));
 export default function DetailsForm() {
     const router = useRouter();
     const fileRef = useRef(null);
     const [preview, setPreview] = useState(null);
     const [phone, setPhone] = useState("");
-    const [dialCode, setDialCode] = useState("+1");
+    const [dialCode, setDialCode] = useState("");
     const [country, setCountry] = useState("");
     const [city, setCity] = useState("");
     const [phoneError, setPhoneError] = useState("");
@@ -60,8 +71,8 @@ router.push("/register/interests");
     return (
     <div
     dir="rtl"
-    className="w-full max-w-[520px] flex flex-col gap-4 py-6 px-8 rounded-2xl border border-white/[0.07] bg-white/[0.02] backdrop-blur-lg"
-    >
+    className="w-full max-w-[520px] sm:max-w-[400px] lg:max-w-[520px] flex flex-col gap-4 py-4 px-4 lg:px-8 rounded-2xl border border-white/[0.07] bg-white/[0.02] backdrop-blur-lg"
+>
         {/* العنوان */}
         <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-bold text-right text-[#E1E3E4]">
@@ -111,22 +122,59 @@ router.push("/register/interests");
                 <div className="flex flex-col gap-2">
                     <label className="text-sm text-[#BFC9C4] text-right">رقم الهاتف</label>
                     <div className="flex flex-row gap-2">
-                        <select
-                        value={dialCode}
-                        onChange={(e) => setDialCode(e.target.value)}
-                        className={`h-10 rounded-lg border border-[#FFEEE3]/40 px-2 text-sm outline-none cursor-pointer transition-all
-                            ${dialCode === "+1"
-                                ? "bg-transparent text-[#BFC9C4]" : "bg-white text-black"}`}
-                        >
-                            <option value="+1">🇺🇸 +1</option>
-                            {countries.map((c) => (
-                                <option key={c.code} value={c.dial}>
-                                    {c.name} {c.dial}
-                                </option>
-                            ))}
-                        </select>
+                        
+
+<Select
+instanceId="dial-code-select"
+  options={dialOptions}
+  onChange={(opt) => setDialCode(opt.value)}
+  menuPlacement="bottom"
+  isSearchable
+  placeholder="اختر"
+  value={dialOptions.find((o) => o.value === dialCode) || undefined}
+  styles={{
+    control: (base) => ({
+    ...base,
+    height: "40px",
+    minHeight: "40px",
+    width: "100px",
+    background: dialCode ? "white" : "transparent",
+    borderColor: "rgba(255,238,227,0.4)",
+    borderRadius: "8px",
+    cursor: "pointer",
+    boxShadow: "none",
+    "&:hover": { borderColor: "rgba(255,238,227,0.4)" },
+  }),
+  menu: (base) => ({
+    ...base,
+    width: "200px",
+    zIndex: 9999,
+    background: "#1a1a1a",
+    border: "1px solid rgba(255,238,227,0.15)",
+    borderRadius: "8px",
+  }),
+    option: (base, state) => ({
+    ...base,
+    fontSize: "13px",
+    background: state.isSelected ? "#F97316" : state.isFocused ? "#2a2a2a" : "transparent",
+    color: "white",
+    cursor: "pointer",
+  }),
+    singleValue: (base) => ({
+      ...base,
+      fontSize: "13px",
+      color: "black",
+    }),
+    placeholder: (base) => ({
+      ...base,
+      color: "#929292",
+      fontSize: "13px",
+    }),
+  }}
+/>
 
                         {/* حقل ادخال رقم الهاتف*/}
+                        <div className="flex flex-col flex-1 gap-1 min-h-[44px]">
                         <input
                         type="tel"
                         value={phone}
@@ -135,14 +183,14 @@ router.push("/register/interests");
                             validatePhone(e.target.value);
                         }}
                         placeholder="أدخل رقم الهاتف"
-                        className="flex-1 h-10 rounded-lg border border-[#FFEEE3]/40 bg-white px-4 text-sm text-right text-black placeholder-[#929292] outline-none"
+                        className="w-full h-10 rounded-lg border border-[#FFEEE3]/40 bg-white px-4 text-sm text-right text-black placeholder-[#929292] outline-none"
                         />
-                        {errors.phone && (
-                            <p className="text-xs text-red-400 text-right m-0">{errors.phone}</p>
-                            )}
-                        {phoneError && (
-                            <p className="text-xs text-red-400 text-right m-0">{phoneError}</p>
-                            )}
+                        {(phoneError || errors.phone) && (
+                            <p className="text-xs text-red-400 text-right m-0">
+                                {phoneError || errors.phone}
+                            </p>
+                        )}
+                        </div>
                     </div>
                 </div>
 
@@ -151,19 +199,53 @@ router.push("/register/interests");
                     {/* الدولة */}
                     <div className="flex flex-col gap-2 flex-1">
                         <label className="text-sm text-[#BFC9C4] text-right">الدولة</label>
-                        <select
-                        value={country}
-                        onChange={(e) => setCountry(e.target.value)}
-                        className={`w-full h-10 rounded-lg border border-[#FFEEE3]/40 px-4 text-sm text-right outline-none cursor-pointer transition-all
-                            ${country ? "bg-white text-black" : "bg-transparent text-[#BFC9C4]"}`}
-                        >
-                            <option value="">اختر الدولة</option>
-                            {countries.map((c) => (
-                                <option key={c.code} value={c.code} className="bg-white text-black">
-                                    {c.name}
-                                </option>
-                            ))}
-                        </select>
+                        <Select
+  instanceId="country-select"
+  options={countryOptions}
+  onChange={(opt) => setCountry(opt.value)}
+  menuPlacement="bottom"
+  isSearchable
+  placeholder="اختر الدولة"
+  value={countryOptions.find((o) => o.value === country) || undefined}
+  styles={{
+    control: (base) => ({
+      ...base,
+      height: "40px",
+      minHeight: "40px",
+      background: country ? "white" : "transparent",
+      borderColor: "rgba(255,238,227,0.4)",
+      borderRadius: "8px",
+      cursor: "pointer",
+      boxShadow: "none",
+      "&:hover": { borderColor: "rgba(255,238,227,0.4)" },
+    }),
+    menu: (base) => ({
+      ...base,
+      zIndex: 9999,
+      background: "#1a1a1a",
+      border: "1px solid rgba(255,238,227,0.15)",
+      borderRadius: "8px",
+    }),
+    option: (base, state) => ({
+      ...base,
+      fontSize: "13px",
+      background: state.isSelected ? "#F97316" : state.isFocused ? "#2a2a2a" : "transparent",
+      color: "white",
+      cursor: "pointer",
+    }),
+    singleValue: (base) => ({
+      ...base,
+      fontSize: "13px",
+      color: country ? "black" : "#BFC9C4",
+    }),
+    placeholder: (base) => ({
+      ...base,
+      color: "#929292",
+      fontSize: "13px",
+    }),
+    indicatorSeparator: () => ({ display: "none" }),
+  }}
+/>
                         {errors.country && (
                             <p className="text-xs text-red-400 text-right m-0">{errors.country}</p>
                             )}

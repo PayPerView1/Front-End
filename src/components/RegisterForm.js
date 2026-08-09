@@ -24,6 +24,11 @@ function validate() {
     if (!userType) newErrors.userType = "اختر نوع الحساب";
     if (!name.trim()) newErrors.name = "أدخل الاسم الكامل";
     if (!email.trim()) newErrors.email = "أدخل البريد الإلكتروني";
+    if (!email.trim()) {
+    newErrors.email = "أدخل البريد الإلكتروني";
+  } else if (!/^[^\s@]+@gmail\.com$/.test(email)) {
+    newErrors.email = "البريد الإلكتروني غير صحيح";
+  }
     return newErrors;
   }
 function checkEmail(value) {
@@ -48,7 +53,7 @@ function handleNext() {
   return (
     <div
     dir="rtl"
-    className="w-full max-w-[520px] flex flex-col gap-4 py-8 px-8 rounded-2xl border border-white/[0.07] bg-white/[0.02] backdrop-blur-lg"
+    className= "w-full max-w-[520px] sm:max-w-[400px] lg:max-w-[520px] flex flex-col gap-3 py-4 px-4 lg:px-8 rounded-2xl border border-white/[0.07] bg-white/[0.02] backdrop-blur-lg"
 >
       {/* إنشاء حساب جديد */}
       <div className="flex flex-col gap-2">
@@ -62,7 +67,6 @@ function handleNext() {
 
       {/* StepIndicator */}
       <StepIndicator currentStep={currentStep} />
-      <div className="flex flex-row gap-4 w-full mt-2"></div>
 
       {/* اختيار نوع الحساب */}
       <div className="flex flex-row gap-4 w-full">
