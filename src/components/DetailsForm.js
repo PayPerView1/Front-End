@@ -90,11 +90,11 @@ router.push("/register/interests");
         <div className="flex flex-col items-center gap-2">
             <div
             onClick={() => fileRef.current.click()}
-            className="relative w-20 h-20 rounded-full border-2 border-[#94D3C1] cursor-pointer overflow-visible bg-white/10 flex items-center justify-center"
+            className="relative w-20 h-20 rounded-full cursor-pointer overflow-visible bg-white/10 flex items-center justify-center"
             >
                 
                 {/* الأيقونة  */}
-                <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center bg-white/10">
+                <div className="relative w-20 h-20 rounded-full overflow-hidden flex items-center justify-center bg-white/10">
                 {preview ? (
                     <Image src={preview} alt="profile" fill className="object-cover" />
                 ) : (
