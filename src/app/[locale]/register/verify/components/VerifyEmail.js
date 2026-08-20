@@ -2,14 +2,22 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Message } from "react-iconly";
+import api from "@/services";
 
 export default function VerifyEmail({ email = "user@example.com" }) {
     const [resent, setResent] = useState(false);
     const router = useRouter(); 
-function handleResend() {
-    // هون بتبعت طلب إعادة الإرسال للـ API
-    setResent(true);
-    setTimeout(() => setResent(false), 3000);
+async function handleResend() {
+    setResent(false);
+    try {
+        await api.resendVerification(email);
+        setResent(true);
+        setTimeout(() => setResent(false), 3000);
+    } catch {
+        // يمكن إضافة رسالة خطأ هنا لاحقاً
+        setResent(true);
+        setTimeout(() => setResent(false), 3000);
+    }
 }
     return (
         <div

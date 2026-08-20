@@ -6,6 +6,7 @@ import { Camera } from "react-iconly";
 import StepIndicator from "@/app/[locale]/register/components/StepIndicator";
 import worldCountries from "world-countries";
 import Select from "react-select";
+import api from "@/services";
 
 const countries = worldCountries
   .map((c) => ({
@@ -94,50 +95,33 @@ export default function DetailsForm() {
   const registerData = JSON.parse(savedData);
 
   try {
-    const formData = new FormData();
-    formData.append("fullName", registerData.fullName);
-    formData.append("email", registerData.email);
-    formData.append("password", registerData.password);
-    formData.append("role", registerData.role);
-    formData.append("phoneNumber", `${dialCode}${phone}`);
-    formData.append("country", country);
-    formData.append("city", city);
-    if (profilePicture) {
-      formData.append("profilePicture", profilePicture);
-    }
+    // بناء FormData وإرساله عبر api.register
+    const formData = api.createFormData({
+      fullName: registerData.fullName,
+      email: registerData.email,
+      password: registerData.password,
+      role: registerData.role,
+      phoneNumber: `${dialCode}${phone}`,
+      country,
+      city,
+      ...(profilePicture ? { profilePicture } : {}),
+    });
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/register`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      if (result.message?.toLowerCase().includes("email")) {
-        setErrors({ submit: "هذا البريد الإلكتروني مسجل مسبقاً" });
-      } else {
-        setErrors({ submit: result.message || "حدث خطأ، حاول مرة أخرى" });
-      }
-      return;
-    }
-
-    // حفظ التوكن
-    if (result.token) {
-      localStorage.setItem("authToken", result.token);
-    }
+    await api.register(formData);
+    // api.register يحفظ التوكن تلقائياً
 
     // مسح الـ sessionStorage
     sessionStorage.removeItem("registerData");
 
     // الانتقال للخطوة التالية
     router.push("/register/interests");
-
   } catch (error) {
-    setErrors({ submit: "حدث خطأ في الاتصال، حاول مرة أخرى" });
+    const msg = error.message || "حدث خطأ، حاول مرة أخرى";
+    if (msg.toLowerCase().includes("email")) {
+      setErrors({ submit: "هذا البريد الإلكتروني مسجل مسبقاً" });
+    } else {
+      setErrors({ submit: msg });
+    }
   }
 }
   return (

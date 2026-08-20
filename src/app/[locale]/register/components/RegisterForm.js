@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import StepIndicator from "@/app/[locale]/register/components/StepIndicator";
 import { useRouter } from "next/navigation";
+import api from "@/services";
 export default function RegisterForm() {
   const router = useRouter();
   const [userType, setUserType] = useState(null);
@@ -209,9 +210,7 @@ export default function RegisterForm() {
       <div className="flex gap-4">
         {/* Google */}
         <button
-          onClick={() => {
-            window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`;
-          }}
+          onClick={() => api.loginWithGoogle()}
           className="flex-1 h-10 rounded-lg border border-[#FFEEE3]/40 bg-transparent text-[#E1E3E4] text-sm cursor-pointer flex items-center justify-center gap-2"
         >
           <svg
@@ -242,9 +241,7 @@ export default function RegisterForm() {
 
         {/* Apple */}
         <button
-          onClick={() => {
-            window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/apple`;
-          }}
+          onClick={() => api.loginWithApple()}
           className="flex-1 h-10 rounded-lg border border-[#FFEEE3]/40 bg-transparent text-[#E1E3E4] text-sm cursor-pointer flex items-center justify-center gap-2"
         >
           <svg
