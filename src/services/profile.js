@@ -7,7 +7,7 @@ import axiosInstance, { handleError } from "@/lib/axiosInstance";
  */
 export async function getProfile() {
   try {
-    const response = await axiosInstance.get("/profile");
+    const response = await axiosInstance.get("/api/v1/profile");
     return response.data;
   } catch (error) {
     console.error("Get Profile Error:", error);
@@ -21,7 +21,7 @@ export async function getProfile() {
  */
 export async function updateProfile(data) {
   try {
-    const response = await axiosInstance.put("/profile", data);
+    const response = await axiosInstance.put("/api/v1/profile", data);
     return response.data;
   } catch (error) {
     console.error("Update Profile Error:", error);

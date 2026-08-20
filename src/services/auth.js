@@ -13,7 +13,7 @@ import axiosInstance, {
  */
 export async function register(data) {
   try {
-    const response = await axiosInstance.post("/auth/register", data);
+    const response = await axiosInstance.post("/api/v1/auth/register", data);
     const result = response.data;
     if (result.token && result.user) {
       saveAuthData(result.token, result.user);
@@ -31,7 +31,7 @@ export async function register(data) {
  */
 export async function verifyEmail(token) {
   try {
-    const response = await axiosInstance.get(`/auth/verify-email/${token}`);
+    const response = await axiosInstance.get(`/api/v1/auth/verify-email/${token}`);
     return response.data;
   } catch (error) {
     console.error("Verify Email Error:", error);
@@ -45,7 +45,7 @@ export async function verifyEmail(token) {
  */
 export async function resendVerification(email) {
   try {
-    const response = await axiosInstance.post("/auth/resend-verification", {
+    const response = await axiosInstance.post("/api/v1/auth/resend-verification", {
       email,
     });
     return response.data;
@@ -62,7 +62,7 @@ export async function logout() {
   try {
     const token = getToken();
     if (token) {
-      await axiosInstance.post("/auth/logout");
+      await axiosInstance.post("/api/v1/auth/logout");
     }
   } catch (error) {
     console.error("Logout Error:", error);
