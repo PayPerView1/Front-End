@@ -24,7 +24,6 @@ export default function LogoutButtonPage() {
       <div className="absolute inset-0 bg-black/5 z-10" />
 
       <div className="relative z-20 text-center">
-
         <LogoutButton />
       </div>
     </div>

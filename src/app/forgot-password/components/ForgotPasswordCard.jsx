@@ -109,7 +109,7 @@ export default function ForgotPasswordCard() {
           </button>
         </form>
 
-        <Link href="#" className="flex items-center gap-2 text-[14px] text-[#E1E3E4] hover:text-white transition-colors mt-[-10px]">
+        <Link href="/login" className="flex items-center gap-2 text-[14px] text-[#E1E3E4] hover:text-white transition-colors mt-[-10px]">
           العودة إلى تسجيل الدخول
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="rotate-180">
             <polyline points="9 18 15 12 9 6"></polyline>

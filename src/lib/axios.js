@@ -1,4 +1,5 @@
 import axios from "axios";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://payperview-platform.onrender.com";
 
 const api = axios.create({
@@ -21,8 +22,15 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const isLoginRequest = error.config && error.config.url && error.config.url.includes("/api/v1/auth/login");
-    if (!isLoginRequest && error.response && (error.response.status === 401 || error.response.status === 403)) {
+    const isLoginRequest =
+      error.config &&
+      error.config.url &&
+      error.config.url.includes("/api/v1/auth/login");
+    if (
+      !isLoginRequest &&
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
       if (typeof window !== "undefined") {
         localStorage.removeItem("token");
         window.location.href = "/login";

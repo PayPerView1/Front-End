@@ -23,7 +23,7 @@ export default function LogoutButton() {
       localStorage.removeItem("token");
     }
 
-    setTimeout(() => { 
+    setTimeout(() => {
       router.push("/login");
     }, 800);
   };
@@ -71,13 +71,13 @@ export default function LogoutButton() {
               <button
                 onClick={handleConfirmLogout}
                 style={{ background: "linear-gradient(97.47deg, #FFA600 0%, #FF4B04 100%)" }}
-                className="flex-1 rounded-xl text-white font-semibold text-sm py-3.5 shadow-[0_4px_20px_rgba(234,88,12,0.4)] transition-all "
+                className="flex-1 rounded-xl text-white font-semibold text-sm py-3.5 shadow-[0_4px_20px_rgba(234,88,12,0.4)] transition-all"
               >
                 تسجيل الخروج
               </button>
               <button
                 onClick={() => setShowModal(false)}
-                className="flex-1 rounded-xl bg-transparent border border-white/70 text-white font-semibold text-sm py-3.5 transition-all "
+                className="flex-1 rounded-xl bg-transparent border border-white/70 text-white font-semibold text-sm py-3.5 transition-all"
               >
                 إلغاء
               </button>

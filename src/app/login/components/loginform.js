@@ -215,7 +215,7 @@ export default function LoginForm() {
         </div>
 
         <p className="text-center text-xs text-gray-300">
-          ليس لديك حساب؟{" "}
+          ليس لديك حساب?{" "}
           <Link href="/register" className="text-[#94D3C1] font-medium transition-colors drop-shadow-md">
             إنشاء حساب جديد
           </Link>
