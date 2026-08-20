@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "orders": "Siparişler",
+    "partners": "Ortaklar",
+    "finance": "Finans",
+    "support": "Yardım ve Destek",
+    "language": "Dil",
+    "logout": "Çıkış Yap"
+  },
+  "profile": {
+    "edit": "Profili Düzenle",
+    "manageOrders": "Siparişleri Yönet",
+    "share": "Paylaş",
+    "copyLink": "Linki Kopyala"
+  }
+}

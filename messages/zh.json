@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "orders": "订单",
+    "partners": "合作伙伴",
+    "finance": "财务",
+    "support": "帮助与支持",
+    "language": "语言",
+    "logout": "退出登录"
+  },
+  "profile": {
+    "edit": "编辑资料",
+    "manageOrders": "管理订单",
+    "share": "分享",
+    "copyLink": "复制链接"
+  }
+}

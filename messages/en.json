@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "orders": "Orders",
+    "partners": "Partners",
+    "finance": "Finance",
+    "support": "Help & Support",
+    "language": "Language",
+    "logout": "Logout"
+  },
+  "profile": {
+    "edit": "Edit Profile",
+    "manageOrders": "Manage Orders",
+    "share": "Share",
+    "copyLink": "Copy Link"
+  }
+}

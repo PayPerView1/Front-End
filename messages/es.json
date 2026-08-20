@@ -1,0 +1,62 @@
+{
+  "nav": {
+    "orders": "Pedidos",
+    "partners": "Socios",
+    "finance": "Finanzas",
+    "support": "Ayuda y soporte",
+    "language": "Idioma",
+    "logout": "Cerrar sesión"
+  },
+   
+  "profile": {
+    "tabs": {
+      "creator": "Creator",
+      "joined": "Joined",
+      "reviews": "Reviews"
+    },
+    "user": {
+      "name": "Shatha Al-Banna",
+      "email": "@gmail.com",
+      "location": "Gaza, PS",
+      "joined": "Joined Jul 2026",
+      "followers": "Followers",
+      "following": "Following",
+      "profile": "Profile"
+    },
+    "buttons": {
+      "editProfile": "Edit Profile",
+      "manageRequests": "Manage Requests",
+      "createWork": "Create New Work",
+      "exploreCampaigns": "Explore Campaigns"
+    },
+    "coverMenu": {
+      "share": "Share",
+      "copyLink": "Copy Link",
+      "edit": "Edit Profile"
+    },
+    "empty": {
+      "noCreatedWorks": "No created works yet",
+      "noJoinedCampaigns": "No joined campaigns yet"
+    },
+    "campaigns": {
+      "arabClips": "Arabic Clips Community",
+      "creators": "Creators Platform",
+      "academy": "Content Academy",
+      "followers": "{count} followers"
+    },
+    "cardMenu": {
+      "markRead": "Mark as Read",
+      "invite": "Invite People",
+      "copyLink": "Copy Link",
+      "writeReview": "Write a Review",
+      "leave": "Leave"
+    },
+    "reviews": {
+      "noReviews": "No reviews yet",
+      "noUserReviews": "This user has no reviews yet",
+      "beFirst": "Be the first to write a review!",
+      "leaveReview": "Leave a Review"
+    }
+  }
+
+}

@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "orders": "Bestellingen",
+    "partners": "Partners",
+    "finance": "Financiën",
+    "support": "Hulp en ondersteuning",
+    "language": "Taal",
+    "logout": "Uitloggen"
+  },
+  "profile": {
+    "edit": "Profiel bewerken",
+    "manageOrders": "Bestellingen beheren",
+    "share": "Delen",
+    "copyLink": "Link kopiëren"
+  }
+}

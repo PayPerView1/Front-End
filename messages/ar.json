@@ -1,0 +1,60 @@
+{
+  "nav": {
+    "orders": "الطلبات",
+    "partners": "الشركاء",
+    "finance": "المالية",
+    "support": "المساعدة والدعم",
+    "language": "اللغة",
+    "logout": "تسجيل الخروج"
+  },
+  "profile": {
+    "tabs": {
+      "creator": "منشئ",
+      "joined": "الانضمامات",
+      "reviews": "التقييمات"
+    },
+    "user": {
+      "name": "شذا البنا",
+      "email": "@gmail.com",
+      "location": "Gaza, PS",
+      "joined": "انضم في يوليو 2026",
+      "followers": "المتابعون",
+      "following": "المتابَعون",
+      "profile": "الملف الشخصي"
+    },
+    "buttons": {
+      "editProfile": "تعديل الملف الشخصي",
+      "manageRequests": "إدارة الطلبات",
+      "createWork": "إنشاء عمل جديد",
+      "exploreCampaigns": "استكشاف الحملات"
+    },
+    "coverMenu": {
+      "share": "مشاركة",
+      "copyLink": "نسخ الرابط",
+      "edit": "تعديل الملف"
+    },
+    "empty": {
+      "noCreatedWorks": "لا توجد أعمال منشأة بعد",
+      "noJoinedCampaigns": "لا توجد حملات منضم اليها بعد"
+    },
+    "campaigns": {
+      "arabClips": "مجتمع كليبات عربية",
+      "creators": "منصة المبدعين",
+      "academy": "أكاديمية المحتوى",
+      "followers": "{count} يتابع"
+    },
+    "cardMenu": {
+      "markRead": "تحديد كمقروء",
+      "invite": "دعوة أشخاص",
+      "copyLink": "نسخ الرابط",
+      "writeReview": "كتابة تقييم",
+      "leave": "مغادرة"
+    },
+    "reviews": {
+      "noReviews": "لا توجد تقييمات حتى الآن",
+      "noUserReviews": "ليس لدى هذا المستخدم أي تقييمات حتى الآن",
+      "beFirst": "كن أول من يكتب تقييماً!",
+      "leaveReview": "اترك تقييماً"
+    }
+  }
+}

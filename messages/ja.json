@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "orders": "注文",
+    "partners": "パートナー",
+    "finance": "財務",
+    "support": "ヘルプとサポート",
+    "language": "言語",
+    "logout": "ログアウト"
+  },
+  "profile": {
+    "edit": "プロフィールを編集",
+    "manageOrders": "注文を管理",
+    "share": "シェア",
+    "copyLink": "リンクをコピー"
+  }
+}

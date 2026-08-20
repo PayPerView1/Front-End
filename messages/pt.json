@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "orders": "Pedidos",
+    "partners": "Parceiros",
+    "finance": "Finanças",
+    "support": "Ajuda e suporte",
+    "language": "Idioma",
+    "logout": "Sair"
+  },
+  "profile": {
+    "edit": "Editar perfil",
+    "manageOrders": "Gerir pedidos",
+    "share": "Partilhar",
+    "copyLink": "Copiar link"
+  }
+}
