@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import PasswordResetSuccessCard from "@/components/PasswordResetSuccessCard";
+import PasswordResetSuccessCard from "./components/PasswordResetSuccessCard";
 
 export const metadata = {
   title: "تم تحديث كلمة المرور",

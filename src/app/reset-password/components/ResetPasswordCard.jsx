@@ -27,7 +27,6 @@ function ResetPasswordForm() {
   };
 
   const strengthCount = Object.values(rules).filter(Boolean).length;
-  const isFormValid = strengthCount === 4 && password === confirmPassword && confirmPassword.length > 0;
 
   const getStrengthText = () => {
     if (strengthCount === 0) return 'ضعيفة جداً';

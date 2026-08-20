@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import ResetPasswordCard from "@/components/ResetPasswordCard";
+import ResetPasswordCard from "./components/ResetPasswordCard";
 
 export const metadata = {
   title: "تعيين كلمة مرور جديدة",
