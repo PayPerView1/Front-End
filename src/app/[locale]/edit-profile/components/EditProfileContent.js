@@ -13,7 +13,7 @@ import { MdOutlineGavel, MdOutlineSecurity } from "react-icons/md";
 import { FiEdit2 } from "react-icons/fi";
 import { RiUserLine } from "react-icons/ri";
 import { useRouter } from "next/navigation";
-import api from "@/lib/api";
+import api from "@/lib/axios";
 
 const menuItems = [
   { key: "profile", label: "تعديل الملف الشخصي", icon: RiUserLine },

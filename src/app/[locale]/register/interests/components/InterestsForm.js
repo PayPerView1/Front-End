@@ -2,12 +2,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import StepIndicator from "@/app/[locale]/register/components/StepIndicator";
-import { HiOutlineDevicePhoneMobile, HiOutlineComputerDesktop } from "react-icons/hi2";
+import {
+  HiOutlineDevicePhoneMobile,
+  HiOutlineComputerDesktop,
+} from "react-icons/hi2";
 import { MdOutlineLocalMovies } from "react-icons/md";
 import { PiGraduationCapLight } from "react-icons/pi";
 import { TbShieldPlus } from "react-icons/tb";
 import { BsWallet2 } from "react-icons/bs";
-import api from "@/lib/api";
+import api from "@/lib/axios";
 
 const interests = [
   { id: "LIFESTYLE", label: "نمط الحياة", icon: HiOutlineDevicePhoneMobile },
@@ -26,7 +29,7 @@ export default function InterestsForm() {
 
   function toggleInterest(id) {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   }
 
@@ -52,8 +55,12 @@ export default function InterestsForm() {
       className="w-full max-w-[520px] flex flex-col gap-4 py-6 px-4 lg:px-8 rounded-2xl border border-white/[0.07] bg-white/[0.02] backdrop-blur-lg mx-4 lg:mx-0"
     >
       <div className="flex flex-col gap-1">
-        <h2 className="text-2xl font-bold text-right text-[#E1E3E4]">اهتماماتك</h2>
-        <p className="text-sm text-right text-[#BFC9C4]">اختر المجالات التي تهمك لتخصيص تجربتك</p>
+        <h2 className="text-2xl font-bold text-right text-[#E1E3E4]">
+          اهتماماتك
+        </h2>
+        <p className="text-sm text-right text-[#BFC9C4]">
+          اختر المجالات التي تهمك لتخصيص تجربتك
+        </p>
       </div>
 
       <StepIndicator currentStep={4} />
@@ -69,8 +76,13 @@ export default function InterestsForm() {
               className={`h-[90px] rounded-xl border p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all
                 ${isSelected ? "border-[#F97316] bg-white/5" : "border-[#FFEEE3]/40 bg-white/5"}`}
             >
-              <IconComponent size={28} color={isSelected ? "#F97316" : "rgba(255,255,255,0.7)"} />
-              <p className="text-sm font-light text-[#E1E3E4] m-0">{item.label}</p>
+              <IconComponent
+                size={28}
+                color={isSelected ? "#F97316" : "rgba(255,255,255,0.7)"}
+              />
+              <p className="text-sm font-light text-[#E1E3E4] m-0">
+                {item.label}
+              </p>
             </div>
           );
         })}

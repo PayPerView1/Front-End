@@ -18,7 +18,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { createPortal } from "react-dom";
 import { AiOutlineStar } from "react-icons/ai";
 import { useTranslations } from "next-intl";
-import api from "@/lib/api";
+import api from "@/lib/axios";
 
 const tabs = ["منشئ", "الانضمامات", "التقييمات"];
 
@@ -87,9 +87,9 @@ export default function ProfileContent() {
     }
     loadProfile();
   }, []);
-  
-    /* بيانات وهمية مؤقتة للانضمامات */
-  
+
+  /* بيانات وهمية مؤقتة للانضمامات */
+
   const joinedCampaigns = [
     {
       id: 1,
