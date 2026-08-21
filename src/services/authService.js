@@ -1,5 +1,5 @@
 import axios from "axios";
-import api from "@/lib/axios";
+import axiosInstance, { clearAuthData, saveAuthData } from "@/lib/axiosInstance";
 
 // ─── Auth (Login / Logout) ───────────────────────────────────────────────────
 
@@ -9,8 +9,13 @@ import api from "@/lib/axios";
  * Throws an Axios error on failure (to be handled by the caller).
  */
 export const login = async (email, password) => {
-  const response = await api.post("/api/v1/auth/login", { email, password });
-  return response.data; // { success, message, data: { token, user } }
+  const response = await axiosInstance.post("/api/v1/auth/login", { email, password });
+  const result = response.data;
+  const token = result?.token || result?.data?.token;
+  const user = result?.user || result?.data?.user;
+  if (!token) throw new Error("بنية استجابة الخادم غير صالحة");
+  saveAuthData(token, user || {});
+  return result;
 };
 
 /**
@@ -18,21 +23,17 @@ export const login = async (email, password) => {
  * Token is automatically attached by the Axios request interceptor.
  */
 export const logout = async () => {
-  const response = await api.post("/api/v1/auth/logout");
-  return response.data;
+  try {
+    const response = await axiosInstance.post("/api/v1/auth/logout");
+    return response.data;
+  } finally {
+    clearAuthData();
+  }
 };
 
 // ─── Password Reset ───────────────────────────────────────────────────────────
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://payperview-platform.onrender.com/api/v1";
-
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: { "Content-Type": "application/json" },
-  timeout: 15000,
-});
+const apiClient = axiosInstance;
 
 /**
  * Request a password reset link to be sent to the user's email.
@@ -41,7 +42,7 @@ const apiClient = axios.create({
  */
 export async function requestForgotPassword(email) {
   try {
-    const response = await apiClient.post("/auth/forgot-password", { email });
+    const response = await apiClient.post("/api/v1/auth/forgot-password", { email });
     return {
       success: true,
       message:
@@ -69,7 +70,7 @@ export async function requestForgotPassword(email) {
  */
 export async function resetPassword(token, password) {
   try {
-    const response = await apiClient.post(`/auth/reset-password/${token}`, {
+    const response = await apiClient.post(`/api/v1/auth/reset-password/${token}`, {
       password,
     });
     return {

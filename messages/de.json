@@ -1,0 +1,139 @@
+{
+  "nav": {
+    "orders": "Bestellungen",
+    "partners": "Partner",
+    "finance": "Finanzen",
+    "support": "Hilfe und Support",
+    "language": "Sprache",
+    "logout": "Abmelden"
+  },
+  "sidebar": { "home": "Startseite", "search": "Suchen", "discover": "Entdecken", "startProject": "Projekt starten", "resources": "Ressourcen", "members": "Mitglieder", "partners": "Partner", "new": "Neu", "help": "Hilfe", "blog": "Blog" },
+  "profile": {
+    "edit": "Profil bearbeiten",
+    "manageOrders": "Bestellungen verwalten",
+    "share": "Teilen",
+    "copyLink": "Link kopieren",
+    "tabs": {
+      "creator": "Ersteller",
+      "joined": "Beigetreten",
+      "reviews": "Rezensionen"
+    },
+    "user": {
+      "joined": "Beigetreten im Juli 2026",
+      "followers": "Follower",
+      "following": "Folgen"
+    },
+    "buttons": {
+      "editProfile": "Bearbeiten Profil",
+      "manageRequests": "Anfragen verwalten",
+      "createWork": "Neue Arbeit erstellen",
+      "exploreCampaigns": "Kampagnen erkunden"
+    },
+    "coverMenu": {
+      "share": "Teilen",
+      "copyLink": "Link kopieren",
+      "edit": "Bearbeiten Profil"
+    },
+    "empty": {
+      "noCreatedWorks": "Noch keine erstellten Werke",
+      "noJoinedCampaigns": "Noch keine Kampagnen beigetreten"
+    },
+    "campaigns": {
+      "arabClips": "Arabische Clips-Community",
+      "creators": "Creators Platform",
+      "academy": "Content Academy",
+      "followers": "{count} Follower"
+    },
+    "cardMenu": {
+      "markRead": "Als gelesen markieren",
+      "invite": "Personen einladen",
+      "copyLink": "Link kopieren",
+      "writeReview": "Bewertung schreiben",
+      "leave": "Verlassen"
+    },
+    "reviews": {
+      "noReviews": "Keine Bewertungen noch",
+      "noUserReviews": "Dieser Benutzer hat noch keine Bewertungen",
+      "beFirst": "Seien Sie der Erste, der eine Bewertung schreibt!",
+      "leaveReview": "Hinterlassen Sie eine Bewertung"
+    }
+  },
+  "auth": {
+    "required": "Dieses Feld ist erforderlich",
+    "loginTitle": "Anmelden",
+    "loginWelcome": "Willkommen zurück bei Pay Per Anzeigen",
+    "emailOrUsername": "E-Mail oder Benutzername",
+    "emailPlaceholder": "Geben Sie Ihre E-Mail-Adresse ein",
+    "password": "Passwort",
+    "passwordPlaceholder": "Geben Sie Ihr Passwort ein",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Ausblenden Passwort",
+    "forgotPassword": "Passwort vergessen?",
+    "signIn": "Anmelden",
+    "signingIn": "Anmelden...",
+    "orContinueWith": "Oder fortfahren mit",
+    "noAccount": "Sie haben noch kein Konto?",
+    "createAccount": "Erstellen Sie ein Konto",
+    "invalidCredentials": "E-Mail oder Passwort falsch",
+    "invalidLoginData": "Ungültige Anmeldedaten. Bitte überprüfen Sie Ihre Eingabe.",
+    "connectionFailed": "Es konnte keine Verbindung zum Server hergestellt werden. Überprüfen Sie Ihre Internetverbindung.",
+    "genericLoginError": "Bei der Anmeldung ist ein Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.",
+    "invalidServerResponse": "Ungültige Serverantwort",
+    "forgotTitle": "Passwort vergessen?",
+    "forgotDescription": "Geben Sie Ihre registrierte E-Mail-Adresse ein und wir senden Ihnen innerhalb einer Minute einen Link zum Zurücksetzen des Passworts Stunde.",
+    "sendResetLink": "Link zum Zurücksetzen senden",
+    "sending": "Wird gesendet...",
+    "backToSignIn": "Zurück zur Anmeldung",
+    "signOut": "Abmelden",
+    "signOutTitle": "Abmelden",
+    "confirmSignOut": "Sind Sie sicher, dass Sie unterschreiben möchten? aus?",
+    "signOutDescription": "Ihre aktuelle Sitzung wird beendet.",
+    "cancel": "Abbrechen"
+  },
+  "register": {
+    "createTitle": "Neues Konto erstellen",
+    "createSubtitle": "Geben Sie Ihre Daten ein, um zu beginnen",
+    "selectAccountType": "Wählen Sie einen Kontotyp",
+    "creator": "Inhalt Ersteller",
+    "creatorDescription": "Ich biete Dienstleistungen an",
+    "brand": "Kampagneninhaber",
+    "brandDescription": "Ich suche Dienstleistungen",
+    "fullName": "Vollständiger Name",
+    "fullNamePlaceholder": "Geben Sie Ihren vollständigen Namen ein",
+    "email": "E-Mail-Adresse Adresse",
+    "continue": "Weiter",
+    "or": "oder",
+    "alreadyHaveAccount": "Haben Sie bereits ein Konto?",
+    "requiredAccountType": "Wählen Sie einen Kontotyp aus",
+    "requiredName": "Geben Sie Ihren vollständigen Namen ein",
+    "requiredEmail": "Geben Sie Ihre E-Mail-Adresse ein Adresse",
+    "invalidEmail": "Geben Sie eine gültige E-Mail-Adresse ein",
+    "signIn": "Anmelden",
+    "resetPassword": "Passwort zurücksetzen"
+  },
+  "editProfile": {
+    "accountSettings": "Kontoeinstellungen",
+    "signOut": "Signieren out",
+    "name": "Name",
+    "username": "Benutzername",
+    "bio": "Bio",
+    "bioPlaceholder": "Erzählen Sie uns etwas über sich",
+    "birthDate": "Geburtsdatum",
+    "additionalSettings": "Zusätzlich Einstellungen",
+    "additionalDescription": "Wählen Sie aus, was in Ihrem Profil angezeigt wird, und ermöglichen Sie anderen, Sie zu entdecken",
+    "earnings": "Gesamteinnahmen",
+    "location": "Standort",
+    "openCommunities": "Offene Communities",
+    "joinedCommunities": "Beigetretene Communities",
+    "save": "Änderungen speichern",
+    "saving": "Speichern...",
+    "saved": "Erfolgreich gespeichert",
+    "saveError": "Ein Fehler ist aufgetreten",
+    "profile": "Profil bearbeiten",
+    "payments": "Zahlungen",
+    "services": "Verbundene Dienste",
+    "security": "Konto security",
+    "subscriptions": "Abonnements",
+    "disputes": "Streitbeilegungsstelle"
+  }
+}

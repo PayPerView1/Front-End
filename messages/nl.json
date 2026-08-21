@@ -1,0 +1,139 @@
+{
+  "nav": {
+    "orders": "Bestellingen",
+    "partners": "Partners",
+    "finance": "Financiën",
+    "support": "Hulp en ondersteuning",
+    "language": "Taal",
+    "logout": "Uitloggen"
+  },
+  "sidebar": { "home": "Home", "search": "Zoeken", "discover": "Ontdekken", "startProject": "Een project starten", "resources": "Bronnen", "members": "Leden", "partners": "Partners", "new": "Nieuw", "help": "Hulp", "blog": "Blog" },
+  "profile": {
+    "edit": "Profiel bewerken",
+    "manageOrders": "Bestellingen beheren",
+    "share": "Delen",
+    "copyLink": "Link kopiëren",
+    "tabs": {
+      "creator": "Schepper",
+      "joined": "Aangesloten",
+      "reviews": "Recensies"
+    },
+    "user": {
+      "joined": "Aangesloten in juli 2026",
+      "followers": "Volgers",
+      "following": "Volgende"
+    },
+    "buttons": {
+      "editProfile": "Profiel bewerken",
+      "manageRequests": "Beheer verzoeken",
+      "createWork": "Creëer nieuw werk",
+      "exploreCampaigns": "Ontdek campagnes"
+    },
+    "coverMenu": {
+      "share": "Deel",
+      "copyLink": "Kopieer link",
+      "edit": "Profiel bewerken"
+    },
+    "empty": {
+      "noCreatedWorks": "Nog geen gemaakte werken",
+      "noJoinedCampaigns": "Nog geen gekoppelde campagnes"
+    },
+    "campaigns": {
+      "arabClips": "Arabische Clips-gemeenschap",
+      "creators": "Creators-platform",
+      "academy": "Inhoud Academie",
+      "followers": "{count} volgers"
+    },
+    "cardMenu": {
+      "markRead": "Markeer als gelezen",
+      "invite": "Nodig mensen uit",
+      "copyLink": "Kopieer link",
+      "writeReview": "Schrijf een recensie",
+      "leave": "Vertrekken"
+    },
+    "reviews": {
+      "noReviews": "Nog geen beoordelingen",
+      "noUserReviews": "Deze gebruiker heeft nog geen beoordelingen",
+      "beFirst": "Schrijf als eerste een recensie!",
+      "leaveReview": "Laat een recensie achter"
+    }
+  },
+  "auth": {
+    "required": "Dit veld is verplicht",
+    "loginTitle": "Inloggen",
+    "loginWelcome": "Welkom terug bij Pay Per View",
+    "emailOrUsername": "E-mailadres of gebruikersnaam",
+    "emailPlaceholder": "Voer uw e-mailadres in",
+    "password": "Wachtwoord",
+    "passwordPlaceholder": "Voer uw wachtwoord in",
+    "showPassword": "Wachtwoord weergeven",
+    "hidePassword": "Wachtwoord verbergen",
+    "forgotPassword": "Wachtwoord vergeten?",
+    "signIn": "Inloggen",
+    "signingIn": "Inloggen...",
+    "orContinueWith": "Of ga verder met",
+    "noAccount": "Heeft u geen account?",
+    "createAccount": "Maak een account aan",
+    "invalidCredentials": "Onjuist e-mailadres of wachtwoord",
+    "invalidLoginData": "Ongeldige inloggegevens. Controleer uw invoer.",
+    "connectionFailed": "Kan geen verbinding maken met de server. Controleer uw internetverbinding.",
+    "genericLoginError": "Er is iets misgegaan tijdens het inloggen. Probeer het later opnieuw.",
+    "invalidServerResponse": "Ongeldig antwoord van de server",
+    "forgotTitle": "Wachtwoord vergeten?",
+    "forgotDescription": "Voer uw geregistreerde e-mailadres in en we sturen u binnen een uur een link voor het opnieuw instellen van uw wachtwoord.",
+    "sendResetLink": "Verstuur link voor opnieuw instellen",
+    "sending": "Verzenden...",
+    "backToSignIn": "Terug naar aanmelden",
+    "signOut": "Afmelden",
+    "signOutTitle": "Afmelden",
+    "confirmSignOut": "Weet u zeker dat u zich wilt afmelden?",
+    "signOutDescription": "Uw huidige sessie wordt beëindigd.",
+    "cancel": "Annuleren"
+  },
+  "register": {
+    "createTitle": "Maak een nieuw account",
+    "createSubtitle": "Voer uw gegevens in om aan de slag te gaan",
+    "selectAccountType": "Selecteer een accounttype",
+    "creator": "Contentmaker",
+    "creatorDescription": "Ik bied diensten aan",
+    "brand": "Campagne-eigenaar",
+    "brandDescription": "Ik zoek diensten",
+    "fullName": "Volledige naam",
+    "fullNamePlaceholder": "Voer uw volledige naam in",
+    "email": "E-mailadres",
+    "continue": "Doorgaan",
+    "or": "of",
+    "alreadyHaveAccount": "Heeft u al een account?",
+    "requiredAccountType": "Selecteer een accounttype",
+    "requiredName": "Voer uw volledige naam in",
+    "requiredEmail": "Voer uw e-mailadres in",
+    "invalidEmail": "Voer een geldig e-mailadres in",
+    "signIn": "Inloggen",
+    "resetPassword": "Wachtwoord opnieuw instellen"
+  },
+  "editProfile": {
+    "accountSettings": "Accountinstellingen",
+    "signOut": "Ondertekenen out",
+    "name": "Naam",
+    "username": "Gebruikersnaam",
+    "bio": "Bio",
+    "bioPlaceholder": "Vertel ons over jezelf",
+    "birthDate": "Geboortedatum",
+    "additionalSettings": "Aanvullende instellingen",
+    "additionalDescription": "Kies wat er op je profiel verschijnt en laat anderen je ontdekken",
+    "earnings": "Totale inkomsten",
+    "location": "Locatie",
+    "openCommunities": "Open gemeenschappen",
+    "joinedCommunities": "Aangesloten communities",
+    "save": "Wijzigingen opslaan",
+    "saving": "Opslaan...",
+    "saved": "Succesvol opgeslagen",
+    "saveError": "Er is een fout opgetreden",
+    "profile": "Profiel bewerken",
+    "payments": "Betalingen",
+    "services": "Verbonden services",
+    "security": "Accountbeveiliging",
+    "subscriptions": "Abonnementen",
+    "disputes": "Geschillencentrum"
+  }
+}
