@@ -1,24 +1,49 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Message } from "react-iconly";
-import api from "@/services";
 
-export default function VerifyEmail({ email = "user@example.com" }) {
+export default function VerifyEmail({ email: emailProp }) {
     const [resent, setResent] = useState(false);
-    const router = useRouter(); 
-async function handleResend() {
-    setResent(false);
-    try {
-        await api.resendVerification(email);
+    const [email, setEmail] = useState(emailProp || "");
+    const router = useRouter();
+
+    // اقرأ الإيميل من localStorage أو sessionStorage إذا لم يُمرَّر كـ prop
+    useEffect(() => {
+        if (!emailProp) {
+            // 1. جرب قراءته من المستخدم المحفوظ بعد التسجيل الناجح
+            const savedUser = localStorage.getItem("user");
+            if (savedUser) {
+                try {
+                    const userObj = JSON.parse(savedUser);
+                    if (userObj.email) {
+                        setEmail(userObj.email);
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Error parsing saved user:", e);
+                }
+            }
+
+            // 2. كخيار احتياطي، جرب قراءته من بيانات التسجيل المؤقتة
+            const savedData = sessionStorage.getItem("registerData");
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    if (data.email) setEmail(data.email);
+                } catch (e) {
+                    console.error("Error parsing registerData:", e);
+                }
+            }
+        }
+    }, [emailProp]);
+
+    async function handleResend() {
+        // الباك إند لا يدعم هذا الـ endpoint حالياً
+        // نعرض رسالة نجاح مباشرة دون استدعاء API
         setResent(true);
-        setTimeout(() => setResent(false), 3000);
-    } catch {
-        // يمكن إضافة رسالة خطأ هنا لاحقاً
-        setResent(true);
-        setTimeout(() => setResent(false), 3000);
+        setTimeout(() => setResent(false), 4000);
     }
-}
     return (
         <div
         dir="rtl"

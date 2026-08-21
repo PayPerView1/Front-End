@@ -3,8 +3,11 @@ import { useState, useEffect } from "react";
 import StepIndicator from "@/app/[locale]/register/components/StepIndicator";
 import { useRouter } from "next/navigation";
 import api from "@/services";
+import { useLocale, useTranslations } from "next-intl";
 export default function RegisterForm() {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("register");
   const [userType, setUserType] = useState(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -22,13 +25,13 @@ export default function RegisterForm() {
   }
   function validate() {
     const newErrors = {};
-    if (!userType) newErrors.userType = "اختر نوع الحساب";
-    if (!name.trim()) newErrors.name = "أدخل الاسم الكامل";
-    if (!email.trim()) newErrors.email = "أدخل البريد الإلكتروني";
+    if (!userType) newErrors.userType = t("requiredAccountType");
+    if (!name.trim()) newErrors.name = t("requiredName");
+    if (!email.trim()) newErrors.email = t("requiredEmail");
     if (!email.trim()) {
-      newErrors.email = "أدخل البريد الإلكتروني";
+      newErrors.email = t("requiredEmail");
     } else if (!/^[^\s@]+@gmail\.com$/.test(email)) {
-      newErrors.email = "البريد الإلكتروني غير صحيح";
+      newErrors.email = t("invalidEmail");
     }
     return newErrors;
   }
@@ -65,19 +68,19 @@ export default function RegisterForm() {
     };
 
     sessionStorage.setItem("registerData", JSON.stringify(registerData));
-    router.push("/register/password");
+    router.push(`/${locale}/register/password`);
   }
   return (
     <div
-      dir="rtl"
+      dir={locale === "ar" ? "rtl" : "ltr"}
       className="w-full max-w-[520px] sm:max-w-[400px] lg:max-w-[520px] flex flex-col gap-3 py-4 px-4 lg:px-8 rounded-2xl border border-white/[0.07] bg-white/[0.02] backdrop-blur-lg"
     >
       {/* إنشاء حساب جديد */}
       <div className="flex flex-col gap-2">
         <h2 className="text-2xl font-bold text-right text-[#E1E3E4]">
-          إنشاء حساب جديد
+          {t("createTitle")}
         </h2>
-        <p className="text-sm text-right text-[#BFC9C4]">أدخل تفاصيلك للبدء</p>
+        <p className="text-sm text-right text-[#BFC9C4]">{t("createSubtitle")}</p>
       </div>
 
       {/* StepIndicator */}
@@ -115,8 +118,8 @@ export default function RegisterForm() {
               </svg>
             </div>
           </div>
-          <p className="text-sm font-bold text-[#E1E3E4] m-0">صانع محتوى</p>
-          <p className="text-xs text-[#BFC9C4] m-0">أقدم خدمات</p>
+          <p className="text-sm font-bold text-[#E1E3E4] m-0">{t("creator")}</p>
+          <p className="text-xs text-[#BFC9C4] m-0">{t("creatorDescription")}</p>
         </div>
 
         {/* صاحب حملة */}
@@ -145,21 +148,21 @@ export default function RegisterForm() {
               </svg>
             </div>
           </div>
-          <p className="text-sm font-bold text-[#E1E3E4] m-0">صاحب حملة</p>
-          <p className="text-xs text-[#BFC9C4] m-0">ابحث عن خدمات</p>
+          <p className="text-sm font-bold text-[#E1E3E4] m-0">{t("brand")}</p>
+          <p className="text-xs text-[#BFC9C4] m-0">{t("brandDescription")}</p>
         </div>
       </div>
 
       {/* حقل الاسم */}
       <div className="flex flex-col gap-2">
         <label className="text-sm text-[#BFC9C4] text-right">
-          الاسم الكامل
+          {t("fullName")}
         </label>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           type="text"
-          placeholder="أدخل اسمك الكامل"
+          placeholder={t("fullNamePlaceholder")}
           className="w-full h-11 rounded-lg border border-[#FFEEE3]/40 bg-white px-4 text-sm text-right text-black placeholder-[#929292] outline-none"
         />
         {errors.name && <p className="text-xs text-red-400">{errors.name}</p>}
@@ -168,7 +171,7 @@ export default function RegisterForm() {
       {/* حقل الإيميل */}
       <div className="flex flex-col gap-2">
         <label className="text-sm text-[#BFC9C4] text-right">
-          البريد الإلكتروني
+          {t("email")}
         </label>
         <input
           value={email}
@@ -182,11 +185,11 @@ export default function RegisterForm() {
           <p className="text-xs text-red-400 text-right">
             {errors.email}{" "}
             <a href="/login" className="text-[#94D3C1] underline">
-              تسجيل الدخول
+              {t("signIn")}
             </a>{" "}
             أو{" "}
             <a href="/forgot-password" className="text-[#94D3C1] underline">
-              إعادة تعيين كلمة المرور
+              {t("resetPassword")}
             </a>
           </p>
         )}
@@ -197,13 +200,13 @@ export default function RegisterForm() {
         className="w-full mt-2 h-12 rounded-lg text-white text-base font-bold cursor-pointer border-none"
         style={{ background: "linear-gradient(90deg, #FFA600, #FF4B04)" }}
       >
-        متابعة
+        {t("continue")}
       </button>
 
       {/* أو */}
       <div className="flex items-center gap-3">
         <div className="flex-1 h-px bg-white/10" />
-        <span className="text-sm text-[#BFC9C4]">أو</span>
+        <span className="text-sm text-[#BFC9C4]">{t("or")}</span>
         <div className="flex-1 h-px bg-white/10" />
       </div>
       {/* Apple & Google */}
@@ -258,9 +261,9 @@ export default function RegisterForm() {
       </div>
       {/* تسجيل الدخول */}
       <p className="text-center text-sm text-[#BFC9C4] m-0">
-        لديك حساب بالفعل؟{" "}
+        {t("alreadyHaveAccount")} {" "}
         <a href="/login" className="text-[#94D3C1] font-bold no-underline">
-          تسجيل الدخول
+          {t("signIn")}
         </a>
       </p>
     </div>

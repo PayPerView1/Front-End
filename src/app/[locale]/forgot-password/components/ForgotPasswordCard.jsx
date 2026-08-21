@@ -4,8 +4,10 @@ import React, { useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
 import { requestForgotPassword } from "@/services/authService";
+import { useTranslations } from "next-intl";
 
 export default function ForgotPasswordCard() {
+  const t = useTranslations("auth");
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -44,11 +46,11 @@ export default function ForgotPasswordCard() {
         </div>
 
         <h1 className="w-full max-w-[264px] text-center font-bold text-[28px] sm:text-[32px] leading-[38.4px] tracking-[-0.32px] text-white font-tajawal">
-          نسيت كلمة المرور؟
+          {t("forgotTitle")}
         </h1>
 
         <p className="w-full max-w-[450px] text-center font-normal text-[15px] sm:text-[16px] leading-[26px] text-white font-tajawal">
-          أدخل بريدك الإلكتروني المسجل، وسنرسل لك رابطاً لإعادة تعيين كلمة المرور خلال ساعة واحدة.
+          {t("forgotDescription")}
         </p>
 
         {/* Feedback messages */}
@@ -101,16 +103,16 @@ export default function ForgotPasswordCard() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                جاري الإرسال...
+                {t("sending")}
               </span>
             ) : (
-              'إرسال رابط التعيين'
+              t("sendResetLink")
             )}
           </button>
         </form>
 
         <Link href="/login" className="flex items-center gap-2 text-[14px] text-[#E1E3E4] hover:text-white transition-colors mt-[-10px]">
-          العودة إلى تسجيل الدخول
+          {t("backToSignIn")}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="rotate-180">
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>

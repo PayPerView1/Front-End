@@ -7,10 +7,133 @@
     "language": "Idioma",
     "logout": "Sair"
   },
+  "sidebar": { "home": "Início", "search": "Pesquisar", "discover": "Descobrir", "startProject": "Iniciar um projeto", "resources": "Recursos", "members": "Membros", "partners": "Parceiros", "new": "Novo", "help": "Ajuda", "blog": "Blog" },
   "profile": {
     "edit": "Editar perfil",
     "manageOrders": "Gerir pedidos",
     "share": "Partilhar",
-    "copyLink": "Copiar link"
+    "copyLink": "Copiar link",
+    "tabs": {
+      "creator": "Criador",
+      "joined": "Ingressado",
+      "reviews": "Avaliações"
+    },
+    "user": {
+      "joined": "Ingressado em julho de 2026",
+      "followers": "Seguidores",
+      "following": "Seguindo"
+    },
+    "buttons": {
+      "editProfile": "Editar perfil",
+      "manageRequests": "Gerenciar solicitações",
+      "createWork": "Criar novo trabalho",
+      "exploreCampaigns": "Explorar campanhas"
+    },
+    "coverMenu": {
+      "share": "Compartilhar",
+      "copyLink": "Copiar link",
+      "edit": "Editar perfil"
+    },
+    "empty": {
+      "noCreatedWorks": "Nenhum trabalho criado ainda",
+      "noJoinedCampaigns": "Nenhuma campanha aderida ainda"
+    },
+    "campaigns": {
+      "arabClips": "Comunidade de Arabic Clips",
+      "creators": "Criadores Plataforma",
+      "academy": "Content Academy",
+      "followers": "{count} seguidores"
+    },
+    "cardMenu": {
+      "markRead": "Marcar como lido",
+      "invite": "Convidar pessoas",
+      "copyLink": "Copiar link",
+      "writeReview": "Escrever um comentário",
+      "leave": "Deixar"
+    },
+    "reviews": {
+      "noReviews": "Nenhum comentário ainda",
+      "noUserReviews": "Este usuário ainda não tem comentários",
+      "beFirst": "Seja o primeiro a escrever um comentário!",
+      "leaveReview": "Deixe um comentário"
+    }
+  },
+  "auth": {
+    "required": "Este campo é obrigatório",
+    "loginTitle": "Entrar",
+    "loginWelcome": "Bem-vindo de volta ao Pay Per View",
+    "emailOrUsername": "E-mail ou nome de usuário",
+    "emailPlaceholder": "Digite seu endereço de e-mail",
+    "password": "Senha",
+    "passwordPlaceholder": "Digite sua senha",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha",
+    "forgotPassword": "Esqueceu a senha?",
+    "signIn": "Fazer login",
+    "signingIn": "Fazer login...",
+    "orContinueWith": "Ou continuar com",
+    "noAccount": "Não tem uma conta?",
+    "createAccount": "Criar uma conta",
+    "invalidCredentials": "E-mail ou senha incorretos",
+    "invalidLoginData": "Detalhes de login inválidos. Verifique sua entrada.",
+    "connectionFailed": "Não é possível conectar-se ao servidor. Verifique sua conexão com a Internet.",
+    "genericLoginError": "Algo deu errado ao fazer login. Tente novamente mais tarde.",
+    "invalidServerResponse": "Resposta inválida do servidor",
+    "forgotTitle": "Esqueceu sua senha?",
+    "forgotDescription": "Digite seu endereço de e-mail registrado e enviaremos um link de redefinição de senha dentro de uma hora.",
+    "sendResetLink": "Enviar link de redefinição",
+    "sending": "Enviando...",
+    "backToSignIn": "Voltar para entrar",
+    "signOut": "Sair",
+    "signOutTitle": "Sair",
+    "confirmSignOut": "Tem certeza de que deseja sair?",
+    "signOutDescription": "Sua sessão atual será fim.",
+    "cancel": "Cancelar"
+  },
+  "register": {
+    "createTitle": "Crie uma nova conta",
+    "createSubtitle": "Insira seus dados para começar",
+    "selectAccountType": "Selecione um tipo de conta",
+    "creator": "Criador de conteúdo",
+    "creatorDescription": "Eu ofereço serviços",
+    "brand": "Proprietário da campanha",
+    "brandDescription": "Estou procurando serviços",
+    "fullName": "Nome completo",
+    "fullNamePlaceholder": "Insira seu nome completo",
+    "email": "Endereço de e-mail",
+    "continue": "Continuar",
+    "or": "ou",
+    "alreadyHaveAccount": "Já tem uma conta?",
+    "requiredAccountType": "Selecione um tipo de conta",
+    "requiredName": "Insira seu nome completo nome",
+    "requiredEmail": "Digite seu endereço de e-mail",
+    "invalidEmail": "Digite um endereço de e-mail válido",
+    "signIn": "Entrar",
+    "resetPassword": "Redefinir senha"
+  },
+  "editProfile": {
+    "accountSettings": "Configurações da conta",
+    "signOut": "Sair",
+    "name": "Nome",
+    "username": "Nome de usuário",
+    "bio": "Bio",
+    "bioPlaceholder": "Conte-nos sobre você",
+    "birthDate": "Data de nascimento",
+    "additionalSettings": "Configurações adicionais",
+    "additionalDescription": "Escolha o que aparece em seu perfil e permita que outras pessoas descubram você",
+    "earnings": "Ganhos totais",
+    "location": "Localização",
+    "openCommunities": "Comunidades abertas",
+    "joinedCommunities": "Comunidades participadas",
+    "save": "Salvar alterações",
+    "saving": "Salvando...",
+    "saved": "Salvo com sucesso",
+    "saveError": "Ocorreu um erro",
+    "profile": "Editar perfil",
+    "payments": "Pagamentos",
+    "services": "Serviços conectados",
+    "security": "Segurança da conta",
+    "subscriptions": "Assinaturas",
+    "disputes": "Centro de disputas"
   }
 }

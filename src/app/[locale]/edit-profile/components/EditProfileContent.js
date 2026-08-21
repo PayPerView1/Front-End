@@ -14,17 +14,18 @@ import { FiEdit2 } from "react-icons/fi";
 import { RiUserLine } from "react-icons/ri";
 import { useRouter } from "next/navigation";
 import api from "@/lib/axios";
+import { useLocale, useTranslations } from "next-intl";
 
 const menuItems = [
-  { key: "profile", label: "تعديل الملف الشخصي", icon: RiUserLine },
-  { key: "payments", label: "الدفعات", icon: Wallet },
-  { key: "services", label: "الخدمات المرتبطة", icon: Bag },
-  { key: "security", label: "أمان الحساب", icon: MdOutlineSecurity },
-  { key: "subscriptions", label: "الاشتراكات", icon: Document },
-  { key: "disputes", label: "مركز حل النزاعات", icon: MdOutlineGavel },
+  { key: "profile", icon: RiUserLine },
+  { key: "payments", icon: Wallet },
+  { key: "services", icon: Bag },
+  { key: "security", icon: MdOutlineSecurity },
+  { key: "subscriptions", icon: Document },
+  { key: "disputes", icon: MdOutlineGavel },
 ];
 
-function DatePicker({ value, onChange, isDark, t }) {
+function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState("day");
   const ref = useRef(null);
@@ -38,20 +39,12 @@ function DatePicker({ value, onChange, isDark, t }) {
     selected?.getFullYear() ?? today.getFullYear(),
   );
 
-  const months = [
-    "يناير",
-    "فبراير",
-    "مارس",
-    "أبريل",
-    "مايو",
-    "يونيو",
-    "يوليو",
-    "أغسطس",
-    "سبتمبر",
-    "أكتوبر",
-    "نوفمبر",
-    "ديسمبر",
-  ];
+  const months = Array.from({ length: 12 }, (_, month) =>
+    new Intl.DateTimeFormat(locale, { month: "long" }).format(new Date(2026, month, 1)),
+  );
+  const weekdays = Array.from({ length: 7 }, (_, day) =>
+    new Intl.DateTimeFormat(locale, { weekday: "short" }).format(new Date(2026, 7, 2 + day)),
+  );
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDay = new Date(currentYear, currentMonth, 1).getDay();
 
@@ -71,7 +64,7 @@ function DatePicker({ value, onChange, isDark, t }) {
 
   const displayValue = selected
     ? `${selected.getDate()} ${months[selected.getMonth()]} ${selected.getFullYear()}`
-    : "اختر تاريخ الميلاد";
+    : placeholder;
 
   return (
     <div ref={ref} className="relative w-full">
@@ -91,7 +84,7 @@ function DatePicker({ value, onChange, isDark, t }) {
         <div
           className={`absolute top-12 right-0 z-50 w-full rounded-xl border shadow-2xl p-3
             ${isDark ? "bg-[#1a1a1a] border-[#2D2D2D]" : "bg-white border-[#E5E5E5]"}`}
-          dir="rtl"
+          dir={locale === "ar" ? "rtl" : "ltr"}
         >
           {/* Header */}
           <div className="flex items-center justify-between mb-3">
@@ -192,7 +185,7 @@ function DatePicker({ value, onChange, isDark, t }) {
           {view === "day" && (
             <>
               <div className="grid grid-cols-7 mb-1">
-                {["أح", "إث", "ثل", "أر", "خم", "جم", "سب"].map((d) => (
+                {weekdays.map((d) => (
                   <div
                     key={d}
                     className={`text-center text-[10px] py-1 ${t.subText}`}
@@ -252,6 +245,8 @@ function Toggle({ value, onChange, isDark }) {
 export default function EditProfileContent() {
   const { isDark } = useTheme();
   const router = useRouter();
+  const locale = useLocale();
+  const copy = useTranslations("editProfile");
   const [activeMenu, setActiveMenu] = useState("profile");
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
@@ -307,10 +302,11 @@ export default function EditProfileContent() {
         data = { fullName: form.name };
       }
       const result = await api.updateProfile(data);
-      setSaveMsg(" تم الحفظ بنجاح");
-      if (result.user) api.saveAuthData(api.getToken(), result.user);
+      setSaveMsg(copy("saved"));
+      const updatedUser = result?.user || result?.data || result;
+      if (updatedUser) api.saveAuthData(api.getToken(), updatedUser);
     } catch (error) {
-      setSaveMsg(" حدث خطأ: " + error.message);
+      setSaveMsg(`${copy("saveError")}: ${error.message}`);
     } finally {
       setSaving(false);
     }
@@ -319,12 +315,12 @@ export default function EditProfileContent() {
     async function loadProfile() {
       try {
         const result = await api.getProfile();
-        const user = result.user;
+        const user = result?.user || result?.data || result;
         setForm({
-          name: user.fullName || "",
-          username: user.username || "",
-          bio: user.bio || "",
-          birthDate: user.birthDate || "",
+          name: user?.fullName || "",
+          username: user?.username || "",
+          bio: user?.bio || "",
+          birthDate: user?.birthDate || "",
         });
         // إذا عنده صورة
         if (
@@ -344,7 +340,7 @@ export default function EditProfileContent() {
     loadProfile();
   }, []);
   return (
-    <div className={`flex flex-1 w-full ${t.bg}`} dir="rtl">
+    <div className={`flex flex-1 w-full ${t.bg}`} dir={locale === "ar" ? "rtl" : "ltr"}>
       {/* ===== قائمة الإعدادات ===== */}
       <div
         className={`w-[240px] flex-shrink-0 border-l flex flex-col py-4 px-2 ${t.sidebarBg} ${t.sidebarBorder}`}
@@ -354,7 +350,7 @@ export default function EditProfileContent() {
         ${isDark ? "text-white" : "text-black"}
         `}
         >
-          إعدادات الحساب
+          {copy("accountSettings")}
         </p>
         <nav className="flex flex-col gap-1 flex-1">
           {menuItems.map((item) => {
@@ -369,7 +365,7 @@ export default function EditProfileContent() {
                   ${isActive ? t.activeMenu : `${t.subText} ${t.hoverMenu}`}`}
               >
                 <Icon size={18} color={isActive ? "#94D3C1" : "#9A9A9A"} />
-                <span>{item.label}</span>
+                <span>{copy(item.key)}</span>
               </button>
             );
           })}
@@ -379,14 +375,11 @@ export default function EditProfileContent() {
         <div className={`border-t pt-4 px-2 ${t.sidebarBorder}`}>
           <button
             type="button"
-            onClick={async () => {
-              await api.logout();
-              router.push("/login");
-            }}
+            onClick={() => router.push(`/${locale}/logout`)}
             className="w-full h-10 rounded-lg text-white text-sm font-bold cursor-pointer border-none"
             style={{ background: "#DC2626" }}
           >
-            تسجيل خروج
+            {copy("signOut")}
           </button>
         </div>
       </div>
@@ -455,7 +448,7 @@ export default function EditProfileContent() {
           {/* الاسم */}
           <div className="flex flex-col gap-1 mt-4">
             <label className={`text-sm font-bold text-right ${t.text}`}>
-              الاسم
+              {copy("name")}
             </label>
 
             <input
@@ -476,7 +469,7 @@ export default function EditProfileContent() {
           {/* اسم المستخدم */}
           <div className="flex flex-col gap-1">
             <label className={`text-sm font-bold ${t.text}`}>
-              اسم المستخدم
+              {copy("username")}
             </label>
 
             <input
@@ -496,13 +489,13 @@ export default function EditProfileContent() {
 
           {/* نبذة شخصية */}
           <div className="flex flex-col gap-1">
-            <label className={`text-sm font-bold ${t.text}`}>نبذة شخصية</label>
+            <label className={`text-sm font-bold ${t.text}`}>{copy("bio")}</label>
 
             <textarea
               value={form.bio}
               maxLength={100}
               onChange={(e) => setForm({ ...form, bio: e.target.value })}
-              placeholder="نبذة شخصية لا يوجد سيرة ذاتية"
+              placeholder={copy("bioPlaceholder")}
               rows={3}
               className={`w-full rounded-lg border px-4 py-3 text-right text-sm outline-none resize-none transition-all
                 ${t.inputBg} ${t.inputBorder} ${t.inputText} placeholder-[#9A9A9A]`}
@@ -517,38 +510,40 @@ export default function EditProfileContent() {
           {/* تاريخ الميلاد */}
           <div className="flex flex-col gap-1 w-full sm:max-w-[280px]">
             <label className={`text-sm font-bold text-right ${t.text}`}>
-              تاريخ الميلاد
+              {copy("birthDate")}
             </label>
             <DatePicker
               value={form.birthDate}
               onChange={(val) => setForm({ ...form, birthDate: val })}
               isDark={isDark}
               t={t}
+              locale={locale}
+              placeholder={copy("birthDate")}
             />
           </div>
 
           {/* تقاضين إضافية */}
           <div className="flex flex-col gap-1">
             <label className={`text-sm font-bold text-right ${t.text}`}>
-              تقاضين إضافية
+              {copy("additionalSettings")}
             </label>
             <p className={`text-xs text-right ${t.subText}`}>
-              اختر ما يظهر في ملفك الشخصي واسمح للآخرين بالاكتشاف
+              {copy("additionalDescription")}
             </p>
             <div
               className={`flex flex-col gap-0 rounded-xl border overflow-hidden mt-2 ${t.cardBg} ${t.cardBorder}`}
             >
               {[
-                { key: "earnings", label: "إجمالي الأرباح", icon: Wallet },
-                { key: "location", label: "الموقع", icon: Location },
+                { key: "earnings", label: copy("earnings"), icon: Wallet },
+                { key: "location", label: copy("location"), icon: Location },
                 {
                   key: "openCommunities",
-                  label: "المجتمعات المفتوحة",
+                  label: copy("openCommunities"),
                   icon: Category,
                 },
                 {
                   key: "joinedCommunities",
-                  label: "المجتمعات المنضم إليها",
+                  label: copy("joinedCommunities"),
                   icon: People,
                 },
               ].map((item, i, arr) => {
@@ -590,7 +585,7 @@ export default function EditProfileContent() {
               background: "linear-gradient(to right, #FFA600, #FF4B04)",
             }}
           >
-            {saving ? "جاري الحفظ..." : "حفظ التغييرات"}
+            {saving ? copy("saving") : copy("save")}
           </button>
 
           {saveMsg && (

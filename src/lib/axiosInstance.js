@@ -4,22 +4,21 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://payperview-platform
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // ─── Auth Helpers ─────────────────────────────────────────────────────────────
 
 export function getToken() {
   if (typeof window !== "undefined") {
-    return localStorage.getItem("token") || localStorage.getItem("authToken");
+    return getCookie("authToken") || localStorage.getItem("token") || localStorage.getItem("authToken");
   }
   return null;
 }
 
 export function saveAuthData(token, user) {
   if (typeof window !== "undefined") {
+    setCookie("authToken", token);
+    setCookie("user", user);
     localStorage.setItem("token", token);
     localStorage.setItem("authToken", token);
     localStorage.setItem("user", JSON.stringify(user));
@@ -28,18 +27,44 @@ export function saveAuthData(token, user) {
 
 export function getSavedUser() {
   if (typeof window !== "undefined") {
-    const user = localStorage.getItem("user");
-    return user ? JSON.parse(user) : null;
+    const user = getCookie("user") || localStorage.getItem("user");
+    try {
+      return user ? JSON.parse(user) : null;
+    } catch {
+      return null;
+    }
   }
   return null;
 }
 
 export function clearAuthData() {
   if (typeof window !== "undefined") {
+    deleteCookie("authToken");
+    deleteCookie("user");
     localStorage.removeItem("token");
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
   }
+}
+
+function getCookie(name) {
+  const value = document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith(`${name}=`))
+    ?.split("=")
+    .slice(1)
+    .join("=");
+  return value ? decodeURIComponent(value) : null;
+}
+
+function setCookie(name, value) {
+  document.cookie = `${name}=${encodeURIComponent(
+    typeof value === "string" ? value : JSON.stringify(value),
+  )}; Path=/; Max-Age=604800; SameSite=Lax`;
+}
+
+function deleteCookie(name) {
+  document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax`;
 }
 
 export function isAuthenticated() {
@@ -64,6 +89,11 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
+    // طباعة تفاصيل الخطأ للتشخيص في الكونسول
+    if (error.response?.data) {
+      console.error("[Axios Response Error]:", error.config.url, error.response.status, error.response.data);
+    }
+
     const isLoginRequest =
       error.config &&
       error.config.url &&
@@ -75,7 +105,8 @@ axiosInstance.interceptors.response.use(
     ) {
       if (typeof window !== "undefined") {
         clearAuthData();
-        window.location.href = "/login";
+        const locale = document.documentElement.lang || "ar";
+        window.location.href = `/${locale}/login`;
       }
     }
     return Promise.reject(error);
@@ -85,6 +116,9 @@ axiosInstance.interceptors.response.use(
 // ─── Error Handler ────────────────────────────────────────────────────────────
 
 export function handleError(error) {
+  if (error.response?.data) {
+    console.error("API Error Response Data:", JSON.stringify(error.response.data, null, 2));
+  }
   const message =
     error.response?.data?.message ||
     error.response?.data?.errors?.[0]?.message ||

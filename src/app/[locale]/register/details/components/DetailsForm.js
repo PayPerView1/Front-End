@@ -94,20 +94,55 @@ export default function DetailsForm() {
 
   const registerData = JSON.parse(savedData);
 
-  try {
-    // بناء FormData وإرساله عبر api.register
-    const formData = api.createFormData({
-      fullName: registerData.fullName,
-      email: registerData.email,
-      password: registerData.password,
-      role: registerData.role,
-      phoneNumber: `${dialCode}${phone}`,
-      country,
-      city,
-      ...(profilePicture ? { profilePicture } : {}),
-    });
+  // التحقق من وجود كلمة المرور
+  if (!registerData.password) {
+    setErrors({ submit: "كلمة المرور غير موجودة، يرجى العودة للخطوة السابقة." });
+    return;
+  }
 
-    await api.register(formData);
+  // التحقق المحلي (نفس regex الباك إند: رموز ASCII فقط)
+  const pwd = registerData.password;
+  const SPECIAL_CHAR_REGEX = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/;
+  const passwordValid =
+    pwd.length >= 8 &&
+    /[A-Z]/.test(pwd) &&
+    /[a-z]/.test(pwd) &&
+    /[0-9]/.test(pwd) &&
+    SPECIAL_CHAR_REGEX.test(pwd);
+
+  if (!passwordValid) {
+    setErrors({ submit: "كلمة المرور لا تستوفي المتطلبات (8 أحرف، حرف كبير، حرف صغير، رقم، رمز مثل !@#$). يرجى العودة للخطوة السابقة." });
+    return;
+  }
+
+  try {
+    let payload;
+
+    if (profilePicture) {
+      // إذا في صورة → FormData (multipart)
+      payload = new FormData();
+      payload.append("fullName", registerData.fullName);
+      payload.append("email", registerData.email);
+      payload.append("password", registerData.password);
+      payload.append("role", registerData.role);
+      payload.append("phoneNumber", `${dialCode}${phone}`);
+      payload.append("country", country);
+      payload.append("city", city);
+      payload.append("profilePicture", profilePicture);
+    } else {
+      // بدون صورة → JSON
+      payload = {
+        fullName: registerData.fullName,
+        email: registerData.email,
+        password: registerData.password,
+        role: registerData.role,
+        phoneNumber: `${dialCode}${phone}`,
+        country,
+        city,
+      };
+    }
+
+    await api.register(payload);
     // api.register يحفظ التوكن تلقائياً
 
     // مسح الـ sessionStorage
@@ -124,6 +159,8 @@ export default function DetailsForm() {
     }
   }
 }
+
+
   return (
     <div
       dir="rtl"

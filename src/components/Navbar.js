@@ -21,16 +21,43 @@ import { MdOutlineMonitor } from "react-icons/md";
 
 import { useTheme } from "@/context/ThemeContext";
 import LanguageSelector from "@/components/LanguageSelector";
+import { useLocale, useTranslations } from "next-intl";
+import { getSavedUser } from "@/lib/axiosInstance";
+import { getProfile } from "@/services/profile";
 
 export default function Navbar() {
   const router = useRouter();
+  const locale = useLocale();
+  const nav = useTranslations("nav");
 
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [user, setUser] = useState(null);
 
   const menuRef = useRef(null);
   const menuDropdownRef = useRef(null);
+  const userName =
+    user?.fullName || user?.name || user?.username || (locale === "ar" ? "المستخدم" : "User");
+  const userInitial = userName.trim().charAt(0);
+
+  useEffect(() => {
+    async function loadUser() {
+      const savedUser = getSavedUser();
+      if (savedUser) setUser(savedUser);
+
+      try {
+        const result = await getProfile();
+        const profileUser = result?.user || result?.data?.user || result?.data;
+        if (profileUser && typeof profileUser === "object") setUser(profileUser);
+      } catch {
+        // The saved login data remains available when the profile request fails.
+      }
+    }
+
+    loadUser();
+  }, []);
 
   // ألوان النافبار حسب الثيم
   const t = {
@@ -68,8 +95,26 @@ export default function Navbar() {
     };
   }, []);
 
+  function toggleUserMenu() {
+    const rect = menuRef.current?.getBoundingClientRect();
+    if (rect) {
+      const menuWidth = 256;
+      const screenPadding = 8;
+      const preferredLeft = locale === "ar" ? rect.left : rect.right - menuWidth;
+      setMenuPosition({
+        top: rect.bottom + 8,
+        left: Math.max(
+          screenPadding,
+          Math.min(preferredLeft, window.innerWidth - menuWidth - screenPadding),
+        ),
+      });
+    }
+    setMenuOpen((previous) => !previous);
+  }
+
   return (
      <div
+  dir={locale === "ar" ? "rtl" : "ltr"}
   className={`
     w-full
     flex
@@ -163,7 +208,7 @@ export default function Navbar() {
         >
           {/* صورة المستخدم */}
           <div
-            onClick={() => setMenuOpen((p) => !p)}
+            onClick={toggleUserMenu}
             className={`
               w-7
               h-7
@@ -177,7 +222,7 @@ export default function Navbar() {
               ${isDark ? "bg-[#3a3a3a] text-white" : "bg-[#FE6B02] text-white"}
             `}
           >
-            ش
+            {userInitial}
           </div>
 
           {/* السهم */}
@@ -185,7 +230,7 @@ export default function Navbar() {
             size={15}
             color={isDark ? "#BFC8C9" : "#666"}
             className="cursor-pointer"
-            onClick={() => setMenuOpen((p) => !p)}
+            onClick={toggleUserMenu}
           />
 
           {/* القائمة */}
@@ -194,10 +239,9 @@ export default function Navbar() {
               <div
                 ref={menuDropdownRef}
                 data-menu="true"
+                style={{ top: menuPosition.top, left: menuPosition.left }}
                 className={`
                   fixed
-                  top-[55px]
-                  left-4
                   z-[9999999]
                   w-64
                   rounded-xl
@@ -237,10 +281,10 @@ export default function Navbar() {
                         }
                       `}
                     >
-                      ش
+                      {userInitial}
                     </div>
 
-                    <div className="text-right">
+                    <div className={locale === "ar" ? "text-right" : "text-left"}>
                       <p
                         className={`
                           text-sm
@@ -248,7 +292,7 @@ export default function Navbar() {
                           ${t.text}
                         `}
                       >
-                        شذا البنا
+                        {userName}
                       </p>
 
                       <p
@@ -277,17 +321,17 @@ export default function Navbar() {
                 <div className="py-2 px-1">
                   {[
                     {
-                      label: "الطلبات",
+                      label: nav("orders"),
                       icon: Document,
                       href: "/orders",
                     },
                     {
-                      label: "الشركاء",
+                      label: nav("partners"),
                       icon: People,
                       href: "/partners",
                     },
                     {
-                      label: "المالية",
+                      label: nav("finance"),
                       icon: Wallet,
                       href: "/finance",
                     },
@@ -379,7 +423,7 @@ export default function Navbar() {
                         ${t.menuText}
                       `}
                     >
-                      المساعدة والدعم
+                      {nav("support")}
                     </span>
                   </button>
 
@@ -389,7 +433,7 @@ export default function Navbar() {
                   {/* تسجيل الخروج */}
                   <button
                     type="button"
-                    onClick={() => router.push("/login")}
+                    onClick={() => router.push(`/${locale}/logout`)}
                     className="
                       group
                       w-full
@@ -409,7 +453,7 @@ export default function Navbar() {
                     <Logout set="light" size={18} primaryColor="#EF4444" />
 
                     <span className="text-red-400 text-sm mr-4">
-                      تسجيل الخروج
+                      {nav("logout")}
                     </span>
                   </button>
                 </div>

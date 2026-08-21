@@ -17,10 +17,30 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { useTheme } from "@/context/ThemeContext";
 import { createPortal } from "react-dom";
 import { AiOutlineStar } from "react-icons/ai";
-import { useTranslations } from "next-intl";
-import api from "@/lib/axios";
+import { useLocale, useMessages } from "next-intl";
+import { getProfile } from "@/services/profile";
+import { getSavedUser } from "@/lib/axiosInstance";
 
-const tabs = ["منشئ", "الانضمامات", "التقييمات"];
+const profileFallbacks = {
+  "campaigns.arabClips": "Arabic Clips Community", "campaigns.creators": "Creators Platform", "campaigns.academy": "Content Academy", "campaigns.followers": "{count} followers",
+  "user.joined": "Joined Jul 2026", "user.followers": "Followers", "user.following": "Following",
+  "buttons.editProfile": "Edit Profile", "buttons.manageRequests": "Manage Requests", "buttons.createWork": "Create New Work", "buttons.exploreCampaigns": "Explore Campaigns",
+  "tabs.creator": "Creator", "tabs.joined": "Joined", "tabs.reviews": "Reviews",
+  "coverMenu.share": "Share", "coverMenu.copyLink": "Copy link", "coverMenu.edit": "Edit profile",
+  "empty.noCreatedWorks": "No created works yet", "empty.noJoinedCampaigns": "No joined campaigns yet",
+  "cardMenu.markRead": "Mark as read", "cardMenu.invite": "Invite people", "cardMenu.copyLink": "Copy link", "cardMenu.writeReview": "Write a review", "cardMenu.leave": "Leave",
+  "reviews.noReviews": "No reviews yet", "reviews.noUserReviews": "This user has no reviews yet", "reviews.beFirst": "Be the first to write a review!", "reviews.leaveReview": "Leave a review",
+};
+
+function getUserName(user) {
+  return (
+    user?.fullName ||
+    user?.name ||
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    user?.username ||
+    "اسم المستخدم"
+  );
+}
 
 export default function ProfileContent() {
   const [activeTab, setActiveTab] = useState("");
@@ -36,7 +56,13 @@ export default function ProfileContent() {
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
   const menuDropdownRef = useRef(null);
   const [openCardMenu, setOpenCardMenu] = useState(null);
-  const text = useTranslations("profile");
+  const messages = useMessages();
+  const text = (key, values = {}) => {
+    const translated = key.split(".").reduce((value, part) => value && value[part], messages.profile);
+    return String(translated || profileFallbacks[key] || key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
+  };
+  const locale = useLocale();
+  const tabs = ["creator", "joined", "reviews"];
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -77,8 +103,11 @@ export default function ProfileContent() {
   useEffect(() => {
     async function loadProfile() {
       try {
-        const result = await api.getProfile();
-        setUser(result.user);
+        const savedUser = getSavedUser();
+        if (savedUser) setUser(savedUser);
+        const result = await getProfile();
+        const userData = result?.user || result?.data?.user || result?.data || result;
+        if (userData && typeof userData === "object") setUser(userData);
       } catch (error) {
         console.error("خطأ في جلب البروفايل:", error);
       } finally {
@@ -93,22 +122,22 @@ export default function ProfileContent() {
   const joinedCampaigns = [
     {
       id: 1,
-      title: "مجتمع كليبات عربية",
-      category: "1.2k يتابع",
+      title: text("campaigns.arabClips"),
+      category: text("campaigns.followers", { count: "1.2k" }),
       rating: 4.9,
       image: null,
     },
     {
       id: 2,
-      title: "منصة المبدعين",
-      category: "850 يتابع",
+      title: text("campaigns.creators"),
+      category: text("campaigns.followers", { count: "850" }),
       rating: 4.3,
       image: null,
     },
     {
       id: 3,
-      title: "أكاديمية المحتوى",
-      category: "2.4k يتابع",
+      title: text("campaigns.academy"),
+      category: text("campaigns.followers", { count: "2.4k" }),
       rating: 5.0,
       image: null,
     },
@@ -121,7 +150,7 @@ export default function ProfileContent() {
     );
 
   return (
-    <div className={`flex flex-col flex-1 ${t.bg}`} dir="rtl">
+    <div className={`flex flex-col flex-1 ${t.bg}`} dir={locale === "ar" ? "rtl" : "ltr"}>
       {/* الغلاف */}
       <div className="relative mx-2 sm:mx-4 mt-3 sm:mt-4">
         <div
@@ -158,7 +187,7 @@ export default function ProfileContent() {
               >
                 {[
                   {
-                    label: "مشاركة",
+                    label: text("coverMenu.share"),
                     icon: FiShare2,
                     action: async () => {
                       try {
@@ -172,7 +201,7 @@ export default function ProfileContent() {
                     },
                   },
                   {
-                    label: "نسخ الرابط",
+                    label: text("coverMenu.copyLink"),
                     icon: FiCopy,
                     action: async () => {
                       try {
@@ -184,7 +213,7 @@ export default function ProfileContent() {
                     },
                   },
                   {
-                    label: "تعديل الملف الشخصي",
+                    label: text("coverMenu.edit"),
                     icon: FiEdit2,
                     href: "/edit-profile",
                   },
@@ -227,7 +256,7 @@ export default function ProfileContent() {
 
         {/* صورة البروفايل */}
         <div
-          className="absolute -bottom-7 right-5 z-20 cursor-pointer"
+          className={`absolute -bottom-7 z-20 cursor-pointer ${locale === "ar" ? "right-5" : "left-5"}`}
           onClick={(e) => {
             e.stopPropagation();
             profileInputRef.current?.click();
@@ -251,7 +280,7 @@ export default function ProfileContent() {
               />
             ) : (
               <span className={`text-xl font-bold ${t.text}`}>
-                {user?.fullName?.[0] || "؟"}
+                {getUserName(user)[0] || "؟"}
               </span>
             )}
           </div>
@@ -269,9 +298,11 @@ export default function ProfileContent() {
       </div>
 
       {/* معلومات البروفايل */}
-      <div className={`relative z-30 px-6 pt-10 pb-4 text-right`}>
+      <div
+        className={`relative z-30 px-6 pt-10 pb-4 ${locale === "ar" ? "text-right" : "text-left"}`}
+      >
         <h1 className={`text-xl font-bold ${t.text}`}>
-          {user?.fullName || "اسم المستخدم"}
+          {getUserName(user)}
         </h1>
         <p className={`text-sm mt-1 ${t.subText}`}>{user?.email}</p>
         <div className={`flex items-center gap-3 mt-3 text-xs ${t.subText}`}>
@@ -282,15 +313,15 @@ export default function ProfileContent() {
           <span>•</span>
           <span className="flex items-center gap-1">
             <Calendar set="light" size={12} primaryColor="#9A9A9A" />
-            Joined Jul 2026
+            {text("user.joined")}
           </span>
         </div>
         <div className={`flex gap-4 mt-2 text-xs ${t.subText}`}>
           <span>
-            Followers <span className={`font-bold ${t.followers}`}>0</span>
+            {text("user.followers")} <span className={`font-bold ${t.followers}`}>0</span>
           </span>
           <span>
-            Following <span className={`font-bold ${t.followers}`}>0</span>
+            {text("user.following")} <span className={`font-bold ${t.followers}`}>0</span>
           </span>
         </div>
       </div>
@@ -298,8 +329,8 @@ export default function ProfileContent() {
       {/* الأزرار */}
       <div className="flex gap-3 px-6 pb-4">
         {[
-          { label: "تعديل الملف الشخصي", href: "/edit-profile" },
-          { label: "إدارة الطلبات", href: "/orders" },
+          { label: text("buttons.editProfile"), href: "/edit-profile" },
+          { label: text("buttons.manageRequests"), href: "/orders" },
         ].map((item) => (
           <button
             key={item.label}
@@ -320,7 +351,7 @@ export default function ProfileContent() {
               className={`w-full text-center py-3 text-sm font-bold transition-all cursor-pointer bg-transparent border-none
                 ${activeTab === tab ? t.text : t.subText}`}
             >
-              {tab}
+              {text(`tabs.${tab}`)}
             </button>
             {activeTab === tab && (
               <div
@@ -341,7 +372,7 @@ export default function ProfileContent() {
         </div>
       )}
 
-      {activeTab === "منشئ" && (
+      {activeTab === "creator" && (
         <div className="flex flex-col items-center justify-center py-16 gap-4">
           <div
             className={`w-16 h-16 rounded-2xl flex items-center justify-center ${t.emptyBg}`}
@@ -349,9 +380,7 @@ export default function ProfileContent() {
             <MdRocketLaunch size={28} color="#F97316" />
           </div>
           <p className={`text-sm font-bold ${t.text}`}>
-            {activeTab === "منشئ"
-              ? "لا توجد أعمال منشأة بعد"
-              : "لا توجد حملات منضم اليها بعد"}
+            {text("empty.noCreatedWorks")}
           </p>
           <button
             className="text-white text-sm font-bold px-10 py-2.5 rounded-lg cursor-pointer border-none transition"
@@ -359,11 +388,11 @@ export default function ProfileContent() {
               background: "linear-gradient(to right, #FFA600, #FF4B04)",
             }}
           >
-            {activeTab === "منشئ" ? "إنشاء عمل جديد" : "استكشاف الحملات"}
+            {text("buttons.createWork")}
           </button>
         </div>
       )}
-      {activeTab === "الانضمامات" && (
+      {activeTab === "joined" && (
         <>
           {joinedCampaigns.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 gap-4">
@@ -373,7 +402,7 @@ export default function ProfileContent() {
                 <MdRocketLaunch size={28} color="#F97316" />
               </div>
               <p className={`text-sm font-bold ${t.text}`}>
-                لا توجد حملات منضم اليها بعد
+                {text("empty.noJoinedCampaigns")}
               </p>
               <button
                 className="text-white text-sm font-bold px-10 py-2.5 rounded-lg cursor-pointer border-none"
@@ -381,7 +410,7 @@ export default function ProfileContent() {
                   background: "linear-gradient(to right, #FFA600, #FF4B04)",
                 }}
               >
-                استكشاف الحملات
+                {text("buttons.exploreCampaigns")}
               </button>
             </div>
           ) : (
@@ -400,7 +429,7 @@ export default function ProfileContent() {
                     >
                       {[
                         {
-                          label: "تحديد كمقروء",
+                          label: text("cardMenu.markRead"),
                           icon: (
                             <TickSquare
                               set="light"
@@ -410,7 +439,7 @@ export default function ProfileContent() {
                           ),
                         },
                         {
-                          label: "دعوة أشخاص",
+                          label: text("cardMenu.invite"),
                           icon: (
                             <FiUserPlus
                               size={15}
@@ -419,7 +448,7 @@ export default function ProfileContent() {
                           ),
                         },
                         {
-                          label: "نسخ الرابط",
+                          label: text("cardMenu.copyLink"),
                           icon: (
                             <FiCopy
                               size={15}
@@ -428,7 +457,7 @@ export default function ProfileContent() {
                           ),
                         },
                         {
-                          label: "كتابة تقييم",
+                          label: text("cardMenu.writeReview"),
                           icon: (
                             <AiOutlineStar
                               size={15}
@@ -437,7 +466,7 @@ export default function ProfileContent() {
                           ),
                         },
                         {
-                          label: "مغادرة",
+                          label: text("cardMenu.leave"),
                           icon: (
                             <Logout
                               set="light"
@@ -510,7 +539,7 @@ export default function ProfileContent() {
         </>
       )}
 
-      {activeTab === "التقييمات" && (
+      {activeTab === "reviews" && (
         <div className="flex flex-col items-center justify-center py-16 gap-4">
           <div
             className={`w-16 h-16 rounded-2xl flex items-center justify-center ${t.emptyBg}`}
@@ -518,13 +547,13 @@ export default function ProfileContent() {
             <MdRocketLaunch size={28} color="#F97316" />
           </div>
           <p className={`text-sm font-bold ${t.text}`}>
-            لا توجد تقييمات حتى الآن
+            {text("reviews.noReviews")}
           </p>
           <div className="flex flex-col items-center gap-1">
             <p className={`text-xs ${t.subText}`}>
-              ليس لدى هذا المستخدم أي تقييمات حتى الآن
+              {text("reviews.noUserReviews")}
             </p>
-            <p className={`text-xs ${t.subText}`}>كن أول من يكتب تقييماً!</p>
+            <p className={`text-xs ${t.subText}`}>{text("reviews.beFirst")}</p>
           </div>
           <button
             className="relative text-white text-sm font-bold px-14 py-2.5 rounded-lg cursor-pointer border-none overflow-hidden"
@@ -536,7 +565,7 @@ export default function ProfileContent() {
               className="absolute inset-0"
               style={{ background: "#004D40", opacity: 0.3 }}
             />
-            <span className="relative z-10">اترك تقييماً</span>
+            <span className="relative z-10">{text("reviews.leaveReview")}</span>
           </button>
         </div>
       )}

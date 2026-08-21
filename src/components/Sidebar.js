@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   Home,
@@ -17,24 +15,42 @@ import {
 
 import { useTheme } from "@/context/ThemeContext";
 import { BsList, BsX } from "react-icons/bs";
+import { useLocale, useMessages } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 
 const navItems = [
-  { label: "الرئيسية", href: "/dashboard", icon: Home },
-  { label: "ابحث", href: "/search", icon: Search },
-  { label: "اكتشف", href: "/discover", icon: Discovery },
-  { label: "ابدأ مشروعاً", href: "/new", icon: Plus },
+  { label: "home", href: "/dashboard", icon: Home },
+  { label: "search", href: "/search", icon: Search },
+  { label: "discover", href: "/discover", icon: Discovery },
+  { label: "startProject", href: "/new", icon: Plus },
 ];
 
 const resourceItems = [
-  { label: "المنتسبون", href: "/members", icon: Bag },
-  { label: "الشركاء", href: "/partners", icon: People, badge: "جديد" },
-  { label: "يساعد", href: "/help", icon: Message },
-  { label: "مدونة", href: "/blog", icon: Document },
+  { label: "members", href: "/members", icon: Bag },
+  { label: "partners", href: "/partners", icon: People, badge: "new" },
+  { label: "help", href: "/help", icon: Message },
+  { label: "blog", href: "/blog", icon: Document },
 ];
+
+const sidebarFallbacks = {
+  home: "Home",
+  search: "Search",
+  discover: "Discover",
+  startProject: "Start a project",
+  resources: "Resources",
+  members: "Members",
+  partners: "Partners",
+  new: "New",
+  help: "Help",
+  blog: "Blog",
+};
 
 export default function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const locale = useLocale();
+  const messages = useMessages();
+  const sidebar = (key) => messages.sidebar?.[key] || sidebarFallbacks[key];
   const { isDark } = useTheme();
 
   const t = {
@@ -82,7 +98,7 @@ export default function Sidebar() {
           lg:hidden
           absolute
           top-4
-          left-4
+          ${locale === "ar" ? "right-4" : "left-4"}
           w-9
           h-9
           rounded-lg
@@ -144,7 +160,7 @@ export default function Sidebar() {
               />
 
               <span className={isDark ? "text-white" : "text-black"}>
-                {item.label}
+                {sidebar(item.label)}
               </span>
             </Link>
           );
@@ -153,7 +169,9 @@ export default function Sidebar() {
 
       {/* موارد */}
       <div className="px-4 mt-6">
-        <p className={`text-xs px-3 mb-2 ${t.subText}`}>موارد</p>
+        <p className={`text-xs px-3 mb-2 ${t.subText}`}>
+          {sidebar("resources")}
+        </p>
 
         <nav className="flex flex-col gap-1">
           {resourceItems.map((item) => {
@@ -199,13 +217,13 @@ export default function Sidebar() {
                   />
 
                   <span className={isDark ? "text-white" : "text-black"}>
-                    {item.label}
+                    {sidebar(item.label)}
                   </span>
                 </div>
 
                 {item.badge ? (
                   <span className="bg-[#94D3C1] text-white text-xs rounded px-1.5 py-0.5">
-                    {item.badge}
+                    {sidebar(item.badge)}
                   </span>
                 ) : (
                   <span />
@@ -228,7 +246,7 @@ export default function Sidebar() {
           lg:hidden
           fixed
           top-4
-          right-4
+          ${locale === "ar" ? "right-4" : "left-4"}
           z-[999999999999]
           w-10
           h-10
@@ -269,14 +287,13 @@ export default function Sidebar() {
       {/* Sidebar */}
 
       <aside
-        dir="rtl"
+        dir={locale === "ar" ? "rtl" : "ltr"}
         className={`
           fixed
-          right-0
+          ${locale === "ar" ? "right-0 border-l" : "left-0 border-r"}
           top-0
           h-screen
           w-[260px]
-          border-l
           flex
           flex-col
           z-[9999999999]
@@ -289,7 +306,11 @@ export default function Sidebar() {
 
           lg:translate-x-0
 
-          ${sidebarOpen ? "translate-x-0" : "translate-x-full"}
+          ${sidebarOpen
+            ? "translate-x-0"
+            : locale === "ar"
+              ? "translate-x-full"
+              : "-translate-x-full"}
         `}
       >
         {sidebarContent}

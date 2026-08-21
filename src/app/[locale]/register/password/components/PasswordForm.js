@@ -63,6 +63,9 @@ export default function PasswordForm() {
     return "#BFC9C4";
   }
 
+  // رموز خاصة ASCII فقط (مطابق لمتطلبات الباك إند)
+  const SPECIAL_CHAR_REGEX = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/;
+
   function validate() {
     const newErrors = {};
 
@@ -71,13 +74,13 @@ export default function PasswordForm() {
     } else if (password.length < 8) {
       newErrors.password = "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل";
     } else if (!/[A-Z]/.test(password)) {
-      newErrors.password = "يجب أن تحتوي كلمة المرور على حرف كبير";
+      newErrors.password = "يجب أن تحتوي كلمة المرور على حرف كبير (A-Z)";
     } else if (!/[a-z]/.test(password)) {
-      newErrors.password = "يجب أن تحتوي كلمة المرور على حرف صغير";
+      newErrors.password = "يجب أن تحتوي كلمة المرور على حرف صغير (a-z)";
     } else if (!/[0-9]/.test(password)) {
       newErrors.password = "يجب أن تحتوي كلمة المرور على رقم";
-    } else if (!/[^A-Za-z0-9]/.test(password)) {
-      newErrors.password = "يجب أن تحتوي كلمة المرور على رمز خاص";
+    } else if (!SPECIAL_CHAR_REGEX.test(password)) {
+      newErrors.password = "يجب أن تحتوي على رمز خاص مثل: ! @ # $ %";
     }
 
     if (!confirmPass.trim()) {

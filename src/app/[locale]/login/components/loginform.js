@@ -9,6 +9,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
 import { login } from "@/services/authService";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -17,6 +18,8 @@ export default function LoginForm() {
   const [errors, setErrors] = useState({ email: "", password: "", general: "" });
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("auth");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,11 +27,11 @@ export default function LoginForm() {
     const newErrors = { email: "", password: "", general: "" };
 
     if (!email.trim()) {
-      newErrors.email = "هذا الحقل مطلوب";
+      newErrors.email = t("required");
     }
 
     if (!password.trim()) {
-      newErrors.password = "هذا الحقل مطلوب";
+      newErrors.password = t("required");
     }
 
     setErrors(newErrors);
@@ -36,33 +39,33 @@ export default function LoginForm() {
     if (newErrors.email || newErrors.password) return;
 
     setIsLoading(true);
-
     try {
       const data = await login(email, password);
 
-      if (data && data.success && data.data && data.data.token) {
-        localStorage.setItem("token", data.data.token);
-        router.push("/dashboard");
+      const token = data?.token || data?.data?.token;
+
+      if (token) {
+        router.push(`/${locale}/dashboard`);
       } else {
-        throw new Error("بنية استجابة الخادم غير صالحة");
+        throw new Error(t("invalidServerResponse"));
       }
     } catch (err) {
-      let errorMessage = "حدث خطأ في الاتصال بالخادم. يرجى المحاولة لاحقاً.";
+      let errorMessage = t("genericLoginError");
       if (axios.isAxiosError(err)) {
         if (err.response) {
           const status = err.response.status;
           const backendMessage = err.response.data?.message;
           if (status === 401) {
-            errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة";
+            errorMessage = t("invalidCredentials");
           } else if (status === 400) {
-            errorMessage = "بيانات الدخول غير صالحة. يرجى التحقق من المدخلات.";
+            errorMessage = t("invalidLoginData");
           } else if (backendMessage) {
             errorMessage = backendMessage;
           } else {
             errorMessage = `خطأ من الخادم (${status})`;
           }
         } else if (err.request) {
-          errorMessage = "فشل الاتصال بالخادم. تحقق من اتصالك بالإنترنت.";
+          errorMessage = t("connectionFailed");
         }
       } else if (err instanceof Error) {
         errorMessage = err.message;
@@ -93,10 +96,10 @@ export default function LoginForm() {
           />
         </div>
         <h1 className="text-center text-white text-2xl font-bold mb-1">
-          تسجيل الدخول
+          {t("loginTitle")}
         </h1>
         <p className="text-center text-gray-300 text-sm">
-          مرحباً بك مجدداً في منصة Pay Per View
+          {t("loginWelcome")}
         </p>
       </div>
 
@@ -112,14 +115,14 @@ export default function LoginForm() {
         {/* Email */}
         <div className="mb-4">
           <label htmlFor="email" className="block text-xs text-gray-200 mb-1.5">
-            البريد الإلكتروني أو اسم المستخدم
+            {t("emailOrUsername")}
           </label>
           <input
             id="email"
             type="text"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="ادخل بريدك الإلكتروني"
+            placeholder={t("emailPlaceholder")}
             className={`w-full h-[35px] rounded-lg bg-white text-gray-900 placeholder-gray-400 text-sm px-4 outline-none focus:ring-2 text-right transition-all shadow-inner ${
               errors.email
                 ? "border-2 border-red-500 focus:ring-red-500"
@@ -134,7 +137,7 @@ export default function LoginForm() {
         {/* Password Group */}
         <div className="mb-5">
           <label htmlFor="password" className="block text-xs text-gray-200 mb-1.5">
-            كلمة المرور
+            {t("password")}
           </label>
           <div className="relative">
             <input
@@ -142,7 +145,7 @@ export default function LoginForm() {
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="ادخل كلمة المرور"
+              placeholder={t("passwordPlaceholder")}
               className={`w-full h-[35px] rounded-lg bg-white text-gray-900 placeholder-gray-400 text-sm px-4 pl-10 outline-none focus:ring-2 text-right transition-all shadow-inner ${
                 errors.password
                   ? "border-2 border-red-500 focus:ring-red-500"
@@ -152,7 +155,7 @@ export default function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword((s) => !s)}
-              aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+              aria-label={showPassword ? t("hidePassword") : t("showPassword")}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors"
             >
               {showPassword ? (
@@ -173,7 +176,7 @@ export default function LoginForm() {
               href="/forgot-password"
               className="text-xs text-orange-400 transition-colors drop-shadow-md"
             >
-              نسيت كلمة المرور؟
+              {t("forgotPassword")}
             </Link>
           </div>
         </div>
@@ -184,7 +187,7 @@ export default function LoginForm() {
           disabled={isLoading}
           className="w-full h-[35px] rounded-lg bg-[linear-gradient(97.47deg,#FFA600_0%,#FF4B04_100%)] text-white font-semibold text-base shadow-[0_4px_20px_rgba(234,88,12,0.4)] transition-all disabled:opacity-50"
         >
-          {isLoading ? "جاري تسجيل الدخول..." : "دخول"}
+          {isLoading ? t("signingIn") : t("signIn")}
         </button>
       </form>
 
@@ -193,7 +196,7 @@ export default function LoginForm() {
         <div className="flex items-center gap-3 mb-6">
           <div className="h-px flex-1 bg-white/20" />
           <span className="text-[11px] text-gray-300 whitespace-nowrap">
-            أو الدخول عبر
+            {t("orContinueWith")}
           </span>
           <div className="h-px flex-1 bg-white/20" />
         </div>
@@ -215,9 +218,9 @@ export default function LoginForm() {
         </div>
 
         <p className="text-center text-xs text-gray-300">
-          ليس لديك حساب?{" "}
+          {t("noAccount")} {" "}
           <Link href="/register" className="text-[#94D3C1] font-medium transition-colors drop-shadow-md">
-            إنشاء حساب جديد
+            {t("createAccount")}
           </Link>
         </p>
       </div>
