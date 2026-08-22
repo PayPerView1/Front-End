@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useRef, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import {
@@ -15,6 +16,8 @@ import { RiUserLine } from "react-icons/ri";
 import { useRouter } from "next/navigation";
 import api from "@/lib/axios";
 import { useLocale, useTranslations } from "next-intl";
+import worldCountries from "world-countries";
+import Select from "react-select";
 
 const menuItems = [
   { key: "profile", icon: RiUserLine },
@@ -25,6 +28,15 @@ const menuItems = [
   { key: "disputes", icon: MdOutlineGavel },
 ];
 
+const interests = [
+  { id: "LIFESTYLE", label: "نمط الحياة" },
+  { id: "TECHNOLOGY", label: "التكنولوجيا" },
+  { id: "EDUCATION", label: "التعليم" },
+  { id: "ENTERTAINMENT", label: "الترفيه" },
+  { id: "FINANCE", label: "المالية" },
+  { id: "HEALTH", label: "الصحة" },
+];
+
 function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState("day");
@@ -32,38 +44,54 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
 
   const today = new Date();
   const selected = value ? new Date(value) : null;
+
   const [currentMonth, setCurrentMonth] = useState(
     selected?.getMonth() ?? today.getMonth(),
   );
+
   const [currentYear, setCurrentYear] = useState(
     selected?.getFullYear() ?? today.getFullYear(),
   );
 
   const months = Array.from({ length: 12 }, (_, month) =>
-    new Intl.DateTimeFormat(locale, { month: "long" }).format(new Date(2026, month, 1)),
+    new Intl.DateTimeFormat(locale, { month: "long" }).format(
+      new Date(2026, month, 1),
+    ),
   );
+
   const weekdays = Array.from({ length: 7 }, (_, day) =>
-    new Intl.DateTimeFormat(locale, { weekday: "short" }).format(new Date(2026, 7, 2 + day)),
+    new Intl.DateTimeFormat(locale, { weekday: "short" }).format(
+      new Date(2026, 7, 2 + day),
+    ),
   );
+
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
   const firstDay = new Date(currentYear, currentMonth, 1).getDay();
 
   useEffect(() => {
     function handleClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+      }
     }
+
     document.addEventListener("mousedown", handleClick);
+
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   function selectDay(day) {
     const date = new Date(currentYear, currentMonth, day);
+
     onChange(date.toISOString().split("T")[0]);
     setOpen(false);
   }
 
   const displayValue = selected
-    ? `${selected.getDate()} ${months[selected.getMonth()]} ${selected.getFullYear()}`
+    ? `${selected.getDate()} ${
+        months[selected.getMonth()]
+      } ${selected.getFullYear()}`
     : placeholder;
 
   return (
@@ -72,21 +100,26 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
         type="button"
         onClick={() => setOpen((p) => !p)}
         className={`w-full h-11 rounded-lg border px-4 text-right text-sm cursor-pointer flex items-center justify-between
+          hover:border-[#94D3C1]
           ${t.inputBg} ${t.inputBorder} ${t.inputText}`}
       >
         <span className={selected ? t.inputText : "text-[#9A9A9A]"}>
           {displayValue}
         </span>
+
         <span className={t.subText}>▾</span>
       </button>
 
       {open && (
         <div
           className={`absolute top-12 right-0 z-50 w-full rounded-xl border shadow-2xl p-3
-            ${isDark ? "bg-[#1a1a1a] border-[#2D2D2D]" : "bg-white border-[#E5E5E5]"}`}
+            ${
+              isDark
+                ? "bg-[#1a1a1a] border-[#2D2D2D]"
+                : "bg-white border-[#E5E5E5]"
+            }`}
           dir={locale === "ar" ? "rtl" : "ltr"}
         >
-          {/* Header */}
           <div className="flex items-center justify-between mb-3">
             <button
               type="button"
@@ -96,6 +129,7 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
                     setCurrentYear((y) => y - 1);
                     return 11;
                   }
+
                   return p - 1;
                 })
               }
@@ -103,6 +137,7 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
             >
               ‹
             </button>
+
             <div className="flex gap-2">
               <button
                 type="button"
@@ -113,6 +148,7 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
               >
                 {months[currentMonth]}
               </button>
+
               <button
                 type="button"
                 onClick={() => setView((v) => (v === "year" ? "day" : "year"))}
@@ -121,6 +157,7 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
                 {currentYear}
               </button>
             </div>
+
             <button
               type="button"
               onClick={() =>
@@ -129,6 +166,7 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
                     setCurrentYear((y) => y + 1);
                     return 0;
                   }
+
                   return p + 1;
                 })
               }
@@ -138,7 +176,6 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
             </button>
           </div>
 
-          {/* الأشهر */}
           {view === "month" && (
             <div className="grid grid-cols-3 gap-1">
               {months.map((m, i) => (
@@ -150,7 +187,11 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
                     setView("day");
                   }}
                   className={`py-2 text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all
-                    ${currentMonth === i ? "bg-[#94D3C1]/20 text-[#94D3C1]" : `${t.subText} hover:bg-white/5`}`}
+                    ${
+                      currentMonth === i
+                        ? "bg-[#94D3C1]/20 text-[#94D3C1]"
+                        : `${t.subText} hover:bg-white/5`
+                    }`}
                 >
                   {m}
                 </button>
@@ -158,7 +199,6 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
             </div>
           )}
 
-          {/* السنوات */}
           {view === "year" && (
             <div className="grid grid-cols-4 gap-1 max-h-[160px] overflow-y-auto">
               {Array.from(
@@ -173,7 +213,11 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
                     setView("day");
                   }}
                   className={`py-2 text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all
-                    ${currentYear === y ? "bg-[#94D3C1]/20 text-[#94D3C1]" : `${t.subText} hover:bg-white/5`}`}
+                    ${
+                      currentYear === y
+                        ? "bg-[#94D3C1]/20 text-[#94D3C1]"
+                        : `${t.subText} hover:bg-white/5`
+                    }`}
                 >
                   {y}
                 </button>
@@ -181,7 +225,6 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
             </div>
           )}
 
-          {/* الأيام */}
           {view === "day" && (
             <>
               <div className="grid grid-cols-7 mb-1">
@@ -194,23 +237,30 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
                   </div>
                 ))}
               </div>
+
               <div className="grid grid-cols-7 gap-0.5">
                 {Array.from({ length: firstDay }).map((_, i) => (
                   <div key={i} />
                 ))}
+
                 {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(
                   (day) => {
                     const isSelected =
                       selected?.getDate() === day &&
                       selected?.getMonth() === currentMonth &&
                       selected?.getFullYear() === currentYear;
+
                     return (
                       <button
                         key={day}
                         type="button"
                         onClick={() => selectDay(day)}
                         className={`w-full aspect-square text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all
-                        ${isSelected ? "bg-[#94D3C1] text-white" : `${t.inputText} hover:bg-[#94D3C1]/20`}`}
+                        ${
+                          isSelected
+                            ? "bg-[#94D3C1] text-white"
+                            : `${t.inputText} hover:bg-[#94D3C1]/20`
+                        }`}
                       >
                         {day}
                       </button>
@@ -236,7 +286,7 @@ function Toggle({ value, onChange, isDark }) {
     >
       <span
         className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all duration-200
-        ${value ? "left-[18px]" : "left-0.5"}`}
+          ${value ? "left-[18px]" : "left-0.5"}`}
       />
     </button>
   );
@@ -247,18 +297,30 @@ export default function EditProfileContent() {
   const router = useRouter();
   const locale = useLocale();
   const copy = useTranslations("editProfile");
+
   const [activeMenu, setActiveMenu] = useState("profile");
+
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
+
   const coverRef = useRef(null);
   const profileRef = useRef(null);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
 
+  const [phone, setPhone] = useState("");
+  const [dialCode, setDialCode] = useState("");
+  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
+
+  const [selectedInterests, setSelectedInterests] = useState([]);
+
   const [form, setForm] = useState({
     name: "",
     username: "",
+    email: "",
     bio: "",
     birthDate: "",
   });
@@ -287,42 +349,62 @@ export default function EditProfileContent() {
       : "bg-[#94D3C1]/10 text-[#2a9d8f]",
     hoverMenu: isDark ? "hover:bg-white/5" : "hover:bg-[#F5F5F5]",
   };
+
   async function handleSave() {
     setSaving(true);
     setSaveMsg("");
+
     try {
       const hasNewImage = profileImage instanceof File;
       let data;
+
       if (hasNewImage) {
         data = api.createFormData({
           fullName: form.name,
           profilePicture: profileImage,
+          interests: selectedInterests,
         });
       } else {
-        data = { fullName: form.name };
+        data = {
+          fullName: form.name,
+          interests: selectedInterests,
+        };
       }
+
       const result = await api.updateProfile(data);
+
       setSaveMsg(copy("saved"));
+
       const updatedUser = result?.user || result?.data || result;
-      if (updatedUser) api.saveAuthData(api.getToken(), updatedUser);
+
+      if (updatedUser) {
+        api.saveAuthData(api.getToken(), updatedUser);
+      }
     } catch (error) {
       setSaveMsg(`${copy("saveError")}: ${error.message}`);
     } finally {
       setSaving(false);
     }
   }
+
   useEffect(() => {
     async function loadProfile() {
       try {
         const result = await api.getProfile();
         const user = result?.user || result?.data || result;
+
         setForm({
           name: user?.fullName || "",
           username: user?.username || "",
+          email: user?.email || "",
           bio: user?.bio || "",
           birthDate: user?.birthDate || "",
         });
-        // إذا عنده صورة
+
+        if (user?.interests && user.interests.length > 0) {
+          setSelectedInterests(user.interests);
+        }
+
         if (
           user.profilePicture &&
           user.profilePicture !== "default-avatar.png"
@@ -337,60 +419,93 @@ export default function EditProfileContent() {
         setLoading(false);
       }
     }
+
     loadProfile();
   }, []);
+
+  const countries = worldCountries
+    .map((c) => ({
+      name: c.translations.ara?.common || c.name.common,
+      code: c.cca2,
+      dial: c.idd.root + (c.idd.suffixes?.[0] || ""),
+      flag: c.flag,
+    }))
+    .filter((c) => c.dial && c.dial !== "")
+    .sort((a, b) => a.name.localeCompare(b.name, "ar"));
+
+  const dialOptions = countries.map((c) => ({
+    value: c.dial,
+    label: `${c.flag} ${c.dial}`,
+  }));
+
+  const countryOptions = countries.map((c) => ({
+    value: c.code,
+    label: `${c.flag} ${c.name}`,
+  }));
+
   return (
-    <div className={`flex flex-1 w-full ${t.bg}`} dir={locale === "ar" ? "rtl" : "ltr"}>
-      {/* ===== قائمة الإعدادات ===== */}
+    <div
+      className={`flex flex-1 w-full min-w-0 ${t.bg}`}
+      dir={locale === "ar" ? "rtl" : "ltr"}
+    >
       <div
-        className={`w-[240px] flex-shrink-0 border-l flex flex-col py-4 px-2 ${t.sidebarBg} ${t.sidebarBorder}`}
+        className={`w-1/4 lg:w-[240px] flex-shrink-0 border-l flex flex-col py-4 px-1 sm:px-2 ${t.sidebarBg} ${t.sidebarBorder}`}
       >
         <p
-          className={` text-xs font-bold px-3 mb-3 ${t.subText}
-        ${isDark ? "text-white" : "text-black"}
+          className={`text-[10px] sm:text-xs font-bold px-1 sm:px-3 mb-3 ${t.subText}
+          ${isDark ? "text-white" : "text-black"}
         `}
         >
           {copy("accountSettings")}
         </p>
+
         <nav className="flex flex-col gap-1 flex-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeMenu === item.key;
+
             return (
               <button
                 key={item.key}
                 type="button"
                 onClick={() => setActiveMenu(item.key)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-right bg-transparent border-none cursor-pointer transition-all
+                className={`w-full flex items-center gap-1 sm:gap-3 px-1.5 sm:px-3 py-2.5 rounded-lg text-[10px] sm:text-sm text-right bg-transparent border-none cursor-pointer transition-all
                   ${isActive ? t.activeMenu : `${t.subText} ${t.hoverMenu}`}`}
               >
                 <Icon size={18} color={isActive ? "#94D3C1" : "#9A9A9A"} />
-                <span>{copy(item.key)}</span>
+
+                <span className="truncate">{copy(item.key)}</span>
               </button>
             );
           })}
         </nav>
 
-        {/* زر تسجيل الخروج */}
-        <div className={`border-t pt-4 px-2 ${t.sidebarBorder}`}>
+        {/* Logout */}
+        <div className={`border-t pt-4 px-1 sm:px-2 ${t.sidebarBorder}`}>
           <button
             type="button"
             onClick={() => router.push(`/${locale}/logout`)}
-            className="w-full h-10 rounded-lg text-white text-sm font-bold cursor-pointer border-none"
-            style={{ background: "#DC2626" }}
+            className="w-full h-9 sm:h-10 rounded-lg text-white text-[10px] sm:text-sm font-bold cursor-pointer border-none"
+            style={{
+              background: "#DC2626",
+            }}
           >
             {copy("signOut")}
           </button>
         </div>
       </div>
 
-      {/* ===== المحتوى ===== */}
-      <div className={`flex-1 flex flex-col overflow-y-auto ${t.contentBg}`}>
-        <div className="w-full px-6 py-6 flex flex-col gap-6">
-          {/* الغلاف */}
+      {/* CONTENT */}
+      <div
+        className={`flex-1 min-w-0 flex flex-col overflow-y-auto ${t.contentBg}`}
+      >
+        <div className="w-full min-w-0 px-2 sm:px-4 lg:px-6 py-4 sm:py-6 flex flex-col gap-5 sm:gap-6">
+          {/* Cover */}
           <div className="relative">
             <div
-              className={`relative h-[120px] sm:h-[160px] w-full rounded-xl overflow-hidden cursor-pointer ${isDark ? "bg-[#1A1A1A]" : "bg-[#E0E0E0]"}`}
+              className={`relative h-[100px] sm:h-[140px] md:h-[160px] lg:h-[190px] w-full rounded-xl overflow-hidden cursor-pointer ${
+                isDark ? "bg-[#1A1A1A]" : "bg-[#E0E0E0]"
+              }`}
               onClick={() => coverRef.current?.click()}
             >
               {coverImage && (
@@ -400,8 +515,8 @@ export default function EditProfileContent() {
                   className="w-full h-full object-cover"
                 />
               )}
-              <div className="absolute inset-0 flex items-center justify-center"></div>
             </div>
+
             <input
               ref={coverRef}
               type="file"
@@ -409,18 +524,25 @@ export default function EditProfileContent() {
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
-                if (f) setCoverImage(URL.createObjectURL(f));
+
+                if (f) {
+                  setCoverImage(URL.createObjectURL(f));
+                }
               }}
             />
 
-            {/* صورة البروفايل */}
+            {/* Profile */}
             <div
-              className="absolute -bottom-7 right-4 cursor-pointer"
+              className="absolute -bottom-7 right-2 sm:right-4 cursor-pointer"
               onClick={() => profileRef.current?.click()}
             >
               <div
-                className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 flex items-center justify-center
-                ${isDark ? "bg-[#333] border-[#0D0D0D]" : "bg-[#D0D0D0] border-white"}`}
+                className={`relative w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-2 flex items-center justify-center
+                  ${
+                    isDark
+                      ? "bg-[#333] border-[#0D0D0D]"
+                      : "bg-[#D0D0D0] border-white"
+                  }`}
               >
                 {profileImage ? (
                   <img
@@ -432,6 +554,7 @@ export default function EditProfileContent() {
                   <RiUserLine size={22} color="#9A9A9A" />
                 )}
               </div>
+
               <input
                 ref={profileRef}
                 type="file"
@@ -439,15 +562,20 @@ export default function EditProfileContent() {
                 className="hidden"
                 onChange={(e) => {
                   const f = e.target.files?.[0];
-                  if (f) setProfileImage(URL.createObjectURL(f));
+
+                  if (f) {
+                    setProfileImage(URL.createObjectURL(f));
+                  }
                 }}
               />
             </div>
           </div>
 
-          {/* الاسم */}
+          {/* Name */}
           <div className="flex flex-col gap-1 mt-4">
-            <label className={`text-sm font-bold text-right ${t.text}`}>
+            <label
+              className={`text-xs sm:text-sm font-bold text-right ${t.text}`}
+            >
               {copy("name")}
             </label>
 
@@ -455,20 +583,30 @@ export default function EditProfileContent() {
               type="text"
               value={form.name}
               maxLength={30}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className={`w-full h-11 rounded-lg border px-4 text-right text-sm outline-none transition-all
-                ${t.inputBg} ${t.inputBorder} ${t.inputText}`}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  name: e.target.value,
+                })
+              }
+              className={`w-full h-10 sm:h-11 rounded-lg border px-3 sm:px-4 text-right text-xs sm:text-sm outline-none transition-all
+                focus:border-[#94D3C1]
+                ${t.inputBg}
+                ${t.inputBorder}
+                ${t.inputText}
+                placeholder-[#9A9A9A]`}
             />
+
             <div className="flex gap-2 justify-end">
-              <span className={`text-xs ${t.subText}`}>
+              <span className={`text-[10px] sm:text-xs ${t.subText}`}>
                 {form.name.length}/30
               </span>
             </div>
           </div>
 
-          {/* اسم المستخدم */}
+          {/* Username */}
           <div className="flex flex-col gap-1">
-            <label className={`text-sm font-bold ${t.text}`}>
+            <label className={`text-xs sm:text-sm font-bold ${t.text}`}>
               {copy("username")}
             </label>
 
@@ -476,45 +614,377 @@ export default function EditProfileContent() {
               type="text"
               value={form.username}
               maxLength={42}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              className={`w-full h-11 rounded-lg border px-4 text-right text-sm outline-none transition-all
-                ${t.inputBg} ${t.inputBorder} ${t.inputText}`}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  username: e.target.value,
+                })
+              }
+              className={`w-full h-10 sm:h-11 rounded-lg border px-3 sm:px-4 text-right text-xs sm:text-sm outline-none transition-all
+                focus:border-[#94D3C1]
+                ${t.inputBg}
+                ${t.inputBorder}
+                ${t.inputText}
+                placeholder-[#9A9A9A]`}
             />
+
             <div className="flex gap-2 justify-end">
-              <span className={`text-xs ${t.subText}`}>
+              <span className={`text-[10px] sm:text-xs ${t.subText}`}>
                 {form.username.length}/42
               </span>
             </div>
           </div>
 
-          {/* نبذة شخصية */}
+          {/* Email */}
           <div className="flex flex-col gap-1">
-            <label className={`text-sm font-bold ${t.text}`}>{copy("bio")}</label>
+            <label className={`text-xs sm:text-sm font-bold ${t.text}`}>
+              {copy("email")}
+            </label>
+
+            <input
+              type="email"
+              value={form.email}
+              maxLength={42}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  email: e.target.value,
+                })
+              }
+              className={`w-full h-10 sm:h-11 rounded-lg border px-3 sm:px-4 text-right text-xs sm:text-sm outline-none transition-all
+                focus:border-[#94D3C1]
+                ${t.inputBg}
+                ${t.inputBorder}
+                ${t.inputText}
+                placeholder-[#9A9A9A]`}
+            />
+
+            <div className="flex gap-2 justify-end">
+              <span className={`text-[10px] sm:text-xs ${t.subText}`}>
+                {form.email.length}/42
+              </span>
+            </div>
+          </div>
+
+          {/* Bio */}
+          <div className="flex flex-col gap-1">
+            <label className={`text-xs sm:text-sm font-bold ${t.text}`}>
+              {copy("bio")}
+            </label>
 
             <textarea
               value={form.bio}
               maxLength={100}
-              onChange={(e) => setForm({ ...form, bio: e.target.value })}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  bio: e.target.value,
+                })
+              }
               placeholder={copy("bioPlaceholder")}
               rows={3}
-              className={`w-full rounded-lg border px-4 py-3 text-right text-sm outline-none resize-none transition-all
-                ${t.inputBg} ${t.inputBorder} ${t.inputText} placeholder-[#9A9A9A]`}
+              className={`w-full rounded-lg border px-3 sm:px-4 py-3 text-xs sm:text-sm text-right outline-none resize-none transition-all
+                focus:border-[#94D3C1]
+                ${t.inputBg}
+                ${t.inputBorder}
+                ${t.inputText}
+                placeholder-[#9A9A9A]`}
             />
+
             <div className="flex gap-2 justify-end">
-              <span className={`text-xs ${t.subText}`}>
+              <span className={`text-[10px] sm:text-xs ${t.subText}`}>
                 {form.bio.length}/100
               </span>
             </div>
           </div>
 
-          {/* تاريخ الميلاد */}
+          {/* Phone */}
+          <div className="flex flex-col gap-1">
+            <label className={`text-xs sm:text-sm font-bold ${t.text}`}>
+              رقم الهاتف
+            </label>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              {/* Dial Code */}
+              <div className="w-full sm:w-[30%]">
+                <Select
+                  instanceId="dial-code-select"
+                  options={dialOptions}
+                  onChange={(opt) => setDialCode(opt.value)}
+                  isSearchable
+                  placeholder="اختر"
+                  value={
+                    dialOptions.find((o) => o.value === dialCode) || undefined
+                  }
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      height: "44px",
+                      minHeight: "44px",
+                      width: "100%",
+                      background: isDark ? "#111" : "#F5F5F5",
+                      borderColor: state.isFocused
+                        ? "#94D3C1"
+                        : isDark
+                          ? "#2D2D2D"
+                          : "#E0E0E0",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      boxShadow: "none",
+                    }),
+
+                    menu: (base) => ({
+                      ...base,
+                      width: "200px",
+                      maxWidth: "90vw",
+                      zIndex: 9999,
+                      background: isDark ? "#1a1a1a" : "white",
+                      border: `1px solid ${isDark ? "#2D2D2D" : "#E5E5E5"}`,
+                      borderRadius: "8px",
+                    }),
+
+                    option: (base, state) => ({
+                      ...base,
+                      fontSize: "13px",
+                      background: state.isSelected
+                        ? "#F97316"
+                        : state.isFocused
+                          ? isDark
+                            ? "#2a2a2a"
+                            : "#F5F5F5"
+                          : "transparent",
+                      color: isDark ? "white" : "black",
+                      cursor: "pointer",
+                    }),
+
+                    singleValue: (base) => ({
+                      ...base,
+                      fontSize: "13px",
+                      color: isDark ? "white" : "black",
+                    }),
+
+                    placeholder: (base) => ({
+                      ...base,
+                      color: "#9A9A9A",
+                      fontSize: "13px",
+                    }),
+
+                    indicatorSeparator: () => ({
+                      display: "none",
+                    }),
+                  }}
+                />
+              </div>
+
+              {/* Phone */}
+              <div className="w-full sm:w-[70%]">
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="أدخل رقم الهاتف"
+                  className={`w-full h-11 rounded-lg border px-3 sm:px-4 text-right text-xs sm:text-sm outline-none transition-all
+                    focus:border-[#94D3C1]
+                    ${t.inputBg}
+                    ${t.inputBorder}
+                    ${t.inputText}
+                    placeholder-[#9A9A9A]`}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Country + City */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Country */}
+            <div className="flex flex-col gap-1 w-full sm:w-[30%]">
+              <label className={`text-xs sm:text-sm font-bold ${t.text}`}>
+                الدولة
+              </label>
+
+              <Select
+                instanceId="country-select"
+                options={countryOptions}
+                onChange={(opt) => setCountry(opt.value)}
+                isSearchable
+                placeholder="اختر الدولة"
+                value={
+                  countryOptions.find((o) => o.value === country) || undefined
+                }
+                styles={{
+                  control: (base, state) => ({
+                    ...base,
+                    height: "44px",
+                    minHeight: "44px",
+                    background: isDark ? "#111" : "#F5F5F5",
+                    borderColor: state.isFocused
+                      ? "#94D3C1"
+                      : isDark
+                        ? "#2D2D2D"
+                        : "#E0E0E0",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    boxShadow: "none",
+                  }),
+
+                  menu: (base) => ({
+                    ...base,
+                    zIndex: 9999,
+                    maxWidth: "90vw",
+                    background: isDark ? "#1a1a1a" : "white",
+                    border: `1px solid ${isDark ? "#2D2D2D" : "#E5E5E5"}`,
+                    borderRadius: "8px",
+                  }),
+
+                  option: (base, state) => ({
+                    ...base,
+                    fontSize: "13px",
+                    background: state.isSelected
+                      ? "#F97316"
+                      : state.isFocused
+                        ? isDark
+                          ? "#2a2a2a"
+                          : "#F5F5F5"
+                        : "transparent",
+                    color: isDark ? "white" : "black",
+                    cursor: "pointer",
+                  }),
+
+                  singleValue: (base) => ({
+                    ...base,
+                    fontSize: "13px",
+                    color: isDark ? "white" : "black",
+                  }),
+
+                  placeholder: (base) => ({
+                    ...base,
+                    color: "#9A9A9A",
+                    fontSize: "13px",
+                  }),
+
+                  indicatorSeparator: () => ({
+                    display: "none",
+                  }),
+                }}
+              />
+            </div>
+
+            {/* City */}
+            <div className="flex flex-col gap-1 w-full sm:w-[70%]">
+              <label className={`text-xs sm:text-sm font-bold ${t.text}`}>
+                المدينة
+              </label>
+
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="مثال: دبي"
+                className={`w-full h-11 rounded-lg border px-3 sm:px-4 text-right text-xs sm:text-sm outline-none transition-all
+                  focus:border-[#94D3C1]
+                  ${t.inputBg}
+                  ${t.inputBorder}
+                  ${t.inputText}
+                  placeholder-[#9A9A9A]`}
+              />
+            </div>
+          </div>
+
+          {/* Interests */}
+          <div className="flex flex-col gap-2">
+            <label className={`text-xs sm:text-sm font-bold ${t.text}`}>
+              الاهتمامات
+            </label>
+
+            {selectedInterests.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {selectedInterests.map((id) => {
+                  const item = interests.find((i) => i.id === id);
+
+                  return (
+                    <div
+                      key={id}
+                      className="flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold text-white"
+                      style={{
+                        background: "linear-gradient(90deg, #FFA600, #FF4B04)",
+                      }}
+                    >
+                      <span>{item?.label}</span>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSelectedInterests((prev) =>
+                            prev.filter((i) => i !== id),
+                          )
+                        }
+                        className="bg-transparent border-none cursor-pointer text-white flex items-center p-0 mr-1"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div
+              className={`flex flex-wrap gap-2 p-2 sm:p-3 rounded-lg border ${t.inputBg} ${t.inputBorder}`}
+            >
+              {interests.map((item) => {
+                const isSelected = selectedInterests.includes(item.id);
+
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedInterests((prev) =>
+                        isSelected
+                          ? prev.filter((i) => i !== item.id)
+                          : [...prev, item.id],
+                      );
+                    }}
+                    className={`px-2.5 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold border-none cursor-pointer transition-all
+                      ${
+                        isSelected
+                          ? "text-white"
+                          : `${t.subText} ${
+                              isDark ? "bg-white/5" : "bg-[#F0F0F0]"
+                            }`
+                      }`}
+                    style={
+                      isSelected
+                        ? {
+                            background:
+                              "linear-gradient(90deg, #FFA600, #FF4B04)",
+                          }
+                        : {}
+                    }
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Birth Date */}
           <div className="flex flex-col gap-1 w-full sm:max-w-[280px]">
-            <label className={`text-sm font-bold text-right ${t.text}`}>
+            <label
+              className={`text-xs sm:text-sm font-bold text-right ${t.text}`}
+            >
               {copy("birthDate")}
             </label>
+
             <DatePicker
               value={form.birthDate}
-              onChange={(val) => setForm({ ...form, birthDate: val })}
+              onChange={(val) =>
+                setForm({
+                  ...form,
+                  birthDate: val,
+                })
+              }
               isDark={isDark}
               t={t}
               locale={locale}
@@ -522,20 +992,32 @@ export default function EditProfileContent() {
             />
           </div>
 
-          {/* تقاضين إضافية */}
+          {/* Additional Settings */}
           <div className="flex flex-col gap-1">
-            <label className={`text-sm font-bold text-right ${t.text}`}>
+            <label
+              className={`text-xs sm:text-sm font-bold text-right ${t.text}`}
+            >
               {copy("additionalSettings")}
             </label>
-            <p className={`text-xs text-right ${t.subText}`}>
+
+            <p className={`text-[10px] sm:text-xs text-right ${t.subText}`}>
               {copy("additionalDescription")}
             </p>
+
             <div
               className={`flex flex-col gap-0 rounded-xl border overflow-hidden mt-2 ${t.cardBg} ${t.cardBorder}`}
             >
               {[
-                { key: "earnings", label: copy("earnings"), icon: Wallet },
-                { key: "location", label: copy("location"), icon: Location },
+                {
+                  key: "earnings",
+                  label: copy("earnings"),
+                  icon: Wallet,
+                },
+                {
+                  key: "location",
+                  label: copy("location"),
+                  icon: Location,
+                },
                 {
                   key: "openCommunities",
                   label: copy("openCommunities"),
@@ -548,24 +1030,30 @@ export default function EditProfileContent() {
                 },
               ].map((item, i, arr) => {
                 const Icon = item.icon;
+
                 return (
                   <div
                     key={item.key}
-                    className={`flex items-center justify-between px-4 py-3
-        ${i < arr.length - 1 ? `border-b ${t.cardBorder}` : ""}`}
+                    className={`flex items-center justify-between px-3 sm:px-4 py-3
+                      ${i < arr.length - 1 ? `border-b ${t.cardBorder}` : ""}`}
                   >
-                    {/* الأيقونة والنص على اليمين */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
                       <Icon set="light" size={18} primaryColor="#9CA3AF" />
-                      <span className={`text-sm font-bold ${t.text}`}>
+
+                      <span
+                        className={`text-[10px] sm:text-sm font-bold truncate ${t.text}`}
+                      >
                         {item.label}
                       </span>
                     </div>
-                    {/* الزر على اليسار */}
+
                     <Toggle
                       value={toggles[item.key]}
                       onChange={(val) =>
-                        setToggles({ ...toggles, [item.key]: val })
+                        setToggles({
+                          ...toggles,
+                          [item.key]: val,
+                        })
                       }
                       isDark={isDark}
                     />
@@ -575,22 +1063,45 @@ export default function EditProfileContent() {
             </div>
           </div>
 
-          {/* زر الحفظ */}
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className="w-full sm:w-[200px] sm:mr-auto h-11 rounded-lg text-white text-sm font-bold cursor-pointer border-none disabled:opacity-70"
-            style={{
-              background: "linear-gradient(to right, #FFA600, #FF4B04)",
-            }}
-          >
-            {saving ? copy("saving") : copy("save")}
-          </button>
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            {/* Save */}
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving}
+              className="w-full sm:w-[250px] h-11 px-4 sm:px-8 rounded-lg text-white text-xs sm:text-sm font-bold cursor-pointer border-none disabled:opacity-70"
+              style={{
+                background: "linear-gradient(to right, #FFA600, #FF4B04)",
+              }}
+            >
+              {saving ? copy("saving") : copy("save")}
+            </button>
 
+            {/* Cancel */}
+            <button
+              type="button"
+              onClick={() => router.push(`/${locale}/dashboard`)}
+              className={`w-full sm:w-[130px] h-11 px-4 sm:px-8 rounded-lg text-xs sm:text-sm font-bold cursor-pointer transition-all border
+                hover:border-[#94D3C1]
+                focus:border-[#94D3C1]
+                focus:outline-none
+                ${
+                  isDark
+                    ? "bg-transparent border-[#A1A1AA] text-white"
+                    : "bg-transparent border-[#A1A1AA] text-black"
+                }`}
+            >
+              {copy("cancel")}
+            </button>
+          </div>
+
+          {/* Save Message */}
           {saveMsg && (
             <p
-              className={`text-sm text-right ${saveMsg.includes("✅") ? "text-[#94D3C1]" : "text-red-400"}`}
+              className={`text-xs sm:text-sm text-right ${
+                saveMsg.includes("✅") ? "text-[#94D3C1]" : "text-red-400"
+              }`}
             >
               {saveMsg}
             </p>

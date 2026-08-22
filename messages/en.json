@@ -25,13 +25,45 @@
     "share": "Share",
     "copyLink": "Copy Link",
     "tabs": { "creator": "Creator", "joined": "Joined", "reviews": "Reviews" },
-    "user": { "joined": "Joined Jul 2026", "followers": "Followers", "following": "Following" },
-    "buttons": { "editProfile": "Edit Profile", "manageRequests": "Manage Requests", "createWork": "Create New Work", "exploreCampaigns": "Explore Campaigns" },
-    "coverMenu": { "share": "Share", "copyLink": "Copy Link", "edit": "Edit Profile" },
-    "empty": { "noCreatedWorks": "No created works yet", "noJoinedCampaigns": "No joined campaigns yet" },
-    "campaigns": { "arabClips": "Arabic Clips Community", "creators": "Creators Platform", "academy": "Content Academy", "followers": "{count} followers" },
-    "cardMenu": { "markRead": "Mark as read", "invite": "Invite people", "copyLink": "Copy link", "writeReview": "Write a review", "leave": "Leave" },
-    "reviews": { "noReviews": "No reviews yet", "noUserReviews": "This user has no reviews yet", "beFirst": "Be the first to write a review!", "leaveReview": "Leave a review" }
+    "user": {
+      "joined": "Joined Jul 2026",
+      "followers": "Followers",
+      "following": "Following"
+    },
+    "buttons": {
+      "editProfile": "Edit Profile",
+      "manageRequests": "Manage Requests",
+      "createWork": "Create New Work",
+      "exploreCampaigns": "Explore Campaigns"
+    },
+    "coverMenu": {
+      "share": "Share",
+      "copyLink": "Copy Link",
+      "edit": "Edit Profile"
+    },
+    "empty": {
+      "noCreatedWorks": "No created works yet",
+      "noJoinedCampaigns": "No joined campaigns yet"
+    },
+    "campaigns": {
+      "arabClips": "Arabic Clips Community",
+      "creators": "Creators Platform",
+      "academy": "Content Academy",
+      "followers": "{count} followers"
+    },
+    "cardMenu": {
+      "markRead": "Mark as read",
+      "invite": "Invite people",
+      "copyLink": "Copy link",
+      "writeReview": "Write a review",
+      "leave": "Leave"
+    },
+    "reviews": {
+      "noReviews": "No reviews yet",
+      "noUserReviews": "This user has no reviews yet",
+      "beFirst": "Be the first to write a review!",
+      "leaveReview": "Leave a review"
+    }
   },
   "auth": {
     "required": "This field is required",
@@ -87,6 +119,30 @@
     "resetPassword": "Reset password"
   },
   "editProfile": {
-    "accountSettings": "Account settings", "signOut": "Sign out", "name": "Name", "username": "Username", "bio": "Bio", "bioPlaceholder": "Tell us about yourself", "birthDate": "Date of birth", "additionalSettings": "Additional settings", "additionalDescription": "Choose what appears on your profile and allow others to discover you", "earnings": "Total earnings", "location": "Location", "openCommunities": "Open communities", "joinedCommunities": "Joined communities", "save": "Save changes", "saving": "Saving...", "saved": "Saved successfully", "saveError": "An error occurred", "profile": "Edit profile", "payments": "Payments", "services": "Connected services", "security": "Account security", "subscriptions": "Subscriptions", "disputes": "Dispute center"
+    "accountSettings": "Account settings",
+    "signOut": "Sign out",
+    "name": "Name",
+    "username": "Username",
+    "email": "Email",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell us about yourself",
+    "birthDate": "Date of birth",
+    "additionalSettings": "Additional settings",
+    "additionalDescription": "Choose what appears on your profile and allow others to discover you",
+    "earnings": "Total earnings",
+    "location": "Location",
+    "openCommunities": "Open communities",
+    "joinedCommunities": "Joined communities",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "saved": "Saved successfully",
+    "saveError": "An error occurred",
+    "cancel": "Cancel", 
+    "profile": "Edit profile",
+    "payments": "Payments",
+    "services": "Connected services",
+    "security": "Account security",
+    "subscriptions": "Subscriptions",
+    "disputes": "Dispute center"
   }
 }
