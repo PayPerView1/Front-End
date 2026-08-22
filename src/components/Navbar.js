@@ -1,5 +1,5 @@
 "use client";
-
+import { useAssistant } from "@/context/AssistantContext";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
@@ -31,7 +31,7 @@ export default function Navbar() {
   const nav = useTranslations("nav");
 
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
-
+  const { toggleAssistant } = useAssistant();
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [user, setUser] = useState(null);
@@ -152,7 +152,7 @@ export default function Navbar() {
         </div>
 
         {/* AI */}
-        <BsStars size={19} color="#9A9A9A" className="cursor-pointer mx-1" />
+        <BsStars size={19} color="#9A9A9A" className="cursor-pointer mx-1" onClick={toggleAssistant}/>
 
         {/* الرسائل */}
         <Chat
