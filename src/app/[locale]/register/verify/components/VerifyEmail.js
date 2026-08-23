@@ -4,13 +4,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Message } from "react-iconly";
 import { verifyEmail } from "@/services/auth";
 
-export default function VerifyEmail({ email: emailProp }) {
+export default function VerifyEmail({ email: emailProp, verificationToken = "" }) {
     const [resent, setResent] = useState(false);
     const [email, setEmail] = useState(emailProp || "");
     const [verificationState, setVerificationState] = useState("idle");
     const [verificationMessage, setVerificationMessage] = useState("");
     const searchParams = useSearchParams();
-    const token = searchParams.get("token") || searchParams.get("verificationToken") || "";
+    const token = verificationToken || searchParams.get("token") || searchParams.get("verificationToken") || "";
     const router = useRouter();
 
     // اقرأ الإيميل من localStorage أو sessionStorage إذا لم يُمرَّر كـ prop

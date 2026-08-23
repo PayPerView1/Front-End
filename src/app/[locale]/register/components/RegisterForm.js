@@ -213,6 +213,7 @@ export default function RegisterForm() {
       <div className="flex gap-4">
         {/* Google */}
         <button
+          type="button"
           onClick={() => api.loginWithGoogle()}
           className="flex-1 h-10 rounded-lg border border-[#FFEEE3]/40 bg-transparent text-[#E1E3E4] text-sm cursor-pointer flex items-center justify-center gap-2"
         >

@@ -3,12 +3,14 @@
 import React, { useState, Suspense } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { resetPassword } from '@/services/authService';
 
-function ResetPasswordForm() {
+function ResetPasswordForm({ resetToken }) {
   const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
-  const token = searchParams.get('token') || searchParams.get('resetToken') || '';
+  const token = resetToken || searchParams.get('token') || searchParams.get('resetToken') || '';
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -22,6 +24,7 @@ function ResetPasswordForm() {
   const rules = {
     length: password.length >= 8,
     uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
     number: /[0-9]/.test(password),
     special: /[!@#$%^&*]/.test(password),
   };
@@ -33,14 +36,14 @@ function ResetPasswordForm() {
     if (strengthCount === 1) return 'ضعيفة';
     if (strengthCount === 2) return 'متوسطة';
     if (strengthCount === 3) return 'جيدة';
-    if (strengthCount === 4) return 'قوية';
+    if (strengthCount >= 4) return 'قوية';
   };
 
   const getStrengthTextColor = () => {
     if (strengthCount <= 1) return 'text-[#FF2200]';
     if (strengthCount === 2) return 'text-[#FF6200]';
     if (strengthCount === 3) return 'text-[#E9C349]';
-    if (strengthCount === 4) return 'text-[#00B353]';
+    if (strengthCount >= 4) return 'text-[#00B353]';
     return 'text-[#BFC9C4]';
   };
 
@@ -89,7 +92,7 @@ function ResetPasswordForm() {
       return;
     }
 
-    if (strengthCount < 4) {
+    if (strengthCount < 5) {
       setErrorMessage('يرجى التأكد من استيفاء جميع شروط كلمة المرور.');
       return;
     }
@@ -101,7 +104,7 @@ function ResetPasswordForm() {
     setLoading(false);
 
     if (result.success) {
-      router.push('/done');
+      router.push(`/${locale}/login`);
     } else {
       setErrorMessage(result.message);
     }
@@ -262,6 +265,10 @@ function ResetPasswordForm() {
               <CheckIcon active={rules.uppercase} />
               <span>حرف كبير واحد على الأقل</span>
             </div>
+            <div className={`flex flex-row items-center gap-2 text-[12px] font-medium leading-[12px] ${rules.lowercase ? 'text-[#94D3C1]' : 'text-[#BFC9C4]'}`}>
+              <CheckIcon active={rules.lowercase} />
+              <span>حرف صغير واحد على الأقل</span>
+            </div>
             <div className={`flex flex-row items-center gap-2 text-[12px] font-medium leading-[12px] ${rules.number ? 'text-[#94D3C1]' : 'text-[#BFC9C4]'}`}>
               <CheckIcon active={rules.number} />
               <span>رقم واحد على الأقل</span>
@@ -324,10 +331,10 @@ function ResetPasswordForm() {
   );
 }
 
-export default function ResetPasswordCard() {
+export default function ResetPasswordCard({ resetToken = '' }) {
   return (
     <Suspense fallback={<div className="text-white">جاري التحميل...</div>}>
-      <ResetPasswordForm />
+      <ResetPasswordForm resetToken={resetToken} />
     </Suspense>
   );
 }

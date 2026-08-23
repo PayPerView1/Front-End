@@ -9,6 +9,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
 import { login } from "@/services/authService";
+import api from "@/services";
 import { useLocale, useTranslations } from "next-intl";
 
 export default function LoginForm() {
@@ -203,6 +204,7 @@ export default function LoginForm() {
         <div className="flex justify-center gap-3.5 mb-6">
           <button
             type="button"
+            onClick={() => api.loginWithGoogle()}
             className="flex items-center justify-center gap-2 w-[160px] h-[40px] rounded-lg bg-white/10 border border-white/20 text-white text-sm font-medium transition-colors"
           >
             <FcGoogle className="w-5 h-5" />

@@ -51,7 +51,11 @@ export async function requestForgotPassword(email) {
       data: response.data,
     };
   } catch (error) {
+    const validationMessages = Array.isArray(error.response?.data?.errors)
+      ? error.response.data.errors.map((item) => item?.message).filter(Boolean)
+      : [];
     const errorMsg =
+      validationMessages.join("\n") ||
       error.response?.data?.message ||
       error.response?.data?.error ||
       (error.code === "ECONNABORTED"
@@ -70,7 +74,9 @@ export async function requestForgotPassword(email) {
  */
 export async function resetPassword(token, password) {
   try {
-    const response = await apiClient.post(`/api/v1/auth/reset-password/${encodeURIComponent(token)}`, {
+    const encodedToken = encodeURIComponent(token);
+    const response = await apiClient.post(`/api/v1/auth/reset-password/${encodedToken}`, {
+      token,
       password,
     });
     return {
@@ -82,6 +88,9 @@ export async function resetPassword(token, password) {
     const errorMsg =
       error.response?.data?.message ||
       error.response?.data?.error ||
+      (error.response?.status === 400
+        ? "بيانات إعادة التعيين غير صالحة. تأكد من أن التوكن غير منتهي وأن كلمة المرور تستوفي الشروط."
+        : null) ||
       (error.code === "ECONNABORTED"
         ? "انتهت مهلة الاتصال بالخادم. يرجى المحاولة لاحقاً."
         : null) ||

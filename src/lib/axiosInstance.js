@@ -90,7 +90,7 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     // طباعة تفاصيل الخطأ للتشخيص في الكونسول
-    if (error.response?.data) {
+    if (error.response?.data && Object.keys(error.response.data).length > 0) {
       console.error("[Axios Response Error]:", error.config.url, error.response.status, error.response.data);
     }
 
