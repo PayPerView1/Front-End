@@ -70,7 +70,7 @@ export async function requestForgotPassword(email) {
  */
 export async function resetPassword(token, password) {
   try {
-    const response = await apiClient.post(`/api/v1/auth/reset-password/${token}`, {
+    const response = await apiClient.post(`/api/v1/auth/reset-password/${encodeURIComponent(token)}`, {
       password,
     });
     return {

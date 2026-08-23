@@ -302,6 +302,7 @@ export default function EditProfileContent() {
 
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
+  const [profileImagePreview, setProfileImagePreview] = useState(null);
 
   const coverRef = useRef(null);
   const profileRef = useRef(null);
@@ -358,15 +359,26 @@ export default function EditProfileContent() {
       const hasNewImage = profileImage instanceof File;
       let data;
 
+      if (Boolean(phone.trim()) !== Boolean(country)) {
+        setSaveMsg("يجب إرسال الدولة ورقم الهاتف معًا");
+        return;
+      }
+
       if (hasNewImage) {
         data = api.createFormData({
           fullName: form.name,
+          country: country || undefined,
+          phoneNumber: phone || undefined,
+          city: city || undefined,
           profilePicture: profileImage,
           interests: selectedInterests,
         });
       } else {
         data = {
           fullName: form.name,
+          country: country || undefined,
+          phoneNumber: phone || undefined,
+          city: city || undefined,
           interests: selectedInterests,
         };
       }
@@ -405,13 +417,19 @@ export default function EditProfileContent() {
           setSelectedInterests(user.interests);
         }
 
+        setPhone(user?.phoneNumber || "");
+        setCountry(user?.country || "");
+        setCity(user?.city || "");
+
         if (
           user.profilePicture &&
           user.profilePicture !== "default-avatar.png"
         ) {
-          setProfileImage(
-            `https://payperview-platform.onrender.com/${user.profilePicture}`,
-          );
+          const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://payperview-platform.onrender.com";
+          const imageUrl = user.profilePicture.startsWith("http")
+            ? user.profilePicture
+            : `${baseUrl.replace(/\/$/, "")}/${user.profilePicture.replace(/^\//, "")}`;
+          setProfileImagePreview(imageUrl);
         }
       } catch (error) {
         console.error("خطأ:", error);
@@ -544,9 +562,9 @@ export default function EditProfileContent() {
                       : "bg-[#D0D0D0] border-white"
                   }`}
               >
-                {profileImage ? (
+                {profileImagePreview ? (
                   <img
-                    src={profileImage}
+                    src={profileImagePreview}
                     alt="profile"
                     className="w-full h-full rounded-full object-cover"
                   />
@@ -564,7 +582,19 @@ export default function EditProfileContent() {
                   const f = e.target.files?.[0];
 
                   if (f) {
-                    setProfileImage(URL.createObjectURL(f));
+                    const allowedTypes = [
+                      "image/jpeg",
+                      "image/jpg",
+                      "image/png",
+                      "image/webp",
+                    ];
+                    if (!allowedTypes.includes(f.type) || f.size > 5 * 1024 * 1024) {
+                      setSaveMsg("الصورة يجب أن تكون jpeg أو jpg أو png أو webp وبحجم أقصى 5MB");
+                      e.target.value = "";
+                      return;
+                    }
+                    setProfileImage(f);
+                    setProfileImagePreview(URL.createObjectURL(f));
                   }
                 }}
               />

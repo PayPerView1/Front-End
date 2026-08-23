@@ -1,11 +1,16 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Message } from "react-iconly";
+import { verifyEmail } from "@/services/auth";
 
 export default function VerifyEmail({ email: emailProp }) {
     const [resent, setResent] = useState(false);
     const [email, setEmail] = useState(emailProp || "");
+    const [verificationState, setVerificationState] = useState("idle");
+    const [verificationMessage, setVerificationMessage] = useState("");
+    const searchParams = useSearchParams();
+    const token = searchParams.get("token") || searchParams.get("verificationToken") || "";
     const router = useRouter();
 
     // اقرأ الإيميل من localStorage أو sessionStorage إذا لم يُمرَّر كـ prop
@@ -38,6 +43,37 @@ export default function VerifyEmail({ email: emailProp }) {
         }
     }, [emailProp]);
 
+    useEffect(() => {
+        if (!token) {
+            setVerificationState("error");
+            setVerificationMessage("رمز التحقق غير موجود في الرابط.");
+            return;
+        }
+
+        let cancelled = false;
+        setVerificationState("loading");
+
+        async function verifyToken() {
+            try {
+                const result = await verifyEmail(token);
+                if (!cancelled) {
+                    setVerificationState("success");
+                    setVerificationMessage(result?.message || "تم التحقق من البريد الإلكتروني بنجاح.");
+                }
+            } catch (error) {
+                if (!cancelled) {
+                    setVerificationState("error");
+                    setVerificationMessage(error.message || "رابط التحقق غير صالح أو منتهي الصلاحية.");
+                }
+            }
+        }
+
+        verifyToken();
+        return () => {
+            cancelled = true;
+        };
+    }, [token]);
+
     async function handleResend() {
         // الباك إند لا يدعم هذا الـ endpoint حالياً
         // نعرض رسالة نجاح مباشرة دون استدعاء API
@@ -69,6 +105,15 @@ export default function VerifyEmail({ email: emailProp }) {
             يرجى التحقق من صندوق الوارد، والنقر على رابط التفعيل
         </p>
         </div>
+
+        {verificationState === "loading" && (
+            <p className="text-sm text-[#94D3C1]">جارٍ التحقق من الرابط...</p>
+        )}
+        {verificationMessage && (
+            <p className={`text-sm ${verificationState === "error" ? "text-[#FFA600]" : "text-[#94D3C1]"}`}>
+                {verificationMessage}
+            </p>
+        )}
         
         {/* زر إعادة الإرسال */}
         <button
@@ -87,6 +132,7 @@ export default function VerifyEmail({ email: emailProp }) {
         </button>
         <button
         onClick={() => router.push("/dashboard")}
+        disabled={verificationState !== "success"}
         className="text-sm text-[#94D3C1] underline cursor-pointer bg-transparent border-none mt-2"
         >
         تم التحقق - متابعة

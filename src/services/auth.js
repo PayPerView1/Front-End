@@ -31,7 +31,7 @@ export async function register(data) {
  */
 export async function verifyEmail(token) {
   try {
-    const response = await axiosInstance.get(`/api/v1/auth/verify-email/${token}`);
+    const response = await axiosInstance.get(`/api/v1/auth/verify-email/${encodeURIComponent(token)}`);
     return response.data;
   } catch (error) {
     console.error("Verify Email Error:", error);

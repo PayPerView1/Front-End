@@ -1,5 +1,6 @@
 "use client";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
+import { AssistantProvider } from "@/context/AssistantContext";
 import { useLocale } from "next-intl";
 
 function Inner({ children }) {
@@ -18,7 +19,9 @@ function Inner({ children }) {
 export default function DashboardWrapper({ children }) {
   return (
     <ThemeProvider>
-      <Inner>{children}</Inner>
+      <AssistantProvider>
+        <Inner>{children}</Inner>
+      </AssistantProvider>
     </ThemeProvider>
   );
 }
