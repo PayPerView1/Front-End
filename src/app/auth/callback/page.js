@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
@@ -9,9 +9,13 @@ function AuthCallbackContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState("جاري تسجيل الدخول...");
   const [error, setError] = useState(null);
+  const handledRef = useRef(false);
 
   useEffect(() => {
     const handleCallback = async () => {
+      if (handledRef.current) return;
+      handledRef.current = true;
+
       // نحدد الـ locale من الـ localStorage أو نستخدم ar كافتراضي
       const locale =
         (typeof window !== "undefined" && localStorage.getItem("NEXT_LOCALE")) ||
@@ -74,7 +78,7 @@ function AuthCallbackContent() {
         }
 
         setStatus("تم تسجيل الدخول بنجاح! جاري التحويل...");
-        router.push("/" + locale + "/dashboard");
+        router.replace("/" + locale + "/dashboard");
       } catch (err) {
         console.error("Auth callback error:", err);
         setError("حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.");

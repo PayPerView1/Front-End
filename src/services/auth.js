@@ -85,7 +85,7 @@ export function loginWithGoogle() {
   // نمرر رابط الفرونت الحالي كـ state حتى الباك إند يرجع له بعد النجاح
   const frontendCallbackUrl = `${window.location.origin}/auth/callback`;
   googleUrl.searchParams.set("redirect_url", frontendCallbackUrl);
-  googleUrl.searchParams.set("state", encodeURIComponent(frontendCallbackUrl));
+  googleUrl.searchParams.set("state", frontendCallbackUrl);
   window.location.assign(googleUrl.toString());
 }
 
