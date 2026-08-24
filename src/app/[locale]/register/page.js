@@ -3,6 +3,7 @@
 import Image from "next/image";
 import BrandingSide from "@/app/[locale]/register/components/BrandingSide";
 import RegisterForm from "@/app/[locale]/register/components/RegisterForm";
+import { Suspense } from "react";
 
 export default function RegisterPage() {
   return (
@@ -25,7 +26,9 @@ export default function RegisterPage() {
         </div>
         {/* الفورم */}
         <div className="w-full lg:w-1/2 flex justify-center items-center p-4 lg:p-12 py-8">
-          <RegisterForm />
+          <Suspense fallback={<div className="text-white">جاري التحميل...</div>}>
+            <RegisterForm />
+          </Suspense>
         </div>
       </div>
     </main>

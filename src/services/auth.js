@@ -77,10 +77,15 @@ const API_BASE_URL =
 /**
  * تسجيل الدخول أو إنشاء حساب عبر Google.
  * الباك إند يحدد إن كان المستخدم جديدًا أو موجودًا ثم يعيد التوجيه.
+ * نمرر رابط الفرونت الحالي حتى الباك إند يرجع المستخدم للفرونت الصحيح.
  */
 export function loginWithGoogle() {
   const googleUrl = new URL(`${API_BASE_URL}/api/v1/auth/google`);
   googleUrl.searchParams.set("scope", "openid email profile");
+  // نمرر رابط الفرونت الحالي كـ state حتى الباك إند يرجع له بعد النجاح
+  const frontendCallbackUrl = `${window.location.origin}/auth/callback`;
+  googleUrl.searchParams.set("redirect_url", frontendCallbackUrl);
+  googleUrl.searchParams.set("state", encodeURIComponent(frontendCallbackUrl));
   window.location.assign(googleUrl.toString());
 }
 
