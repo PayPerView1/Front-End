@@ -70,12 +70,16 @@ export async function requestForgotPassword(email) {
  * Reset password using the reset token received via email.
  * @param {string} token
  * @param {string} password
+ * @param {string} confirmPassword
  * @returns {Promise<{success: boolean, message: string, data?: any}>}
  */
-export async function resetPassword(token, password) {
+export async function resetPassword(token, password, confirmPassword) {
   try {
     const encodedToken = encodeURIComponent(token);
-    const response = await apiClient.post(`/api/v1/auth/reset-password/${encodedToken}`, { password });
+    const response = await apiClient.post(`/api/v1/auth/reset-password/${encodedToken}`, {
+      password,
+      confirmPassword,
+    });
     return {
       success: true,
       message: response.data?.message || "تم تحديث كلمة المرور بنجاح!",
