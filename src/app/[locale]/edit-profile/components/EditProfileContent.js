@@ -392,6 +392,10 @@ export default function EditProfileContent() {
       if (updatedUser) {
         api.saveAuthData(api.getToken(), updatedUser);
       }
+
+      setTimeout(() => {
+        router.push(`/${locale}/dashboard`);
+      }, 1000);
     } catch (error) {
       setSaveMsg(`${copy("saveError")}: ${error.message}`);
     } finally {

@@ -75,17 +75,18 @@ export async function requestForgotPassword(email) {
 export async function resetPassword(token, password) {
   try {
     const encodedToken = encodeURIComponent(token);
-    const response = await apiClient.post(`/api/v1/auth/reset-password/${encodedToken}`, {
-      token,
-      password,
-    });
+    const response = await apiClient.post(`/api/v1/auth/reset-password/${encodedToken}`, { password });
     return {
       success: true,
       message: response.data?.message || "تم تحديث كلمة المرور بنجاح!",
       data: response.data,
     };
   } catch (error) {
+    const validationMessages = Array.isArray(error.response?.data?.errors)
+      ? error.response.data.errors.map((item) => item?.message).filter(Boolean)
+      : [];
     const errorMsg =
+      validationMessages.join("\n") ||
       error.response?.data?.message ||
       error.response?.data?.error ||
       (error.response?.status === 400
