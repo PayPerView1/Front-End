@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FaApple } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
@@ -11,6 +11,7 @@ import axios from "axios";
 import { login } from "@/services/authService";
 import api from "@/services";
 import { useLocale, useTranslations } from "next-intl";
+import { useEffect } from "react";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,8 +20,56 @@ export default function LoginForm() {
   const [errors, setErrors] = useState({ email: "", password: "", general: "" });
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const locale = useLocale();
   const t = useTranslations("auth");
+
+  useEffect(() => {
+    const handleGoogleRedirect = async () => {
+      const token = searchParams.get("token");
+      const userParam = searchParams.get("user");
+      
+      if (token) {
+        setIsLoading(true);
+        try {
+          let userObj = {};
+          if (userParam) {
+            try {
+              userObj = JSON.parse(decodeURIComponent(userParam));
+            } catch (e) {
+              console.error("Failed to parse user query parameter:", e);
+            }
+          }
+          
+          api.saveAuthData(token, userObj);
+          
+          if (!userObj || !userObj._id || !userObj.email) {
+            try {
+              const profileData = await api.getProfile();
+              if (profileData && profileData.user) {
+                userObj = profileData.user;
+                api.saveAuthData(token, userObj);
+              }
+            } catch (err) {
+              console.error("Failed to fetch profile during Google redirect:", err);
+            }
+          }
+          
+          router.push(`/${locale}/dashboard`);
+        } catch (e) {
+          console.error("Error during Google redirect:", e);
+          setErrors(prev => ({
+            ...prev,
+            general: "فشل تسجيل الدخول باستخدام Google. يرجى المحاولة مرة أخرى."
+          }));
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    
+    handleGoogleRedirect();
+  }, [searchParams, locale, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

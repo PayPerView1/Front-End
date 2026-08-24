@@ -1,5 +1,6 @@
 import LoginForm from "./components/loginform";
 import Image from "next/image";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "تسجيل الدخول | Pay Per View",
@@ -26,7 +27,9 @@ export default function LoginPage() {
 
       {/* بطاقة تسجيل الدخول فوق جميع الطبقات */}
       <div className="relative z-20 w-full flex justify-center">
-        <LoginForm />
+        <Suspense fallback={<div className="text-white">جاري التحميل...</div>}>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );

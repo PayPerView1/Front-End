@@ -6,6 +6,12 @@ const intlMiddleware = createMiddleware(routing);
 
 export default function middleware(request) {
   const pathname = request.nextUrl.pathname;
+
+  // السماح لصفحة الـ Google OAuth callback بالمرور دون أي فحص
+  if (pathname.startsWith("/auth/callback")) {
+    return NextResponse.next();
+  }
+
   const locale = routing.locales.find(
     (candidate) => pathname === `/${candidate}` || pathname.startsWith(`/${candidate}/`),
   );
