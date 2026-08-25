@@ -53,7 +53,6 @@ const api = {
   resendVerification: auth.resendVerification,
   logout: auth.logout,
   loginWithGoogle: auth.loginWithGoogle,
-  loginWithApple: auth.loginWithApple,
 
   // Profile shortcuts
   getProfile: profile.getProfile,

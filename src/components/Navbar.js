@@ -33,7 +33,7 @@ export default function Navbar() {
 
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
   const { toggleNotifications, closeNotifications, unreadCount } = useNotifications();
-  const { toggleAssistant, isAssistantOpen } = useAssistant();
+  const { toggleAssistant, isAssistantOpen, closeAssistant } = useAssistant();
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [user, setUser] = useState(null);
