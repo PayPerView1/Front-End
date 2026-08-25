@@ -89,6 +89,4 @@ export function loginWithGoogle() {
   window.location.assign(googleUrl.toString());
 }
 
-export function loginWithApple() {
-  window.location.assign(`${API_BASE_URL}/api/v1/auth/apple`);
-}
+
