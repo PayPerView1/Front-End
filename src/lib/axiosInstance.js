@@ -90,7 +90,7 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     // طباعة تفاصيل الخطأ للتشخيص في الكونسول
-    if (error.response?.data) {
+    if (error.response?.data && Object.keys(error.response.data).length > 0) {
       console.error("[Axios Response Error]:", error.config.url, error.response.status, error.response.data);
     }
 
@@ -119,9 +119,12 @@ export function handleError(error) {
   if (error.response?.data) {
     console.error("API Error Response Data:", JSON.stringify(error.response.data, null, 2));
   }
+  const validationMessages = Array.isArray(error.response?.data?.errors)
+    ? error.response.data.errors.map((item) => item?.message).filter(Boolean)
+    : [];
   const message =
+    validationMessages.join("\n") ||
     error.response?.data?.message ||
-    error.response?.data?.errors?.[0]?.message ||
     error.message ||
     "حدث خطأ في الطلب";
   throw new Error(message);

@@ -1,11 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import StepIndicator from "@/app/[locale]/register/components/StepIndicator";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/services";
 import { useLocale, useTranslations } from "next-intl";
 export default function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const locale = useLocale();
   const t = useTranslations("register");
   const [userType, setUserType] = useState(null);
@@ -13,6 +14,46 @@ export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState({});
   const [currentStep, setCurrentStep] = useState(1);
+
+  useEffect(() => {
+    const handleGoogleRedirect = async () => {
+      const token = searchParams.get("token");
+      const userParam = searchParams.get("user");
+      
+      if (token) {
+        try {
+          let userObj = {};
+          if (userParam) {
+            try {
+              userObj = JSON.parse(decodeURIComponent(userParam));
+            } catch (e) {
+              console.error("Failed to parse user query parameter:", e);
+            }
+          }
+          
+          api.saveAuthData(token, userObj);
+          
+          if (!userObj || !userObj._id || !userObj.email) {
+            try {
+              const profileData = await api.getProfile();
+              if (profileData && profileData.user) {
+                userObj = profileData.user;
+                api.saveAuthData(token, userObj);
+              }
+            } catch (err) {
+              console.error("Failed to fetch profile during Google redirect:", err);
+            }
+          }
+          
+          router.push(`/${locale}/dashboard`);
+        } catch (e) {
+          console.error("Error during Google redirect:", e);
+        }
+      }
+    };
+    
+    handleGoogleRedirect();
+  }, [searchParams, locale, router]);
   const [emailError, setEmailError] = useState("");
   function getStrength(pass) {
     if (pass.length === 0) return 0;
@@ -213,6 +254,7 @@ export default function RegisterForm() {
       <div className="flex gap-4">
         {/* Google */}
         <button
+          type="button"
           onClick={() => api.loginWithGoogle()}
           className="flex-1 h-10 rounded-lg border border-[#FFEEE3]/40 bg-transparent text-[#E1E3E4] text-sm cursor-pointer flex items-center justify-center gap-2"
         >

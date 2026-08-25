@@ -3,12 +3,50 @@
 import React, { useState, Suspense } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { resetPassword } from '@/services/authService';
 
-function ResetPasswordForm() {
+const CheckIcon = ({ active }) => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={active ? 'text-[#94D3C1]' : 'text-[#BFC9C4]'}
+  >
+    <circle cx="8" cy="8" r="7.5" stroke="currentColor" />
+    {active && (
+      <path
+        d="M5 8.5L7 10.5L11 5.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    )}
+  </svg>
+);
+
+const EyeOffIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#BFC9C4]">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+    <line x1="1" y1="1" x2="23" y2="23"></line>
+  </svg>
+);
+
+const EyeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#BFC9C4]">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+  </svg>
+);
+
+function ResetPasswordForm({ resetToken }) {
   const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
-  const token = searchParams.get('token') || '';
+  const token = resetToken || searchParams.get('token') || searchParams.get('resetToken') || '';
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -22,6 +60,7 @@ function ResetPasswordForm() {
   const rules = {
     length: password.length >= 8,
     uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
     number: /[0-9]/.test(password),
     special: /[!@#$%^&*]/.test(password),
   };
@@ -33,52 +72,16 @@ function ResetPasswordForm() {
     if (strengthCount === 1) return 'ضعيفة';
     if (strengthCount === 2) return 'متوسطة';
     if (strengthCount === 3) return 'جيدة';
-    if (strengthCount === 4) return 'قوية';
+    if (strengthCount >= 4) return 'قوية';
   };
 
   const getStrengthTextColor = () => {
     if (strengthCount <= 1) return 'text-[#FF2200]';
     if (strengthCount === 2) return 'text-[#FF6200]';
     if (strengthCount === 3) return 'text-[#E9C349]';
-    if (strengthCount === 4) return 'text-[#00B353]';
+    if (strengthCount >= 4) return 'text-[#00B353]';
     return 'text-[#BFC9C4]';
   };
-
-  const CheckIcon = ({ active }) => (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={active ? 'text-[#94D3C1]' : 'text-[#BFC9C4]'}
-    >
-      <circle cx="8" cy="8" r="7.5" stroke="currentColor" />
-      {active && (
-        <path
-          d="M5 8.5L7 10.5L11 5.5"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      )}
-    </svg>
-  );
-
-  const EyeOffIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#BFC9C4]">
-      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-      <line x1="1" y1="1" x2="23" y2="23"></line>
-    </svg>
-  );
-
-  const EyeIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#BFC9C4]">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-      <circle cx="12" cy="12" r="3"></circle>
-    </svg>
-  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -89,7 +92,7 @@ function ResetPasswordForm() {
       return;
     }
 
-    if (strengthCount < 4) {
+    if (strengthCount < 5) {
       setErrorMessage('يرجى التأكد من استيفاء جميع شروط كلمة المرور.');
       return;
     }
@@ -97,11 +100,11 @@ function ResetPasswordForm() {
     setErrorMessage('');
     setLoading(true);
 
-    const result = await resetPassword(token, password);
+    const result = await resetPassword(token, password, confirmPassword);
     setLoading(false);
 
     if (result.success) {
-      router.push('/done');
+      router.push(`/${locale}/login`);
     } else {
       setErrorMessage(result.message);
     }
@@ -262,6 +265,10 @@ function ResetPasswordForm() {
               <CheckIcon active={rules.uppercase} />
               <span>حرف كبير واحد على الأقل</span>
             </div>
+            <div className={`flex flex-row items-center gap-2 text-[12px] font-medium leading-[12px] ${rules.lowercase ? 'text-[#94D3C1]' : 'text-[#BFC9C4]'}`}>
+              <CheckIcon active={rules.lowercase} />
+              <span>حرف صغير واحد على الأقل</span>
+            </div>
             <div className={`flex flex-row items-center gap-2 text-[12px] font-medium leading-[12px] ${rules.number ? 'text-[#94D3C1]' : 'text-[#BFC9C4]'}`}>
               <CheckIcon active={rules.number} />
               <span>رقم واحد على الأقل</span>
@@ -324,10 +331,10 @@ function ResetPasswordForm() {
   );
 }
 
-export default function ResetPasswordCard() {
+export default function ResetPasswordCard({ resetToken = '' }) {
   return (
     <Suspense fallback={<div className="text-white">جاري التحميل...</div>}>
-      <ResetPasswordForm />
+      <ResetPasswordForm resetToken={resetToken} />
     </Suspense>
   );
 }

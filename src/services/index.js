@@ -34,7 +34,7 @@ function createFormData(data) {
   const formData = new FormData();
   Object.entries(data).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== "") {
-      formData.append(key, value);
+      formData.append(key, Array.isArray(value) ? JSON.stringify(value) : value);
     }
   });
   return formData;

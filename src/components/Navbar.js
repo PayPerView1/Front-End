@@ -32,8 +32,8 @@ export default function Navbar() {
   const nav = useTranslations("nav");
 
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
-  const { toggleAssistant, closeAssistant } = useAssistant();
   const { toggleNotifications, closeNotifications, unreadCount } = useNotifications();
+  const { toggleAssistant, isAssistantOpen } = useAssistant();
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [user, setUser] = useState(null);
@@ -153,15 +153,18 @@ export default function Navbar() {
         </div>
 
         {/* AI */}
-        <BsStars
-          size={19}
-          color="#9A9A9A"
-          className="cursor-pointer mx-1"
-          onClick={() => {
-            closeNotifications();
-            toggleAssistant();
-          }}
-        />
+
+        <button
+            type="button"
+            onClick={toggleAssistant}
+            className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
+            isAssistantOpen
+                ? "bg-[#2a2a2a]"
+                : "bg-transparent hover:bg-white/10"
+            }`}
+        >
+  <BsStars size={19} color={isAssistantOpen ? "#ffffff" : "#9A9A9A"} />
+</button>
 
         {/* الرسائل */}
         <Chat

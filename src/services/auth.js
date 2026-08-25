@@ -31,7 +31,7 @@ export async function register(data) {
  */
 export async function verifyEmail(token) {
   try {
-    const response = await axiosInstance.get(`/api/v1/auth/verify-email/${token}`);
+    const response = await axiosInstance.get(`/api/v1/auth/verify-email/${encodeURIComponent(token)}`);
     return response.data;
   } catch (error) {
     console.error("Verify Email Error:", error);
@@ -71,13 +71,24 @@ export async function logout() {
   }
 }
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://payperview-platform.onrender.com";
+
 /**
- * روابط OAuth (Google / Apple) — إعادة توجيه مباشرة
+ * تسجيل الدخول أو إنشاء حساب عبر Google.
+ * الباك إند يحدد إن كان المستخدم جديدًا أو موجودًا ثم يعيد التوجيه.
+ * نمرر رابط الفرونت الحالي حتى الباك إند يرجع المستخدم للفرونت الصحيح.
  */
 export function loginWithGoogle() {
-  window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`;
+  const googleUrl = new URL(`${API_BASE_URL}/api/v1/auth/google`);
+  googleUrl.searchParams.set("scope", "openid email profile");
+  // نمرر رابط الفرونت الحالي كـ state حتى الباك إند يرجع له بعد النجاح
+  const frontendCallbackUrl = `${window.location.origin}/auth/callback`;
+  googleUrl.searchParams.set("redirect_url", frontendCallbackUrl);
+  googleUrl.searchParams.set("state", frontendCallbackUrl);
+  window.location.assign(googleUrl.toString());
 }
 
 export function loginWithApple() {
-  window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/apple`;
+  window.location.assign(`${API_BASE_URL}/api/v1/auth/apple`);
 }

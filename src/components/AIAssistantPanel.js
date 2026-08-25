@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { BsStars } from "react-icons/bs";
 import { FiUsers, FiMic, FiSend, FiPlus, FiX } from "react-icons/fi";
 import { MdCampaign, MdLiveTv, MdReceiptLong } from "react-icons/md";
@@ -32,6 +32,9 @@ const actions = [
 export default function AIAssistantPanel({ side = "left" }) {
   const { isAssistantOpen, closeAssistant } = useAssistant();
   const [message, setMessage] = useState("");
+
+  const fileInputRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   if (!isAssistantOpen) return null;
 
@@ -103,37 +106,80 @@ export default function AIAssistantPanel({ side = "left" }) {
       <div className="relative z-10 w-full mt-6">
         <form
           onSubmit={handleSend}
-          className="flex items-center gap-1.5 rounded-full bg-white/[0.06] border border-white/10 px-2.5 py-1.5 backdrop-blur-sm"
+          className="flex flex-col rounded-2xl bg-white/[0.06] border border-white/10 px-2.5 py-2 backdrop-blur-sm gap-2"
         >
-          <button
-            type="button"
-            onClick={handleSend}
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-gradient-to-r from-[#FFA600] to-[#FF4B04] text-white shrink-0"
-          >
-            <FiSend className="w-3.5 h-3.5 -rotate-45 translate-x-[1px] -translate-y-[1px]" />
-          </button>
+          {/* معاينة الملف جوا الإنبوت */}
+          {selectedFile && (
+            <div className="flex items-center gap-2 px-1 py-1 rounded-lg bg-white/10 border border-white/10">
+              {selectedFile.type.startsWith("image/") ? (
+                <img
+                  src={URL.createObjectURL(selectedFile)}
+                  alt="معاينة"
+                  className="w-8 h-8 rounded-md object-cover shrink-0"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-md bg-white/10 flex items-center justify-center shrink-0">
+                  <FiPlus className="w-3.5 h-3.5 text-gray-300 rotate-45" />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-white text-[11px] font-medium truncate">{selectedFile.name}</p>
+                <p className="text-gray-400 text-[9px]">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedFile(null)}
+                className="text-gray-400 hover:text-white transition-colors shrink-0"
+              >
+                <FiX className="w-3 h-3" />
+              </button>
+            </div>
+          )}
 
-          <button
-            type="button"
-            className="w-7 h-7 flex items-center justify-center text-gray-300 shrink-0"
-          >
-            <FiMic className="w-3.5 h-3.5" />
-          </button>
+          {/* شريط الكتابة والأزرار */}
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={handleSend}
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-gradient-to-r from-[#FFA600] to-[#FF4B04] text-white shrink-0"
+            >
+              <FiSend className="w-3.5 h-3.5 -rotate-27 translate-y-[1.5px]" />
+            </button>
 
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="اكتب رسالتك هنا..."
-            className="flex-1 min-w-0 bg-transparent text-white placeholder-gray-400 text-xs outline-none text-right"
-          />
+            <button
+              type="button"
+              className="w-7 h-7 flex items-center justify-center text-gray-300 shrink-0"
+            >
+              <FiMic className="w-3.5 h-3.5" />
+            </button>
 
-          <button
-            type="button"
-            className="w-7 h-7 flex items-center justify-center text-gray-300 shrink-0"
-          >
-            <FiPlus className="w-3.5 h-3.5" />
-          </button>
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="اكتب رسالتك هنا..."
+              className="flex-1 min-w-0 bg-transparent text-white placeholder-gray-400 text-xs outline-none text-right"
+            />
+
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-7 h-7 flex items-center justify-center text-gray-300 shrink-0"
+            >
+              <FiPlus className="w-3.5 h-3.5" />
+            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,video/*,.pdf,.doc,.docx"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) setSelectedFile(file);
+              }}
+            />
+          </div>
         </form>
 
         <p className="text-center text-[9px] text-gray-500 mt-2 px-2">
