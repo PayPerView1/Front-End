@@ -1,5 +1,6 @@
 "use client";
 import { useAssistant } from "@/context/AssistantContext";
+import { useNotifications } from "@/context/NotificationsContext";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
@@ -31,7 +32,8 @@ export default function Navbar() {
   const nav = useTranslations("nav");
 
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
-  const { toggleAssistant } = useAssistant();
+  const { toggleAssistant, closeAssistant } = useAssistant();
+  const { toggleNotifications, closeNotifications, unreadCount } = useNotifications();
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [user, setUser] = useState(null);
@@ -113,9 +115,9 @@ export default function Navbar() {
   }
 
   return (
-     <div
-  dir={locale === "ar" ? "rtl" : "ltr"}
-  className={`
+    <div
+      dir={locale === "ar" ? "rtl" : "ltr"}
+      className={`
     w-full
     flex
     items-center
@@ -130,7 +132,7 @@ export default function Navbar() {
     ${t.navBg}
     ${t.navBorder}
   `}
->
+    >
       <div className="flex items-center gap-5 px-3 py-1.5">
         {/* الرصيد */}
         <div
@@ -141,10 +143,9 @@ export default function Navbar() {
             text-sm
             font-boldس
             border
-            ${
-              isDark
-                ? "bg-[#2a2a2a] border-[#3a3a3a] text-white"
-                : "bg-[#EAEAEA] border-[#EAEAEA] text-[#787878]"
+            ${isDark
+              ? "bg-[#2a2a2a] border-[#3a3a3a] text-white"
+              : "bg-[#EAEAEA] border-[#EAEAEA] text-[#787878]"
             }
           `}
         >
@@ -152,7 +153,15 @@ export default function Navbar() {
         </div>
 
         {/* AI */}
-        <BsStars size={19} color="#9A9A9A" className="cursor-pointer mx-1" onClick={toggleAssistant}/>
+        <BsStars
+          size={19}
+          color="#9A9A9A"
+          className="cursor-pointer mx-1"
+          onClick={() => {
+            closeNotifications();
+            toggleAssistant();
+          }}
+        />
 
         {/* الرسائل */}
         <Chat
@@ -163,27 +172,36 @@ export default function Navbar() {
         />
 
         {/* الجرس */}
-        <div className="relative cursor-pointer mx-1">
+        <div
+          className="relative cursor-pointer mx-1"
+          onClick={() => {
+            console.log("Navbar: Notification bell clicked. Toggling panel...");
+            closeAssistant();
+            toggleNotifications();
+          }}
+        >
           <Notification set="light" size={19} primaryColor="#9A9A9A" />
 
-          <span
-            className="
-              absolute
-              -top-1
-              -right-1
-              w-3.5
-              h-3.5
-              bg-red-500
-              rounded-full
-              text-[8px]
-              text-white
-              flex
-              items-center
-              justify-center
-            "
-          >
-            3
-          </span>
+          {unreadCount > 0 && (
+            <span
+              className="
+                absolute
+                -top-1
+                -right-1
+                w-3.5
+                h-3.5
+                bg-red-500
+                rounded-full
+                text-[8px]
+                text-white
+                flex
+                items-center
+                justify-center
+              "
+            >
+              {unreadCount}
+            </span>
+          )}
         </div>
 
         {/* قائمة المستخدم */}
@@ -199,10 +217,9 @@ export default function Navbar() {
             px-2
             py-1
             border
-            ${
-              isDark
-                ? "bg-[#2a2a2a] border-[#3a3a3a]"
-                : "bg-[#F5F5F5] border-[#E5E5E5]"
+            ${isDark
+              ? "bg-[#2a2a2a] border-[#3a3a3a]"
+              : "bg-[#F5F5F5] border-[#E5E5E5]"
             }
           `}
         >
@@ -274,10 +291,9 @@ export default function Navbar() {
                         justify-center
                         text-sm
                         font-bold
-                        ${
-                          isDark
-                            ? "bg-white/20 text-white"
-                            : "bg-[#E0E0E0] text-black"
+                        ${isDark
+                          ? "bg-white/20 text-white"
+                          : "bg-[#E0E0E0] text-black"
                         }
                       `}
                     >
@@ -310,10 +326,10 @@ export default function Navbar() {
                     size={18}
                     color="#9A9A9A"
                     className="cursor-pointer"
-  //                   onClick={() => {
-  //   router.push("/ar/edit-profile?settings=true");
-  //   setMenuOpen(false);
-  // }}
+                  //                   onClick={() => {
+                  //   router.push("/ar/edit-profile?settings=true");
+                  //   setMenuOpen(false);
+                  // }}
                   />
                 </div>
 
@@ -494,10 +510,9 @@ export default function Navbar() {
                       bg-transparent
                       border-none
                       transition-all
-                      ${
-                        isSystem
-                          ? "bg-white/10 ring-1 ring-[#9A9A9A]"
-                          : "hover:bg-white/10"
+                      ${isSystem
+                        ? "bg-white/10 ring-1 ring-[#9A9A9A]"
+                        : "hover:bg-white/10"
                       }
                     `}
                   >
@@ -528,10 +543,9 @@ export default function Navbar() {
                       bg-transparent
                       border-none
                       transition-all
-                      ${
-                        !isDark
-                          ? "bg-[#FFF3E0] ring-1 ring-[#F97316]"
-                          : "hover:bg-white/10"
+                      ${!isDark
+                        ? "bg-[#FFF3E0] ring-1 ring-[#F97316]"
+                        : "hover:bg-white/10"
                       }
                     `}
                   >
@@ -562,10 +576,9 @@ export default function Navbar() {
                       bg-transparent
                       border-none
                       transition-all
-                      ${
-                        isDark
-                          ? "bg-[#94D3C1]/10 ring-1 ring-[#94D3C1]"
-                          : "hover:bg-white/10"
+                      ${isDark
+                        ? "bg-[#94D3C1]/10 ring-1 ring-[#94D3C1]"
+                        : "hover:bg-white/10"
                       }
                     `}
                   >
