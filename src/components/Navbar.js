@@ -32,7 +32,7 @@ export default function Navbar() {
   const nav = useTranslations("nav");
 
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
-  const { toggleNotifications, closeNotifications, unreadCount } = useNotifications();
+  const { toggleNotifications, closeNotifications, isNotificationsOpen, unreadCount } = useNotifications();
   const { toggleAssistant, isAssistantOpen, closeAssistant } = useAssistant();
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
@@ -156,13 +156,21 @@ export default function Navbar() {
 
         <button
             type="button"
-            onClick={toggleAssistant}
-            className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
-            isAssistantOpen
-                ? "bg-[#2a2a2a]"
-                : "bg-transparent hover:bg-white/10"
-            }`}
-        >
+    onClick={() => {
+      if (isAssistantOpen) {
+        closeAssistant();
+        return;
+      }
+
+      closeNotifications();
+      toggleAssistant();
+    }}
+    className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
+    isAssistantOpen
+        ? "bg-[#2a2a2a]"
+        : "bg-transparent hover:bg-white/10"
+    }`}
+>
   <BsStars size={19} color={isAssistantOpen ? "#ffffff" : "#9A9A9A"} />
 </button>
 
