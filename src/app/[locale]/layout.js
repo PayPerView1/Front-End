@@ -4,6 +4,8 @@ import { routing } from "../../i18n/routing";
 import { notFound } from "next/navigation";
 import { Geist, Geist_Mono, Tajawal } from "next/font/google";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { MessagesProvider } from "@/context/MessagesContext";
+import MessagesPanel from "@/components/MessagesPanel"; // 👈 استيراد مكون الرسائل
 import "../globals.css";
 
 const geistSans = Geist({
@@ -43,10 +45,13 @@ export default async function LocaleLayout({ children, params }) {
       dir={dir}
       className={`${geistSans.variable} ${geistMono.variable} ${tajawal.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col font-tajawal">
+      <body className="min-h-full flex flex-col font-tajawal" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
-            {children}
+            <MessagesProvider> 
+              {children}
+              <MessagesPanel />
+            </MessagesProvider> 
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

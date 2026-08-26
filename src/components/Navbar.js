@@ -3,7 +3,7 @@ import { useAssistant } from "@/context/AssistantContext";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-
+import { useMessages } from "@/context/MessagesContext";
 import {
   Chat,
   Notification,
@@ -32,6 +32,8 @@ export default function Navbar() {
 
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
   const { toggleAssistant, isAssistantOpen } = useAssistant();
+  const { toggleMessages, isMessagesOpen } = useMessages(); 
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [user, setUser] = useState(null);
@@ -113,24 +115,24 @@ export default function Navbar() {
   }
 
   return (
-     <div
-  dir={locale === "ar" ? "rtl" : "ltr"}
-  className={`
-    w-full
-    flex
-    items-center
-    justify-end
-    px-2
-    sm:px-6
-    py-3
-    sticky
-    top-0
-    z-[9999999]
-    border-b
-    ${t.navBg}
-    ${t.navBorder}
-  `}
->
+    <div
+      dir={locale === "ar" ? "rtl" : "ltr"}
+      className={`
+        w-full
+        flex
+        items-center
+        justify-end
+        px-2
+        sm:px-6
+        py-3
+        sticky
+        top-0
+        z-[9999999]
+        border-b
+        ${t.navBg}
+        ${t.navBorder}
+      `}
+    >
       <div className="flex items-center gap-5 px-3 py-1.5">
         {/* الرصيد */}
         <div
@@ -139,7 +141,7 @@ export default function Navbar() {
             px-4
             py-1
             text-sm
-            font-boldس
+            font-bold
             border
             ${
               isDark
@@ -153,24 +155,25 @@ export default function Navbar() {
 
         {/* AI */}
         <button
-            type="button"
-            onClick={toggleAssistant}
-            className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
+          type="button"
+          onClick={toggleAssistant}
+          className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
             isAssistantOpen
-                ? "bg-[#2a2a2a]"
-                : "bg-transparent hover:bg-white/10"
-            }`}
+              ? "bg-[#2a2a2a]"
+              : "bg-transparent hover:bg-white/10"
+          }`}
         >
-  <BsStars size={19} color={isAssistantOpen ? "#ffffff" : "#9A9A9A"} />
-</button>
-
-        {/* الرسائل */}
-        <Chat
-          set="light"
-          size={19}
-          primaryColor="#9A9A9A"
-          className="cursor-pointer"
-        />
+          <BsStars size={19} color={isAssistantOpen ? "#ffffff" : "#9A9A9A"} />
+        </button>
+        <button
+            type="button"
+            onClick={toggleMessages}
+            className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
+              isMessagesOpen ? "bg-[#2a2a2a]" : "bg-transparent hover:bg-white/10"
+            }`}
+          >
+            <Chat set="light" size={19} primaryColor={isMessagesOpen ? "#ffffff" : "#9A9A9A"} />
+        </button>
 
         {/* الجرس */}
         <div className="relative cursor-pointer mx-1">
@@ -320,10 +323,6 @@ export default function Navbar() {
                     size={18}
                     color="#9A9A9A"
                     className="cursor-pointer"
-  //                   onClick={() => {
-  //   router.push("/ar/edit-profile?settings=true");
-  //   setMenuOpen(false);
-  // }}
                   />
                 </div>
 
