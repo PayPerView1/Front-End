@@ -4,6 +4,7 @@ import { routing } from "../../i18n/routing";
 import { notFound } from "next/navigation";
 import { Geist, Geist_Mono, Tajawal } from "next/font/google";
 import { ThemeProvider } from "@/context/ThemeContext";
+import MainLayout from "@/components/MainLayout";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -46,7 +47,9 @@ export default async function LocaleLayout({ children, params }) {
       <body className="min-h-full flex flex-col font-tajawal">
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
-            {children}
+            <MainLayout locale={locale}>
+              {children}
+            </MainLayout>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

@@ -155,24 +155,30 @@ export default function Navbar() {
         {/* AI */}
 
         <button
-            type="button"
-    onClick={() => {
-      if (isAssistantOpen) {
-        closeAssistant();
-        return;
-      }
+          type="button"
+          onClick={() => {
+            if (isAssistantOpen) {
+              closeAssistant();
+              return;
+            }
 
-      closeNotifications();
-      toggleAssistant();
-    }}
-    className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
-    isAssistantOpen
-        ? "bg-[#2a2a2a]"
-        : "bg-transparent hover:bg-white/10"
-    }`}
->
-  <BsStars size={19} color={isAssistantOpen ? "#ffffff" : "#9A9A9A"} />
-</button>
+            closeNotifications();
+            toggleAssistant();
+          }}
+          className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${isAssistantOpen
+              ? isDark
+                ? "bg-[#2a2a2a]"
+                : "bg-[#94D3C1]/25"
+              : isDark
+                ? "bg-transparent hover:bg-white/10"
+                : "bg-transparent hover:bg-[#94D3C1]/15"
+            }`}
+        >
+          <BsStars
+            size={19}
+            color={isAssistantOpen ? (isDark ? "#ffffff" : "#2A9D8F") : "#9A9A9A"}
+          />
+        </button>
 
         {/* الرسائل */}
         <Chat
@@ -184,14 +190,26 @@ export default function Navbar() {
 
         {/* الجرس */}
         <div
-          className="relative cursor-pointer mx-1"
+          className={`relative w-8 h-8 flex items-center justify-center rounded-xl cursor-pointer transition-colors mx-1 ${
+            isNotificationsOpen
+              ? isDark
+                ? "bg-[#2a2a2a]"
+                : "bg-[#94D3C1]/25"
+              : isDark
+                ? "hover:bg-white/10"
+                : "hover:bg-[#94D3C1]/15"
+          }`}
           onClick={() => {
             console.log("Navbar: Notification bell clicked. Toggling panel...");
             closeAssistant();
             toggleNotifications();
           }}
         >
-          <Notification set="light" size={19} primaryColor="#9A9A9A" />
+          <Notification
+            set="light"
+            size={19}
+            primaryColor={isNotificationsOpen ? (isDark ? "#ffffff" : "#2A9D8F") : "#9A9A9A"}
+          />
 
           {unreadCount > 0 && (
             <span
@@ -378,6 +396,7 @@ export default function Navbar() {
                           w-full
                           flex
                           items-center
+                          gap-3
                           px-3
                           py-2.5
                           rounded-[16px]
@@ -398,7 +417,6 @@ export default function Navbar() {
                         <span
                           className={`
                             text-sm
-                            mr-4
                             ${t.menuText}
                           `}
                         >
@@ -426,6 +444,7 @@ export default function Navbar() {
                       w-full
                       flex
                       items-center
+                      gap-3
                       px-3
                       py-2.5
                       rounded-[16px]
@@ -446,7 +465,6 @@ export default function Navbar() {
                     <span
                       className={`
                         text-sm
-                        mr-4
                         ${t.menuText}
                       `}
                     >
@@ -466,6 +484,7 @@ export default function Navbar() {
                       w-full
                       flex
                       items-center
+                      gap-3
                       px-3
                       py-2.5
                       rounded-[16px]
@@ -479,7 +498,7 @@ export default function Navbar() {
                   >
                     <Logout set="light" size={18} primaryColor="#EF4444" />
 
-                    <span className="text-red-400 text-sm mr-4">
+                    <span className="text-red-400 text-sm">
                       {nav("logout")}
                     </span>
                   </button>

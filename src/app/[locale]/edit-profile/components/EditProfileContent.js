@@ -297,6 +297,7 @@ export default function EditProfileContent() {
   const router = useRouter();
   const locale = useLocale();
   const copy = useTranslations("editProfile");
+  const fieldTextAlign = locale === "en" ? "text-left" : "text-right";
 
   const [activeMenu, setActiveMenu] = useState("profile");
 
@@ -555,7 +556,9 @@ export default function EditProfileContent() {
 
             {/* Profile */}
             <div
-              className="absolute -bottom-7 right-2 sm:right-4 cursor-pointer"
+              className={`absolute -bottom-7 cursor-pointer ${
+                locale === "ar" ? "right-2 sm:right-4" : "left-2 sm:left-4"
+              }`}
               onClick={() => profileRef.current?.click()}
             >
               <div
@@ -608,7 +611,7 @@ export default function EditProfileContent() {
           {/* Name */}
           <div className="flex flex-col gap-1 mt-4">
             <label
-              className={`text-xs sm:text-sm font-bold text-right ${t.text}`}
+              className={`text-xs sm:text-sm font-bold ${fieldTextAlign} ${t.text}`}
             >
               {copy("name")}
             </label>
@@ -623,7 +626,7 @@ export default function EditProfileContent() {
                   name: e.target.value,
                 })
               }
-              className={`w-full h-10 sm:h-11 rounded-lg border px-3 sm:px-4 text-right text-xs sm:text-sm outline-none transition-all
+              className={`w-full h-10 sm:h-11 rounded-lg border px-3 sm:px-4 ${fieldTextAlign} text-xs sm:text-sm outline-none transition-all
                 focus:border-[#94D3C1]
                 ${t.inputBg}
                 ${t.inputBorder}
@@ -654,7 +657,7 @@ export default function EditProfileContent() {
                   username: e.target.value,
                 })
               }
-              className={`w-full h-10 sm:h-11 rounded-lg border px-3 sm:px-4 text-right text-xs sm:text-sm outline-none transition-all
+              className={`w-full h-10 sm:h-11 rounded-lg border px-3 sm:px-4 ${fieldTextAlign} text-xs sm:text-sm outline-none transition-all
                 focus:border-[#94D3C1]
                 ${t.inputBg}
                 ${t.inputBorder}
@@ -685,7 +688,7 @@ export default function EditProfileContent() {
                   email: e.target.value,
                 })
               }
-              className={`w-full h-10 sm:h-11 rounded-lg border px-3 sm:px-4 text-right text-xs sm:text-sm outline-none transition-all
+              className={`w-full h-10 sm:h-11 rounded-lg border px-3 sm:px-4 ${fieldTextAlign} text-xs sm:text-sm outline-none transition-all
                 focus:border-[#94D3C1]
                 ${t.inputBg}
                 ${t.inputBorder}
@@ -717,7 +720,7 @@ export default function EditProfileContent() {
               }
               placeholder={copy("bioPlaceholder")}
               rows={3}
-              className={`w-full rounded-lg border px-3 sm:px-4 py-3 text-xs sm:text-sm text-right outline-none resize-none transition-all
+              className={`w-full rounded-lg border px-3 sm:px-4 py-3 text-xs sm:text-sm ${fieldTextAlign} outline-none resize-none transition-all
                 focus:border-[#94D3C1]
                 ${t.inputBg}
                 ${t.inputBorder}
@@ -817,7 +820,7 @@ export default function EditProfileContent() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="أدخل رقم الهاتف"
-                  className={`w-full h-11 rounded-lg border px-3 sm:px-4 text-right text-xs sm:text-sm outline-none transition-all
+                  className={`w-full h-11 rounded-lg border px-3 sm:px-4 ${fieldTextAlign} text-xs sm:text-sm outline-none transition-all
                     focus:border-[#94D3C1]
                     ${t.inputBg}
                     ${t.inputBorder}
@@ -914,7 +917,7 @@ export default function EditProfileContent() {
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="مثال: دبي"
-                className={`w-full h-11 rounded-lg border px-3 sm:px-4 text-right text-xs sm:text-sm outline-none transition-all
+                className={`w-full h-11 rounded-lg border px-3 sm:px-4 ${fieldTextAlign} text-xs sm:text-sm outline-none transition-all
                   focus:border-[#94D3C1]
                   ${t.inputBg}
                   ${t.inputBorder}
@@ -1006,7 +1009,7 @@ export default function EditProfileContent() {
           {/* Birth Date */}
           <div className="flex flex-col gap-1 w-full sm:max-w-[280px]">
             <label
-              className={`text-xs sm:text-sm font-bold text-right ${t.text}`}
+              className={`text-xs sm:text-sm font-bold ${fieldTextAlign} ${t.text}`}
             >
               {copy("birthDate")}
             </label>
@@ -1029,12 +1032,12 @@ export default function EditProfileContent() {
           {/* Additional Settings */}
           <div className="flex flex-col gap-1">
             <label
-              className={`text-xs sm:text-sm font-bold text-right ${t.text}`}
+              className={`text-xs sm:text-sm font-bold ${fieldTextAlign} ${t.text}`}
             >
               {copy("additionalSettings")}
             </label>
 
-            <p className={`text-[10px] sm:text-xs text-right ${t.subText}`}>
+            <p className={`text-[10px] sm:text-xs ${fieldTextAlign} ${t.subText}`}>
               {copy("additionalDescription")}
             </p>
 

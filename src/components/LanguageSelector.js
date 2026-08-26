@@ -86,6 +86,7 @@ export default function LanguageSelector() {
                 key={lang.code}
                 href={pathname || "/"}
                 locale={lang.code}
+                replace
                 onClick={() => setOpen(false)}
                 className={`w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-[#94D3C142] transition-colors cursor-pointer bg-transparent border-none
           ${isDark ? "text-white" : "text-[#333]"}`}

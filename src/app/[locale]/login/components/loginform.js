@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FaApple } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
@@ -250,21 +249,14 @@ export default function LoginForm() {
           </span>
           <div className="h-px flex-1 bg-white/20" />
         </div>
-        <div className="flex justify-center gap-3.5 mb-6">
+        <div className="flex justify-center mb-6">
           <button
             type="button"
             onClick={() => api.loginWithGoogle()}
-            className="flex items-center justify-center gap-2 w-[160px] h-[40px] rounded-lg bg-white/10 border border-white/20 text-white text-sm font-medium transition-colors"
+            className="flex items-center justify-center gap-2 w-full h-[40px] rounded-lg bg-white/10 border border-white/20 text-white text-sm font-medium transition-colors"
           >
             <FcGoogle className="w-5 h-5" />
             Google
-          </button>
-          <button
-            type="button"
-            className="flex items-center justify-center gap-2 w-[160px] h-[40px] rounded-lg bg-white/10 border border-white/20 text-white text-sm font-medium transition-colors"
-          >
-            <FaApple className="w-5 h-5 mb-0.5" />
-            Apple
           </button>
         </div>
 

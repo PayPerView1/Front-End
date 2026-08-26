@@ -82,7 +82,7 @@ export default function NotificationsPanel({ side = "left" }) {
 
   return (
     <aside
-      className={`fixed top-[64px] h-[calc(100vh-64px)] w-[500px] max-w-[500px] z-40 flex flex-col overflow-y-auto border transition-all duration-300 ${sideClass} ${t.border}`}
+      className={`fixed top-[64px] h-[calc(100vh-64px)] w-full max-w-full sm:w-[500px] sm:max-w-[500px] z-40 flex flex-col overflow-y-auto border transition-all duration-300 ${sideClass} ${t.border}`}
       style={{
         backgroundColor: isDark ? "#0C0F10" : "#FFFFFF",
         boxShadow: "0px 25px 50px -12px rgba(0, 0, 0, 0.25)",
