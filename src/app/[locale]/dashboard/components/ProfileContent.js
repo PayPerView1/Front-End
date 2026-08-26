@@ -21,6 +21,8 @@ import { useLocale, useMessages } from "next-intl";
 import { getProfile, updateProfile } from "@/services/profile";
 import { getSavedUser } from "@/lib/axiosInstance";
 import api from "@/lib/axios";
+import { useAssistant } from "@/context/AssistantContext";
+import { useNotifications } from "@/context/NotificationsContext";
 
 const profileFallbacks = {
   "campaigns.arabClips": "Arabic Clips Community", "campaigns.creators": "Creators Platform", "campaigns.academy": "Content Academy", "campaigns.followers": "{count} followers",
@@ -64,12 +66,15 @@ export default function ProfileContent() {
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
   const menuDropdownRef = useRef(null);
   const [openCardMenu, setOpenCardMenu] = useState(null);
+  const { isAssistantOpen } = useAssistant();
+  const { isNotificationsOpen } = useNotifications();
   const messages = useMessages();
   const text = (key, values = {}) => {
     const translated = key.split(".").reduce((value, part) => value && value[part], messages.profile);
     return String(translated || profileFallbacks[key] || key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
   };
   const locale = useLocale();
+  const isUtilityPanelOpen = isAssistantOpen || isNotificationsOpen;
   const tabs = ["creator", "joined", "reviews"];
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -174,7 +179,8 @@ export default function ProfileContent() {
           )}
 
           {/* زر النقاط */}
-          <div ref={coverMenuRef} className="absolute top-3 right-3 z-[100]">
+          {!isUtilityPanelOpen && (
+            <div ref={coverMenuRef} className="absolute top-3 right-3 z-[100]">
             <button
               type="button"
               onClick={(e) => {
@@ -249,7 +255,8 @@ export default function ProfileContent() {
                 ))}
               </div>
             )}
-          </div>
+            </div>
+          )}
           <input
             ref={coverInputRef}
             type="file"

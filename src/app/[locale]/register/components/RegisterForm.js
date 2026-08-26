@@ -4,6 +4,7 @@ import StepIndicator from "@/app/[locale]/register/components/StepIndicator";
 import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/services";
 import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -225,13 +226,13 @@ export default function RegisterForm() {
         {errors.email && (
           <p className="text-xs text-red-400 text-right">
             {errors.email}{" "}
-            <a href="/login" className="text-[#94D3C1] underline">
+            <Link href="/login" className="text-[#94D3C1] underline">
               {t("signIn")}
-            </a>{" "}
+            </Link>{" "}
             أو{" "}
-            <a href="/forgot-password" className="text-[#94D3C1] underline">
+            <Link href="/forgot-password" className="text-[#94D3C1] underline">
               {t("resetPassword")}
-            </a>
+            </Link>
           </p>
         )}
       </div>
@@ -288,9 +289,9 @@ export default function RegisterForm() {
       {/* تسجيل الدخول */}
       <p className="text-center text-sm text-[#BFC9C4] m-0">
         {t("alreadyHaveAccount")} {" "}
-        <a href="/login" className="text-[#94D3C1] font-bold no-underline">
+        <Link href="/login" className="text-[#94D3C1] font-bold no-underline">
           {t("signIn")}
-        </a>
+        </Link>
       </p>
     </div>
   );
