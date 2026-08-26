@@ -14,15 +14,11 @@ export default function DashboardShell({ children, locale }) {
   // hasConversation يتم تمريره من MessagesPanel عبر callback
   const [hasConversation, setHasConversation] = useState(false);
 
-  const panelWidth = isMessagesOpen
-    ? hasConversation
-      ? "lg:ml-[760px]"
-      : "lg:ml-[380px]"
-    : "";
+  const panelWidth = isMessagesOpen ? "lg:ml-[380px]" : "";
 
   const mainMargin = isRtl
     ? `lg:mr-[260px] ${isAssistantOpen ? "lg:ml-[380px]" : ""} ${panelWidth}`
-    : `lg:ml-[260px] ${isAssistantOpen ? "lg:mr-[380px]" : ""} ${isMessagesOpen ? (hasConversation ? "lg:mr-[760px]" : "lg:mr-[380px]") : ""}`;
+    : `lg:ml-[260px] ${isAssistantOpen ? "lg:mr-[380px]" : ""} ${isMessagesOpen ? "lg:mr-[380px]" : ""}`;
 
   return (
     <>

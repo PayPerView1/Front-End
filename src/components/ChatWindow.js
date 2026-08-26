@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { IoClose, IoExpand, IoArrowForward } from "react-icons/io5";
+import { useLocale } from "next-intl";
+import { IoClose, IoExpand, IoArrowForward, IoContract } from "react-icons/io5";
 import { FiMic, FiSend, FiPlus, FiX } from "react-icons/fi";
 import { HiOutlineEmojiHappy } from "react-icons/hi";
+import { useMessages } from "@/context/MessagesContext";
+import { useTheme } from "@/context/ThemeContext";
 
 // دالة تحويل الروابط في النصوص إلى روابط قابلة للنقر تلقائياً
 function renderFormattedText(text) {
@@ -31,6 +34,10 @@ function renderFormattedText(text) {
 }
 
 export default function ChatWindow({ conversation, onClose }) {
+  const locale = useLocale();
+  const isArabic = locale === "ar";
+  const { toggleMaximize, isMaximized } = useMessages();
+  const { isDark } = useTheme();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -89,49 +96,128 @@ export default function ChatWindow({ conversation, onClose }) {
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ backgroundColor: "#0A0812" }}>
+    <div
+      className="flex flex-col h-full"
+      style={{ backgroundColor: isDark ? "rgba(12, 15, 16, 1)" : "#ffffff" }}
+    >
       {/* الهيدر */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-        <div className="flex items-center gap-2">
+      <div
+        className={`flex items-center justify-between px-3 pt-5 pb-3 border-b ${
+          isDark ? "border-white/10" : "border-[#E5E5E5]"
+        } ${
+          isArabic ? "" : "flex-row-reverse"
+        }`}
+        dir="ltr"
+      >
+        <div className="flex items-center gap-2" dir="ltr">
           <button
             type="button"
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-white/10 text-gray-400 hover:text-white transition-colors border-none cursor-pointer"
+            onClick={onClose}
+            aria-label="إغلاق المحادثة"
+            className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
+              isDark ? "text-gray-500 hover:text-white" : "text-gray-400 hover:text-gray-900"
+            }`}
           >
-            <IoArrowForward size={14} />
+            <IoClose size={16} />
+          </button>
+          <button
+            type="button"
+            onClick={toggleMaximize}
+            aria-label={isMaximized ? "تصغير لوحة الرسائل" : "تكبير لوحة الرسائل"}
+            className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
+              isDark ? "text-gray-500 hover:text-white" : "text-gray-400 hover:text-gray-900"
+            }`}
+          >
+            {isMaximized ? <IoContract size={14} /> : <IoExpand size={14} />}
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
-          <h2 className="text-white text-sm font-bold">{conversation.name}</h2>
+        <div
+          className={`flex items-center gap-2 ${isArabic ? "flex-row-reverse" : ""}`}
+          dir="ltr"
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="العودة إلى قائمة المحادثات"
+            className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
+              isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
+            }`}
+          >
+            <IoArrowForward
+              size={14}
+              className={isArabic ? "" : "rotate-180"}
+            />
+          </button>
           <div
-            className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
+            className="w-7 h-7 rounded-md flex items-center justify-center text-white text-xs font-bold"
             style={{ background: conversation.color }}
           >
             {conversation.initials}
           </div>
+          <h2 className={`text-xs font-bold ${isDark ? "text-white" : "text-gray-900"}`}>{conversation.name}</h2>
         </div>
       </div>
 
       {/* منطقة الرسائل */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
+      <div className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-4">
+        {messages[0]?.time && (
+          <p className="text-center text-gray-500 text-[11px] mb-5">
+            {messages[0].time}
+          </p>
+        )}
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`flex flex-col ${msg.isMe ? "items-start" : "items-end"}`}
+            className={`relative flex flex-col ${
+              isArabic ? "items-start" : msg.isMe ? "items-end" : "items-start"
+            } ${
+              isArabic
+                ? "mr-7"
+                : msg.isMe
+                  ? "mr-7"
+                  : "ml-7"
+            }`}
           >
-            {!msg.isMe && (
-              <p className="text-gray-400 text-[10px] mb-1">{msg.sender}</p>
-            )}
-            <div
-              className={`max-w-[80%] rounded-2xl px-4 py-3 text-xs leading-relaxed whitespace-pre-line ${
-                msg.isMe
-                  ? "bg-white/10 text-white rounded-tl-none"
-                  : "bg-white/[0.06] text-white rounded-tr-none"
-              }`}
-            >
-              {renderFormattedText(msg.text)}
+            <div className="relative max-w-[87%]">
+                <div
+                  className={`rounded-2xl px-4 py-3 text-xs leading-6 whitespace-pre-line ${
+                    msg.isMe
+                      ? `${
+                          isDark ? "bg-white/10 text-white" : "bg-gray-200 text-gray-900"
+                        } ${
+                          msg.isMe === isArabic
+                            ? "rounded-bl-none"
+                            : "rounded-br-none"
+                        }`
+                      : `${
+                          isDark ? "bg-white/[0.06] text-white" : "bg-gray-100 text-gray-900 border border-gray-200"
+                        } ${
+                          msg.isMe !== isArabic
+                            ? "rounded-br-none"
+                            : "rounded-bl-none"
+                        }`
+                  }`}
+                >
+                  {renderFormattedText(msg.text)}
+                </div>
+                <div
+                  className={`absolute bottom-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-[10px] font-bold border-2 ${
+                    isDark ? "border-[rgba(12,15,16,1)]" : "border-white shadow-sm"
+                  } ${
+                    msg.isMe
+                      ? isArabic
+                        ? "-left-9"
+                        : "-right-9"
+                      : isArabic
+                        ? "-right-9"
+                        : "-left-9"
+                  }`}
+                  style={{ background: msg.color || conversation.color }}
+                >
+                  {msg.initials || conversation.initials}
+                  </div>
             </div>
-            <p className="text-gray-500 text-[9px] mt-1">{msg.time}</p>
           </div>
         ))}
         {/* المرجع للتمرير التلقائي */}
@@ -139,14 +225,18 @@ export default function ChatWindow({ conversation, onClose }) {
       </div>
 
       {/* شريط الإدخال */}
-      <div className="px-4 py-3 border-t border-white/10">
+      <div className={`px-2 py-2 border-t ${isDark ? "border-white/10" : "border-[#E5E5E5]"}`}>
         <form
           onSubmit={handleSend}
-          className="flex flex-col rounded-2xl bg-white/[0.06] border border-white/10 px-3 py-2 gap-2"
+          className={`flex flex-col rounded-2xl px-3 py-2 gap-2 border ${
+            isDark ? "bg-white/[0.06] border-white/10" : "bg-gray-50 border-gray-200"
+          }`}
         >
           {/* معاينة الملف قبل الإرسال */}
           {selectedFile && (
-            <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/10 border border-white/10">
+            <div className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border ${
+              isDark ? "bg-white/10 border-white/10" : "bg-gray-100 border-gray-200"
+            }`}>
               {filePreviewUrl ? (
                 <img
                   src={filePreviewUrl}
@@ -154,22 +244,24 @@ export default function ChatWindow({ conversation, onClose }) {
                   className="w-8 h-8 rounded-md object-cover shrink-0"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-md bg-white/10 flex items-center justify-center shrink-0">
-                  <FiPlus className="w-3.5 h-3.5 text-gray-300 rotate-45" />
+                <div className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 ${isDark ? "bg-white/10" : "bg-gray-200"}`}>
+                  <FiPlus className={`w-3.5 h-3.5 rotate-45 ${isDark ? "text-gray-300" : "text-gray-500"}`} />
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-white text-[11px] truncate">
+                <p className={`text-[11px] truncate ${isDark ? "text-white" : "text-gray-900"}`}>
                   {selectedFile.name}
                 </p>
-                <p className="text-gray-400 text-[9px]">
+                <p className={`text-[9px] ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                   {(selectedFile.size / 1024).toFixed(1)} KB
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedFile(null)}
-                className="text-gray-400 hover:text-white border-none cursor-pointer bg-transparent"
+                className={`border-none cursor-pointer bg-transparent transition-colors ${
+                  isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-800"
+                }`}
               >
                 <FiX className="w-3 h-3" />
               </button>
@@ -188,7 +280,9 @@ export default function ChatWindow({ conversation, onClose }) {
             {/* إيموجي */}
             <button
               type="button"
-              className="text-gray-400 hover:text-white transition-colors border-none cursor-pointer bg-transparent shrink-0"
+              className={`transition-colors border-none cursor-pointer bg-transparent shrink-0 ${
+                isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
+              }`}
             >
               <HiOutlineEmojiHappy size={16} />
             </button>
@@ -199,13 +293,17 @@ export default function ChatWindow({ conversation, onClose }) {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="اكتب رسالة..."
-              className="flex-1 min-w-0 bg-transparent text-white text-xs placeholder-gray-500 outline-none text-right"
+              className={`flex-1 min-w-0 bg-transparent text-xs outline-none text-right ${
+                isDark ? "text-white placeholder-gray-500" : "text-gray-900 placeholder-gray-400"
+              }`}
             />
 
             {/* مايكروفون */}
             <button
               type="button"
-              className="text-gray-400 hover:text-white transition-colors border-none cursor-pointer bg-transparent shrink-0"
+              className={`transition-colors border-none cursor-pointer bg-transparent shrink-0 ${
+                isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
+              }`}
             >
               <FiMic size={15} />
             </button>
@@ -214,7 +312,9 @@ export default function ChatWindow({ conversation, onClose }) {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="text-gray-400 hover:text-white transition-colors border-none cursor-pointer bg-transparent shrink-0"
+              className={`transition-colors border-none cursor-pointer bg-transparent shrink-0 ${
+                isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
+              }`}
             >
               <FiPlus size={16} />
             </button>

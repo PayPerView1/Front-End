@@ -166,7 +166,7 @@ export default function ProfileContent() {
           )}
 
           {/* زر النقاط */}
-          <div ref={coverMenuRef} className="absolute top-3 right-3 z-[100]">
+          <div ref={coverMenuRef} className="absolute top-3 right-3 z-10">
             <button
               type="button"
               onClick={(e) => {
@@ -174,7 +174,7 @@ export default function ProfileContent() {
                 e.stopPropagation();
                 setCoverMenuOpen((p) => !p);
               }}
-              className="relative z-[101] w-8 h-8 rounded-full bg-black/60 flex items-center justify-center border-none cursor-pointer hover:bg-black/80"
+              className="relative z-10 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center border-none cursor-pointer hover:bg-black/80"
             >
               <BsThreeDots size={15} color="#FFFFFF" />
             </button>
@@ -182,7 +182,7 @@ export default function ProfileContent() {
             {coverMenuOpen && (
               <div
                 data-menu="true"
-                className={`absolute top-10 right-0 z-[999] w-[160px] p-1 rounded-lg shadow-2xl overflow-hidden border ${t.menuBg} ${t.menuBorder}`}
+                className={`absolute top-10 right-0 z-20 w-[160px] p-1 rounded-lg shadow-2xl overflow-hidden border ${t.menuBg} ${t.menuBorder}`}
                 onClick={(e) => e.stopPropagation()}
               >
                 {[

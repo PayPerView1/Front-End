@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { FiSearch, FiEdit } from "react-icons/fi";
-import { IoClose, IoExpand } from "react-icons/io5";
+import { IoClose, IoExpand, IoContract } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { useMessages } from "@/context/MessagesContext";
+import { useTheme } from "@/context/ThemeContext";
 
 // بيانات وهمية معدلة تشمل خاصية isOrder للفلترة
 export const mockConversations = [
@@ -64,7 +65,8 @@ export default function ConversationList({
   const [activeFilter, setActiveFilter] = useState("all");
   const router = useRouter();
   const locale = useLocale();
-  const { toggleMaximize } = useMessages();
+  const { toggleMaximize, isMaximized } = useMessages();
+  const { isDark } = useTheme();
 
   // منطق التصفية حسب البحث وحسب الفلتر النشط
   const filtered = mockConversations.filter((c) => {
@@ -78,22 +80,31 @@ export default function ConversationList({
   });
 
   return (
-    <div className="flex flex-col h-full border-l border-white/10" style={{ backgroundColor: "#0A0812" }}>
+    <div className={`flex flex-col h-full border-l ${isDark ? "border-white/10" : "border-[#E5E5E5]"}`} style={{ backgroundColor: isDark ? "rgba(12, 15, 16, 1)" : "#ffffff" }}>
       {/* الهيدر */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-        <h2 className="text-white text-sm font-bold">الرسائل</h2>
+      <div className={`flex items-center justify-between px-4 pt-5 pb-3 border-b ${isDark ? "border-white/10" : "border-[#E5E5E5]"}`}>
+        <h2 className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-900"}`}>الرسائل</h2>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={toggleMaximize}
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-white/10 text-gray-400 hover:text-white transition-colors border-none cursor-pointer"
+            aria-label={isMaximized ? "تصغير لوحة الرسائل" : "تكبير لوحة الرسائل"}
+            className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
+              isDark 
+                ? "bg-white/10 text-gray-400 hover:text-white" 
+                : "bg-gray-100 text-gray-500 hover:text-gray-900"
+            }`}
           >
-            <IoExpand size={13} />
+            {isMaximized ? <IoContract size={13} /> : <IoExpand size={13} />}
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-white/10 text-gray-400 hover:text-white transition-colors border-none cursor-pointer"
+            className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
+              isDark 
+                ? "bg-white/10 text-gray-400 hover:text-white" 
+                : "bg-gray-100 text-gray-500 hover:text-gray-900"
+            }`}
           >
             <IoClose size={15} />
           </button>
@@ -101,21 +112,31 @@ export default function ConversationList({
       </div>
 
       {/* شريط البحث والأزرار */}
-      <div className="px-4 py-3 border-b border-white/10">
+      <div className={`px-4 py-3 border-b ${isDark ? "border-white/10" : "border-[#E5E5E5]"}`}>
         <div className="flex items-center gap-2 mb-3">
-          <div className="flex-1 flex items-center gap-2 bg-white/[0.06] rounded-lg px-3 py-2 border border-white/10">
-            <FiSearch size={13} className="text-gray-400 shrink-0" />
+          <div className={`flex-1 flex items-center gap-2 rounded-lg px-3 py-2 border ${
+            isDark 
+              ? "bg-white/[0.06] border-white/10" 
+              : "bg-gray-50 border-gray-200"
+          }`}>
+            <FiSearch className={`${isDark ? "text-gray-400" : "text-gray-500"} shrink-0`} size={13} />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="البحث في الرسائل..."
-              className="flex-1 bg-transparent text-white text-xs placeholder-gray-500 outline-none text-right"
+              className={`flex-1 bg-transparent text-xs outline-none text-right ${
+                isDark ? "text-white placeholder-gray-500" : "text-gray-900 placeholder-gray-400"
+              }`}
             />
           </div>
           <button
             type="button"
-            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/[0.06] border border-white/10 text-gray-400 hover:text-white transition-colors cursor-pointer"
+            className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${
+              isDark 
+                ? "bg-white/[0.06] border-white/10 text-gray-400 hover:text-white" 
+                : "bg-gray-50 border-gray-200 text-gray-500 hover:text-gray-900"
+            }`}
           >
             <FiEdit size={13} />
           </button>
@@ -134,8 +155,10 @@ export default function ConversationList({
               onClick={() => setActiveFilter(f.key)}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors border-none cursor-pointer ${
                 activeFilter === f.key
-                  ? "bg-white text-black"
-                  : "bg-white/[0.06] text-gray-400 hover:text-white border border-white/10"
+                  ? (isDark ? "bg-white text-black" : "bg-gray-900 text-white")
+                  : (isDark 
+                      ? "bg-white/[0.06] text-gray-400 hover:text-white border border-white/10" 
+                      : "bg-gray-100 text-gray-600 hover:text-gray-900 border border-gray-200")
               }`}
             >
               {f.label}
@@ -152,10 +175,12 @@ export default function ConversationList({
               key={conv.id}
               type="button"
               onClick={() => onSelectConversation(conv)}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-right transition-colors border-none cursor-pointer border-b border-white/5 ${
+              className={`w-full flex items-center gap-3 px-4 py-3 text-right transition-colors border-none cursor-pointer border-b ${
+                isDark ? "border-white/5" : "border-gray-100"
+              } ${
                 selectedId === conv.id
-                  ? "bg-white/[0.07]"
-                  : "bg-transparent hover:bg-white/[0.04]"
+                  ? (isDark ? "bg-white/[0.07]" : "bg-gray-100")
+                  : (isDark ? "bg-transparent hover:bg-white/[0.04]" : "bg-transparent hover:bg-gray-50")
               }`}
             >
               <div
@@ -166,12 +191,12 @@ export default function ConversationList({
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-gray-500 text-[10px]">{conv.time}</span>
-                  <p className="text-white text-xs font-bold truncate text-right">
+                  <span className={`text-[10px] ${isDark ? "text-gray-500" : "text-gray-400"}`}>{conv.time}</span>
+                  <p className={`text-xs font-bold truncate text-right ${isDark ? "text-white" : "text-gray-900"}`}>
                     {conv.name}
                   </p>
                 </div>
-                <p className="text-gray-400 text-[11px] truncate text-right">
+                <p className={`text-[11px] truncate text-right ${isDark ? "text-gray-400" : "text-gray-600"}`}>
                   {conv.lastMessage}
                 </p>
               </div>
@@ -181,7 +206,7 @@ export default function ConversationList({
             </button>
           ))
         ) : (
-          <div className="p-4 text-center text-gray-500 text-xs">
+          <div className={`p-4 text-center text-xs ${isDark ? "text-gray-500" : "text-gray-400"}`}>
             لا توجد محادثات تطابق البحث
           </div>
         )}

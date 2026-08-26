@@ -31,8 +31,18 @@ export default function Navbar() {
   const nav = useTranslations("nav");
 
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
-  const { toggleAssistant, isAssistantOpen } = useAssistant();
-  const { toggleMessages, isMessagesOpen } = useMessages(); 
+  const { toggleAssistant, closeAssistant, isAssistantOpen } = useAssistant();
+  const { toggleMessages, closeMessages, isMessagesOpen } = useMessages();
+
+  function handleToggleAssistant() {
+    if (!isAssistantOpen && isMessagesOpen) closeMessages();
+    toggleAssistant();
+  }
+
+  function handleToggleMessages() {
+    if (!isMessagesOpen && isAssistantOpen) closeAssistant();
+    toggleMessages();
+  }
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
@@ -156,7 +166,7 @@ export default function Navbar() {
         {/* AI */}
         <button
           type="button"
-          onClick={toggleAssistant}
+          onClick={handleToggleAssistant}
           className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
             isAssistantOpen
               ? "bg-[#2a2a2a]"
@@ -167,7 +177,7 @@ export default function Navbar() {
         </button>
         <button
             type="button"
-            onClick={toggleMessages}
+            onClick={handleToggleMessages}
             className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
               isMessagesOpen ? "bg-[#2a2a2a]" : "bg-transparent hover:bg-white/10"
             }`}

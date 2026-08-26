@@ -2,27 +2,9 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { routing } from "../../i18n/routing";
 import { notFound } from "next/navigation";
-import { Geist, Geist_Mono, Tajawal } from "next/font/google";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { MessagesProvider } from "@/context/MessagesContext";
 import MessagesPanel from "@/components/MessagesPanel"; // 👈 استيراد مكون الرسائل
-import "../globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const tajawal = Tajawal({
-  variable: "--font-tajawal",
-  subsets: ["arabic"],
-  weight: ["400", "500", "700"],
-});
 
 export const metadata = {
   title: "Pay Per View",
@@ -37,24 +19,15 @@ export default async function LocaleLayout({ children, params }) {
   }
 
   const messages = await getMessages();
-  const dir = locale === "ar" ? "rtl" : "ltr";
 
   return (
-    <html
-      lang={locale}
-      dir={dir}
-      className={`${geistSans.variable} ${geistMono.variable} ${tajawal.variable} h-full antialiased dark`}
-    >
-      <body className="min-h-full flex flex-col font-tajawal" suppressHydrationWarning>
-        <NextIntlClientProvider messages={messages}>
-          <ThemeProvider>
-            <MessagesProvider> 
-              {children}
-              <MessagesPanel />
-            </MessagesProvider> 
-          </ThemeProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      <ThemeProvider>
+        <MessagesProvider>
+          {children}
+          <MessagesPanel />
+        </MessagesProvider>
+      </ThemeProvider>
+    </NextIntlClientProvider>
   );
 }

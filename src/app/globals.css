@@ -23,6 +23,32 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+@keyframes messages-panel-from-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes messages-panel-from-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.messages-panel[data-side="left"] {
+  animation: messages-panel-from-left 0.3s ease-out;
+}
+
+.messages-panel[data-side="right"] {
+  animation: messages-panel-from-right 0.3s ease-out;
+}
+
 /* تخصيص لون تحديد النصوص */
 ::selection {
   background-color: #ea580c;

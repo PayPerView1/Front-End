@@ -1,14 +1,21 @@
 "use client";
 
 import { useAssistant } from "@/context/AssistantContext";
+import { useMessages } from "@/context/MessagesContext";
 import AIAssistantPanel from "@/components/AIAssistantPanel";
 
 export default function DashboardShell({ children, locale }) {
   const { isAssistantOpen } = useAssistant();
+  const { isMessagesOpen, isMaximized, selectedConversation } = useMessages();
   const isRtl = locale === "ar";
+  const messagesMargin = isMessagesOpen && !isMaximized
+    ? isRtl
+      ? "lg:ml-[380px]"
+      : "lg:mr-[380px]"
+    : "";
   const mainMargin = isRtl
-    ? `lg:mr-[260px] ${isAssistantOpen ? "lg:ml-[380px]" : ""}`
-    : `lg:ml-[260px] ${isAssistantOpen ? "lg:mr-[380px]" : ""}`;
+    ? `lg:mr-[260px] ${isAssistantOpen ? "lg:ml-[380px]" : ""} ${messagesMargin}`
+    : `lg:ml-[260px] ${isAssistantOpen ? "lg:mr-[380px]" : ""} ${messagesMargin}`;
 
   return (
     <>
