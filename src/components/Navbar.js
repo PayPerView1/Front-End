@@ -4,7 +4,7 @@ import { useNotifications } from "@/context/NotificationsContext";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-
+import { useMessages } from "@/context/MessagesContext";
 import {
   Chat,
   Notification,
@@ -32,8 +32,41 @@ export default function Navbar() {
   const nav = useTranslations("nav");
 
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
-  const { toggleNotifications, closeNotifications, isNotificationsOpen, unreadCount } = useNotifications();
-  const { toggleAssistant, isAssistantOpen, closeAssistant } = useAssistant();
+const { toggleAssistant, closeAssistant, isAssistantOpen } = useAssistant();
+const { toggleMessages, closeMessages, isMessagesOpen } = useMessages();
+const {
+  toggleNotifications,
+  closeNotifications,
+  isNotificationsOpen,
+  unreadCount,
+} = useNotifications();
+
+function handleToggleAssistant() {
+  if (!isAssistantOpen) {
+    if (isMessagesOpen) closeMessages();
+    if (isNotificationsOpen) closeNotifications();
+  }
+
+  toggleAssistant();
+}
+
+function handleToggleMessages() {
+  if (!isMessagesOpen) {
+    if (isAssistantOpen) closeAssistant();
+    if (isNotificationsOpen) closeNotifications();
+  }
+
+  toggleMessages();
+}
+
+function handleToggleNotifications() {
+  if (!isNotificationsOpen) {
+    if (isAssistantOpen) closeAssistant();
+    if (isMessagesOpen) closeMessages();
+  }
+
+  toggleNotifications();
+}
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [user, setUser] = useState(null);
@@ -118,20 +151,19 @@ export default function Navbar() {
     <div
       dir={locale === "ar" ? "rtl" : "ltr"}
       className={`
-    w-full
-    flex
-    items-center
-    justify-end
-    px-2
-    sm:px-6
-    py-3
-    sticky
-    top-0
-    z-[9999999]
-    border-b
-    ${t.navBg}
-    ${t.navBorder}
-  `}
+w-full
+flex
+items-center
+justify-end
+px-2
+sm:px-6
+py-3
+sticky
+top-0
+z-[9999999]
+border-b
+${t.navBg}
+${t.navBorder}
     >
       <div className="flex items-center gap-5 px-3 py-1.5">
         {/* الرصيد */}
@@ -141,7 +173,7 @@ export default function Navbar() {
             px-4
             py-1
             text-sm
-            font-boldس
+            font-bold
             border
             ${isDark
               ? "bg-[#2a2a2a] border-[#3a3a3a] text-white"
@@ -156,38 +188,60 @@ export default function Navbar() {
 
         <button
           type="button"
-          onClick={() => {
-            if (isAssistantOpen) {
-              closeAssistant();
-              return;
-            }
+<button
+  type="button"
+  onClick={() => {
+    if (isAssistantOpen) {
+      closeAssistant();
+      return;
+    }
 
-            closeNotifications();
-            toggleAssistant();
-          }}
-          className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${isAssistantOpen
-              ? isDark
-                ? "bg-[#2a2a2a]"
-                : "bg-[#94D3C1]/25"
-              : isDark
-                ? "bg-transparent hover:bg-white/10"
-                : "bg-transparent hover:bg-[#94D3C1]/15"
-            }`}
-        >
-          <BsStars
-            size={19}
-            color={isAssistantOpen ? (isDark ? "#ffffff" : "#2A9D8F") : "#9A9A9A"}
-          />
-        </button>
+    closeNotifications();
+    if (isMessagesOpen) closeMessages();
+    toggleAssistant();
+  }}
+  className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
+    isAssistantOpen
+      ? isDark
+        ? "bg-[#2a2a2a]"
+        : "bg-[#94D3C1]/25"
+      : isDark
+        ? "bg-transparent hover:bg-white/10"
+        : "bg-transparent hover:bg-[#94D3C1]/15"
+  }`}
+>
+  <BsStars
+    size={19}
+    color={
+      isAssistantOpen
+        ? isDark
+          ? "#ffffff"
+          : "#2A9D8F"
+        : "#9A9A9A"
+    }
+  />
+</button>
 
-        {/* الرسائل */}
-        <Chat
-          set="light"
-          size={19}
-          primaryColor="#9A9A9A"
-          className="cursor-pointer"
-        />
-
+{/* الرسائل */}
+<button
+  type="button"
+  onClick={handleToggleMessages}
+  className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
+    isMessagesOpen
+      ? isDark
+        ? "bg-[#2a2a2a]"
+        : "bg-[#94D3C1]/25"
+      : isDark
+        ? "bg-transparent hover:bg-white/10"
+        : "bg-transparent hover:bg-[#94D3C1]/15"
+  }`}
+>
+  <Chat
+    set="light"
+    size={19}
+    primaryColor={isMessagesOpen ? (isDark ? "#ffffff" : "#2A9D8F") : "#9A9A9A"}
+  />
+</button>
         {/* الجرس */}
         <div
           className={`relative w-8 h-8 flex items-center justify-center rounded-xl cursor-pointer transition-colors mx-1 ${
@@ -355,10 +409,7 @@ export default function Navbar() {
                     size={18}
                     color="#9A9A9A"
                     className="cursor-pointer"
-                  //                   onClick={() => {
-                  //   router.push("/ar/edit-profile?settings=true");
-                  //   setMenuOpen(false);
-                  // }}
+
                   />
                 </div>
 

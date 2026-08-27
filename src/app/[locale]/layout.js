@@ -2,8 +2,9 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { routing } from "../../i18n/routing";
 import { notFound } from "next/navigation";
-import { Geist, Geist_Mono, Tajawal } from "next/font/google";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { MessagesProvider } from "@/context/MessagesContext";
+import MessagesPanel from "@/components/MessagesPanel";
 import MainLayout from "@/components/MainLayout";
 import "../globals.css";
 
@@ -36,23 +37,25 @@ export default async function LocaleLayout({ children, params }) {
   }
 
   const messages = await getMessages();
-  const dir = locale === "ar" ? "rtl" : "ltr";
 
   return (
-    <html
-      lang={locale}
-      dir={dir}
-      className={`${geistSans.variable} ${geistMono.variable} ${tajawal.variable} h-full antialiased dark`}
-    >
-      <body className="min-h-full flex flex-col font-tajawal">
-        <NextIntlClientProvider messages={messages}>
-          <ThemeProvider>
-            <MainLayout locale={locale}>
-              {children}
-            </MainLayout>
-          </ThemeProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+<html
+  lang={locale}
+  dir={dir}
+  className={`${geistSans.variable} ${geistMono.variable} ${tajawal.variable} h-full antialiased dark`}
+>
+  <body className="min-h-full flex flex-col font-tajawal">
+    <NextIntlClientProvider messages={messages}>
+      <ThemeProvider>
+        <MainLayout locale={locale}>
+          <MessagesProvider>
+            {children}
+            <MessagesPanel />
+          </MessagesProvider>
+        </MainLayout>
+      </ThemeProvider>
+    </NextIntlClientProvider>
+  </body>
+</html>
   );
 }
