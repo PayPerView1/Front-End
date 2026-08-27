@@ -51,7 +51,11 @@ export async function requestForgotPassword(email) {
       data: response.data,
     };
   } catch (error) {
+    const validationMessages = Array.isArray(error.response?.data?.errors)
+      ? error.response.data.errors.map((item) => item?.message).filter(Boolean)
+      : [];
     const errorMsg =
+      validationMessages.join("\n") ||
       error.response?.data?.message ||
       error.response?.data?.error ||
       (error.code === "ECONNABORTED"
@@ -66,12 +70,15 @@ export async function requestForgotPassword(email) {
  * Reset password using the reset token received via email.
  * @param {string} token
  * @param {string} password
+ * @param {string} confirmPassword
  * @returns {Promise<{success: boolean, message: string, data?: any}>}
  */
-export async function resetPassword(token, password) {
+export async function resetPassword(token, password, confirmPassword) {
   try {
-    const response = await apiClient.post(`/api/v1/auth/reset-password/${token}`, {
+    const encodedToken = encodeURIComponent(token);
+    const response = await apiClient.post(`/api/v1/auth/reset-password/${encodedToken}`, {
       password,
+      confirmPassword,
     });
     return {
       success: true,
@@ -79,9 +86,16 @@ export async function resetPassword(token, password) {
       data: response.data,
     };
   } catch (error) {
+    const validationMessages = Array.isArray(error.response?.data?.errors)
+      ? error.response.data.errors.map((item) => item?.message).filter(Boolean)
+      : [];
     const errorMsg =
+      validationMessages.join("\n") ||
       error.response?.data?.message ||
       error.response?.data?.error ||
+      (error.response?.status === 400
+        ? "بيانات إعادة التعيين غير صالحة. تأكد من أن التوكن غير منتهي وأن كلمة المرور تستوفي الشروط."
+        : null) ||
       (error.code === "ECONNABORTED"
         ? "انتهت مهلة الاتصال بالخادم. يرجى المحاولة لاحقاً."
         : null) ||

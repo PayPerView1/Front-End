@@ -1,11 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import StepIndicator from "@/app/[locale]/register/components/StepIndicator";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/services";
 import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 export default function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const locale = useLocale();
   const t = useTranslations("register");
   const [userType, setUserType] = useState(null);
@@ -13,6 +15,46 @@ export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState({});
   const [currentStep, setCurrentStep] = useState(1);
+
+  useEffect(() => {
+    const handleGoogleRedirect = async () => {
+      const token = searchParams.get("token");
+      const userParam = searchParams.get("user");
+      
+      if (token) {
+        try {
+          let userObj = {};
+          if (userParam) {
+            try {
+              userObj = JSON.parse(decodeURIComponent(userParam));
+            } catch (e) {
+              console.error("Failed to parse user query parameter:", e);
+            }
+          }
+          
+          api.saveAuthData(token, userObj);
+          
+          if (!userObj || !userObj._id || !userObj.email) {
+            try {
+              const profileData = await api.getProfile();
+              if (profileData && profileData.user) {
+                userObj = profileData.user;
+                api.saveAuthData(token, userObj);
+              }
+            } catch (err) {
+              console.error("Failed to fetch profile during Google redirect:", err);
+            }
+          }
+          
+          router.push(`/${locale}/dashboard`);
+        } catch (e) {
+          console.error("Error during Google redirect:", e);
+        }
+      }
+    };
+    
+    handleGoogleRedirect();
+  }, [searchParams, locale, router]);
   const [emailError, setEmailError] = useState("");
   function getStrength(pass) {
     if (pass.length === 0) return 0;
@@ -184,13 +226,13 @@ export default function RegisterForm() {
         {errors.email && (
           <p className="text-xs text-red-400 text-right">
             {errors.email}{" "}
-            <a href="/login" className="text-[#94D3C1] underline">
+            <Link href="/login" className="text-[#94D3C1] underline">
               {t("signIn")}
-            </a>{" "}
+            </Link>{" "}
             أو{" "}
-            <a href="/forgot-password" className="text-[#94D3C1] underline">
+            <Link href="/forgot-password" className="text-[#94D3C1] underline">
               {t("resetPassword")}
-            </a>
+            </Link>
           </p>
         )}
       </div>
@@ -209,12 +251,13 @@ export default function RegisterForm() {
         <span className="text-sm text-[#BFC9C4]">{t("or")}</span>
         <div className="flex-1 h-px bg-white/10" />
       </div>
-      {/* Apple & Google */}
-      <div className="flex gap-4">
+      {/* Google */}
+      <div className="flex w-full">
         {/* Google */}
         <button
+          type="button"
           onClick={() => api.loginWithGoogle()}
-          className="flex-1 h-10 rounded-lg border border-[#FFEEE3]/40 bg-transparent text-[#E1E3E4] text-sm cursor-pointer flex items-center justify-center gap-2"
+          className="w-full h-10 rounded-lg border border-[#FFEEE3]/40 bg-transparent text-[#E1E3E4] text-sm cursor-pointer flex items-center justify-center gap-2"
         >
           <svg
             width="18"
@@ -242,29 +285,13 @@ export default function RegisterForm() {
           Google
         </button>
 
-        {/* Apple */}
-        <button
-          onClick={() => api.loginWithApple()}
-          className="flex-1 h-10 rounded-lg border border-[#FFEEE3]/40 bg-transparent text-[#E1E3E4] text-sm cursor-pointer flex items-center justify-center gap-2"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 814 1000"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="white"
-          >
-            <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-43.4-150.3-107.9C27.5 714.3 0 603.7 0 500.9c0-219.1 141.9-335 281.8-335 75.8 0 138.9 50 185.7 50 44.6 0 115.2-52.8 199.2-52.8 31.9 0 108.8 2.6 168.1 81.2zm-208.8-103.7c31.2-37 52.8-88.2 52.8-139.4 0-7.1-.6-14.3-1.9-20.1-49.4 1.9-108.8 33.1-144.2 75.2-28.2 32.4-55.1 83.6-55.1 135.5 0 7.8 1.3 15.6 1.9 18.1 3.2.6 8.4 1.3 13.6 1.3 44.6 0 100.3-29.8 132.9-70.6z" />
-          </svg>
-          Apple
-        </button>
       </div>
       {/* تسجيل الدخول */}
       <p className="text-center text-sm text-[#BFC9C4] m-0">
         {t("alreadyHaveAccount")} {" "}
-        <a href="/login" className="text-[#94D3C1] font-bold no-underline">
+        <Link href="/login" className="text-[#94D3C1] font-bold no-underline">
           {t("signIn")}
-        </a>
+        </Link>
       </p>
     </div>
   );

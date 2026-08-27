@@ -4,7 +4,25 @@ import { routing } from "../../i18n/routing";
 import { notFound } from "next/navigation";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { MessagesProvider } from "@/context/MessagesContext";
-import MessagesPanel from "@/components/MessagesPanel"; // 👈 استيراد مكون الرسائل
+import MessagesPanel from "@/components/MessagesPanel";
+import MainLayout from "@/components/MainLayout";
+import "../globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const tajawal = Tajawal({
+  variable: "--font-tajawal",
+  subsets: ["arabic"],
+  weight: ["400", "500", "700"],
+});
 
 export const metadata = {
   title: "Pay Per View",
@@ -21,13 +39,23 @@ export default async function LocaleLayout({ children, params }) {
   const messages = await getMessages();
 
   return (
+<html
+  lang={locale}
+  dir={dir}
+  className={`${geistSans.variable} ${geistMono.variable} ${tajawal.variable} h-full antialiased dark`}
+>
+  <body className="min-h-full flex flex-col font-tajawal">
     <NextIntlClientProvider messages={messages}>
       <ThemeProvider>
-        <MessagesProvider>
-          {children}
-          <MessagesPanel />
-        </MessagesProvider>
+        <MainLayout locale={locale}>
+          <MessagesProvider>
+            {children}
+            <MessagesPanel />
+          </MessagesProvider>
+        </MainLayout>
       </ThemeProvider>
     </NextIntlClientProvider>
+  </body>
+</html>
   );
 }

@@ -18,8 +18,11 @@ import { useTheme } from "@/context/ThemeContext";
 import { createPortal } from "react-dom";
 import { AiOutlineStar } from "react-icons/ai";
 import { useLocale, useMessages } from "next-intl";
-import { getProfile } from "@/services/profile";
+import { getProfile, updateProfile } from "@/services/profile";
 import { getSavedUser } from "@/lib/axiosInstance";
+import api from "@/lib/axios";
+import { useAssistant } from "@/context/AssistantContext";
+import { useNotifications } from "@/context/NotificationsContext";
 
 const profileFallbacks = {
   "campaigns.arabClips": "Arabic Clips Community", "campaigns.creators": "Creators Platform", "campaigns.academy": "Content Academy", "campaigns.followers": "{count} followers",
@@ -42,6 +45,13 @@ function getUserName(user) {
   );
 }
 
+function getProfileImageUrl(profilePicture) {
+  if (!profilePicture) return null;
+  if (profilePicture.startsWith("http")) return profilePicture;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://payperview-platform.onrender.com";
+  return `${baseUrl.replace(/\/$/, "")}/${profilePicture.replace(/^\//, "")}`;
+}
+
 export default function ProfileContent() {
   const [activeTab, setActiveTab] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -56,12 +66,15 @@ export default function ProfileContent() {
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
   const menuDropdownRef = useRef(null);
   const [openCardMenu, setOpenCardMenu] = useState(null);
+  const { isAssistantOpen } = useAssistant();
+  const { isNotificationsOpen } = useNotifications();
   const messages = useMessages();
   const text = (key, values = {}) => {
     const translated = key.split(".").reduce((value, part) => value && value[part], messages.profile);
     return String(translated || profileFallbacks[key] || key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
   };
   const locale = useLocale();
+  const isUtilityPanelOpen = isAssistantOpen || isNotificationsOpen;
   const tabs = ["creator", "joined", "reviews"];
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -166,7 +179,8 @@ export default function ProfileContent() {
           )}
 
           {/* زر النقاط */}
-          <div ref={coverMenuRef} className="absolute top-3 right-3 z-10">
+{!isUtilityPanelOpen && (
+  <div ref={coverMenuRef} className="absolute top-3 right-3 z-[100]">
             <button
               type="button"
               onClick={(e) => {
@@ -241,7 +255,8 @@ export default function ProfileContent() {
                 ))}
               </div>
             )}
-          </div>
+            </div>
+          )}
           <input
             ref={coverInputRef}
             type="file"
@@ -274,7 +289,7 @@ export default function ProfileContent() {
             ) : user?.profilePicture &&
               user.profilePicture !== "default-avatar.png" ? (
               <img
-                src={`https://payperview-platform.onrender.com/${user.profilePicture}`}
+                src={getProfileImageUrl(user.profilePicture)}
                 alt="Profile"
                 className="w-full h-full rounded-full object-cover"
               />
@@ -291,7 +306,24 @@ export default function ProfileContent() {
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0];
-              if (f) setProfileImage(URL.createObjectURL(f));
+              if (!f) return;
+              const allowedTypes = [
+                "image/jpeg",
+                "image/jpg",
+                "image/png",
+                "image/webp",
+              ];
+              if (!allowedTypes.includes(f.type) || f.size > 5 * 1024 * 1024) return;
+
+              setProfileImage(URL.createObjectURL(f));
+              updateProfile(api.createFormData({ profilePicture: f }))
+                .then((result) => {
+                  const updatedUser = result?.user || result?.data?.user || result?.data;
+                  if (updatedUser && typeof updatedUser === "object") setUser(updatedUser);
+                })
+                .catch((error) => {
+                  console.error("خطأ في تحديث صورة البروفايل:", error);
+                });
             }}
           />
         </div>

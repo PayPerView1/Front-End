@@ -37,10 +37,7 @@ export default function InterestsForm() {
     setLoading(true);
     setError("");
     try {
-      // لو في اهتمامات مختارة بعتيها للـ API
-      if (selected.length > 0) {
-        await api.updateProfile({ interests: selected });
-      }
+      await api.updateProfile({ interests: selected });
       router.push("/register/verify");
     } catch (err) {
       setError("حدث خطأ، حاول مرة أخرى");

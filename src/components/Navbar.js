@@ -1,5 +1,6 @@
 "use client";
 import { useAssistant } from "@/context/AssistantContext";
+import { useNotifications } from "@/context/NotificationsContext";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
@@ -31,19 +32,41 @@ export default function Navbar() {
   const nav = useTranslations("nav");
 
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
-  const { toggleAssistant, closeAssistant, isAssistantOpen } = useAssistant();
-  const { toggleMessages, closeMessages, isMessagesOpen } = useMessages();
+const { toggleAssistant, closeAssistant, isAssistantOpen } = useAssistant();
+const { toggleMessages, closeMessages, isMessagesOpen } = useMessages();
+const {
+  toggleNotifications,
+  closeNotifications,
+  isNotificationsOpen,
+  unreadCount,
+} = useNotifications();
 
-  function handleToggleAssistant() {
-    if (!isAssistantOpen && isMessagesOpen) closeMessages();
-    toggleAssistant();
+function handleToggleAssistant() {
+  if (!isAssistantOpen) {
+    if (isMessagesOpen) closeMessages();
+    if (isNotificationsOpen) closeNotifications();
   }
 
-  function handleToggleMessages() {
-    if (!isMessagesOpen && isAssistantOpen) closeAssistant();
-    toggleMessages();
+  toggleAssistant();
+}
+
+function handleToggleMessages() {
+  if (!isMessagesOpen) {
+    if (isAssistantOpen) closeAssistant();
+    if (isNotificationsOpen) closeNotifications();
   }
 
+  toggleMessages();
+}
+
+function handleToggleNotifications() {
+  if (!isNotificationsOpen) {
+    if (isAssistantOpen) closeAssistant();
+    if (isMessagesOpen) closeMessages();
+  }
+
+  toggleNotifications();
+}
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [user, setUser] = useState(null);
@@ -128,20 +151,19 @@ export default function Navbar() {
     <div
       dir={locale === "ar" ? "rtl" : "ltr"}
       className={`
-        w-full
-        flex
-        items-center
-        justify-end
-        px-2
-        sm:px-6
-        py-3
-        sticky
-        top-0
-        z-[9999999]
-        border-b
-        ${t.navBg}
-        ${t.navBorder}
-      `}
+w-full
+flex
+items-center
+justify-end
+px-2
+sm:px-6
+py-3
+sticky
+top-0
+z-[9999999]
+border-b
+${t.navBg}
+${t.navBorder}
     >
       <div className="flex items-center gap-5 px-3 py-1.5">
         {/* الرصيد */}
@@ -153,10 +175,9 @@ export default function Navbar() {
             text-sm
             font-bold
             border
-            ${
-              isDark
-                ? "bg-[#2a2a2a] border-[#3a3a3a] text-white"
-                : "bg-[#EAEAEA] border-[#EAEAEA] text-[#787878]"
+            ${isDark
+              ? "bg-[#2a2a2a] border-[#3a3a3a] text-white"
+              : "bg-[#EAEAEA] border-[#EAEAEA] text-[#787878]"
             }
           `}
         >
@@ -164,49 +185,106 @@ export default function Navbar() {
         </div>
 
         {/* AI */}
+
         <button
           type="button"
-          onClick={handleToggleAssistant}
-          className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
-            isAssistantOpen
-              ? "bg-[#2a2a2a]"
-              : "bg-transparent hover:bg-white/10"
-          }`}
-        >
-          <BsStars size={19} color={isAssistantOpen ? "#ffffff" : "#9A9A9A"} />
-        </button>
-        <button
-            type="button"
-            onClick={handleToggleMessages}
-            className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
-              isMessagesOpen ? "bg-[#2a2a2a]" : "bg-transparent hover:bg-white/10"
-            }`}
-          >
-            <Chat set="light" size={19} primaryColor={isMessagesOpen ? "#ffffff" : "#9A9A9A"} />
-        </button>
+<button
+  type="button"
+  onClick={() => {
+    if (isAssistantOpen) {
+      closeAssistant();
+      return;
+    }
 
+    closeNotifications();
+    if (isMessagesOpen) closeMessages();
+    toggleAssistant();
+  }}
+  className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
+    isAssistantOpen
+      ? isDark
+        ? "bg-[#2a2a2a]"
+        : "bg-[#94D3C1]/25"
+      : isDark
+        ? "bg-transparent hover:bg-white/10"
+        : "bg-transparent hover:bg-[#94D3C1]/15"
+  }`}
+>
+  <BsStars
+    size={19}
+    color={
+      isAssistantOpen
+        ? isDark
+          ? "#ffffff"
+          : "#2A9D8F"
+        : "#9A9A9A"
+    }
+  />
+</button>
+
+{/* الرسائل */}
+<button
+  type="button"
+  onClick={handleToggleMessages}
+  className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
+    isMessagesOpen
+      ? isDark
+        ? "bg-[#2a2a2a]"
+        : "bg-[#94D3C1]/25"
+      : isDark
+        ? "bg-transparent hover:bg-white/10"
+        : "bg-transparent hover:bg-[#94D3C1]/15"
+  }`}
+>
+  <Chat
+    set="light"
+    size={19}
+    primaryColor={isMessagesOpen ? (isDark ? "#ffffff" : "#2A9D8F") : "#9A9A9A"}
+  />
+</button>
         {/* الجرس */}
-        <div className="relative cursor-pointer mx-1">
-          <Notification set="light" size={19} primaryColor="#9A9A9A" />
+        <div
+          className={`relative w-8 h-8 flex items-center justify-center rounded-xl cursor-pointer transition-colors mx-1 ${
+            isNotificationsOpen
+              ? isDark
+                ? "bg-[#2a2a2a]"
+                : "bg-[#94D3C1]/25"
+              : isDark
+                ? "hover:bg-white/10"
+                : "hover:bg-[#94D3C1]/15"
+          }`}
+          onClick={() => {
+            console.log("Navbar: Notification bell clicked. Toggling panel...");
+            closeAssistant();
+            toggleNotifications();
+          }}
+        >
+          <Notification
+            set="light"
+            size={19}
+            primaryColor={isNotificationsOpen ? (isDark ? "#ffffff" : "#2A9D8F") : "#9A9A9A"}
+          />
 
-          <span
-            className="
-              absolute
-              -top-1
-              -right-1
-              w-3.5
-              h-3.5
-              bg-red-500
-              rounded-full
-              text-[8px]
-              text-white
-              flex
-              items-center
-              justify-center
-            "
-          >
-            3
-          </span>
+          {unreadCount > 0 && (
+            <span
+              className="
+                absolute
+                -top-1
+                -right-1
+                w-3.5
+                h-3.5
+                bg-red-500
+                rounded-full
+                text-[8px]
+                text-white
+                flex
+                items-center
+                justify-center
+              "
+            >
+              {unreadCount}
+            </span>
+          )}
         </div>
 
         {/* قائمة المستخدم */}
@@ -222,10 +300,9 @@ export default function Navbar() {
             px-2
             py-1
             border
-            ${
-              isDark
-                ? "bg-[#2a2a2a] border-[#3a3a3a]"
-                : "bg-[#F5F5F5] border-[#E5E5E5]"
+            ${isDark
+              ? "bg-[#2a2a2a] border-[#3a3a3a]"
+              : "bg-[#F5F5F5] border-[#E5E5E5]"
             }
           `}
         >
@@ -297,10 +374,9 @@ export default function Navbar() {
                         justify-center
                         text-sm
                         font-bold
-                        ${
-                          isDark
-                            ? "bg-white/20 text-white"
-                            : "bg-[#E0E0E0] text-black"
+                        ${isDark
+                          ? "bg-white/20 text-white"
+                          : "bg-[#E0E0E0] text-black"
                         }
                       `}
                     >
@@ -333,6 +409,7 @@ export default function Navbar() {
                     size={18}
                     color="#9A9A9A"
                     className="cursor-pointer"
+
                   />
                 </div>
 
@@ -370,6 +447,7 @@ export default function Navbar() {
                           w-full
                           flex
                           items-center
+                          gap-3
                           px-3
                           py-2.5
                           rounded-[16px]
@@ -390,7 +468,6 @@ export default function Navbar() {
                         <span
                           className={`
                             text-sm
-                            mr-4
                             ${t.menuText}
                           `}
                         >
@@ -418,6 +495,7 @@ export default function Navbar() {
                       w-full
                       flex
                       items-center
+                      gap-3
                       px-3
                       py-2.5
                       rounded-[16px]
@@ -438,7 +516,6 @@ export default function Navbar() {
                     <span
                       className={`
                         text-sm
-                        mr-4
                         ${t.menuText}
                       `}
                     >
@@ -458,6 +535,7 @@ export default function Navbar() {
                       w-full
                       flex
                       items-center
+                      gap-3
                       px-3
                       py-2.5
                       rounded-[16px]
@@ -471,7 +549,7 @@ export default function Navbar() {
                   >
                     <Logout set="light" size={18} primaryColor="#EF4444" />
 
-                    <span className="text-red-400 text-sm mr-4">
+                    <span className="text-red-400 text-sm">
                       {nav("logout")}
                     </span>
                   </button>
@@ -513,10 +591,9 @@ export default function Navbar() {
                       bg-transparent
                       border-none
                       transition-all
-                      ${
-                        isSystem
-                          ? "bg-white/10 ring-1 ring-[#9A9A9A]"
-                          : "hover:bg-white/10"
+                      ${isSystem
+                        ? "bg-white/10 ring-1 ring-[#9A9A9A]"
+                        : "hover:bg-white/10"
                       }
                     `}
                   >
@@ -547,10 +624,9 @@ export default function Navbar() {
                       bg-transparent
                       border-none
                       transition-all
-                      ${
-                        !isDark
-                          ? "bg-[#FFF3E0] ring-1 ring-[#F97316]"
-                          : "hover:bg-white/10"
+                      ${!isDark
+                        ? "bg-[#FFF3E0] ring-1 ring-[#F97316]"
+                        : "hover:bg-white/10"
                       }
                     `}
                   >
@@ -581,10 +657,9 @@ export default function Navbar() {
                       bg-transparent
                       border-none
                       transition-all
-                      ${
-                        isDark
-                          ? "bg-[#94D3C1]/10 ring-1 ring-[#94D3C1]"
-                          : "hover:bg-white/10"
+                      ${isDark
+                        ? "bg-[#94D3C1]/10 ring-1 ring-[#94D3C1]"
+                        : "hover:bg-white/10"
                       }
                     `}
                   >
