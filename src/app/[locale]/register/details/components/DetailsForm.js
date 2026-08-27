@@ -316,7 +316,7 @@ export default function DetailsForm() {
       </div>
 
       {/* الدولة والمدينة */}
-      <div className="flex flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         {/* الدولة */}
         <div className="flex flex-col gap-2 flex-1">
           <label className="text-sm text-[#BFC9C4] text-right">الدولة</label>

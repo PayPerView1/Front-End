@@ -165,7 +165,7 @@ border-b
 ${t.navBg}
 ${t.navBorder}
     >
-      <div className="flex items-center gap-5 px-3 py-1.5">
+      <div className="flex items-center gap-2.5 sm:gap-5 px-1.5 sm:px-3 py-1.5">
         {/* الرصيد */}
         <div
           className={`

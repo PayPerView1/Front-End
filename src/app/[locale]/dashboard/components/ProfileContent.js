@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import PageLoader from "@/components/PageLoader";
 import {
   Notification,
   Chat,
@@ -155,12 +156,7 @@ export default function ProfileContent() {
       image: null,
     },
   ];
-  if (loading)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-2 border-[#F97316] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+  if (loading) return <PageLoader />;
 
   return (
     <div className={`flex flex-col flex-1 ${t.bg}`} dir={locale === "ar" ? "rtl" : "ltr"}>

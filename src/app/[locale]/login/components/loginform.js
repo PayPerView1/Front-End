@@ -131,7 +131,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-[480px] rounded-[16px] bg-white/[0.02] border border-white/10 backdrop-blur-[4px] p-8 shadow-[0_0_60px_rgba(0,0,0,0.5)]">
+    <div className="w-full max-w-[480px] rounded-[16px] bg-white/[0.02] border border-white/10 backdrop-blur-[4px] p-6 sm:p-8 shadow-[0_0_60px_rgba(0,0,0,0.5)]">
       {/* اللوجو والعناوين */}
       <div className="flex flex-col items-center mb-8">
         <div className="flex justify-center mb-4">

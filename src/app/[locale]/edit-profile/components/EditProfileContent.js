@@ -18,6 +18,7 @@ import api from "@/lib/axios";
 import { useLocale, useTranslations } from "next-intl";
 import worldCountries from "world-countries";
 import Select from "react-select";
+import PageLoader from "@/components/PageLoader";
 
 const menuItems = [
   { key: "profile", icon: RiUserLine },
@@ -89,9 +90,8 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
   }
 
   const displayValue = selected
-    ? `${selected.getDate()} ${
-        months[selected.getMonth()]
-      } ${selected.getFullYear()}`
+    ? `${selected.getDate()} ${months[selected.getMonth()]
+    } ${selected.getFullYear()}`
     : placeholder;
 
   return (
@@ -113,10 +113,9 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
       {open && (
         <div
           className={`absolute top-12 right-0 z-50 w-full rounded-xl border shadow-2xl p-3
-            ${
-              isDark
-                ? "bg-[#1a1a1a] border-[#2D2D2D]"
-                : "bg-white border-[#E5E5E5]"
+            ${isDark
+              ? "bg-[#1a1a1a] border-[#2D2D2D]"
+              : "bg-white border-[#E5E5E5]"
             }`}
           dir={locale === "ar" ? "rtl" : "ltr"}
         >
@@ -187,10 +186,9 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
                     setView("day");
                   }}
                   className={`py-2 text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all
-                    ${
-                      currentMonth === i
-                        ? "bg-[#94D3C1]/20 text-[#94D3C1]"
-                        : `${t.subText} hover:bg-white/5`
+                    ${currentMonth === i
+                      ? "bg-[#94D3C1]/20 text-[#94D3C1]"
+                      : `${t.subText} hover:bg-white/5`
                     }`}
                 >
                   {m}
@@ -213,10 +211,9 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
                     setView("day");
                   }}
                   className={`py-2 text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all
-                    ${
-                      currentYear === y
-                        ? "bg-[#94D3C1]/20 text-[#94D3C1]"
-                        : `${t.subText} hover:bg-white/5`
+                    ${currentYear === y
+                      ? "bg-[#94D3C1]/20 text-[#94D3C1]"
+                      : `${t.subText} hover:bg-white/5`
                     }`}
                 >
                   {y}
@@ -256,11 +253,10 @@ function DatePicker({ value, onChange, isDark, t, locale, placeholder }) {
                         type="button"
                         onClick={() => selectDay(day)}
                         className={`w-full aspect-square text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all
-                        ${
-                          isSelected
+                        ${isSelected
                             ? "bg-[#94D3C1] text-white"
                             : `${t.inputText} hover:bg-[#94D3C1]/20`
-                        }`}
+                          }`}
                       >
                         {day}
                       </button>
@@ -466,23 +462,26 @@ export default function EditProfileContent() {
     label: `${c.flag} ${c.name}`,
   }));
 
+  if (loading) return <PageLoader />;
+
   return (
     <div
-      className={`flex flex-1 w-full min-w-0 ${t.bg}`}
+      className={`flex flex-col md:flex-row flex-1 w-full min-w-0 ${t.bg}`}
       dir={locale === "ar" ? "rtl" : "ltr"}
     >
       <div
-        className={`w-1/4 lg:w-[240px] flex-shrink-0 border-l flex flex-col py-4 px-1 sm:px-2 ${t.sidebarBg} ${t.sidebarBorder}`}
+        className={`w-full md:w-[240px] flex-shrink-0 border-b md:border-b-0 md:border-l flex flex-row md:flex-col items-center md:items-stretch justify-between md:justify-start gap-4 py-3 md:py-4 px-4 sm:px-6 md:px-2 ${t.sidebarBg} ${t.sidebarBorder}`}
       >
         <p
           className={`text-[10px] sm:text-xs font-bold px-1 sm:px-3 mb-3 ${t.subText}
           ${isDark ? "text-white" : "text-black"}
+          hidden md:block
         `}
         >
           {copy("accountSettings")}
         </p>
 
-        <nav className="flex flex-col gap-1 flex-1">
+        <nav className="flex flex-row md:flex-col gap-1 flex-1 md:flex-initial overflow-x-auto md:overflow-x-visible lang-scroll">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeMenu === item.key;
@@ -492,23 +491,23 @@ export default function EditProfileContent() {
                 key={item.key}
                 type="button"
                 onClick={() => setActiveMenu(item.key)}
-                className={`w-full flex items-center gap-1 sm:gap-3 px-1.5 sm:px-3 py-2.5 rounded-lg text-[10px] sm:text-sm text-right bg-transparent border-none cursor-pointer transition-all
+                className={`flex items-center gap-1 sm:gap-3 px-3 py-2.5 rounded-lg text-xs sm:text-sm text-right bg-transparent border-none cursor-pointer transition-all whitespace-nowrap
                   ${isActive ? t.activeMenu : `${t.subText} ${t.hoverMenu}`}`}
               >
                 <Icon size={18} color={isActive ? "#94D3C1" : "#9A9A9A"} />
 
-                <span className="truncate">{copy(item.key)}</span>
+                <span>{copy(item.key)}</span>
               </button>
             );
           })}
         </nav>
 
         {/* Logout */}
-        <div className={`border-t pt-4 px-1 sm:px-2 ${t.sidebarBorder}`}>
+        <div className={`md:border-t md:pt-4 flex-shrink-0 ${t.sidebarBorder}`}>
           <button
             type="button"
             onClick={() => router.push(`/${locale}/logout`)}
-            className="w-full h-9 sm:h-10 rounded-lg text-white text-[10px] sm:text-sm font-bold cursor-pointer border-none"
+            className="w-full h-9 px-4 md:px-0 rounded-lg text-white text-xs sm:text-sm font-bold cursor-pointer border-none whitespace-nowrap"
             style={{
               background: "#DC2626",
             }}
@@ -526,9 +525,8 @@ export default function EditProfileContent() {
           {/* Cover */}
           <div className="relative">
             <div
-              className={`relative h-[100px] sm:h-[140px] md:h-[160px] lg:h-[190px] w-full rounded-xl overflow-hidden cursor-pointer ${
-                isDark ? "bg-[#1A1A1A]" : "bg-[#E0E0E0]"
-              }`}
+              className={`relative h-[100px] sm:h-[140px] md:h-[160px] lg:h-[190px] w-full rounded-xl overflow-hidden cursor-pointer ${isDark ? "bg-[#1A1A1A]" : "bg-[#E0E0E0]"
+                }`}
               onClick={() => coverRef.current?.click()}
             >
               {coverImage && (
@@ -556,17 +554,15 @@ export default function EditProfileContent() {
 
             {/* Profile */}
             <div
-              className={`absolute -bottom-7 cursor-pointer ${
-                locale === "ar" ? "right-2 sm:right-4" : "left-2 sm:left-4"
-              }`}
+              className={`absolute -bottom-7 cursor-pointer ${locale === "ar" ? "right-2 sm:right-4" : "left-2 sm:left-4"
+                }`}
               onClick={() => profileRef.current?.click()}
             >
               <div
                 className={`relative w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-2 flex items-center justify-center
-                  ${
-                    isDark
-                      ? "bg-[#333] border-[#0D0D0D]"
-                      : "bg-[#D0D0D0] border-white"
+                  ${isDark
+                    ? "bg-[#333] border-[#0D0D0D]"
+                    : "bg-[#D0D0D0] border-white"
                   }`}
               >
                 {profileImagePreview ? (
@@ -983,19 +979,17 @@ export default function EditProfileContent() {
                       );
                     }}
                     className={`px-2.5 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold border-none cursor-pointer transition-all
-                      ${
-                        isSelected
-                          ? "text-white"
-                          : `${t.subText} ${
-                              isDark ? "bg-white/5" : "bg-[#F0F0F0]"
-                            }`
+                      ${isSelected
+                        ? "text-white"
+                        : `${t.subText} ${isDark ? "bg-white/5" : "bg-[#F0F0F0]"
+                        }`
                       }`}
                     style={
                       isSelected
                         ? {
-                            background:
-                              "linear-gradient(90deg, #FFA600, #FF4B04)",
-                          }
+                          background:
+                            "linear-gradient(90deg, #FFA600, #FF4B04)",
+                        }
                         : {}
                     }
                   >
@@ -1123,10 +1117,9 @@ export default function EditProfileContent() {
                 hover:border-[#94D3C1]
                 focus:border-[#94D3C1]
                 focus:outline-none
-                ${
-                  isDark
-                    ? "bg-transparent border-[#A1A1AA] text-white"
-                    : "bg-transparent border-[#A1A1AA] text-black"
+                ${isDark
+                  ? "bg-transparent border-[#A1A1AA] text-white"
+                  : "bg-transparent border-[#A1A1AA] text-black"
                 }`}
             >
               {copy("cancel")}
@@ -1136,9 +1129,8 @@ export default function EditProfileContent() {
           {/* Save Message */}
           {saveMsg && (
             <p
-              className={`text-xs sm:text-sm text-right ${
-                saveMsg.includes("✅") ? "text-[#94D3C1]" : "text-red-400"
-              }`}
+              className={`text-xs sm:text-sm text-right ${saveMsg.includes("✅") ? "text-[#94D3C1]" : "text-red-400"
+                }`}
             >
               {saveMsg}
             </p>

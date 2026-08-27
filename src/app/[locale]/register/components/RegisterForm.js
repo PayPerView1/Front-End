@@ -129,7 +129,7 @@ export default function RegisterForm() {
       <StepIndicator currentStep={currentStep} />
 
       {/* اختيار نوع الحساب */}
-      <div className="flex flex-row gap-4 w-full">
+      <div className="flex flex-col sm:flex-row gap-4 w-full">
         {errors.userType && (
           <p className="text-xs text-red-400">{errors.userType}</p>
         )}
@@ -137,7 +137,7 @@ export default function RegisterForm() {
         {/* صانع محتوى */}
         <div
           onClick={() => setUserType("creator")}
-          className={`flex-1 h-[90px] rounded-xl border p-3 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all
+          className={`flex-1 min-h-[90px] py-3 rounded-xl border px-3 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all
             ${
               userType === "creator"
                 ? "border-[#FE6B02] bg-gradient-to-b from-[#FE6B02] to-[#EA580C]"
@@ -167,7 +167,7 @@ export default function RegisterForm() {
         {/* صاحب حملة */}
         <div
           onClick={() => setUserType("brand")}
-          className={`flex-1 h-[90px] rounded-xl border p-4 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all 
+          className={`flex-1 min-h-[90px] py-3 rounded-xl border px-4 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all 
             ${
               userType === "brand"
                 ? "border-[#FE6B02] bg-gradient-to-b from-[#FE6B02] to-[#EA580C]"
