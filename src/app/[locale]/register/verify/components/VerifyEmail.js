@@ -75,8 +75,7 @@ export default function VerifyEmail({ email: emailProp, verificationToken = "" }
     }, [token]);
 
     async function handleResend() {
-        // الباك إند لا يدعم هذا الـ endpoint حالياً
-        // نعرض رسالة نجاح مباشرة دون استدعاء API
+        await api.register(payload);
         setResent(true);
         setTimeout(() => setResent(false), 4000);
     }

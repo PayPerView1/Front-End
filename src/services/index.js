@@ -50,7 +50,7 @@ const api = {
   // Auth shortcuts
   register: auth.register,
   verifyEmail: auth.verifyEmail,
-  resendVerification: auth.resendVerification,
+  // resendVerification: auth.resendVerification,
   logout: auth.logout,
   loginWithGoogle: auth.loginWithGoogle,
 

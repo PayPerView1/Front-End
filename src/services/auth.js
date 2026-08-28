@@ -39,21 +39,7 @@ export async function verifyEmail(token) {
   }
 }
 
-/**
- * إعادة إرسال رابط التحقق
- * @param {string} email
- */
-export async function resendVerification(email) {
-  try {
-    const response = await axiosInstance.post("/api/v1/auth/resend-verification", {
-      email,
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Resend Verification Error:", error);
-    handleError(error);
-  }
-}
+
 
 /**
  * تسجيل الخروج
