@@ -24,6 +24,7 @@ import { getSavedUser } from "@/lib/axiosInstance";
 import api from "@/lib/axios";
 import { useAssistant } from "@/context/AssistantContext";
 import { useNotifications } from "@/context/NotificationsContext";
+import { useMessages as useChatMessages } from "@/context/MessagesContext";
 
 const profileFallbacks = {
   "campaigns.arabClips": "Arabic Clips Community", "campaigns.creators": "Creators Platform", "campaigns.academy": "Content Academy", "campaigns.followers": "{count} followers",
@@ -69,13 +70,14 @@ export default function ProfileContent() {
   const [openCardMenu, setOpenCardMenu] = useState(null);
   const { isAssistantOpen } = useAssistant();
   const { isNotificationsOpen } = useNotifications();
+  const { isMessagesOpen } = useChatMessages();
   const messages = useMessages();
   const text = (key, values = {}) => {
     const translated = key.split(".").reduce((value, part) => value && value[part], messages.profile);
     return String(translated || profileFallbacks[key] || key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
   };
   const locale = useLocale();
-  const isUtilityPanelOpen = isAssistantOpen || isNotificationsOpen;
+  const isUtilityPanelOpen = isAssistantOpen || isNotificationsOpen || isMessagesOpen;
   const tabs = ["creator", "joined", "reviews"];
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);

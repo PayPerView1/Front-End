@@ -23,8 +23,8 @@ const messagesMargin =
 const notificationsMargin =
   isNotificationsOpen
     ? isRtl
-      ? "lg:ml-[500px]"
-      : "lg:mr-[500px]"
+      ? "lg:ml-[380px]"
+      : "lg:mr-[380px]"
     : "";
 
 const mainMargin = isRtl

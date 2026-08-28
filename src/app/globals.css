@@ -49,11 +49,15 @@ body {
   }
 }
 
-.messages-panel[data-side="left"] {
+.messages-panel[data-side="left"],
+.ai-panel[data-side="left"],
+.notifications-panel[data-side="left"] {
   animation: messages-panel-from-left 0.3s ease-out;
 }
 
-.messages-panel[data-side="right"] {
+.messages-panel[data-side="right"],
+.ai-panel[data-side="right"],
+.notifications-panel[data-side="right"] {
   animation: messages-panel-from-right 0.3s ease-out;
 }
 

@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useRef } from "react";
+import Image from "next/image";
+import { useEffect, useState, useRef } from "react";
 import { BsStars } from "react-icons/bs";
 import { FiUsers, FiMic, FiSend, FiPlus, FiX } from "react-icons/fi";
 import { MdCampaign, MdLiveTv, MdReceiptLong } from "react-icons/md";
 import { useAssistant } from "@/context/AssistantContext";
 import { useTheme } from "@/context/ThemeContext";
+import { useLocale } from "next-intl";
 
-const actions = [
+const actionsAr = [
   {
     icon: FiUsers,
     title: "مراسلة أحدث الأعضاء",
@@ -30,13 +32,52 @@ const actions = [
   },
 ];
 
+const actionsEn = [
+  {
+    icon: FiUsers,
+    title: "Message recent members",
+    desc: "Draft a welcome message for new subscribers",
+  },
+  {
+    icon: MdCampaign,
+    title: "Create creative ad",
+    desc: "Generate engaging ad copies for your next campaign",
+  },
+  {
+    icon: MdLiveTv,
+    title: "Start a live stream",
+    desc: "Set up a live stream session to connect with your audience",
+  },
+  {
+    icon: MdReceiptLong,
+    title: "Send client invoice",
+    desc: "Create and send a professional invoice quickly",
+  },
+];
+
 export default function AIAssistantPanel({ side = "left" }) {
   const { isAssistantOpen, closeAssistant } = useAssistant();
   const { isDark } = useTheme();
+  const locale = useLocale();
+  const isAr = locale === "ar";
+  const actions = isAr ? actionsAr : actionsEn;
   const [message, setMessage] = useState("");
 
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+
+  useEffect(() => {
+    if (!selectedFile?.type.startsWith("image/")) {
+      return undefined;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => setPreviewUrl(String(reader.result));
+    reader.readAsDataURL(selectedFile);
+
+    return () => reader.abort();
+  }, [selectedFile]);
 
   if (!isAssistantOpen) return null;
 
@@ -51,11 +92,13 @@ export default function AIAssistantPanel({ side = "left" }) {
 
   return (
     <aside
-      className={`fixed top-[64px] h-[calc(100vh-64px)] w-full max-w-full sm:w-[380px] z-40 flex flex-col justify-between overflow-y-auto px-4 py-6 border ${
+      className={`ai-panel fixed top-16 h-[calc(100vh-64px)] w-full max-w-full sm:w-95 z-40 flex flex-col justify-between overflow-y-auto px-4 py-6 border ${
         isDark ? "border-white/10" : "border-[#E5E5E5]"
       } ${sideClass}`}
+      data-side={side}
       style={{
         backgroundColor: isDark ? "#0A0812" : "#FFFFFF",
+        boxShadow: "0px 25px 50px -12px rgba(0, 0, 0, 0.25)",
         backgroundImage:
           isDark
             ? "linear-gradient(180deg, rgba(142, 3, 255, 0.18) 0%, rgba(0, 0, 0, 0.18) 86.54%)"
@@ -66,12 +109,12 @@ export default function AIAssistantPanel({ side = "left" }) {
       <button
         type="button"
         onClick={closeAssistant}
-        className={`absolute top-6 left-3 w-7 h-7 flex items-center justify-center rounded-full transition-colors z-50 ${
+        className={`absolute top-6 ${isAr ? "left-3" : "right-3"} w-7 h-7 flex items-center justify-center rounded-full transition-colors z-50 ${
           isDark
             ? "bg-white/10 text-gray-300 hover:bg-white/20"
             : "bg-black/5 text-gray-600 hover:bg-black/10"
         }`}
-        aria-label="إغلاق المساعد"
+        aria-label={isAr ? "إغلاق المساعد" : "Close assistant"}
       >
         <FiX className="w-4 h-4" />
       </button>
@@ -89,11 +132,12 @@ export default function AIAssistantPanel({ side = "left" }) {
 
         {/* العنوان */}
         <h1 className={`text-lg font-bold text-center mb-2 px-2 ${isDark ? "text-white" : "text-[#1A1A1A]"}`}>
-          كيف يمكنني مساعدتك اليوم؟
+          {isAr ? "كيف يمكنني مساعدتك اليوم؟" : "How can I help you today?"}
         </h1>
         <p className={`text-xs text-center leading-relaxed mb-6 px-2 ${isDark ? "text-gray-400" : "text-[#666666]"}`}>
-          أنا المساعد الذكي الخاص بك، يمكنني مساعدتك في إنشاء المحتوى، إدارة
-          حسابك، أو الإجابة على أي استفسارات.
+          {isAr
+            ? "أنا المساعد الذكي الخاص بك، يمكنني مساعدتك في إنشاء المحتوى، إدارة حسابك، أو الإجابة على أي استفسارات."
+            : "I am your smart assistant. I can help you create content, manage your account, or answer any inquiries."}
         </p>
 
         {/* بطاقات الإجراءات السريعة */}
@@ -104,7 +148,7 @@ export default function AIAssistantPanel({ side = "left" }) {
               type="button"
               className={`flex flex-col items-start text-right gap-1.5 rounded-xl border p-3 transition-colors ${
                 isDark
-                  ? "bg-white/[0.04] border-white/10 hover:bg-white/[0.07]"
+                  ? "bg-white/4 border-white/10 hover:bg-white/7"
                   : "bg-white/70 border-[#E5E5E5] hover:bg-[#F5F5F5]"
               }`}
             >
@@ -125,7 +169,7 @@ export default function AIAssistantPanel({ side = "left" }) {
         <form
           onSubmit={handleSend}
           className={`flex flex-col rounded-2xl border px-2.5 py-2 backdrop-blur-sm gap-2 ${
-            isDark ? "bg-white/[0.06] border-white/10" : "bg-white/80 border-[#E5E5E5]"
+            isDark ? "bg-white/6 border-white/10" : "bg-white/80 border-[#E5E5E5]"
           }`}
         >
           {/* معاينة الملف جوا الإنبوت */}
@@ -133,10 +177,13 @@ export default function AIAssistantPanel({ side = "left" }) {
             <div className={`flex items-center gap-2 px-1 py-1 rounded-lg border ${
               isDark ? "bg-white/10 border-white/10" : "bg-[#F5F5F5] border-[#E5E5E5]"
             }`}>
-              {selectedFile.type.startsWith("image/") ? (
-                <img
-                  src={URL.createObjectURL(selectedFile)}
-                  alt="معاينة"
+              {selectedFile.type.startsWith("image/") && previewUrl ? (
+                <Image
+                  src={previewUrl}
+                  alt={isAr ? "معاينة" : "Preview"}
+                  width={32}
+                  height={32}
+                  unoptimized
                   className="w-8 h-8 rounded-md object-cover shrink-0"
                 />
               ) : (
@@ -163,7 +210,7 @@ export default function AIAssistantPanel({ side = "left" }) {
             <button
               type="button"
               onClick={handleSend}
-              className="w-7 h-7 flex items-center justify-center rounded-full bg-gradient-to-r from-[#FFA600] to-[#FF4B04] text-white shrink-0"
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-linear-to-r from-[#FFA600] to-[#FF4B04] text-white shrink-0"
             >
               <FiSend className="w-3.5 h-3.5 -rotate-27 translate-y-[1.5px]" />
             </button>
@@ -179,7 +226,7 @@ export default function AIAssistantPanel({ side = "left" }) {
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="اكتب رسالتك هنا..."
+              placeholder={isAr ? "اكتب رسالتك هنا..." : "Type your message here..."}
               className={`flex-1 min-w-0 bg-transparent text-xs outline-none text-right ${isDark ? "text-white placeholder-gray-400" : "text-[#1A1A1A] placeholder-gray-500"}`}
             />
 
@@ -205,7 +252,9 @@ export default function AIAssistantPanel({ side = "left" }) {
         </form>
 
         <p className={`text-center text-[9px] mt-2 px-2 ${isDark ? "text-gray-500" : "text-gray-600"}`}>
-          قد يرتكب المساعد بعض الأخطاء أحياناً، يرجى التحقق من المعلومات المهمة.
+          {isAr
+            ? "قد يرتكب المساعد بعض الأخطاء أحياناً، يرجى التحقق من المعلومات المهمة."
+            : "The assistant may make mistakes sometimes. Please verify important information."}
         </p>
       </div>
     </aside>

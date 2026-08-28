@@ -356,33 +356,37 @@ export default function EditProfileContent() {
       const hasNewImage = profileImage instanceof File;
       let data;
 
-      if (Boolean(phone.trim()) !== Boolean(country)) {
-        setSaveMsg("يجب إرسال الدولة ورقم الهاتف معًا");
+      if (Boolean(phone.trim()) !== Boolean(dialCode)) {
+        setSaveMsg(locale === "ar" ? "يجب اختيار مقدمة الاتصال مع رقم الهاتف" : "Both country code and phone number must be provided");
+        setSaving(false);
         return;
       }
 
+      const payload = {
+        fullName: form.name || undefined,
+        username: form.username || undefined,
+        bio: form.bio || undefined,
+        dateOfBirth: form.birthDate || undefined,
+        country: country || undefined,
+        city: city || undefined,
+        interests: selectedInterests,
+      };
+
+      if (phone.trim()) {
+        payload.phoneNumber = phone.trim();
+        payload.phoneCountryCode = dialCode || undefined;
+      }
+
       if (hasNewImage) {
-        data = api.createFormData({
-          fullName: form.name,
-          country: country || undefined,
-          phoneNumber: phone || undefined,
-          city: city || undefined,
-          profilePicture: profileImage,
-          interests: selectedInterests,
-        });
+        payload.profilePicture = profileImage;
+        data = api.createFormData(payload);
       } else {
-        data = {
-          fullName: form.name,
-          country: country || undefined,
-          phoneNumber: phone || undefined,
-          city: city || undefined,
-          interests: selectedInterests,
-        };
+        data = payload;
       }
 
       const result = await api.updateProfile(data);
 
-      setSaveMsg(copy("saved"));
+      setSaveMsg(copy("saved") + " ✅");
 
       const updatedUser = result?.user || result?.data || result;
 
@@ -394,7 +398,15 @@ export default function EditProfileContent() {
         router.push(`/${locale}/dashboard`);
       }, 1000);
     } catch (error) {
-      setSaveMsg(`${copy("saveError")}: ${error.message}`);
+      const responseErrors = error.response?.data?.errors;
+      if (responseErrors && Array.isArray(responseErrors)) {
+        const errorMsgs = responseErrors.map(err => `${err.field}: ${err.message}`).join(" | ");
+        setSaveMsg(errorMsgs);
+      } else if (error.response?.data?.message) {
+        setSaveMsg(error.response.data.message);
+      } else {
+        setSaveMsg(`${copy("saveError")}: ${error.message}`);
+      }
     } finally {
       setSaving(false);
     }
@@ -411,7 +423,7 @@ export default function EditProfileContent() {
           username: user?.username || "",
           email: user?.email || "",
           bio: user?.bio || "",
-          birthDate: user?.birthDate || "",
+          birthDate: user?.dateOfBirth ? user.dateOfBirth.split("T")[0] : "",
         });
 
         if (user?.interests && user.interests.length > 0) {
@@ -419,6 +431,7 @@ export default function EditProfileContent() {
         }
 
         setPhone(user?.phoneNumber || "");
+        setDialCode(user?.phoneCountryCode || "");
         setCountry(user?.country || "");
         setCity(user?.city || "");
 

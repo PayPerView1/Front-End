@@ -54,6 +54,7 @@ export default function MessagesPanel({ onConversationChange, side }) {
       style={{
         width: isFullWidth ? "auto" : "min(380px, 100vw)",
         backgroundColor: isDark ? "rgba(12, 15, 16, 1)" : "#ffffff",
+        boxShadow: "0px 25px 50px -12px rgba(0, 0, 0, 0.25)",
       }}
     >
       {isFullWidth ? (

@@ -80,9 +80,9 @@ export default function ChatWindow({ conversation, onClose }) {
 
     const newMsg = {
       id: Date.now(),
-      sender: "أنا",
+      sender: isArabic ? "أنا" : "Me",
       text: message,
-      time: new Date().toLocaleTimeString("ar-EG", {
+      time: new Date().toLocaleTimeString(isArabic ? "ar-EG" : "en-US", {
         hour: "2-digit",
         minute: "2-digit",
       }),
@@ -113,7 +113,7 @@ export default function ChatWindow({ conversation, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="إغلاق المحادثة"
+            aria-label={isArabic ? "إغلاق المحادثة" : "Close conversation"}
             className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
               isDark ? "text-gray-500 hover:text-white" : "text-gray-400 hover:text-gray-900"
             }`}
@@ -123,7 +123,7 @@ export default function ChatWindow({ conversation, onClose }) {
           <button
             type="button"
             onClick={toggleMaximize}
-            aria-label={isMaximized ? "تصغير لوحة الرسائل" : "تكبير لوحة الرسائل"}
+            aria-label={isMaximized ? (isArabic ? "تصغير لوحة الرسائل" : "Minimize messages panel") : (isArabic ? "تكبير لوحة الرسائل" : "Maximize messages panel")}
             className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
               isDark ? "text-gray-500 hover:text-white" : "text-gray-400 hover:text-gray-900"
             }`}
@@ -139,7 +139,7 @@ export default function ChatWindow({ conversation, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="العودة إلى قائمة المحادثات"
+            aria-label={isArabic ? "العودة إلى قائمة المحادثات" : "Back to conversations list"}
             className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
               isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
             }`}
@@ -292,7 +292,7 @@ export default function ChatWindow({ conversation, onClose }) {
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="اكتب رسالة..."
+              placeholder={isArabic ? "اكتب رسالة..." : "Type a message..."}
               className={`flex-1 min-w-0 bg-transparent text-xs outline-none text-right ${
                 isDark ? "text-white placeholder-gray-500" : "text-gray-900 placeholder-gray-400"
               }`}

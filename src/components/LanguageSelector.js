@@ -4,7 +4,7 @@ import { RiGlobalLine } from "react-icons/ri";
 import { IoChevronDownOutline } from "react-icons/io5";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
-import { Link, usePathname } from "@/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { createPortal } from "react-dom";
 const languages = [
   { code: "ar", label: "العربية", flag: "sa" },
@@ -24,6 +24,7 @@ const languages = [
 export default function LanguageSelector() {
   const pathname = usePathname();
   const locale = useLocale();
+  const router = useRouter();
   const t = useTranslations("nav");
   const { isDark } = useTheme();
   const [open, setOpen] = useState(false);
@@ -82,12 +83,16 @@ export default function LanguageSelector() {
             onClick={(e) => e.stopPropagation()}
           >
             {languages.map((lang) => (
-              <Link
+              <button
                 key={lang.code}
-                href={pathname || "/"}
-                locale={lang.code}
-                replace
-                onClick={() => setOpen(false)}
+                type="button"
+                onClick={() => {
+                  // استبدال السجل الحالي بدلاً من إضافة سجل جديد
+                  // حتى لا يرجع المتصفح للغة القديمة عند الضغط على رجوع
+                  const newPath = `/${lang.code}${pathname || "/"}`;
+                  window.location.replace(newPath);
+                  setOpen(false);
+                }}
                 className={`w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-[#94D3C142] transition-colors cursor-pointer bg-transparent border-none
           ${isDark ? "text-white" : "text-[#333]"}`}
               >
@@ -97,14 +102,15 @@ export default function LanguageSelector() {
                     width={20}
                     height={15}
                     alt={lang.label}
-                    className="rounded-sm"
+                    className="rounded-sm animate-none"
+                    style={{ display: "inline-block", verticalAlign: "middle" }}
                   />
                   <span>{lang.label}</span>
                 </div>
                 {locale === lang.code && (
                   <span className="text-[#94D3C1]">✓</span>
                 )}
-              </Link>
+              </button>
             ))}
           </div>,
           document.body,

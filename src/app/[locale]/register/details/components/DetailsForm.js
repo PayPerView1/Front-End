@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import Image from "next/image";
 import { Camera } from "react-iconly";
 import StepIndicator from "@/app/[locale]/register/components/StepIndicator";
@@ -22,13 +23,17 @@ const dialOptions = countries.map((c) => ({
   value: c.dial,
   label: `${c.flag} ${c.dial}`,
 }));
+
 const countryOptions = countries.map((c) => ({
   value: c.code,
   label: `${c.flag} ${c.name}`,
 }));
+
 export default function DetailsForm() {
   const router = useRouter();
+  const locale = useLocale();
   const fileRef = useRef(null);
+
   const [profilePicture, setProfilePicture] = useState(null);
   const [preview, setPreview] = useState(null);
   const [phone, setPhone] = useState("");
@@ -37,15 +42,15 @@ export default function DetailsForm() {
   const [city, setCity] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   function handleImage(e) {
     const file = e.target.files[0];
-
     if (!file) return;
-
     setProfilePicture(file);
     setPreview(URL.createObjectURL(file));
   }
+
   function validatePhone(value) {
     if (!value.trim()) {
       setPhoneError("أدخل رقم الهاتف");
@@ -55,111 +60,131 @@ export default function DetailsForm() {
       setPhoneError("");
     }
   }
+
   function validate() {
     const newErrors = {};
-
     if (!phone.trim()) {
       newErrors.phone = "أدخل رقم الهاتف";
     } else if (!/^\d{7,15}$/.test(phone)) {
       newErrors.phone = "رقم الهاتف غير صحيح";
     }
-
-    if (!dialCode) {
-      newErrors.dialCode = "اختر مفتاح الدولة";
-    }
-
-    if (!country) {
-      newErrors.country = "اختر الدولة";
-    }
-
-    if (!city.trim()) {
-      newErrors.city = "أدخل المدينة";
-    }
-
+    if (!dialCode) newErrors.dialCode = "اختر مفتاح الدولة";
+    if (!country) newErrors.country = "اختر الدولة";
+    if (!city.trim()) newErrors.city = "أدخل المدينة";
     return newErrors;
   }
 
-  async function handleSubmit() {
-  const newErrors = validate();
-  if (Object.keys(newErrors).length > 0) {
-    setErrors(newErrors);
-    return;
-  }
-
-  const savedData = sessionStorage.getItem("registerData");
-  if (!savedData) {
-    setErrors({ submit: "بيانات التسجيل غير موجودة، يرجى إعادة التسجيل." });
-    return;
-  }
-
-  const registerData = JSON.parse(savedData);
-
-  // التحقق من وجود كلمة المرور
-  if (!registerData.password) {
-    setErrors({ submit: "كلمة المرور غير موجودة، يرجى العودة للخطوة السابقة." });
-    return;
-  }
-
-  // التحقق المحلي (نفس regex الباك إند: رموز ASCII فقط)
-  const pwd = registerData.password;
-  const SPECIAL_CHAR_REGEX = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/;
-  const passwordValid =
-    pwd.length >= 8 &&
-    /[A-Z]/.test(pwd) &&
-    /[a-z]/.test(pwd) &&
-    /[0-9]/.test(pwd) &&
-    SPECIAL_CHAR_REGEX.test(pwd);
-
-  if (!passwordValid) {
-    setErrors({ submit: "كلمة المرور لا تستوفي المتطلبات (8 أحرف، حرف كبير، حرف صغير، رقم، رمز مثل !@#$). يرجى العودة للخطوة السابقة." });
-    return;
-  }
-
-  try {
-    let payload;
-
-    if (profilePicture) {
-      // إذا في صورة → FormData (multipart)
-      payload = new FormData();
-      payload.append("fullName", registerData.fullName);
-      payload.append("email", registerData.email);
-      payload.append("password", registerData.password);
-      payload.append("role", registerData.role);
-      payload.append("phoneNumber", `${dialCode}${phone}`);
-      payload.append("country", country);
-      payload.append("city", city);
-      payload.append("profilePicture", profilePicture);
-    } else {
-      // بدون صورة → JSON
-      payload = {
-        fullName: registerData.fullName,
-        email: registerData.email,
-        password: registerData.password,
-        role: registerData.role,
-        phoneNumber: `${dialCode}${phone}`,
-        country,
-        city,
-      };
+  // ─── تسجيل الحساب الأساسي من sessionStorage ──────────────────────────────
+  async function doRegister() {
+    const savedData = sessionStorage.getItem("registerData");
+    if (!savedData) {
+      throw new Error("بيانات التسجيل غير موجودة، يرجى إعادة التسجيل.");
     }
+
+    const registerData = JSON.parse(savedData);
+
+    if (!registerData.password) {
+      throw new Error("كلمة المرور غير موجودة، يرجى العودة للخطوة السابقة.");
+    }
+
+    const pwd = registerData.password;
+    const SPECIAL_CHAR_REGEX = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/;
+    const passwordValid =
+      pwd.length >= 8 &&
+      /[A-Z]/.test(pwd) &&
+      /[a-z]/.test(pwd) &&
+      /[0-9]/.test(pwd) &&
+      SPECIAL_CHAR_REGEX.test(pwd);
+
+    if (!passwordValid) {
+      throw new Error(
+        "كلمة المرور لا تستوفي المتطلبات (8 أحرف، حرف كبير، حرف صغير، رقم، رمز مثل !@#$). يرجى العودة للخطوة السابقة."
+      );
+    }
+
+    const payload = {
+      fullName: registerData.fullName,
+      email: registerData.email,
+      password: registerData.password,
+      role: registerData.role,
+    };
 
     await api.register(payload);
-    // api.register يحفظ التوكن تلقائياً
-
-    // مسح الـ sessionStorage
     sessionStorage.removeItem("registerData");
+  }
 
-    // الانتقال للخطوة التالية
-    router.push("/register/interests");
-  } catch (error) {
-    const msg = error.message || "حدث خطأ، حاول مرة أخرى";
-    if (msg.toLowerCase().includes("email")) {
-      setErrors({ submit: "هذا البريد الإلكتروني مسجل مسبقاً" });
-    } else {
-      setErrors({ submit: msg });
+  // ─── تحديث البروفايل ببيانات الخطوة 3 ────────────────────────────────────
+  async function updateProfileData() {
+    try {
+      let profilePayload;
+      if (profilePicture) {
+        profilePayload = new FormData();
+        profilePayload.append("phoneNumber", phone.trim());
+        profilePayload.append("phoneCountryCode", dialCode);
+        profilePayload.append("country", country);
+        profilePayload.append("city", city.trim());
+        profilePayload.append("profilePicture", profilePicture);
+      } else {
+        profilePayload = {
+          phoneNumber: phone.trim(),
+          phoneCountryCode: dialCode,
+          country,
+          city: city.trim(),
+        };
+      }
+      await api.updateProfile(profilePayload);
+    } catch (err) {
+      // لا نوقف التدفق إذا فشل تحديث البروفايل
+      console.warn("Profile update failed:", err.message);
     }
   }
-}
 
+  // ─── إتمام الإعداد (مع البيانات الإضافية) ───────────────────────────────
+  async function handleSubmit() {
+    const newErrors = validate();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setLoading(true);
+    setErrors({});
+
+    try {
+      await doRegister();
+      await updateProfileData();
+      router.push(`/${locale}/register/interests`);
+    } catch (error) {
+      const msg = error.message || "حدث خطأ، حاول مرة أخرى";
+      if (msg.toLowerCase().includes("email") || msg.includes("البريد")) {
+        setErrors({ submit: "هذا البريد الإلكتروني مسجل مسبقاً" });
+      } else {
+        setErrors({ submit: msg });
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ─── تخطي (تسجيل بدون بيانات إضافية) ────────────────────────────────────
+  async function handleSkip() {
+    setLoading(true);
+    setErrors({});
+
+    try {
+      await doRegister();
+      router.push(`/${locale}/register/interests`);
+    } catch (error) {
+      const msg = error.message || "حدث خطأ، حاول مرة أخرى";
+      if (msg.toLowerCase().includes("email") || msg.includes("البريد")) {
+        setErrors({ submit: "هذا البريد الإلكتروني مسجل مسبقاً" });
+      } else {
+        setErrors({ submit: msg });
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div
@@ -185,15 +210,9 @@ export default function DetailsForm() {
           onClick={() => fileRef.current.click()}
           className="relative w-20 h-20 rounded-full cursor-pointer overflow-visible bg-white/10 flex items-center justify-center"
         >
-          {/* الأيقونة  */}
           <div className="relative w-20 h-20 rounded-full overflow-hidden flex items-center justify-center bg-white/10">
             {preview ? (
-              <Image
-                src={preview}
-                alt="profile"
-                fill
-                className="object-cover"
-              />
+              <Image src={preview} alt="profile" fill className="object-cover" />
             ) : (
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
                 <path
@@ -222,7 +241,6 @@ export default function DetailsForm() {
       {/* رقم الهاتف */}
       <div className="flex flex-col gap-2">
         <label className="text-sm text-[#BFC9C4] text-right">رقم الهاتف</label>
-
         <div className="flex flex-row gap-2">
           {/* مفتاح الدولة */}
           <div className="flex flex-col gap-1">
@@ -245,11 +263,8 @@ export default function DetailsForm() {
                   borderRadius: "8px",
                   cursor: "pointer",
                   boxShadow: "none",
-                  "&:hover": {
-                    borderColor: "rgba(255,238,227,0.4)",
-                  },
+                  "&:hover": { borderColor: "rgba(255,238,227,0.4)" },
                 }),
-
                 menu: (base) => ({
                   ...base,
                   width: "200px",
@@ -258,25 +273,22 @@ export default function DetailsForm() {
                   border: "1px solid rgba(255,238,227,0.15)",
                   borderRadius: "8px",
                 }),
-
                 option: (base, state) => ({
                   ...base,
                   fontSize: "13px",
                   background: state.isSelected
                     ? "#F97316"
                     : state.isFocused
-                      ? "#2a2a2a"
-                      : "transparent",
+                    ? "#2a2a2a"
+                    : "transparent",
                   color: "white",
                   cursor: "pointer",
                 }),
-
                 singleValue: (base) => ({
                   ...base,
                   fontSize: "13px",
                   color: "black",
                 }),
-
                 placeholder: (base) => ({
                   ...base,
                   color: "#929292",
@@ -284,8 +296,6 @@ export default function DetailsForm() {
                 }),
               }}
             />
-
-            {/* خطأ مفتاح الدولة */}
             {errors.dialCode && (
               <p className="text-xs text-red-400 text-right m-0">
                 {errors.dialCode}
@@ -293,7 +303,7 @@ export default function DetailsForm() {
             )}
           </div>
 
-          {/* رقم الهاتف */}
+          {/* حقل رقم الهاتف */}
           <div className="flex flex-col flex-1 gap-1 min-h-[44px]">
             <input
               type="tel"
@@ -305,7 +315,6 @@ export default function DetailsForm() {
               placeholder="أدخل رقم الهاتف"
               className="w-full h-10 rounded-lg border border-[#FFEEE3]/40 bg-white px-4 text-sm text-right text-black placeholder-[#929292] outline-none"
             />
-
             {(phoneError || errors.phone) && (
               <p className="text-xs text-red-400 text-right m-0">
                 {phoneError || errors.phone}
@@ -353,8 +362,8 @@ export default function DetailsForm() {
                 background: state.isSelected
                   ? "#F97316"
                   : state.isFocused
-                    ? "#2a2a2a"
-                    : "transparent",
+                  ? "#2a2a2a"
+                  : "transparent",
                 color: "white",
                 cursor: "pointer",
               }),
@@ -378,7 +387,7 @@ export default function DetailsForm() {
           )}
         </div>
 
-        {/* حقل المدينة*/}
+        {/* المدينة */}
         <div className="flex flex-col gap-2 flex-1">
           <label className="text-sm text-[#BFC9C4] text-right">المدينة</label>
           <input
@@ -394,21 +403,25 @@ export default function DetailsForm() {
         </div>
       </div>
 
-      {/* الأزرار */}
+      {/* رسالة الخطأ العامة */}
       {errors.submit && (
         <p className="text-sm text-red-400 text-right m-0">{errors.submit}</p>
       )}
+
+      {/* الأزرار */}
       <div className="flex flex-row-reverse items-center justify-between">
         <button
           onClick={handleSubmit}
-          className="h-12 px-8 rounded-lg text-white text-base font-bold cursor-pointer border-none"
+          disabled={loading}
+          className="h-12 px-8 rounded-lg text-white text-base font-bold cursor-pointer border-none disabled:opacity-60"
           style={{ background: "linear-gradient(90deg, #FFA600, #FF4B04)" }}
         >
-          إتمام الإعداد
+          {loading ? "جارٍ الحفظ..." : "إتمام الإعداد"}
         </button>
         <button
-          onClick={() => router.push("/register/interests")}
-          className="text-sm text-[#BFC9C4] bg-transparent border-none cursor-pointer"
+          onClick={handleSkip}
+          disabled={loading}
+          className="text-sm text-[#BFC9C4] bg-transparent border-none cursor-pointer disabled:opacity-60"
         >
           تخطى الآن
         </button>

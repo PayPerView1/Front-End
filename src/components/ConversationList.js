@@ -79,34 +79,44 @@ export default function ConversationList({
     return matchesSearch;
   });
 
+  const isAr = locale === "ar";
+
   return (
     <div className={`flex flex-col h-full border-l ${isDark ? "border-white/10" : "border-[#E5E5E5]"}`} style={{ backgroundColor: isDark ? "rgba(12, 15, 16, 1)" : "#ffffff" }}>
       {/* الهيدر */}
-      <div className={`flex items-center justify-between px-4 pt-5 pb-3 border-b ${isDark ? "border-white/10" : "border-[#E5E5E5]"}`}>
-        <h2 className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-900"}`}>الرسائل</h2>
+      <div className={`w-full h-[73px] flex flex-row justify-between items-center px-5 py-5 border-b ${isDark ? "border-[#373A3B]" : "border-[#E5E5E5]"}`}>
+        {/* Title */}
+        <h2 
+          className={`font-normal text-[24px] leading-[32px] tracking-[-0.6px] select-none ${isDark ? "text-[#E1E3E4]" : "text-[#1A1A1A]"}`}
+          style={{ fontFamily: "Tajawal, sans-serif" }}
+        >
+          {isAr ? "الرسائل" : "Messages"}
+        </h2>
+
+        {/* Buttons (Maximize and Close) */}
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={toggleMaximize}
-            aria-label={isMaximized ? "تصغير لوحة الرسائل" : "تكبير لوحة الرسائل"}
-            className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
+            aria-label={isMaximized ? (isAr ? "تصغير لوحة الرسائل" : "Minimize messages panel") : (isAr ? "تكبير لوحة الرسائل" : "Maximize messages panel")}
+            className={`w-[26px] h-[26px] flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
               isDark 
                 ? "bg-white/10 text-gray-400 hover:text-white" 
                 : "bg-gray-100 text-gray-500 hover:text-gray-900"
             }`}
           >
-            {isMaximized ? <IoContract size={13} /> : <IoExpand size={13} />}
+            {isMaximized ? <IoContract size={14} /> : <IoExpand size={14} />}
           </button>
+          
           <button
             type="button"
             onClick={onClose}
-            className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
-              isDark 
-                ? "bg-white/10 text-gray-400 hover:text-white" 
-                : "bg-gray-100 text-gray-500 hover:text-gray-900"
-            }`}
+            className={`w-[18px] h-[18px] flex items-center justify-center hover:opacity-85 transition-opacity cursor-pointer border-none bg-transparent ${isDark ? "text-[#E1E3E4]" : "text-[#1A1A1A]"}`}
+            aria-label={isAr ? "إغلاق" : "Close"}
           >
-            <IoClose size={15} />
+            <svg className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
       </div>
@@ -116,7 +126,7 @@ export default function ConversationList({
         <div className="flex items-center gap-2 mb-3">
           <div className={`flex-1 flex items-center gap-2 rounded-lg px-3 py-2 border ${
             isDark 
-              ? "bg-white/[0.06] border-white/10" 
+              ? "bg-white/6 border-white/10" 
               : "bg-gray-50 border-gray-200"
           }`}>
             <FiSearch className={`${isDark ? "text-gray-400" : "text-gray-500"} shrink-0`} size={13} />
@@ -124,7 +134,7 @@ export default function ConversationList({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="البحث في الرسائل..."
+              placeholder={isAr ? "البحث في الرسائل..." : "Search messages..."}
               className={`flex-1 bg-transparent text-xs outline-none text-right ${
                 isDark ? "text-white placeholder-gray-500" : "text-gray-900 placeholder-gray-400"
               }`}
@@ -134,7 +144,7 @@ export default function ConversationList({
             type="button"
             className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${
               isDark 
-                ? "bg-white/[0.06] border-white/10 text-gray-400 hover:text-white" 
+                ? "bg-white/6 border-white/10 text-gray-400 hover:text-white" 
                 : "bg-gray-50 border-gray-200 text-gray-500 hover:text-gray-900"
             }`}
           >
@@ -145,9 +155,9 @@ export default function ConversationList({
         {/* الفلاتر */}
         <div className="flex gap-2 justify-right">
           {[
-            { key: "all", label: "الكل" },
-            { key: "unread", label: "غير مقروءة" },
-            { key: "orders", label: "الطلبات" },
+            { key: "all", label: isAr ? "الكل" : "All" },
+            { key: "unread", label: isAr ? "غير مقروءة" : "Unread" },
+            { key: "orders", label: isAr ? "الطلبات" : "Orders" },
           ].map((f) => (
             <button
               key={f.key}
@@ -157,7 +167,7 @@ export default function ConversationList({
                 activeFilter === f.key
                   ? (isDark ? "bg-white text-black" : "bg-gray-900 text-white")
                   : (isDark 
-                      ? "bg-white/[0.06] text-gray-400 hover:text-white border border-white/10" 
+                      ? "bg-white/6 text-gray-400 hover:text-white border border-white/10" 
                       : "bg-gray-100 text-gray-600 hover:text-gray-900 border border-gray-200")
               }`}
             >
@@ -180,7 +190,7 @@ export default function ConversationList({
               } ${
                 selectedId === conv.id
                   ? (isDark ? "bg-white/[0.07]" : "bg-gray-100")
-                  : (isDark ? "bg-transparent hover:bg-white/[0.04]" : "bg-transparent hover:bg-gray-50")
+                  : (isDark ? "bg-transparent hover:bg-white/4" : "bg-transparent hover:bg-gray-50")
               }`}
             >
               <div
@@ -207,7 +217,7 @@ export default function ConversationList({
           ))
         ) : (
           <div className={`p-4 text-center text-xs ${isDark ? "text-gray-500" : "text-gray-400"}`}>
-            لا توجد محادثات تطابق البحث
+            {isAr ? "لا توجد محادثات تطابق البحث" : "No conversations match search"}
           </div>
         )}
       </div>

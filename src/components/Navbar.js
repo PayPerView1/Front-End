@@ -155,39 +155,42 @@ w-full
 flex
 items-center
 justify-end
-px-2
+gap-1.5
+sm:gap-3
+px-3
 sm:px-6
-py-3
+${locale === "ar" ? "pr-14 sm:pr-6" : "pl-14 sm:pl-6"}
+py-2.5
 sticky
 top-0
 z-[9999999]
 border-b
 ${t.navBg}
 ${t.navBorder}
+  `}
     >
-      <div className="flex items-center gap-2.5 sm:gap-5 px-1.5 sm:px-3 py-1.5">
-        {/* الرصيد */}
-        <div
-          className={`
-            rounded-full
-            px-4
-            py-1
-            text-sm
-            font-bold
-            border
-            ${isDark
-              ? "bg-[#2a2a2a] border-[#3a3a3a] text-white"
-              : "bg-[#EAEAEA] border-[#EAEAEA] text-[#787878]"
-            }
-          `}
-        >
-          $0.00
-        </div>
+      <div
+        className={`
+          rounded-full
+          px-2.5
+          sm:px-4
+          py-1
+          text-xs
+          sm:text-sm
+          font-bold
+          border
+          flex-shrink-0
+          ${isDark
+            ? "bg-[#2a2a2a] border-[#3a3a3a] text-white"
+            : "bg-[#EAEAEA] border-[#EAEAEA] text-[#787878]"
+          }
+        `}
+      >
+        $0.00
+      </div>
 
-        {/* AI */}
+      {/* AI */}
 
-        <button
-          type="button"
 <button
   type="button"
   onClick={() => {
@@ -200,7 +203,7 @@ ${t.navBorder}
     if (isMessagesOpen) closeMessages();
     toggleAssistant();
   }}
-  className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
+  className={`w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
     isAssistantOpen
       ? isDark
         ? "bg-[#2a2a2a]"
@@ -226,7 +229,7 @@ ${t.navBorder}
 <button
   type="button"
   onClick={handleToggleMessages}
-  className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
+  className={`w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
     isMessagesOpen
       ? isDark
         ? "bg-[#2a2a2a]"
@@ -253,11 +256,7 @@ ${t.navBorder}
                 ? "hover:bg-white/10"
                 : "hover:bg-[#94D3C1]/15"
           }`}
-          onClick={() => {
-            console.log("Navbar: Notification bell clicked. Toggling panel...");
-            closeAssistant();
-            toggleNotifications();
-          }}
+          onClick={handleToggleNotifications}
         >
           <Notification
             set="light"
@@ -295,11 +294,12 @@ ${t.navBorder}
             flex
             flex-row
             items-center
-            gap-2.5
+            gap-1.5
             rounded-full
             px-2
             py-1
             border
+            flex-shrink-0
             ${isDark
               ? "bg-[#2a2a2a] border-[#3a3a3a]"
               : "bg-[#F5F5F5] border-[#E5E5E5]"
@@ -674,6 +674,5 @@ ${t.navBorder}
             )}
         </div>
       </div>
-    </div>
   );
 }
