@@ -205,7 +205,7 @@ export default function RegisterForm() {
           onChange={(e) => setName(e.target.value)}
           type="text"
           placeholder={t("fullNamePlaceholder")}
-          className="w-full h-11 rounded-lg border border-[#FFEEE3]/40 bg-white px-4 text-sm text-right text-black placeholder-[#929292] outline-none"
+          className="w-full h-11 rounded-lg border border-[#FFEEE3]/40 bg-white px-4 text-sm leading-[2.75rem] text-right text-black placeholder-[#929292] outline-none"
         />
         {errors.name && <p className="text-xs text-red-400">{errors.name}</p>}
       </div>
@@ -221,7 +221,7 @@ export default function RegisterForm() {
           type="email"
           placeholder="name@company.com"
           dir="ltr"
-          className="w-full h-11 rounded-lg border border-[#FFEEE3]/40 bg-white px-4 text-sm text-right text-black placeholder-[#929292] outline-none"
+          className="w-full h-11 rounded-lg border border-[#FFEEE3]/40 bg-white px-4 text-sm leading-[2.75rem] text-right text-black placeholder-[#929292] outline-none"
         />
         {errors.email && (
           <p className="text-xs text-red-400 text-right">
@@ -239,7 +239,7 @@ export default function RegisterForm() {
       {/* زر متابعة */}
       <button
         onClick={handleNext}
-        className="w-full mt-2 h-12 rounded-lg text-white text-base font-bold cursor-pointer border-none"
+        className="w-full mt-2 h-12 rounded-lg text-white text-base leading-none font-bold cursor-pointer border-none flex items-center justify-center"
         style={{ background: "linear-gradient(90deg, #FFA600, #FF4B04)" }}
       >
         {t("continue")}

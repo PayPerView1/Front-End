@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useLocale } from "next-intl";
 import { Message } from "react-iconly";
-import { verifyEmail } from "@/services/auth";
+import api from "@/services";
 
 export default function VerifyEmail({ email: emailProp, verificationToken = "" }) {
     const [resent, setResent] = useState(false);
@@ -12,10 +13,17 @@ export default function VerifyEmail({ email: emailProp, verificationToken = "" }
     const searchParams = useSearchParams();
     const token = verificationToken || searchParams.get("token") || searchParams.get("verificationToken") || "";
     const router = useRouter();
+    const locale = useLocale();
 
     // اقرأ الإيميل من localStorage أو sessionStorage إذا لم يُمرَّر كـ prop
     useEffect(() => {
         if (!emailProp) {
+            const verificationEmail = sessionStorage.getItem("verificationEmail");
+            if (verificationEmail) {
+                setEmail(verificationEmail);
+                return;
+            }
+
             // 1. جرب قراءته من المستخدم المحفوظ بعد التسجيل الناجح
             const savedUser = localStorage.getItem("user");
             if (savedUser) {
@@ -45,8 +53,8 @@ export default function VerifyEmail({ email: emailProp, verificationToken = "" }
 
     useEffect(() => {
         if (!token) {
-            setVerificationState("error");
-            setVerificationMessage("رمز التحقق غير موجود في الرابط.");
+            setVerificationState("idle");
+            setVerificationMessage("");
             return;
         }
 
@@ -55,7 +63,7 @@ export default function VerifyEmail({ email: emailProp, verificationToken = "" }
 
         async function verifyToken() {
             try {
-                const result = await verifyEmail(token);
+                const result = await api.verifyEmail(token);
                 if (!cancelled) {
                     setVerificationState("success");
                     setVerificationMessage(result?.message || "تم التحقق من البريد الإلكتروني بنجاح.");
@@ -75,9 +83,22 @@ export default function VerifyEmail({ email: emailProp, verificationToken = "" }
     }, [token]);
 
     async function handleResend() {
-        await api.register(payload);
-        setResent(true);
-        setTimeout(() => setResent(false), 4000);
+        if (!email) {
+            setVerificationState("error");
+            setVerificationMessage("لم نتمكن من تحديد البريد الإلكتروني لإعادة الإرسال.");
+            return;
+        }
+
+        try {
+            await api.resendVerification(email);
+            setVerificationState("idle");
+            setVerificationMessage("");
+            setResent(true);
+            setTimeout(() => setResent(false), 4000);
+        } catch (error) {
+            setVerificationState("error");
+            setVerificationMessage(error.message || "تعذر إرسال رابط التفعيل مرة أخرى.");
+        }
     }
     return (
         <div
@@ -97,7 +118,7 @@ export default function VerifyEmail({ email: emailProp, verificationToken = "" }
         {/* الوصف */}
         <div className="flex flex-col gap-2">
             <p className="text-sm text-[#BFC9C4]">
-                لقد أرسلنا رابط تفعيل إلى:
+                أرسلنا رابط التفعيل إلى:
                 <span className="text-white font-bold mx-1">{email}</span>
             </p>
         <p className="text-sm text-[#BFC9C4]">
@@ -117,7 +138,7 @@ export default function VerifyEmail({ email: emailProp, verificationToken = "" }
         {/* زر إعادة الإرسال */}
         <button
         onClick={handleResend}
-        className="h-12 px-8 rounded-lg text-white text-base font-bold cursor-pointer border-none flex items-center gap-2"
+        className="h-12 px-8 rounded-lg text-white text-base leading-none font-bold cursor-pointer border-none flex items-center justify-center gap-2"
         style={{ background: "linear-gradient(90deg, #FFA600, #FF4B04)" }}
         >
             {resent ? "تم الإرسال " : (
@@ -130,9 +151,9 @@ export default function VerifyEmail({ email: emailProp, verificationToken = "" }
                 )}
         </button>
         <button
-        onClick={() => router.push("/dashboard")}
+        onClick={() => router.push(`/${locale}/dashboard`)}
         disabled={verificationState !== "success"}
-        className="text-sm text-[#94D3C1] underline cursor-pointer bg-transparent border-none mt-2"
+        className="text-sm leading-none text-[#94D3C1] underline cursor-pointer bg-transparent border-none mt-2 inline-flex items-center justify-center"
         >
         تم التحقق - متابعة
         </button>

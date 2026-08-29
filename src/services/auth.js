@@ -15,8 +15,10 @@ export async function register(data) {
   try {
     const response = await axiosInstance.post("/api/v1/auth/register", data);
     const result = response.data;
-    if (result.token && result.user) {
-      saveAuthData(result.token, result.user);
+    const token = result?.token || result?.accessToken || result?.data?.token || result?.data?.accessToken;
+    const user = result?.user || result?.data?.user || {};
+    if (token) {
+      saveAuthData(token, user);
     }
     return result;
   } catch (error) {
@@ -35,6 +37,20 @@ export async function verifyEmail(token) {
     return response.data;
   } catch (error) {
     console.error("Verify Email Error:", error);
+    handleError(error);
+  }
+}
+
+/**
+ * إعادة إرسال رابط تفعيل البريد الإلكتروني
+ * @param {string} email
+ */
+export async function resendVerification(email) {
+  try {
+    const response = await axiosInstance.post("/api/v1/auth/resend-verification", { email });
+    return response.data;
+  } catch (error) {
+    console.error("Resend Verification Error:", error);
     handleError(error);
   }
 }

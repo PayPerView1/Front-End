@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import { Hide, Show } from "react-iconly";
 import StepIndicator from "@/app/[locale]/register/components/StepIndicator";
 
 export default function PasswordForm() {
   const router = useRouter();
+  const locale = useLocale();
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -101,7 +103,7 @@ export default function PasswordForm() {
 
   const oldData = sessionStorage.getItem("registerData");
   if (!oldData) {
-    router.push("/register");
+    router.push(`/${locale}/register`);
     return;
   }
 
@@ -111,7 +113,7 @@ export default function PasswordForm() {
     password: password,
   }));
 
-  router.push("/register/details");
+  router.push(`/${locale}/register/details`);
 }
   return (
     <div
@@ -140,7 +142,7 @@ export default function PasswordForm() {
             onChange={(e) => setPassword(e.target.value)}
             type={showPass ? "text" : "password"}
             placeholder="أنشئ كلمة مرور قوية"
-            className="w-full h-10 rounded-lg border border-[#FFEEE3]/40 bg-white pr-4 pl-12 text-sm text-right text-black placeholder-[#929292] outline-none"
+            className="w-full h-10 rounded-lg border border-[#FFEEE3]/40 bg-white pr-4 pl-12 text-sm leading-[2.5rem] text-right text-black placeholder-[#929292] outline-none"
           />
           <button
             onClick={() => setShowPass(!showPass)}
@@ -194,7 +196,7 @@ export default function PasswordForm() {
             onChange={(e) => setConfirmPass(e.target.value)}
             type={showConfirmPass ? "text" : "password"}
             placeholder="أعد إدخال كلمة المرور"
-            className={`w-full h-10 rounded-lg border bg-white pr-4 pl-12 text-sm text-right text-black placeholder-[#929292] outline-none transition-all
+            className={`w-full h-10 rounded-lg border bg-white pr-4 pl-12 text-sm leading-[2.5rem] text-right text-black placeholder-[#929292] outline-none transition-all
                 ${
                   confirmPass && password !== confirmPass
                     ? "border-red-400"
@@ -231,7 +233,7 @@ export default function PasswordForm() {
 
       <button
         onClick={handleNext}
-        className="w-full h-12 rounded-lg text-white text-base font-bold cursor-pointer border-none"
+        className="w-full h-12 rounded-lg text-white text-base leading-none font-bold cursor-pointer border-none flex items-center justify-center"
         style={{ background: "linear-gradient(90deg, #FFA600, #FF4B04)" }}
       >
         متابعة

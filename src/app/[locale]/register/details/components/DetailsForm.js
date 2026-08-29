@@ -75,7 +75,16 @@ export default function DetailsForm() {
   }
 
   // ─── تسجيل الحساب الأساسي من sessionStorage ──────────────────────────────
-  async function doRegister() {
+  function getDetailsPayload() {
+    return {
+      phoneNumber: phone.trim(),
+      phoneCountryCode: dialCode,
+      country,
+      city: city.trim(),
+    };
+  }
+
+  async function doRegister(detailsPayload) {
     const savedData = sessionStorage.getItem("registerData");
     if (!savedData) {
       throw new Error("بيانات التسجيل غير موجودة، يرجى إعادة التسجيل.");
@@ -107,36 +116,29 @@ export default function DetailsForm() {
       email: registerData.email,
       password: registerData.password,
       role: registerData.role,
+      ...detailsPayload,
     };
 
-    await api.register(payload);
-    sessionStorage.removeItem("registerData");
+    if (profilePicture) {
+      await api.register(api.createFormData({ ...payload, profilePicture }));
+    } else {
+      await api.register(payload);
+    }
+
+    sessionStorage.setItem("verificationEmail", registerData.email);
   }
 
   // ─── تحديث البروفايل ببيانات الخطوة 3 ────────────────────────────────────
-  async function updateProfileData() {
-    try {
-      let profilePayload;
-      if (profilePicture) {
-        profilePayload = new FormData();
-        profilePayload.append("phoneNumber", phone.trim());
-        profilePayload.append("phoneCountryCode", dialCode);
-        profilePayload.append("country", country);
-        profilePayload.append("city", city.trim());
-        profilePayload.append("profilePicture", profilePicture);
-      } else {
-        profilePayload = {
-          phoneNumber: phone.trim(),
-          phoneCountryCode: dialCode,
-          country,
-          city: city.trim(),
-        };
-      }
-      await api.updateProfile(profilePayload);
-    } catch (err) {
-      // لا نوقف التدفق إذا فشل تحديث البروفايل
-      console.warn("Profile update failed:", err.message);
+  async function updateProfileData(detailsPayload) {
+    if (!api.getToken()) {
+      return;
     }
+
+    const profilePayload = profilePicture
+      ? api.createFormData({ ...detailsPayload, profilePicture })
+      : detailsPayload;
+
+    await api.updateProfile(profilePayload);
   }
 
   // ─── إتمام الإعداد (مع البيانات الإضافية) ───────────────────────────────
@@ -151,8 +153,10 @@ export default function DetailsForm() {
     setErrors({});
 
     try {
-      await doRegister();
-      await updateProfileData();
+      const detailsPayload = getDetailsPayload();
+      await doRegister(detailsPayload);
+      await updateProfileData(detailsPayload);
+      sessionStorage.removeItem("registerData");
       router.push(`/${locale}/register/interests`);
     } catch (error) {
       const msg = error.message || "حدث خطأ، حاول مرة أخرى";
@@ -172,7 +176,8 @@ export default function DetailsForm() {
     setErrors({});
 
     try {
-      await doRegister();
+      await doRegister({});
+      sessionStorage.removeItem("registerData");
       router.push(`/${locale}/register/interests`);
     } catch (error) {
       const msg = error.message || "حدث خطأ، حاول مرة أخرى";
@@ -263,7 +268,22 @@ export default function DetailsForm() {
                   borderRadius: "8px",
                   cursor: "pointer",
                   boxShadow: "none",
+                  alignItems: "center",
                   "&:hover": { borderColor: "rgba(255,238,227,0.4)" },
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  height: "40px",
+                  padding: "0 8px",
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: 0,
+                  padding: 0,
+                }),
+                indicatorsContainer: (base) => ({
+                  ...base,
+                  height: "40px",
                 }),
                 menu: (base) => ({
                   ...base,
@@ -288,11 +308,13 @@ export default function DetailsForm() {
                   ...base,
                   fontSize: "13px",
                   color: "black",
+                  lineHeight: "40px",
                 }),
                 placeholder: (base) => ({
                   ...base,
                   color: "#929292",
                   fontSize: "13px",
+                  lineHeight: "40px",
                 }),
               }}
             />
@@ -313,7 +335,7 @@ export default function DetailsForm() {
                 validatePhone(e.target.value);
               }}
               placeholder="أدخل رقم الهاتف"
-              className="w-full h-10 rounded-lg border border-[#FFEEE3]/40 bg-white px-4 text-sm text-right text-black placeholder-[#929292] outline-none"
+              className="w-full h-10 rounded-lg border border-[#FFEEE3]/40 bg-white px-4 text-sm leading-[2.5rem] text-right text-black placeholder-[#929292] outline-none"
             />
             {(phoneError || errors.phone) && (
               <p className="text-xs text-red-400 text-right m-0">
@@ -347,7 +369,22 @@ export default function DetailsForm() {
                 borderRadius: "8px",
                 cursor: "pointer",
                 boxShadow: "none",
+                alignItems: "center",
                 "&:hover": { borderColor: "rgba(255,238,227,0.4)" },
+              }),
+              valueContainer: (base) => ({
+                ...base,
+                height: "40px",
+                padding: "0 8px",
+              }),
+              input: (base) => ({
+                ...base,
+                margin: 0,
+                padding: 0,
+              }),
+              indicatorsContainer: (base) => ({
+                ...base,
+                height: "40px",
               }),
               menu: (base) => ({
                 ...base,
@@ -371,11 +408,13 @@ export default function DetailsForm() {
                 ...base,
                 fontSize: "13px",
                 color: country ? "black" : "#BFC9C4",
+                lineHeight: "40px",
               }),
               placeholder: (base) => ({
                 ...base,
                 color: "#929292",
                 fontSize: "13px",
+                lineHeight: "40px",
               }),
               indicatorSeparator: () => ({ display: "none" }),
             }}
@@ -395,7 +434,7 @@ export default function DetailsForm() {
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="مثال: دبي"
-            className="w-full h-10 rounded-lg border border-[#FFEEE3]/40 bg-white px-4 text-sm text-right text-black placeholder-[#929292] outline-none"
+            className="w-full h-10 rounded-lg border border-[#FFEEE3]/40 bg-white px-4 text-sm leading-[2.5rem] text-right text-black placeholder-[#929292] outline-none"
           />
           {errors.city && (
             <p className="text-xs text-red-400 text-right m-0">{errors.city}</p>
@@ -413,7 +452,7 @@ export default function DetailsForm() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="h-12 px-8 rounded-lg text-white text-base font-bold cursor-pointer border-none disabled:opacity-60"
+          className="h-12 px-8 rounded-lg text-white text-base leading-none font-bold cursor-pointer border-none disabled:opacity-60 flex items-center justify-center"
           style={{ background: "linear-gradient(90deg, #FFA600, #FF4B04)" }}
         >
           {loading ? "جارٍ الحفظ..." : "إتمام الإعداد"}
@@ -421,7 +460,7 @@ export default function DetailsForm() {
         <button
           onClick={handleSkip}
           disabled={loading}
-          className="text-sm text-[#BFC9C4] bg-transparent border-none cursor-pointer disabled:opacity-60"
+          className="text-sm leading-none text-[#BFC9C4] bg-transparent border-none cursor-pointer disabled:opacity-60 flex items-center justify-center"
         >
           تخطى الآن
         </button>

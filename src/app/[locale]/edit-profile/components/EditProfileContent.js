@@ -1443,6 +1443,10 @@ function Toggle({ value, onChange, isDark }) {
   );
 }
 
+function getUserFromResponse(result) {
+  return result?.user || result?.data?.user || result?.data || result;
+}
+
 export default function EditProfileContent() {
   const { isDark } = useTheme();
   const router = useRouter();
@@ -1511,7 +1515,6 @@ export default function EditProfileContent() {
 
     try {
       const hasNewImage = profileImage instanceof File;
-      let data;
 
       if (Boolean(phone.trim()) !== Boolean(dialCode)) {
         setSaveMsg(locale === "ar" ? "يجب اختيار مقدمة الاتصال مع رقم الهاتف" : "Both country code and phone number must be provided");
@@ -1521,8 +1524,8 @@ export default function EditProfileContent() {
 
       const payload = {
         fullName: form.name || undefined,
-        username: form.username || undefined,
-        bio: form.bio || undefined,
+        username: form.username.trim(),
+        bio: form.bio.trim(),
         dateOfBirth: form.birthDate || undefined,
         country: country || undefined,
         city: city || undefined,
@@ -1534,28 +1537,32 @@ export default function EditProfileContent() {
         payload.phoneCountryCode = dialCode || undefined;
       }
 
-      if (hasNewImage) {
-        // المستخدم رفع صورة جديدة
-        payload.profilePicture = profileImage;
-        data = api.createFormData(payload);
-      } else if (removeProfileImage) {
+      if (removeProfileImage) {
         // المستخدم مسح الصورة الحالية ولم يرفع صورة بديلة
         // ⚠️ تأكد من الصيغة اللي يتوقعها الـ backend لحذف الصورة
         // (قد تكون "" أو null أو حقل منفصل مثل removeProfilePicture: true)
         payload.profilePicture = "";
-        data = payload;
-      } else {
-        data = payload;
       }
 
-      const result = await api.updateProfile(data);
+      const result = await api.updateProfile(payload);
+
+      if (hasNewImage) {
+        await api.updateProfile(api.createFormData({ profilePicture: profileImage }));
+      }
 
       setSaveMsg(copy("saved") + " ✅");
 
-      const updatedUser = result?.user || result?.data || result;
+      const updatedUser = getUserFromResponse(result);
 
-      if (updatedUser) {
-        api.saveAuthData(api.getToken(), updatedUser);
+      if (updatedUser && typeof updatedUser === "object") {
+        const savedUser = api.getSavedUser() || {};
+        api.saveAuthData(api.getToken(), {
+          ...savedUser,
+          ...updatedUser,
+          fullName: form.name,
+          username: form.username.trim(),
+          bio: form.bio.trim(),
+        });
       }
 
       setTimeout(() => {
@@ -1580,7 +1587,7 @@ export default function EditProfileContent() {
     async function loadProfile() {
       try {
         const result = await api.getProfile();
-        const user = result?.user || result?.data || result;
+        const user = getUserFromResponse(result);
 
         setForm({
           name: user?.fullName || "",

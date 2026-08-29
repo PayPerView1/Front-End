@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import StepIndicator from "@/app/[locale]/register/components/StepIndicator";
 import {
   HiOutlineDevicePhoneMobile,
@@ -10,7 +11,7 @@ import { MdOutlineLocalMovies } from "react-icons/md";
 import { PiGraduationCapLight } from "react-icons/pi";
 import { TbShieldPlus } from "react-icons/tb";
 import { BsWallet2 } from "react-icons/bs";
-import api from "@/lib/axios";
+import api from "@/services";
 
 const interests = [
   { id: "LIFESTYLE", label: "نمط الحياة", icon: HiOutlineDevicePhoneMobile },
@@ -23,6 +24,7 @@ const interests = [
 
 export default function InterestsForm() {
   const router = useRouter();
+  const locale = useLocale();
   const [selected, setSelected] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -37,8 +39,10 @@ export default function InterestsForm() {
     setLoading(true);
     setError("");
     try {
-      await api.updateProfile({ interests: selected });
-      router.push("/register/verify");
+      if (selected.length > 0 && api.getToken()) {
+        await api.updateInterests(selected);
+      }
+      router.push(`/${locale}/register/verify`);
     } catch (err) {
       setError("حدث خطأ، حاول مرة أخرى");
     } finally {
@@ -91,14 +95,14 @@ export default function InterestsForm() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="h-12 px-6 rounded-lg text-white text-base font-bold cursor-pointer border-none opacity-100 disabled:opacity-70"
+          className="h-12 px-6 rounded-lg text-white text-base leading-none font-bold cursor-pointer border-none opacity-100 disabled:opacity-70 flex items-center justify-center"
           style={{ background: "linear-gradient(90deg, #FFA600, #FF4B04)" }}
         >
           {loading ? "جاري الحفظ..." : "الانتقال للوحة التحكم"}
         </button>
         <button
-          onClick={() => router.push("/register/verify")}
-          className="text-sm text-[#BFC9C4] bg-transparent border-none cursor-pointer"
+          onClick={() => router.push(`/${locale}/register/verify`)}
+          className="text-sm leading-none text-[#BFC9C4] bg-transparent border-none cursor-pointer flex items-center justify-center"
         >
           تخطى الآن
         </button>
