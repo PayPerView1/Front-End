@@ -90,17 +90,7 @@ export default function VerifyEmail({ email: emailProp, verificationToken = "" }
         }
 
         try {
-            let regData = null;
-            const savedData = sessionStorage.getItem("registerData");
-            if (savedData) {
-                try {
-                    regData = JSON.parse(savedData);
-                } catch (e) {
-                    console.error("Error parsing registerData for resend:", e);
-                }
-            }
-
-            const res = await api.resendVerification(email, regData);
+            const res = await api.resendVerification(email);
             setVerificationState("idle");
             setVerificationMessage(res?.message || "تم إرسال رابط التفعيل بنجاح.");
             setResent(true);

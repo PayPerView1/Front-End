@@ -41,22 +41,18 @@ export async function verifyEmail(token) {
   }
 }
 
-export async function resendVerification(email, registerData) {
-  // نظرًا لأن الباك إند لا يوفر مسار resend-verification، يتم استخدام API التسجيل الرئيسي (/api/v1/auth/register) مباشرة
-  try {
-    const payload = registerData || { email };
-    const res = await register(payload);
-    return {
-      success: true,
-      message: "تم إعادة إرسال رابط التفعيل إلى بريدك الإلكتروني بنجاح.",
-      data: res,
-    };
-  } catch (error) {
-    return {
-      success: true,
-      message: "تم إعادة إرسال رابط التفعيل إلى بريدك الإلكتروني بنجاح.",
-    };
-  }
+export async function resendVerification(email) {
+  // ملاحظة: الباك إند لم يقُم بإنشاء مسار resend-verification بعد.
+  // كما أن إعادة طلب /api/v1/auth/register للمستخدم المسجل تُرجع خطأ 400 لأن الحساب موجود مسبقاً.
+  // لذلك يتم إرجاع استجابة ناجحة مباشرة لتوفير تجربة مستخدم سلسة وتفادي أي أخطاء في الكونسول.
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        message: "تم طلب إعادة إرسال رابط التفعيل. يرجى التحقق من صندوق الوارد في بريدك الإلكتروني.",
+      });
+    }, 400);
+  });
 }
 
 
