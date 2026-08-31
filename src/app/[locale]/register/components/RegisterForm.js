@@ -20,7 +20,7 @@ export default function RegisterForm() {
     const handleGoogleRedirect = async () => {
       const token = searchParams.get("token");
       const userParam = searchParams.get("user");
-      
+
       if (token) {
         try {
           let userObj = {};
@@ -31,9 +31,9 @@ export default function RegisterForm() {
               console.error("Failed to parse user query parameter:", e);
             }
           }
-          
+
           api.saveAuthData(token, userObj);
-          
+
           if (!userObj || !userObj._id || !userObj.email) {
             try {
               const profileData = await api.getProfile();
@@ -45,14 +45,14 @@ export default function RegisterForm() {
               console.error("Failed to fetch profile during Google redirect:", err);
             }
           }
-          
+
           router.push(`/${locale}/dashboard`);
         } catch (e) {
           console.error("Error during Google redirect:", e);
         }
       }
     };
-    
+
     handleGoogleRedirect();
   }, [searchParams, locale, router]);
   const [emailError, setEmailError] = useState("");
@@ -77,17 +77,7 @@ export default function RegisterForm() {
     }
     return newErrors;
   }
-  // function checkEmail(value) {
-  //   setEmail(value);
-  //   if (value === "test@test.com") {
-  //     setErrors((prev) => ({
-  //       ...prev,
-  //       email: "هذا البريد الإلكتروني مسجل مسبقاً.",
-  //     }));
-  //   } else {
-  //     setErrors((prev) => ({ ...prev, email: "" }));
-  //   }
-  // }
+
   useEffect(() => {
     const emailErr = sessionStorage.getItem("emailError");
     if (emailErr) {
@@ -138,10 +128,9 @@ export default function RegisterForm() {
         <div
           onClick={() => setUserType("creator")}
           className={`flex-1 min-h-[90px] py-3 rounded-xl border px-3 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all
-            ${
-              userType === "creator"
-                ? "border-[#FE6B02] bg-gradient-to-b from-[#FE6B02] to-[#EA580C]"
-                : "border-[#FFEEE3]/40 bg-transparent"
+            ${userType === "creator"
+              ? "border-[#FE6B02] bg-gradient-to-b from-[#FE6B02] to-[#EA580C]"
+              : "border-[#FFEEE3]/40 bg-transparent"
             }`}
         >
           <div className="relative">
@@ -168,10 +157,9 @@ export default function RegisterForm() {
         <div
           onClick={() => setUserType("brand")}
           className={`flex-1 min-h-[90px] py-3 rounded-xl border px-4 flex flex-col items-center justify-center gap-1 cursor-pointer transition-all 
-            ${
-              userType === "brand"
-                ? "border-[#FE6B02] bg-gradient-to-b from-[#FE6B02] to-[#EA580C]"
-                : "border-[#FFEEE3]/40 bg-transparent"
+            ${userType === "brand"
+              ? "border-[#FE6B02] bg-gradient-to-b from-[#FE6B02] to-[#EA580C]"
+              : "border-[#FFEEE3]/40 bg-transparent"
             }`}
         >
           <div className="relative">

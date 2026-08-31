@@ -117,16 +117,31 @@ axiosInstance.interceptors.response.use(
 
 export function handleError(error) {
   if (error.response?.data) {
-    console.error("API Error Response Data:", JSON.stringify(error.response.data, null, 2));
+    console.error(
+      "API Error Response Data:",
+      typeof error.response.data === "string"
+        ? error.response.data
+        : JSON.stringify(error.response.data, null, 2)
+    );
   }
   const validationMessages = Array.isArray(error.response?.data?.errors)
     ? error.response.data.errors.map((item) => item?.message).filter(Boolean)
     : [];
-  const message =
+
+  let message =
     validationMessages.join("\n") ||
-    error.response?.data?.message ||
-    error.message ||
-    "حدث خطأ في الطلب";
+    (typeof error.response?.data?.message === "string" ? error.response.data.message : null);
+
+  if (!message) {
+    if (error.response?.status === 404) {
+      message = "الخدمة المطلوبة غير متوفرة حالياً على الخادم (404 Not Found)";
+    } else if (typeof error.response?.data === "string" && error.response.data.includes("<html")) {
+      message = "حدث خطأ غير متوقع في الخادم";
+    } else {
+      message = error.message || "حدث خطأ في الطلب";
+    }
+  }
+
   throw new Error(message);
 }
 

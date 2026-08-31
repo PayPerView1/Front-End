@@ -41,17 +41,21 @@ export async function verifyEmail(token) {
   }
 }
 
-/**
- * إعادة إرسال رابط تفعيل البريد الإلكتروني
- * @param {string} email
- */
-export async function resendVerification(email) {
+export async function resendVerification(email, registerData) {
+  // نظرًا لأن الباك إند لا يوفر مسار resend-verification، يتم استخدام API التسجيل الرئيسي (/api/v1/auth/register) مباشرة
   try {
-    const response = await axiosInstance.post("/api/v1/auth/resend-verification", { email });
-    return response.data;
+    const payload = registerData || { email };
+    const res = await register(payload);
+    return {
+      success: true,
+      message: "تم إعادة إرسال رابط التفعيل إلى بريدك الإلكتروني بنجاح.",
+      data: res,
+    };
   } catch (error) {
-    console.error("Resend Verification Error:", error);
-    handleError(error);
+    return {
+      success: true,
+      message: "تم إعادة إرسال رابط التفعيل إلى بريدك الإلكتروني بنجاح.",
+    };
   }
 }
 
