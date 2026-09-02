@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -334,14 +333,55 @@ export default function ChatWindow({
             ? myDisplayName || msg.sender
             : msg.sender || conversationName;
 
+          // في الإنجليزية تظهر الرسائل على اليسار، وفي العربية تظهر على اليمين
+          const isLeft = !isArabic;
+
+          const avatarComponent = (
+            <div
+              className={`w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-white text-[10px] font-bold shrink-0 border ${
+                isDark
+                  ? "border-white/10"
+                  : "border-gray-200 shadow-sm"
+              }`}
+              style={{
+                background: messageAvatar
+                  ? "transparent"
+                  : msg.color ||
+                    (msg.isMe
+                      ? "#FF4B04"
+                      : conversation?.color) ||
+                    "#005D3B",
+              }}
+            >
+              {messageAvatar ? (
+                <img
+                  src={messageAvatar}
+                  alt={messageName || "User"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span>
+                  {getFirstLetter(messageName)}
+                </span>
+              )}
+            </div>
+          );
+
           return (
             <div
               key={msg.id}
               dir="ltr"
-              className="flex items-end justify-end gap-2.5 w-full"
+              className={`flex items-end gap-2.5 w-full ${
+                isLeft ? "justify-start" : "justify-end"
+              }`}
             >
+              {isLeft && avatarComponent}
+
               <div
+                dir={isArabic ? "rtl" : "ltr"}
                 className={`rounded-2xl px-4 py-3 text-xs leading-6 whitespace-pre-line max-w-[75%] ${
+                  isArabic ? "text-right" : "text-left"
+                } ${
                   msg.isMe
                     ? isDark
                       ? "bg-white/10 text-white"
@@ -354,34 +394,7 @@ export default function ChatWindow({
                 {renderFormattedText(msg.text)}
               </div>
 
-              <div
-                className={`w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-white text-[10px] font-bold shrink-0 border ${
-                  isDark
-                    ? "border-white/10"
-                    : "border-gray-200 shadow-sm"
-                }`}
-                style={{
-                  background: messageAvatar
-                    ? "transparent"
-                    : msg.color ||
-                      (msg.isMe
-                        ? "#FF4B04"
-                        : conversation?.color) ||
-                      "#005D3B",
-                }}
-              >
-                {messageAvatar ? (
-                  <img
-                    src={messageAvatar}
-                    alt={messageName || "User"}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span>
-                    {getFirstLetter(messageName)}
-                  </span>
-                )}
-              </div>
+              {!isLeft && avatarComponent}
             </div>
           );
         })}
@@ -549,7 +562,9 @@ export default function ChatWindow({
                   ? "اكتب رسالة..."
                   : "Type a message..."
               }
-              className={`flex-1 min-w-0 bg-transparent text-xs outline-none text-right ${
+              className={`flex-1 min-w-0 bg-transparent text-xs outline-none ${
+                isArabic ? "text-right" : "text-left"
+              } ${
                 isDark
                   ? "text-white placeholder-gray-500"
                   : "text-gray-900 placeholder-gray-400"
