@@ -103,7 +103,7 @@ export default function NotificationsPanel({ side = "left" }) {
         <div className={`w-full h-[73px] flex flex-row justify-between items-center px-5 py-5 border-b ${t.border}`}>
           {/* Title */}
           <h2 
-            className={`font-normal text-[24px] leading-[32px] tracking-[-0.6px] select-none ${t.text}`}
+            className={`font-normal text-xl leading-[32px] tracking-[-0.6px] select-none ${t.text}`}
             style={{ fontFamily: "Tajawal, sans-serif" }}
           >
             {isAr ? "الإشعارات" : "Notifications"}
