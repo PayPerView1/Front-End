@@ -47,76 +47,95 @@ const sidebarFallbacks = {
 
 export default function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const pathname = usePathname();
   const locale = useLocale();
   const messages = useMessages();
-  const sidebar = (key) => messages.sidebar?.[key] || sidebarFallbacks[key];
+
+  const sidebar = (key) =>
+    messages.sidebar?.[key] || sidebarFallbacks[key];
+
   const { isDark } = useTheme();
 
   const t = {
-    bg: isDark ? "bg-[#0D0D0D] border-[#2D2D2D]" : "bg-white border-[#E5E5E5]",
+    bg: isDark
+      ? "bg-[#0D0D0D] border-[#2D2D2D]"
+      : "bg-white border-[#E5E5E5]",
 
     text: isDark ? "text-white" : "text-[#1A1A1A]",
 
-    subText: isDark ? "text-[#9A9A9A]" : "text-[#666666]",
+    subText: isDark
+      ? "text-[#9A9A9A]"
+      : "text-[#666666]",
 
-    activeLink: isDark ? "bg-white/10 text-white" : "bg-[#F0F0F0] text-black",
+    activeLink: isDark
+      ? "bg-white/10 text-white"
+      : "bg-[#F0F0F0] text-black",
 
     hoverLink: isDark
       ? "hover:text-white hover:bg-white/5"
       : "hover:text-black hover:bg-[#F5F5F5]",
 
-    logoText: isDark ? "text-white" : "text-black",
+    logoText: isDark
+      ? "text-white"
+      : "text-black",
   };
 
-  // محتوى الـ Sidebar
   const sidebarContent = (
     <>
-      {/* اللوجو */}
-      <div className="flex items-center px-6 py-5">
+      {/* الهيدر: اللوجو وزر الإغلاق محاذيان على نفس المستوى */}
+      <div className="relative flex items-center px-6 py-5">
         <Image
-          src={isDark ? "/images/image-PPV.png" : "/images/image-PPV-light.png"}
+          src={
+            isDark
+              ? "/logo.png"
+              : "/images/image-PPV-light.png"
+          }
           alt="logo"
-          width={55}
-          height={60}
+          width={isDark ? 40 : 60}
+          height={isDark ? 50 : 65}
           className="rounded-lg"
         />
 
         <span
           className={`font-bold text-lg mr-2 ${t.logoText}`}
-          style={{ fontWeight: 700, fontFamily: "var(--font-tajawal)" }}
+          style={{
+            fontWeight: 700,
+            fontFamily: "var(--font-tajawal)",
+          }}
         >
           Pay Per View
         </span>
-      </div>
 
-      {/* زر الإغلاق - يظهر فقط بالموبايل */}
-      <button
-        type="button"
-        onClick={() => setSidebarOpen(false)}
-        className={`
-          lg:hidden
-          absolute
-          top-4
-          ${locale === "ar" ? "right-4" : "left-4"}
-          w-9
-          h-9
-          rounded-lg
-          flex
-          items-center
-          justify-center
-          border
-          cursor-pointer
-          transition-colors
-          ${
-            isDark
-              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
-          }
-        `}
-      >
-        <BsX size={24} />
-      </button>
+        {/* زر الإغلاق - محاذاة مركزية عمودية مع اللوجو */}
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(false)}
+          className={`
+            min-[1280px]:hidden
+            absolute
+            top-1/2
+            -translate-y-1/2
+            ${locale === "ar" ? "left-4" : "right-4"}
+            w-7
+            h-7
+            rounded-lg
+            flex
+            items-center
+            justify-center
+            border
+            cursor-pointer
+            transition-colors
+            ${
+              isDark
+                ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+                : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+            }
+          `}
+        >
+          <BsX size={18} />
+        </button>
+      </div>
 
       {/* الروابط الرئيسية */}
       <nav className="flex flex-col gap-1 px-4 mt-2">
@@ -159,7 +178,13 @@ export default function Sidebar() {
                 }
               />
 
-              <span className={isDark ? "text-white" : "text-black"}>
+              <span
+                className={
+                  isDark
+                    ? "text-white"
+                    : "text-black"
+                }
+              >
                 {sidebar(item.label)}
               </span>
             </Link>
@@ -167,9 +192,11 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* موارد */}
+      {/* الموارد */}
       <div className="px-4 mt-6">
-        <p className={`text-xs px-3 mb-2 ${t.subText}`}>
+        <p
+          className={`text-xs px-3 mb-2 ${t.subText}`}
+        >
           {sidebar("resources")}
         </p>
 
@@ -216,7 +243,13 @@ export default function Sidebar() {
                     }
                   />
 
-                  <span className={isDark ? "text-white" : "text-black"}>
+                  <span
+                    className={
+                      isDark
+                        ? "text-white"
+                        : "text-black"
+                    }
+                  >
                     {sidebar(item.label)}
                   </span>
                 </div>
@@ -238,18 +271,18 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* زر الثلاث شرطات */}
+      {/* زر الثلاث شرطات - يظهر تحت 1280px */}
       <button
         type="button"
         onClick={() => setSidebarOpen(true)}
         className={`
-          lg:hidden
+          min-[1280px]:hidden
           fixed
           top-4
           ${locale === "ar" ? "right-4" : "left-4"}
           z-[999999999999]
-          w-10
-          h-10
+          w-7
+          h-7
           rounded-lg
           flex
           items-center
@@ -264,18 +297,15 @@ export default function Sidebar() {
           }
         `}
       >
-        <BsList size={24} />
+        <BsList size={18} />
       </button>
 
-      {/* ========================= */}
       {/* الخلفية عند فتح القائمة */}
-      {/* ========================= */}
-
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
           className="
-            lg:hidden
+            min-[1280px]:hidden
             fixed
             inset-0
             z-[70]
@@ -285,7 +315,6 @@ export default function Sidebar() {
       )}
 
       {/* Sidebar */}
-
       <aside
         dir={locale === "ar" ? "rtl" : "ltr"}
         className={`
@@ -304,13 +333,15 @@ export default function Sidebar() {
           duration-300
           ease-in-out
 
-          lg:translate-x-0
+          min-[1280px]:translate-x-0
 
-          ${sidebarOpen
-            ? "translate-x-0"
-            : locale === "ar"
-              ? "translate-x-full"
-              : "-translate-x-full"}
+          ${
+            sidebarOpen
+              ? "translate-x-0"
+              : locale === "ar"
+                ? "translate-x-full"
+                : "-translate-x-full"
+          }
         `}
       >
         {sidebarContent}

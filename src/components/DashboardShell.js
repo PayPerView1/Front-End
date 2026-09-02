@@ -12,29 +12,19 @@ const { isMessagesOpen, isMaximized, selectedConversation } = useMessages();
 const { isNotificationsOpen } = useNotifications();
 
 const isRtl = locale === "ar";
-
 const messagesMargin =
   isMessagesOpen && !isMaximized
-    ? isRtl
-      ? "lg:ml-[380px]"
-      : "lg:mr-[380px]"
+    ? isRtl ? "sm:ml-[380px]" : "sm:mr-[380px]"   
     : "";
 
 const notificationsMargin =
   isNotificationsOpen
-    ? isRtl
-      ? "lg:ml-[380px]"
-      : "lg:mr-[380px]"
+    ? isRtl ? "sm:ml-[380px]" : "sm:mr-[380px]"   
     : "";
 
 const mainMargin = isRtl
-  ? `lg:mr-[260px] ${
-      isAssistantOpen ? "lg:ml-[380px]" : ""
-    } ${messagesMargin} ${notificationsMargin}`
-  : `lg:ml-[260px] ${
-      isAssistantOpen ? "lg:mr-[380px]" : ""
-    } ${messagesMargin} ${notificationsMargin}`;
-
+  ? `xl:mr-[260px] ${isAssistantOpen ? "xl:ml-[380px]" : ""} ${messagesMargin} ${notificationsMargin}`
+  : `xl:ml-[260px] ${isAssistantOpen ? "xl:mr-[380px]" : ""} ${messagesMargin} ${notificationsMargin}`;
   return (
     <>
       {/* بانل المساعد */}
