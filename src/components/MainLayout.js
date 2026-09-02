@@ -3,6 +3,7 @@
 import { usePathname } from "@/i18n/navigation";
 import { AssistantProvider } from "@/context/AssistantContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
+import { MessagesProvider } from "@/context/MessagesContext";
 import { useTheme } from "@/context/ThemeContext";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
@@ -39,11 +40,13 @@ export default function MainLayout({ children, locale }) {
     <div dir={locale === "ar" ? "rtl" : "ltr"} className={`min-h-screen ${isDark ? "bg-[#0D0D0D]" : "bg-white"}`}>
       <NotificationsProvider>
         <AssistantProvider>
-          <Navbar />
-          <Sidebar />
-          <DashboardShell locale={locale}>
-            {children}
-          </DashboardShell>
+          <MessagesProvider>
+            <Navbar />
+            <Sidebar />
+            <DashboardShell locale={locale}>
+              {children}
+            </DashboardShell>
+          </MessagesProvider>
         </AssistantProvider>
       </NotificationsProvider>
     </div>

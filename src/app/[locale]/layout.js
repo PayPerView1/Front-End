@@ -3,8 +3,6 @@ import { getMessages } from "next-intl/server";
 import { routing } from "../../i18n/routing";
 import { notFound } from "next/navigation";
 import { ThemeProvider } from "@/context/ThemeContext";
-import { MessagesProvider } from "@/context/MessagesContext";
-import MessagesPanel from "@/components/MessagesPanel";
 import MainLayout from "@/components/MainLayout";
 import "../globals.css";
 
@@ -25,12 +23,9 @@ export default async function LocaleLayout({ children, params }) {
   return (
     <NextIntlClientProvider messages={messages}>
       <ThemeProvider>
-        <MessagesProvider>
-          <MainLayout locale={locale}>
-            {children}
-            <MessagesPanel />
-          </MainLayout>
-        </MessagesProvider>
+        <MainLayout locale={locale}>
+          {children}
+        </MainLayout>
       </ThemeProvider>
     </NextIntlClientProvider>
   );

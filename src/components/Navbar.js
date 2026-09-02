@@ -130,20 +130,41 @@ function handleToggleNotifications() {
     };
   }, []);
 
+  const updateMenuPosition = () => {
+    if (!menuRef.current) return;
+    const rect = menuRef.current.getBoundingClientRect();
+    const menuWidth = 256;
+    const screenPadding = 8;
+    const preferredLeft = locale === "ar" ? rect.left : rect.right - menuWidth;
+    setMenuPosition({
+      top: rect.bottom + 8,
+      left: Math.max(
+        screenPadding,
+        Math.min(preferredLeft, window.innerWidth - menuWidth - screenPadding),
+      ),
+    });
+  };
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    updateMenuPosition();
+
+    const handleResizeOrScroll = () => {
+      updateMenuPosition();
+    };
+
+    window.addEventListener("resize", handleResizeOrScroll);
+    window.addEventListener("scroll", handleResizeOrScroll, true);
+
+    return () => {
+      window.removeEventListener("resize", handleResizeOrScroll);
+      window.removeEventListener("scroll", handleResizeOrScroll, true);
+    };
+  }, [menuOpen, locale]);
+
   function toggleUserMenu() {
-    const rect = menuRef.current?.getBoundingClientRect();
-    if (rect) {
-      const menuWidth = 256;
-      const screenPadding = 8;
-      const preferredLeft = locale === "ar" ? rect.left : rect.right - menuWidth;
-      setMenuPosition({
-        top: rect.bottom + 8,
-        left: Math.max(
-          screenPadding,
-          Math.min(preferredLeft, window.innerWidth - menuWidth - screenPadding),
-        ),
-      });
-    }
+    updateMenuPosition();
     setMenuOpen((previous) => !previous);
   }
 
@@ -530,7 +551,13 @@ ${t.navBorder}
                   {/* تسجيل الخروج */}
                   <button
                     type="button"
-                    onClick={() => router.push(`/${locale}/logout`)}
+                    onClick={() => {
+                      closeAssistant();
+                      closeNotifications();
+                      closeMessages();
+                      setMenuOpen(false);
+                      router.push(`/${locale}/logout`);
+                    }}
                     className="
                       group
                       w-full

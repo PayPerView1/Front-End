@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { RiGlobalLine } from "react-icons/ri";
 import { IoChevronDownOutline } from "react-icons/io5";
 import { useLocale, useTranslations } from "next-intl";
@@ -30,6 +30,41 @@ export default function LanguageSelector() {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const btnRef = useRef(null);
+
+  const updatePos = () => {
+    if (!btnRef.current) return;
+    const rect = btnRef.current.getBoundingClientRect();
+    const menuWidth = 200;
+    const screenPadding = 8;
+    const preferredLeft =
+      locale === "ar" ? rect.right + 8 : rect.left - menuWidth - 8;
+    setPos({
+      top: rect.top,
+      left: Math.max(
+        screenPadding,
+        Math.min(preferredLeft, window.innerWidth - menuWidth - screenPadding),
+      ),
+    });
+  };
+
+  useEffect(() => {
+    if (!open) return;
+
+    updatePos();
+
+    const handleResizeOrScroll = () => {
+      updatePos();
+    };
+
+    window.addEventListener("resize", handleResizeOrScroll);
+    window.addEventListener("scroll", handleResizeOrScroll, true);
+
+    return () => {
+      window.removeEventListener("resize", handleResizeOrScroll);
+      window.removeEventListener("scroll", handleResizeOrScroll, true);
+    };
+  }, [open, locale]);
+
   return (
     <div style={{ display: "contents" }}>
       <button
@@ -37,20 +72,7 @@ export default function LanguageSelector() {
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          const rect = btnRef.current?.getBoundingClientRect();
-          if (rect) {
-            const menuWidth = 200;
-            const screenPadding = 8;
-            const preferredLeft =
-              locale === "ar" ? rect.right + 8 : rect.left - menuWidth - 8;
-            setPos({
-              top: rect.top,
-              left: Math.max(
-                screenPadding,
-                Math.min(preferredLeft, window.innerWidth - menuWidth - screenPadding),
-              ),
-            });
-          }
+          updatePos();
           setOpen((prev) => !prev);
         }}
         className="w-full flex items-center px-4 py-2.5 bg-transparent border-none rounded-md hover:bg-[#94D3C142] transition-colors duration-150 cursor-pointer"

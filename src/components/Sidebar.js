@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Home,
   Search,
@@ -51,6 +51,17 @@ export default function Sidebar() {
   const pathname = usePathname();
   const locale = useLocale();
   const messages = useMessages();
+
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth >= 1280) {
+        setSidebarOpen(false);
+      }
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const sidebar = (key) =>
     messages.sidebar?.[key] || sidebarFallbacks[key];

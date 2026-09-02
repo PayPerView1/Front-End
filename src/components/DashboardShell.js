@@ -5,6 +5,7 @@ import { useMessages } from "@/context/MessagesContext";
 import { useNotifications } from "@/context/NotificationsContext";
 import AIAssistantPanel from "@/components/AIAssistantPanel";
 import NotificationsPanel from "@/components/NotificationsPanel";
+import MessagesPanel from "@/components/MessagesPanel";
 
 export default function DashboardShell({ children, locale }) {
   const { isAssistantOpen } = useAssistant();
@@ -32,6 +33,9 @@ const mainMargin = isRtl
 
       {/* بانل الإشعارات */}
       <NotificationsPanel side={isRtl ? "left" : "right"} />
+
+      {/* بانل الرسائل */}
+      <MessagesPanel side={isRtl ? "left" : "right"} />
 
       <main className={`transition-all duration-300 ${mainMargin}`}>
         {children}

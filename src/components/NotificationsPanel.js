@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useNotifications } from "@/context/NotificationsContext";
 import { useLocale } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
+import { usePathname } from "@/i18n/navigation";
 
 export default function NotificationsPanel({ side = "left" }) {
   const {
@@ -16,7 +17,20 @@ export default function NotificationsPanel({ side = "left" }) {
 
   const [activeTab, setActiveTab] = useState("mentions");
   const locale = useLocale();
+  const pathname = usePathname();
   const isAr = locale === "ar";
+
+  const excludedPaths = [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+    "/done",
+    "/logout",
+  ];
+  const isExcluded = excludedPaths.some(
+    (path) => pathname === path || pathname?.startsWith(path + "/")
+  );
 
   // Theme mapping colors
   const t = {
@@ -41,7 +55,7 @@ export default function NotificationsPanel({ side = "left" }) {
     closeBtn: isDark ? "text-[#E1E3E4]" : "text-[#1A1A1A]"
   };
 
-  if (!isNotificationsOpen) return null;
+  if (!isNotificationsOpen || isExcluded) return null;
 
   // Filter notifications based on chosen tab
   const filteredNotifications =
@@ -79,19 +93,19 @@ export default function NotificationsPanel({ side = "left" }) {
 
   // Determine sliding side classes
   const sideClass = side === "left" 
-    ? "left-0 xl:border-r border-y-0 border-l-0" 
-    : "right-0 xl:border-l border-y-0 border-r-0";
+    ? "left-0 right-auto border-r border-y-0 border-l-0" 
+    : "right-0 left-auto border-l border-y-0 border-r-0";
 
   return (
     <>
-      {/* Backdrop for mobile and iPad */}
+      {/* Backdrop for mobile */}
       <div 
         onClick={closeNotifications}
-        className="fixed inset-0 top-[64px] bg-black/50 z-30 xl:hidden transition-opacity duration-300"
+        className="fixed inset-0 top-[56px] bg-black/50 z-30 sm:hidden transition-opacity duration-300"
       />
 
       <aside
-        className={`notifications-panel fixed top-14 h-[calc(100vh-64px)] w-full max-w-full xl:w-[380px] xl:max-w-[380px] z-40 flex flex-col overflow-y-auto border transition-all duration-300 ${sideClass} ${t.border}`}
+        className={`notifications-panel fixed top-14 h-[calc(100vh-56px)] w-full sm:w-[380px] sm:max-w-[380px] z-40 flex flex-col overflow-y-auto border transition-all duration-300 ${sideClass} ${t.border}`}
         data-side={side}
         style={{
           backgroundColor: isDark ? "#0C0F10" : "#FFFFFF",

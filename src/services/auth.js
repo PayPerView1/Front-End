@@ -41,18 +41,20 @@ export async function verifyEmail(token) {
   }
 }
 
-export async function resendVerification(email) {
-  // ملاحظة: الباك إند لم يقُم بإنشاء مسار resend-verification بعد.
-  // كما أن إعادة طلب /api/v1/auth/register للمستخدم المسجل تُرجع خطأ 400 لأن الحساب موجود مسبقاً.
-  // لذلك يتم إرجاع استجابة ناجحة مباشرة لتوفير تجربة مستخدم سلسة وتفادي أي أخطاء في الكونسول.
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        message: "تم طلب إعادة إرسال رابط التفعيل. يرجى التحقق من صندوق الوارد في بريدك الإلكتروني.",
-      });
-    }, 400);
-  });
+/**
+ * إعادة إرسال بريد التفعيل
+ * @param {string|Object} emailOrData
+ */
+export async function resendVerification(emailOrData) {
+  try {
+    const payload =
+      typeof emailOrData === "string" ? { email: emailOrData } : emailOrData;
+    const response = await axiosInstance.post("/api/v1/auth/resend-verification", payload);
+    return response.data;
+  } catch (error) {
+    console.error("Resend Verification Error:", error);
+    handleError(error);
+  }
 }
 
 

@@ -31,6 +31,16 @@ export const logout = async () => {
   }
 };
 
+/**
+ * Resend verification email to the given email address.
+ * @param {string|Object} emailOrData
+ */
+export const resendVerification = async (emailOrData) => {
+  const payload = typeof emailOrData === "string" ? { email: emailOrData } : emailOrData;
+  const response = await axiosInstance.post("/api/v1/auth/resend-verification", payload);
+  return response.data;
+};
+
 // ─── Password Reset ───────────────────────────────────────────────────────────
 
 const apiClient = axiosInstance;

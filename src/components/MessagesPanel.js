@@ -7,13 +7,15 @@ import ConversationList from "@/components/ConversationList";
 import ChatWindow from "@/components/ChatWindow";
 import EmptyState from "@/components/EmptyState";
 import { useTheme } from "@/context/ThemeContext";
+import { usePathname } from "@/i18n/navigation";
 
 export default function MessagesPanel({
   onConversationChange,
   side,
-  currentUser, // ✅ التعديل الوحيد هنا
+  currentUser,
 }) {
   const locale = useLocale();
+  const pathname = usePathname();
   const { isDark } = useTheme();
 
   const {
@@ -26,6 +28,18 @@ export default function MessagesPanel({
 
   const [readIds, setReadIds] = useState([]);
 
+  const excludedPaths = [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+    "/done",
+    "/logout",
+  ];
+  const isExcluded = excludedPaths.some(
+    (path) => pathname === path || pathname?.startsWith(path + "/")
+  );
+
   useEffect(() => {
     onConversationChange?.(!!selectedConversation);
   }, [selectedConversation, onConversationChange]);
@@ -36,7 +50,7 @@ export default function MessagesPanel({
     }
   }, [isMessagesOpen, setSelectedConversation]);
 
-  if (!isMessagesOpen) return null;
+  if (!isMessagesOpen || isExcluded) return null;
 
   const handleSelect = (conv) => {
     setReadIds((prev) =>
@@ -55,15 +69,15 @@ export default function MessagesPanel({
   */
   const sideClass = isMaximized
     ? isRtl
-      ? "left-0 right-0 min-[1280px]:right-[260px] border-b"
-      : "left-0 right-0 min-[1280px]:left-[260px] border-b"
+      ? "left-0 right-0 min-[1280px]:left-0 min-[1280px]:right-[260px] border-b"
+      : "left-0 right-0 min-[1280px]:left-[260px] min-[1280px]:right-0 border-b"
     : panelSide === "right"
     ? isRtl
       ? "left-0 right-0 min-[1280px]:left-auto min-[1280px]:right-[260px] border-l w-full min-[1280px]:w-[380px]"
-      : "left-0 right-0 min-[1280px]:left-auto min-[1280px]:right-0 border-l w-full min-[1280px]:w-[380px]"
+      : "right-0 left-auto border-l w-full sm:w-[380px] sm:max-w-[380px]"
     : isRtl
-    ? "left-0 right-0 min-[1280px]:left-0 min-[1280px]:right-auto border-r w-full min-[1280px]:w-[380px]"
-    : "left-0 right-0 min-[1280px]:left-[260px] min-[1280px]:right-auto border-r w-full min-[1280px]:w-[380px]";
+    ? "left-0 right-auto border-r w-full sm:w-[380px] sm:max-w-[380px]"
+    : "right-0 left-auto border-l w-full sm:w-[380px] sm:max-w-[380px]";
 
   return (
     <aside
@@ -71,7 +85,7 @@ export default function MessagesPanel({
         messages-panel 
         fixed 
         top-14 
-        h-[calc(100vh-64px)] 
+        h-[calc(100vh-56px)] 
         z-40 
         flex 
         transition-all 
