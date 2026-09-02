@@ -1,34 +1,49 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
+import { mockConversations } from "@/components/ConversationList";
 
 const MessagesContext = createContext(null);
 
 export function MessagesProvider({ children }) {
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
-  // إضافة حالة للمحادثة المحددة
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [isMaximized, setIsMaximized] = useState(false);
+  const [readIds, setReadIds] = useState([]);
+  const [conversations, setConversations] = useState(mockConversations);
 
   const toggleMessages = () => setIsMessagesOpen((prev) => !prev);
   const toggleMaximize = () => setIsMaximized((prev) => !prev);
   const closeMessages = () => {
     setIsMessagesOpen(false);
-    setSelectedConversation(null); // تصفير التحديد عند الإغلاق
+    setSelectedConversation(null);
     setIsMaximized(false);
   };
 
+  const markAsRead = (id) => {
+    setReadIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  };
+
+  const unreadCount = conversations.filter(
+    (c) => c.unread && !readIds.includes(c.id)
+  ).length;
+
   return (
     <MessagesContext.Provider
-      value={{ 
-        isMessagesOpen, 
-        toggleMessages, 
+      value={{
+        isMessagesOpen,
+        toggleMessages,
         closeMessages,
         selectedConversation,
         setSelectedConversation,
         isMaximized,
         setIsMaximized,
-        toggleMaximize
+        toggleMaximize,
+        conversations,
+        setConversations,
+        readIds,
+        markAsRead,
+        unreadCount,
       }}
     >
       {children}

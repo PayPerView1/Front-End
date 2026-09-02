@@ -33,7 +33,7 @@ export default function Navbar() {
 
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
 const { toggleAssistant, closeAssistant, isAssistantOpen } = useAssistant();
-const { toggleMessages, closeMessages, isMessagesOpen } = useMessages();
+const { toggleMessages, closeMessages, isMessagesOpen, unreadCount: messagesUnreadCount } = useMessages();
 const {
   toggleNotifications,
   closeNotifications,
@@ -226,17 +226,12 @@ ${t.navBorder}
 </button>
 
 {/* الرسائل */}
-<button
-  type="button"
+<div
   onClick={handleToggleMessages}
-  className={`w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-xl transition-colors cursor-pointer border-none ${
+  className={`relative w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-xl transition-colors cursor-pointer ${
     isMessagesOpen
-      ? isDark
-        ? "bg-[#2a2a2a]"
-        : "bg-[#94D3C1]/25"
-      : isDark
-        ? "bg-transparent hover:bg-white/10"
-        : "bg-transparent hover:bg-[#94D3C1]/15"
+      ? isDark ? "bg-[#2a2a2a]" : "bg-[#94D3C1]/25"
+      : isDark ? "hover:bg-white/10" : "hover:bg-[#94D3C1]/15"
   }`}
 >
   <Chat
@@ -244,7 +239,13 @@ ${t.navBorder}
     size={19}
     primaryColor={isMessagesOpen ? (isDark ? "#ffffff" : "#2A9D8F") : "#9A9A9A"}
   />
-</button>
+
+  {messagesUnreadCount > 0 && (
+    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full text-[8px] text-white flex items-center justify-center">
+      {messagesUnreadCount > 9 ? "9+" : messagesUnreadCount}
+    </span>
+  )}
+</div>
         {/* الجرس */}
         <div
           className={`relative w-8 h-8 flex items-center justify-center rounded-xl cursor-pointer transition-colors mx-1 ${

@@ -3,54 +3,44 @@
 import { useState } from "react";
 import { FiSearch, FiEdit } from "react-icons/fi";
 import { IoClose, IoExpand, IoContract } from "react-icons/io5";
-import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { useMessages } from "@/context/MessagesContext";
 import { useTheme } from "@/context/ThemeContext";
 
-// بيانات وهمية معدلة تشمل خاصية isOrder للفلترة
 export const mockConversations = [
   {
     id: 1,
     name: "دعم مجتمع كليبات كوبي",
-    lastMessage: "أحمد محمد: مرحباً بك في دعم المشتركين...",
-    time: "7/23",
-    unread: false,
-    isOrder: false,
     avatar: null,
+    lastMessage: "أحمد محمد: مرحباً بك في دعم المشتركين...",
+    unread: true,
+    isOrder: false,
     color: "#8B5CF6",
-    initials: "د",
     messages: [
       {
         id: 1,
         sender: "Niko Lamberson",
-        text: "مرحباً إسلام أبو منصور! نحن متحمسون جداً لانضمامك إلى مجتمع Copy Clips\n\nإذا كنت تبحث عن المزيد من الفرص، انضم إلى خادمنا على ديسكورد:\nhttps://discord.gg/qYv64zFYu5\n\nانضم هنا للحصول على دورات حصرية وفرص النقاط مقاطع (clipping) مستمرة\nhttps://whop.com/copy-clips?a=nikolam1\n\nإذا كان لديك في أي وقت أي أسئلة حول حملاتنا أو حرفياً أي شيء، لا تتردد في مراسلتي هنا وسأكون سعيداً بالمساعدة! متحمس لرؤيتك :)",
-        time: "23 يونيو 2026 م، 2:19 م",
+        text: "مرحباً بك في مجتمع Copy Clips",
         isMe: false,
         color: "#8B5CF6",
-        initials: "N",
       },
     ],
   },
   {
     id: 2,
     name: "دعم قصاصات عربي",
+    avatar: null,
     lastMessage: "🍪 الخطوة الأولى التي يجب أن تقوم بها تجدها هنا...",
-    time: "7/12",
     unread: true,
     isOrder: true,
-    avatar: null,
     color: "#F59E0B",
-    initials: "ع",
     messages: [
       {
         id: 1,
         sender: "دعم قصاصات عربي",
         text: "🍪 الخطوة الأولى التي يجب أن تقوم بها تجدها هنا...",
-        time: "12 يوليو 2026",
         isMe: false,
         color: "#F59E0B",
-        initials: "ع",
       },
     ],
   },
@@ -63,88 +53,131 @@ export default function ConversationList({
 }) {
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
-  const router = useRouter();
+
   const locale = useLocale();
-  const { toggleMaximize, isMaximized } = useMessages();
+  const { toggleMaximize, isMaximized, conversations, readIds, markAsRead } = useMessages();
   const { isDark } = useTheme();
 
-  // منطق التصفية حسب البحث وحسب الفلتر النشط
-  const filtered = mockConversations.filter((c) => {
-    const matchesSearch =
-      c.name.includes(search) || c.lastMessage.includes(search);
+  const isAr = locale === "ar";
 
-    if (activeFilter === "unread") return matchesSearch && c.unread;
-    if (activeFilter === "orders") return matchesSearch && c.isOrder;
+  const getFirstLetter = (name) => {
+    if (!name) return "؟";
+    return name.trim().charAt(0).toUpperCase();
+  };
+
+  const filtered = conversations.filter((conversation) => {
+    const name = conversation.name || "";
+    const lastMessage = conversation.lastMessage || "";
+
+    const matchesSearch =
+      name.toLowerCase().includes(search.toLowerCase()) ||
+      lastMessage.toLowerCase().includes(search.toLowerCase());
+
+    if (activeFilter === "unread") {
+      return matchesSearch && conversation.unread;
+    }
+
+    if (activeFilter === "orders") {
+      return matchesSearch && conversation.isOrder;
+    }
 
     return matchesSearch;
   });
 
-  const isAr = locale === "ar";
-
   return (
-    <div className={`flex flex-col h-full border-l ${isDark ? "border-white/10" : "border-[#E5E5E5]"}`} style={{ backgroundColor: isDark ? "rgba(12, 15, 16, 1)" : "#ffffff" }}>
-      {/* الهيدر */}
-      <div className={`w-full h-[73px] flex flex-row justify-between items-center px-5 py-5 border-b ${isDark ? "border-[#373A3B]" : "border-[#E5E5E5]"}`}>
-        {/* Title */}
-        <h2 
-          className={`font-normal text-[24px] leading-[32px] tracking-[-0.6px] select-none ${isDark ? "text-[#E1E3E4]" : "text-[#1A1A1A]"}`}
+    <div
+      className={`flex flex-col h-full border-l ${
+        isDark ? "border-white/10" : "border-[#E5E5E5]"
+      }`}
+      style={{
+        backgroundColor: isDark ? "rgba(12, 15, 16, 1)" : "#ffffff",
+      }}
+    >
+      {/* ================= HEADER ================= */}
+
+      <div
+        className={`w-full h-14 min-h-[56px] flex flex-row justify-between items-center px-4 py-2 border-b ${
+          isDark ? "border-[#373A3B]" : "border-[#E5E5E5]"
+        }`}
+      >
+        <h2
+          className={`font-normal text-xl tracking-[-0.6px] select-none ${
+            isDark ? "text-[#E1E3E4]" : "text-[#1A1A1A]"
+          }`}
           style={{ fontFamily: "Tajawal, sans-serif" }}
         >
           {isAr ? "الرسائل" : "Messages"}
         </h2>
 
-        {/* Buttons (Maximize and Close) */}
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={toggleMaximize}
-            aria-label={isMaximized ? (isAr ? "تصغير لوحة الرسائل" : "Minimize messages panel") : (isAr ? "تكبير لوحة الرسائل" : "Maximize messages panel")}
+            aria-label={
+              isMaximized
+                ? isAr ? "تصغير لوحة الرسائل" : "Minimize messages panel"
+                : isAr ? "تكبير لوحة الرسائل" : "Maximize messages panel"
+            }
             className={`w-[26px] h-[26px] flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
-              isDark 
-                ? "bg-white/10 text-gray-400 hover:text-white" 
+              isDark
+                ? "bg-white/10 text-gray-400 hover:text-white"
                 : "bg-gray-100 text-gray-500 hover:text-gray-900"
             }`}
           >
             {isMaximized ? <IoContract size={14} /> : <IoExpand size={14} />}
           </button>
-          
+
           <button
             type="button"
             onClick={onClose}
-            className={`w-[18px] h-[18px] flex items-center justify-center hover:opacity-85 transition-opacity cursor-pointer border-none bg-transparent ${isDark ? "text-[#E1E3E4]" : "text-[#1A1A1A]"}`}
+            className={`w-[18px] h-[18px] flex items-center justify-center hover:opacity-85 transition-opacity cursor-pointer border-none bg-transparent ${
+              isDark ? "text-[#E1E3E4]" : "text-[#1A1A1A]"
+            }`}
             aria-label={isAr ? "إغلاق" : "Close"}
           >
-            <svg className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <IoClose size={18} />
           </button>
         </div>
       </div>
 
-      {/* شريط البحث والأزرار */}
-      <div className={`px-4 py-3 border-b ${isDark ? "border-white/10" : "border-[#E5E5E5]"}`}>
-        <div className="flex items-center gap-2 mb-3">
-          <div className={`flex-1 flex items-center gap-2 rounded-lg px-3 py-2 border ${
-            isDark 
-              ? "bg-white/6 border-white/10" 
-              : "bg-gray-50 border-gray-200"
-          }`}>
-            <FiSearch className={`${isDark ? "text-gray-400" : "text-gray-500"} shrink-0`} size={13} />
+      {/* ================= SEARCH & FILTERS ================= */}
+
+      <div
+        className={`px-3 py-2.5 border-b ${
+          isDark ? "border-white/10" : "border-[#E5E5E5]"
+        }`}
+      >
+        <div className="flex items-center gap-2 mb-2">
+          <div
+            className={`flex-1 flex items-center gap-2 rounded-lg px-2.5 py-1.5 border ${
+              isDark
+                ? "bg-white/6 border-white/10"
+                : "bg-gray-50 border-gray-200"
+            }`}
+          >
+            <FiSearch
+              className={isDark ? "text-gray-400 shrink-0" : "text-gray-500 shrink-0"}
+              size={13}
+            />
+
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={isAr ? "البحث في الرسائل..." : "Search messages..."}
               className={`flex-1 bg-transparent text-xs outline-none text-right ${
-                isDark ? "text-white placeholder-gray-500" : "text-gray-900 placeholder-gray-400"
+                isDark
+                  ? "text-white placeholder-gray-500"
+                  : "text-gray-900 placeholder-gray-400"
               }`}
             />
           </div>
+
           <button
             type="button"
-            className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors cursor-pointer ${
-              isDark 
-                ? "bg-white/6 border-white/10 text-gray-400 hover:text-white" 
+            className={`w-7 h-7 flex items-center justify-center rounded-lg border transition-colors cursor-pointer shrink-0 ${
+              isDark
+                ? "bg-white/6 border-white/10 text-gray-400 hover:text-white"
                 : "bg-gray-50 border-gray-200 text-gray-500 hover:text-gray-900"
             }`}
           >
@@ -152,71 +185,112 @@ export default function ConversationList({
           </button>
         </div>
 
-        {/* الفلاتر */}
-        <div className="flex gap-2 justify-right">
+        {/* FILTERS */}
+        <div className="flex gap-1.5">
           {[
             { key: "all", label: isAr ? "الكل" : "All" },
             { key: "unread", label: isAr ? "غير مقروءة" : "Unread" },
             { key: "orders", label: isAr ? "الطلبات" : "Orders" },
-          ].map((f) => (
+          ].map((filter) => (
             <button
-              key={f.key}
+              key={filter.key}
               type="button"
-              onClick={() => setActiveFilter(f.key)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors border-none cursor-pointer ${
-                activeFilter === f.key
-                  ? (isDark ? "bg-white text-black" : "bg-gray-900 text-white")
-                  : (isDark 
-                      ? "bg-white/6 text-gray-400 hover:text-white border border-white/10" 
-                      : "bg-gray-100 text-gray-600 hover:text-gray-900 border border-gray-200")
+              onClick={() => setActiveFilter(filter.key)}
+              className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors border-none cursor-pointer ${
+                activeFilter === filter.key
+                  ? isDark ? "bg-white text-black" : "bg-gray-900 text-white"
+                  : isDark
+                  ? "bg-white/6 text-gray-400 hover:text-white border border-white/10"
+                  : "bg-gray-100 text-gray-600 hover:text-gray-900 border border-gray-200"
               }`}
             >
-              {f.label}
+              {filter.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* عناصر القائمة */}
+      {/* ================= CONVERSATIONS LIST ================= */}
+
       <div className="flex-1 overflow-y-auto">
         {filtered.length > 0 ? (
-          filtered.map((conv) => (
-            <button
-              key={conv.id}
-              type="button"
-              onClick={() => onSelectConversation(conv)}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-right transition-colors border-none cursor-pointer border-b ${
-                isDark ? "border-white/5" : "border-gray-100"
-              } ${
-                selectedId === conv.id
-                  ? (isDark ? "bg-white/[0.07]" : "bg-gray-100")
-                  : (isDark ? "bg-transparent hover:bg-white/4" : "bg-transparent hover:bg-gray-50")
-              }`}
-            >
-              <div
-                className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
-                style={{ background: conv.color }}
+          filtered.map((conversation) => {
+            const isUnread =
+              conversation.unread && !readIds.includes(conversation.id);
+
+            return (
+              <button
+                key={conversation.id}
+                type="button"
+                onClick={() => {
+                  onSelectConversation(conversation);
+                  markAsRead(conversation.id);
+                }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 text-right transition-colors border-none cursor-pointer border-b ${
+                  isDark ? "border-white/5" : "border-gray-100"
+                } ${
+                  selectedId === conversation.id
+                    ? isDark ? "bg-white/[0.07]" : "bg-gray-100"
+                    : isDark
+                    ? "bg-transparent hover:bg-white/4"
+                    : "bg-transparent hover:bg-gray-50"
+                }`}
               >
-                {conv.initials}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className={`text-[10px] ${isDark ? "text-gray-500" : "text-gray-400"}`}>{conv.time}</span>
-                  <p className={`text-xs font-bold truncate text-right ${isDark ? "text-white" : "text-gray-900"}`}>
-                    {conv.name}
+                {/* AVATAR */}
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden"
+                  style={{
+                    background: conversation.avatar
+                      ? "transparent"
+                      : conversation.color || "#005D3B",
+                  }}
+                >
+                  {conversation.avatar ? (
+                    <img
+                      src={conversation.avatar}
+                      alt={conversation.name || "User"}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>{getFirstLetter(conversation.name)}</span>
+                  )}
+                </div>
+
+                {/* TEXT */}
+                <div className="flex-1 min-w-0">
+                  <p
+                    className={`text-xs font-bold truncate text-right ${
+                      isDark ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    {conversation.name}
+                  </p>
+
+                  <p
+                    className={`text-[11px] truncate text-right ${
+                      isDark ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    {conversation.lastMessage}
                   </p>
                 </div>
-                <p className={`text-[11px] truncate text-right ${isDark ? "text-gray-400" : "text-gray-600"}`}>
-                  {conv.lastMessage}
-                </p>
-              </div>
-              {conv.unread && (
-                <div className="w-2 h-2 rounded-full bg-[#94D3C1] shrink-0" />
-              )}
-            </button>
-          ))
+
+                {/* UNREAD DOT */}
+                {isUnread && (
+                  <div
+                    className="w-2 h-2 rounded-full bg-[#94D3C1] shrink-0"
+                    aria-label={isAr ? "رسالة جديدة" : "New message"}
+                  />
+                )}
+              </button>
+            );
+          })
         ) : (
-          <div className={`p-4 text-center text-xs ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+          <div
+            className={`p-4 text-center text-xs ${
+              isDark ? "text-gray-500" : "text-gray-400"
+            }`}
+          >
             {isAr ? "لا توجد محادثات تطابق البحث" : "No conversations match search"}
           </div>
         )}
