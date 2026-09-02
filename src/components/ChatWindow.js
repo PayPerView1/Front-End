@@ -333,8 +333,9 @@ export default function ChatWindow({
             ? myDisplayName || msg.sender
             : msg.sender || conversationName;
 
-          // في الإنجليزية تظهر الرسائل على اليسار، وفي العربية تظهر على اليمين
-          const isLeft = !isArabic;
+          // الإنجليزية: رسائلي على اليسار، الطرف الآخر على اليمين
+          // العربية: رسائلي على اليمين، الطرف الآخر على اليسار
+          const isLeft = isArabic ? !msg.isMe : Boolean(msg.isMe);
 
           const avatarComponent = (
             <div
