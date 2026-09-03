@@ -186,7 +186,7 @@ export default function ConversationList({
         </div>
 
         {/* FILTERS */}
-        <div className="flex gap-1.5">
+        <div className="flex gap-2">
           {[
             { key: "all", label: isAr ? "الكل" : "All" },
             { key: "unread", label: isAr ? "غير مقروءة" : "Unread" },
@@ -196,7 +196,7 @@ export default function ConversationList({
               key={filter.key}
               type="button"
               onClick={() => setActiveFilter(filter.key)}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors border-none cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors border-none cursor-pointer ${
                 activeFilter === filter.key
                   ? isDark ? "bg-white text-black" : "bg-gray-900 text-white"
                   : isDark
