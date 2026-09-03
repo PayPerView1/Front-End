@@ -2,15 +2,6 @@
  * src/services/index.js
  *
  * نقطة الدخول الموحدة — استخدم هذا الملف في جميع الكومبوننتس
- *
- * مثال:
- *   import api from "@/services";
- *   await api.auth.register(formData);
- *   await api.profile.getProfile();
- *
- *   // أو Shortcuts مباشرة:
- *   await api.register(formData);
- *   await api.getProfile();
  */
 
 import * as auth from "@/services/auth";
@@ -25,11 +16,6 @@ import {
 
 // ─── Helper: createFormData ───────────────────────────────────────────────────
 
-/**
- * إنشاء FormData من كائن JS (يتخطى القيم الفارغة)
- * @param {Record<string, any>} data
- * @returns {FormData}
- */
 function createFormData(data) {
   const formData = new FormData();
   Object.entries(data).forEach(([key, value]) => {
@@ -58,6 +44,7 @@ const api = {
   getProfile: profile.getProfile,
   updateProfile: profile.updateProfile,
   updateInterests: profile.updateInterests,
+  syncPendingInterests: profile.syncPendingInterests,
 
   // Helpers
   getToken,

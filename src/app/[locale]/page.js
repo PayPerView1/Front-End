@@ -17,7 +17,19 @@ export default async function Home({ params, searchParams }) {
   }
 
   if (token && user) {
-    redirect(`/${locale}/dashboard`);
+    let role = null;
+    try {
+      const parsedUser = JSON.parse(decodeURIComponent(user));
+      role = parsedUser?.role;
+    } catch {
+      // ignore JSON parse error
+    }
+
+    if (role === "BRAND") {
+      redirect(`/${locale}/advertiser/dashboard`);
+    } else {
+      redirect(`/${locale}/creator/dashboard`);
+    }
   } else {
     redirect(`/${locale}/login`);
   }

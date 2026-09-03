@@ -4,6 +4,7 @@ import { usePathname } from "@/i18n/navigation";
 import { AssistantProvider } from "@/context/AssistantContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { MessagesProvider } from "@/context/MessagesContext";
+import { UserProvider } from "@/context/UserContext";
 import { useTheme } from "@/context/ThemeContext";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
@@ -20,12 +21,12 @@ export default function MainLayout({ children, locale }) {
     "/forgot-password",
     "/reset-password",
     "/done",
-    "/logout"
+    "/logout",
   ];
-  
+
   // Check if current path matches or starts with any of the excluded paths
   const isExcluded = excludedPaths.some(
-    (path) => pathname === path || pathname?.startsWith(path + "/")
+    (path) => pathname === path || pathname?.startsWith(path + "/"),
   );
 
   if (isExcluded) {
@@ -38,17 +39,19 @@ export default function MainLayout({ children, locale }) {
 
   return (
     <div dir={locale === "ar" ? "rtl" : "ltr"} className={`min-h-screen ${isDark ? "bg-[#0D0D0D]" : "bg-white"}`}>
-      <NotificationsProvider>
-        <AssistantProvider>
-          <MessagesProvider>
-            <Navbar />
-            <Sidebar />
-            <DashboardShell locale={locale}>
-              {children}
-            </DashboardShell>
-          </MessagesProvider>
-        </AssistantProvider>
-      </NotificationsProvider>
+      <UserProvider>
+        <NotificationsProvider>
+          <AssistantProvider>
+            <MessagesProvider>
+              <Navbar />
+              <Sidebar />
+              <DashboardShell locale={locale}>
+                {children}
+              </DashboardShell>
+            </MessagesProvider>
+          </AssistantProvider>
+        </NotificationsProvider>
+      </UserProvider>
     </div>
   );
 }

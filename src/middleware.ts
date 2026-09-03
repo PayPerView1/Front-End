@@ -15,8 +15,12 @@ export default function middleware(request) {
   const locale = routing.locales.find(
     (candidate) => pathname === `/${candidate}` || pathname.startsWith(`/${candidate}/`),
   );
+
+  // المسارات المحمية التي تتطلب تسجيل دخول
   const protectedRoute = routing.locales.some(
-    (candidate) => pathname.startsWith(`/${candidate}/dashboard`) || pathname.startsWith(`/${candidate}/edit-profile`),
+    (candidate) =>
+      pathname.startsWith(`/${candidate}/creator`) ||
+      pathname.startsWith(`/${candidate}/advertiser`),
   );
 
   // إذا كان في token في الـ URL (مثلاً بعد Google OAuth) اسمح بالمرور حتى يُحفظ التوكن أولاً
@@ -30,5 +34,5 @@ export default function middleware(request) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)" ],
 };

@@ -36,3 +36,22 @@ export async function updateProfile(data) {
 export async function updateInterests(interests) {
   return updateProfile({ interests });
 }
+
+/**
+ * مزامنة الاهتمامات المحفوظة مؤقتاً في sessionStorage إلى الخادم
+ */
+export async function syncPendingInterests() {
+  if (typeof window === "undefined") return;
+  const pending = sessionStorage.getItem("userInterests");
+  if (pending) {
+    try {
+      const interests = JSON.parse(pending);
+      if (Array.isArray(interests) && interests.length > 0) {
+        await updateInterests(interests);
+        sessionStorage.removeItem("userInterests");
+      }
+    } catch (e) {
+      console.error("Failed to sync pending interests:", e);
+    }
+  }
+}

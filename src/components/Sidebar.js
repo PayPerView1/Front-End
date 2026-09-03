@@ -17,17 +17,33 @@ import { useTheme } from "@/context/ThemeContext";
 import { BsList, BsX } from "react-icons/bs";
 import { useLocale, useMessages } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
+import { useUser } from "@/context/UserContext";
 
-const navItems = [
-  { label: "home", href: "/dashboard", icon: Home },
+// قائمة صانع المحتوى (CLIPPER)
+const creatorNavItems = [
+  { label: "home", href: "/creator/dashboard", icon: Home },
   { label: "search", href: "/search", icon: Search },
   { label: "discover", href: "/discover", icon: Discovery },
   { label: "startProject", href: "/new", icon: Plus },
 ];
 
-const resourceItems = [
+const creatorResourceItems = [
   { label: "members", href: "/members", icon: Bag },
   { label: "partners", href: "/partners", icon: People, badge: "new" },
+  { label: "help", href: "/help", icon: Message },
+  { label: "blog", href: "/blog", icon: Document },
+];
+
+// قائمة صاحب الحملة (BRAND)
+const advertiserNavItems = [
+  { label: "home", href: "/advertiser/dashboard", icon: Home },
+  { label: "campaigns", href: "/advertiser/campaigns", icon: Discovery },
+  { label: "analytics", href: "/advertiser/analytics", icon: Document },
+  { label: "newCampaign", href: "/advertiser/new", icon: Plus },
+];
+
+const advertiserResourceItems = [
+  { label: "creators", href: "/advertiser/creators", icon: People },
   { label: "help", href: "/help", icon: Message },
   { label: "blog", href: "/blog", icon: Document },
 ];
@@ -43,14 +59,24 @@ const sidebarFallbacks = {
   new: "New",
   help: "Help",
   blog: "Blog",
+  // advertiser labels
+  campaigns: "Campaigns",
+  analytics: "Analytics",
+  newCampaign: "New Campaign",
+  creators: "Creators",
 };
 
 export default function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const pathname = usePathname();
   const locale = useLocale();
   const messages = useMessages();
+
+  const { user: contextUser } = useUser() || {};
+  const role = (contextUser?.role || "").toUpperCase();
+  const isAdvertiser = role === "BRAND" || role === "ADVERTISER" || pathname?.includes("/advertiser");
+  const navItems = isAdvertiser ? advertiserNavItems : creatorNavItems;
+  const resourceItems = isAdvertiser ? advertiserResourceItems : creatorResourceItems;
 
   useEffect(() => {
     function handleResize() {

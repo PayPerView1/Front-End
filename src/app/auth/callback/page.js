@@ -78,7 +78,11 @@ function AuthCallbackContent() {
         }
 
         setStatus("تم تسجيل الدخول بنجاح! جاري التحويل...");
-        router.replace("/" + locale + "/dashboard");
+        if (userObj?.role === "BRAND") {
+          router.replace("/" + locale + "/advertiser/dashboard");
+        } else {
+          router.replace("/" + locale + "/creator/dashboard");
+        }
       } catch (err) {
         console.error("Auth callback error:", err);
         setError("حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.");

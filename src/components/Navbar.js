@@ -2,7 +2,7 @@
 import { useAssistant } from "@/context/AssistantContext";
 import { useNotifications } from "@/context/NotificationsContext";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { createPortal } from "react-dom";
 import { useMessages } from "@/context/MessagesContext";
 import {
@@ -25,13 +25,20 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { useLocale, useTranslations } from "next-intl";
 import { getSavedUser } from "@/lib/axiosInstance";
 import { getProfile } from "@/services/profile";
+import { useUser } from "@/context/UserContext";
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const locale = useLocale();
   const nav = useTranslations("nav");
 
   const { isDark, toggleTheme, setSystemTheme, isSystem } = useTheme();
+  const { user: contextUser } = useUser() || {};
+  const [user, setUser] = useState(null);
+
+  const role = (user?.role || contextUser?.role || "").toUpperCase();
+  const isAdvertiser = role === "BRAND" || role === "ADVERTISER" || pathname?.includes("/advertiser");
 const { toggleAssistant, closeAssistant, isAssistantOpen } = useAssistant();
 const { toggleMessages, closeMessages, isMessagesOpen, unreadCount: messagesUnreadCount } = useMessages();
 const {
@@ -69,7 +76,6 @@ function handleToggleNotifications() {
 }
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
-  const [user, setUser] = useState(null);
 
   const menuRef = useRef(null);
   const menuDropdownRef = useRef(null);
@@ -190,25 +196,28 @@ ${t.navBg}
 ${t.navBorder}
   `}
     >
-      <div
-        className={`
-          rounded-full
-          px-2.5
-          sm:px-4
-          py-1
-          text-xs
-          sm:text-sm
-          font-bold
-          border
-          flex-shrink-0
-          ${isDark
-            ? "bg-[#2a2a2a] border-[#3a3a3a] text-white"
-            : "bg-[#EAEAEA] border-[#EAEAEA] text-[#787878]"
-          }
-        `}
-      >
-        $0.00
-      </div>
+      {/* إخفاء المبلغ لصاحب الحملة (BRAND) */}
+      {!isAdvertiser && (
+        <div
+          className={`
+            rounded-full
+            px-2.5
+            sm:px-4
+            py-1
+            text-xs
+            sm:text-sm
+            font-bold
+            border
+            flex-shrink-0
+            ${isDark
+              ? "bg-[#2a2a2a] border-[#3a3a3a] text-white"
+              : "bg-[#EAEAEA] border-[#EAEAEA] text-[#787878]"
+            }
+          `}
+        >
+          $0.00
+        </div>
+      )}
 
       {/* AI */}
 
@@ -375,6 +384,14 @@ ${t.navBorder}
               >
                 {/* معلومات المستخدم */}
                 <div
+                  onClick={() => {
+                    setMenuOpen(false);
+                    if (isAdvertiser) {
+                      router.push(`/${locale}/advertiser/edit-profile`);
+                    } else {
+                      router.push(`/${locale}/creator/edit-profile`);
+                    }
+                  }}
                   className={`
                     flex
                     items-center
@@ -382,6 +399,9 @@ ${t.navBorder}
                     px-4
                     py-3
                     border-b
+                    cursor-pointer
+                    hover:bg-[#94D3C115]
+                    transition-colors
                     ${t.navBorder}
                   `}
                 >
@@ -431,7 +451,6 @@ ${t.navBorder}
                     size={18}
                     color="#9A9A9A"
                     className="cursor-pointer"
-
                   />
                 </div>
 
