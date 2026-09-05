@@ -96,9 +96,9 @@ export default function LoginForm() {
     try {
       const data = await login(email, password);
 
-      const token = data?.token || data?.data?.token;
+      const token = data?.token || data?.data?.token || data?.accessToken;
       const user = data?.user || data?.data?.user;
-      const role = user?.role;
+      const role = (data?.role || user?.role || "").toUpperCase();
 
       if (token) {
         try {

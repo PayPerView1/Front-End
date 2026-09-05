@@ -108,9 +108,8 @@ export default function AIAssistantPanel({ side = "left" }) {
 
   return (
     <aside
-      className={`ai-panel fixed top-14 h-[calc(100vh-56px)] w-full sm:w-[380px] sm:max-w-[380px] z-40 flex flex-col justify-between overflow-y-auto px-4 py-6 border ${
-        isDark ? "border-white/10" : "border-[#E5E5E5]"
-      } ${sideClass}`}
+      className={`ai-panel fixed top-14 h-[calc(100vh-56px)] w-full sm:w-[380px] sm:max-w-[380px] z-40 flex flex-col justify-between overflow-y-auto px-4 py-6 border ${isDark ? "border-white/10" : "border-[#E5E5E5]"
+        } ${sideClass}`}
       data-side={side}
       style={{
         backgroundColor: isDark ? "#0A0812" : "#FFFFFF",
@@ -125,11 +124,10 @@ export default function AIAssistantPanel({ side = "left" }) {
       <button
         type="button"
         onClick={closeAssistant}
-        className={`absolute top-5 ${isAr ? "left-3" : "right-3"} w-7 h-7 flex items-center justify-center rounded-full transition-colors z-50 ${
-          isDark
+        className={`absolute top-5 ${isAr ? "left-3" : "right-3"} w-7 h-7 flex items-center justify-center rounded-full transition-colors z-50 ${isDark
             ? "bg-white/10 text-gray-300 hover:bg-white/20"
             : "bg-black/5 text-gray-600 hover:bg-black/10"
-        }`}
+          }`}
         aria-label={isAr ? "إغلاق المساعد" : "Close assistant"}
       >
         <FiX className="w-4 h-4" />
@@ -138,11 +136,10 @@ export default function AIAssistantPanel({ side = "left" }) {
       {/* المحتوى الرئيسي */}
       <div className="relative z-10 flex flex-col items-center w-full py-2 my-auto">
         {/* أيقونة النجمة */}
-        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 border ${
-          isDark
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 border ${isDark
             ? "bg-white/10 border-white/10 shadow-[0_0_30px_rgba(139,92,246,0.35)]"
             : "bg-[#94D3C1]/20 border-[#94D3C1]/40 shadow-[0_0_30px_rgba(148,211,193,0.25)]"
-        }`}>
+          }`}>
           <BsStars className={`w-5 h-5 ${isDark ? "text-white" : "text-[#2A9D8F]"}`} />
         </div>
 
@@ -162,11 +159,10 @@ export default function AIAssistantPanel({ side = "left" }) {
             <button
               key={title}
               type="button"
-              className={`flex flex-col items-start text-right gap-1 rounded-xl border p-3 transition-colors ${
-                isDark
+              className={`flex flex-col items-start text-right gap-1 rounded-xl border p-3 transition-colors ${isDark
                   ? "bg-white/4 border-white/10 hover:bg-white/7"
                   : "bg-white/70 border-[#E5E5E5] hover:bg-[#F5F5F5]"
-              }`}
+                }`}
             >
               <Icon className="w-4 h-4 text-orange-400 shrink-0" />
               <span className={`text-[11px] font-bold leading-snug ${isDark ? "text-white" : "text-[#1A1A1A]"}`}>
@@ -184,15 +180,13 @@ export default function AIAssistantPanel({ side = "left" }) {
       <div className="relative z-10 w-full mt-3">
         <form
           onSubmit={handleSend}
-          className={`flex flex-col rounded-2xl border px-3 py-2.5 md:p-3 xl:py-2 backdrop-blur-sm gap-2 ${
-            isDark ? "bg-white/6 border-white/10" : "bg-white/80 border-[#E5E5E5]"
-          }`}
+          className={`flex flex-col rounded-2xl border px-3 py-2.5 md:p-3 xl:py-2 backdrop-blur-sm gap-2 ${isDark ? "bg-white/6 border-white/10" : "bg-white/80 border-[#E5E5E5]"
+            }`}
         >
           {/* معاينة الملف */}
           {selectedFile && (
-            <div className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border ${
-              isDark ? "bg-white/10 border-white/10" : "bg-[#F5F5F5] border-[#E5E5E5]"
-            }`}>
+            <div className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border ${isDark ? "bg-white/10 border-white/10" : "bg-[#F5F5F5] border-[#E5E5E5]"
+              }`}>
               {selectedFile.type.startsWith("image/") && previewUrl ? (
                 <Image
                   src={previewUrl}
@@ -232,9 +226,8 @@ export default function AIAssistantPanel({ side = "left" }) {
 
             <button
               type="button"
-              className={`transition-colors border-none cursor-pointer bg-transparent shrink-0 ${
-                isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
-              }`}
+              className={`transition-colors border-none cursor-pointer bg-transparent shrink-0 ${isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
+                }`}
             >
               <FiMic className="w-4 h-4 md:w-5 md:h-5 xl:w-4 xl:h-4" />
             </button>
@@ -244,17 +237,15 @@ export default function AIAssistantPanel({ side = "left" }) {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={isAr ? "اكتب رسالتك هنا..." : "Type your message here..."}
-              className={`flex-1 min-w-0 bg-transparent text-xs sm:text-sm md:text-base xl:text-xs outline-none text-right ${
-                isDark ? "text-white placeholder-gray-500" : "text-gray-900 placeholder-gray-400"
-              }`}
+              className={`flex-1 min-w-0 bg-transparent text-xs sm:text-sm md:text-base xl:text-xs outline-none text-right ${isDark ? "text-white placeholder-gray-500" : "text-gray-900 placeholder-gray-400"
+                }`}
             />
 
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className={`transition-colors border-none cursor-pointer bg-transparent shrink-0 ${
-                isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
-              }`}
+              className={`transition-colors border-none cursor-pointer bg-transparent shrink-0 ${isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
+                }`}
             >
               <FiPlus className="w-4 h-4 md:w-5 md:h-5 xl:w-4 xl:h-4" />
             </button>

@@ -11,11 +11,42 @@ import axiosInstance, { clearAuthData, saveAuthData } from "@/lib/axiosInstance"
 export const login = async (email, password) => {
   const response = await axiosInstance.post("/api/v1/auth/login", { email, password });
   const result = response.data;
-  const token = result?.token || result?.data?.token;
-  const user = result?.user || result?.data?.user;
+  const token =
+    result?.token ||
+    result?.accessToken ||
+    result?.data?.token ||
+    result?.data?.accessToken;
+
+  let user = result?.user || result?.data?.user;
+  if (!user && result?.data && typeof result.data === "object" && !result.data.token) {
+    user = result.data;
+  }
+  if (!user && result?.role) {
+    user = result;
+  }
+
   if (!token) throw new Error("بنية استجابة الخادم غير صالحة");
+
   saveAuthData(token, user || {});
-  return result;
+
+  if (!user || !user.role) {
+    try {
+      const profileRes = await axiosInstance.get("/api/v1/profile", {
+        _skipAuthRedirect: true,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const profileData = profileRes.data;
+      const fetchedUser = profileData?.user || profileData?.data || profileData;
+      if (fetchedUser && typeof fetchedUser === "object" && fetchedUser.role) {
+        user = fetchedUser;
+        saveAuthData(token, user);
+      }
+    } catch (e) {
+      console.error("Failed to fetch user profile during login:", e);
+    }
+  }
+
+  return { ...result, user, role: user?.role };
 };
 
 /**

@@ -163,10 +163,9 @@ export default function Sidebar() {
             border
             cursor-pointer
             transition-colors
-            ${
-              isDark
-                ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-                : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+            ${isDark
+              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
             }
           `}
         >
@@ -194,10 +193,9 @@ export default function Sidebar() {
                 rounded-lg
                 transition-all
                 text-sm
-                ${
-                  isActive
-                    ? "bg-[#94D3C142]"
-                    : "bg-transparent hover:bg-[#94D3C142]"
+                ${isActive
+                  ? "bg-[#94D3C142]"
+                  : "bg-transparent hover:bg-[#94D3C142]"
                 }
               `}
             >
@@ -258,10 +256,9 @@ export default function Sidebar() {
                   rounded-lg
                   transition-all
                   text-sm
-                  ${
-                    isActive
-                      ? "bg-[#94D3C142]"
-                      : "bg-transparent hover:bg-[#94D3C142]"
+                  ${isActive
+                    ? "bg-[#94D3C142]"
+                    : "bg-transparent hover:bg-[#94D3C142]"
                   }
                 `}
               >
@@ -327,10 +324,9 @@ export default function Sidebar() {
           border
           cursor-pointer
           transition-colors
-          ${
-            isDark
-              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+          ${isDark
+            ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+            : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
           }
         `}
       >
@@ -372,12 +368,11 @@ export default function Sidebar() {
 
           min-[1280px]:translate-x-0
 
-          ${
-            sidebarOpen
-              ? "translate-x-0"
-              : locale === "ar"
-                ? "translate-x-full"
-                : "-translate-x-full"
+          ${sidebarOpen
+            ? "translate-x-0"
+            : locale === "ar"
+              ? "translate-x-full"
+              : "-translate-x-full"
           }
         `}
       >

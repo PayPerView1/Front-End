@@ -9,18 +9,23 @@ export default async function Home({ params, searchParams }) {
 
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken")?.value;
-  const user = cookieStore.get("user")?.value;
+  const userCookie = cookieStore.get("user")?.value;
 
   if (tokenFromUrl) {
     const redirectUrl = `/${locale}/login?token=${encodeURIComponent(tokenFromUrl)}${userFromUrl ? `&user=${encodeURIComponent(userFromUrl)}` : ""}`;
     redirect(redirectUrl);
   }
 
-  if (token && user) {
+  if (token && userCookie) {
     let role = null;
     try {
-      const parsedUser = JSON.parse(decodeURIComponent(user));
-      role = parsedUser?.role;
+      const decoded = decodeURIComponent(userCookie);
+      let parsedUser = JSON.parse(decoded);
+      // Handle double-stringified edge case
+      if (typeof parsedUser === "string") {
+        parsedUser = JSON.parse(parsedUser);
+      }
+      role = (parsedUser?.role || "").toUpperCase();
     } catch {
       // ignore JSON parse error
     }
@@ -34,3 +39,4 @@ export default async function Home({ params, searchParams }) {
     redirect(`/${locale}/login`);
   }
 }
+

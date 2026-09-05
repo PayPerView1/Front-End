@@ -18,7 +18,7 @@ export function getToken() {
 export function saveAuthData(token, user) {
   if (typeof window !== "undefined") {
     setCookie("authToken", token);
-    setCookie("user", user);
+    setCookie("user", JSON.stringify(user));
     localStorage.setItem("token", token);
     localStorage.setItem("authToken", token);
     localStorage.setItem("user", JSON.stringify(user));
@@ -27,9 +27,23 @@ export function saveAuthData(token, user) {
 
 export function getSavedUser() {
   if (typeof window !== "undefined") {
-    const user = getCookie("user") || localStorage.getItem("user");
     try {
-      return user ? JSON.parse(user) : null;
+      const cookieRaw = getCookie("user");
+      if (cookieRaw && cookieRaw !== "undefined" && cookieRaw !== "null") {
+        let parsed = JSON.parse(cookieRaw);
+        if (typeof parsed === "string") {
+          parsed = JSON.parse(parsed);
+        }
+        if (parsed && typeof parsed === "object") return parsed;
+      }
+      const localRaw = localStorage.getItem("user");
+      if (localRaw && localRaw !== "undefined" && localRaw !== "null") {
+        let parsed = JSON.parse(localRaw);
+        if (typeof parsed === "string") {
+          parsed = JSON.parse(parsed);
+        }
+        if (parsed && typeof parsed === "object") return parsed;
+      }
     } catch {
       return null;
     }
@@ -89,16 +103,18 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // طباعة تفاصيل الخطأ للتشخيص في الكونسول
     if (error.response?.data && Object.keys(error.response.data).length > 0) {
-      console.error("[Axios Response Error]:", error.config.url, error.response.status, error.response.data);
+      console.error("[Axios Response Error]:", error.config?.url, error.response.status, error.response.data);
     }
 
+    const skipRedirect = error.config?._skipAuthRedirect;
     const isLoginRequest =
       error.config &&
       error.config.url &&
       error.config.url.includes("/api/v1/auth/login");
+
     if (
+      !skipRedirect &&
       !isLoginRequest &&
       error.response &&
       (error.response.status === 401 || error.response.status === 403)
