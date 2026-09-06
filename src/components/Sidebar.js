@@ -12,6 +12,7 @@ import {
   Message,
   Document,
 } from "react-iconly";
+import { FiFileText } from "react-icons/fi";
 
 import { useTheme } from "@/context/ThemeContext";
 import { BsList, BsX } from "react-icons/bs";
@@ -23,6 +24,7 @@ const navItems = [
   { label: "search", href: "/search", icon: Search },
   { label: "discover", href: "/discover", icon: Discovery },
   { label: "startProject", href: "/new", icon: Plus },
+  { label: "drafts", href: "/drafts", icon: FiFileText, isReactIcon: true },
 ];
 
 const resourceItems = [
@@ -37,6 +39,7 @@ const sidebarFallbacks = {
   search: "Search",
   discover: "Discover",
   startProject: "Start a project",
+  drafts: "مسوداتي",
   resources: "Resources",
   members: "Members",
   partners: "Partners",
@@ -123,6 +126,9 @@ export default function Sidebar() {
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
+          const iconColor = isActive
+            ? isDark ? "white" : "#1A1A1A"
+            : isDark ? "#9A9A9A" : "#666666";
 
           return (
             <Link
@@ -145,19 +151,15 @@ export default function Sidebar() {
                 }
               `}
             >
-              <Icon
-                set="light"
-                size={20}
-                primaryColor={
-                  isActive
-                    ? isDark
-                      ? "white"
-                      : "#1A1A1A"
-                    : isDark
-                      ? "#9A9A9A"
-                      : "#666666"
-                }
-              />
+              {item.isReactIcon ? (
+                <Icon size={20} color={iconColor} />
+              ) : (
+                <Icon
+                  set="light"
+                  size={20}
+                  primaryColor={iconColor}
+                />
+              )}
 
               <span className={isDark ? "text-white" : "text-black"}>
                 {sidebar(item.label)}
