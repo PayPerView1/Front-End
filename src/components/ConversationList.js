@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FiSearch, FiEdit } from "react-icons/fi";
 import { IoClose, IoExpand, IoContract } from "react-icons/io5";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useMessages } from "@/context/MessagesContext";
 import { useTheme } from "@/context/ThemeContext";
 
@@ -55,6 +55,7 @@ export default function ConversationList({
   const [activeFilter, setActiveFilter] = useState("all");
 
   const locale = useLocale();
+  const t = useTranslations("messages");
   const { toggleMaximize, isMaximized, conversations, readIds, markAsRead } = useMessages();
   const { isDark } = useTheme();
 
@@ -106,18 +107,14 @@ export default function ConversationList({
           }`}
           style={{ fontFamily: "Tajawal, sans-serif" }}
         >
-          {isAr ? "الرسائل" : "Messages"}
+          {t("title")}
         </h2>
 
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={toggleMaximize}
-            aria-label={
-              isMaximized
-                ? isAr ? "تصغير لوحة الرسائل" : "Minimize messages panel"
-                : isAr ? "تكبير لوحة الرسائل" : "Maximize messages panel"
-            }
+            aria-label={isMaximized ? t("minimizePanel") : t("maximizePanel")}
             className={`w-[26px] h-[26px] flex items-center justify-center rounded-full transition-colors border-none cursor-pointer ${
               isDark
                 ? "bg-white/10 text-gray-400 hover:text-white"
@@ -133,7 +130,7 @@ export default function ConversationList({
             className={`w-[18px] h-[18px] flex items-center justify-center hover:opacity-85 transition-opacity cursor-pointer border-none bg-transparent ${
               isDark ? "text-[#E1E3E4]" : "text-[#1A1A1A]"
             }`}
-            aria-label={isAr ? "إغلاق" : "Close"}
+            aria-label={t("close")}
           >
             <IoClose size={18} />
           </button>
@@ -164,7 +161,7 @@ export default function ConversationList({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={isAr ? "البحث في الرسائل..." : "Search messages..."}
+              placeholder={t("searchPlaceholder")}
               className={`flex-1 bg-transparent text-xs outline-none text-right ${
                 isDark
                   ? "text-white placeholder-gray-500"
@@ -188,9 +185,9 @@ export default function ConversationList({
         {/* FILTERS */}
         <div className="flex gap-2">
           {[
-            { key: "all", label: isAr ? "الكل" : "All" },
-            { key: "unread", label: isAr ? "غير مقروءة" : "Unread" },
-            { key: "orders", label: isAr ? "الطلبات" : "Orders" },
+            { key: "all", labelKey: "filters.all" },
+            { key: "unread", labelKey: "filters.unread" },
+            { key: "orders", labelKey: "filters.orders" },
           ].map((filter) => (
             <button
               key={filter.key}
@@ -204,7 +201,7 @@ export default function ConversationList({
                   : "bg-gray-100 text-gray-600 hover:text-gray-900 border border-gray-200"
               }`}
             >
-              {filter.label}
+              {t(filter.labelKey)}
             </button>
           ))}
         </div>
@@ -279,7 +276,7 @@ export default function ConversationList({
                 {isUnread && (
                   <div
                     className="w-2 h-2 rounded-full bg-[#94D3C1] shrink-0"
-                    aria-label={isAr ? "رسالة جديدة" : "New message"}
+                    aria-label={t("newMessage")}
                   />
                 )}
               </button>
@@ -291,7 +288,7 @@ export default function ConversationList({
               isDark ? "text-gray-500" : "text-gray-400"
             }`}
           >
-            {isAr ? "لا توجد محادثات تطابق البحث" : "No conversations match search"}
+            {t("noConversations")}
           </div>
         )}
       </div>

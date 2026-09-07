@@ -24,11 +24,19 @@
     "manageOrders": "Manage Orders",
     "share": "Share",
     "copyLink": "Copy Link",
-    "tabs": { "creator": "Creator", "joined": "Joined", "reviews": "Reviews" },
+    "tabs": {
+      "creator": "Creator",
+      "joined": "Joined",
+      "reviews": "Reviews"
+    },
     "user": {
       "joined": "Joined Jul 2026",
       "followers": "Followers",
-      "following": "Following"
+      "following": "Following",
+      "name": "Shatha Al-Banna",
+      "email": "@gmail.com",
+      "location": "Gaza, PS",
+      "profile": "Profile"
     },
     "buttons": {
       "editProfile": "Edit Profile",
@@ -137,12 +145,176 @@
     "saving": "Saving...",
     "saved": "Saved successfully",
     "saveError": "An error occurred",
-    "cancel": "Cancel", 
+    "cancel": "Cancel",
     "profile": "Edit profile",
     "payments": "Payments",
     "services": "Connected services",
     "security": "Account security",
     "subscriptions": "Subscriptions",
     "disputes": "Dispute center"
+  },
+  "assistant": {
+    "close": "Close assistant",
+    "title": "How can I help you today?",
+    "description": "I am your smart assistant. I can help you create content, manage your account, or answer any inquiries.",
+    "preview": "Preview",
+    "placeholder": "Type your message here...",
+    "disclaimer": "The assistant may make mistakes sometimes. Please verify important information.",
+    "actions": {
+      "messageMembers": {
+        "title": "Message recent members",
+        "desc": "Draft a welcome message for new subscribers"
+      },
+      "createAd": {
+        "title": "Create creative ad",
+        "desc": "Generate engaging ad copies for your next campaign"
+      },
+      "startLive": {
+        "title": "Start a live stream",
+        "desc": "Set up a live stream session to connect with your audience"
+      },
+      "sendInvoice": {
+        "title": "Send client invoice",
+        "desc": "Create and send a professional invoice quickly"
+      }
+    }
+  },
+  "messages": {
+    "title": "Messages",
+    "minimizePanel": "Minimize messages panel",
+    "maximizePanel": "Maximize messages panel",
+    "close": "Close",
+    "searchPlaceholder": "Search messages...",
+    "filters": {
+      "all": "All",
+      "unread": "Unread",
+      "orders": "Orders"
+    },
+    "newMessage": "New message",
+    "noConversations": "No conversations match search"
+  },
+  "emptyState": {
+    "title": "Select a message to start",
+    "description": "Choose a conversation from the sidebar to communicate with your subscribers or support team",
+    "encrypted": "Messages are fully encrypted and secure"
+  },
+  "newCampaign": {
+    "steps": {
+      "s1": "Basic Information",
+      "s2": "Compliance",
+      "s3": "Content",
+      "s4": "Review"
+    },
+    "titles": {
+      "t1": "Create a New Campaign",
+      "t2": "Halal Compliance Certificate",
+      "t3": "Upload Media",
+      "t4": "Review and Submit"
+    },
+    "subtitles": {
+      "s1": "Enter the basic details for your ad campaign.",
+      "s2": "Please confirm that your campaign content adheres to the following Islamic guidelines.",
+      "s3": "Provide creative assets for your campaign.",
+      "s4": "Review your campaign details before submitting."
+    },
+    "step1": {
+      "name": "Campaign Name",
+      "namePlaceholder": "Example: Q1 Campaign 2024",
+      "budget": "Budget (USD)",
+      "cpm": "Cost Per Mille (CPM)",
+      "period": "Campaign Period",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "contentType": "Content Type",
+      "contentTypes": {
+        "VIDEO": "Video Reel",
+        "IMAGE": "Static Image",
+        "TEXT": "Text",
+        "MIXED": "Mixed Content",
+        "LOGO": "Logo",
+        "AUDIO": "Audio",
+        "SLIDESHOW": "Slideshow",
+        "UGC": "User Generated Content",
+        "CLIPPING": "Clipping"
+      },
+      "audience": "Target Audience",
+      "audiencePlaceholder": "Brief description or keywords for targeting...",
+      "required": "This field is required"
+    },
+    "compliance": {
+      "intro": "Please confirm that your campaign content adheres to the following Islamic guidelines. This is a mandatory requirement for all campaigns on the Payperview platform.",
+      "items": {
+        "noHaram": {
+          "title": "No Haram Content",
+          "desc": "The campaign does not promote alcohol, gambling, adult content, or any other prohibited products/services."
+        },
+        "islamicValues": {
+          "title": "Respecting Islamic Values",
+          "desc": "Images, messages, and the overall environment are respectful and do not mock or contradict Islamic principles."
+        },
+        "honestRep": {
+          "title": "Honest Representation",
+          "desc": "The campaign avoids deceptive marketing, false claims, and ensures transparency in its offers."
+        },
+        "noGambling": {
+          "title": "No Gambling",
+          "desc": "The campaign content does not include any promotion of gambling or betting."
+        },
+        "noSexualContent": {
+          "title": "No Sexual Content",
+          "desc": "The campaign content does not include any sexual content or explicit insinuations."
+        },
+        "noExplicitMusic": {
+          "title": "No Explicit Music",
+          "desc": "The campaign content does not include inappropriate music or lyrics."
+        },
+        "noAlcohol": {
+          "title": "No Alcohol Promotion",
+          "desc": "The campaign content does not include any promotion of alcoholic beverages."
+        },
+        "noSuspiciousCurrencies": {
+          "title": "No Suspicious Financial Transactions",
+          "desc": "The campaign content does not promote suspicious or untrustworthy currencies or financial transactions."
+        },
+        "noUnrealisticProfit": {
+          "title": "No Unrealistic Profits",
+          "desc": "The campaign content does not promise unrealistic or misleading profit claims."
+        }
+      },
+      "descTitle": "Campaign Description",
+      "descSub": "Detailed Description",
+      "descPlaceholder": "Enter the detailed objectives, target audience, and key messages for your campaign...",
+      "error": "It appears you have not read and agreed to the terms. You must comply with all terms for your campaign to be accepted."
+    },
+    "step3": {
+      "intro": "Provide the creative assets for your campaign. Ensure all files meet the specified guidelines for optimal delivery across networks.",
+      "dropTitle": "Drag and drop your files here",
+      "dropSub": "Or click to browse from your computer. Files will be securely processed and analyzed.",
+      "maxSize": "Maximum size 20MB per file · up to {mb} files",
+      "choose": "Choose Files",
+      "sizeError": "File size exceeds the allowed limit",
+      "complete": "Complete",
+      "required": "Please upload at least one file"
+    },
+    "step4": {
+      "identity": "Campaign Identity",
+      "campaignName": "Campaign Name",
+      "goal": "Goal",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "budget": "Budget Allocation",
+      "budgetTotal": "Total Campaign Budget",
+      "reach": "Expected Reach",
+      "assets": "Creative Assets",
+      "uploaded": "{count} assets uploaded",
+      "targeting": "Targeting",
+      "notSpecified": "Not specified"
+    },
+    "nav": {
+      "back": "Back",
+      "saveDraft": "Save as Draft",
+      "next": "Next →",
+      "submit": "Submit for Review →"
+    }
   }
 }
