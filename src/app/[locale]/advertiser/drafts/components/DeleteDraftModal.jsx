@@ -18,9 +18,10 @@ import DeleteSuccessModal from "./DeleteSuccessModal";
  *   onConfirm  – () => void   (يُطلق الحذف الفعلي في الـ state الخارجي)
  *   draftTitle – string (optional)
  */
-export default function DeleteDraftModal({ isOpen, onClose, onConfirm, draftTitle }) {
+export default function DeleteDraftModal({ isOpen, onClose, onConfirm, draftId, draftTitle }) {
   // "confirm" | "deleting" | "success"
-  const [phase, setPhase] = useState("confirm");
+  const [phase, setPhase]       = useState("confirm");
+  const [deleteError, setDeleteError] = useState(null);
 
   /* ---- إغلاق بـ Escape فقط في مرحلة confirm ---- */
   const handleKeyDown = useCallback(
@@ -42,16 +43,24 @@ export default function DeleteDraftModal({ isOpen, onClose, onConfirm, draftTitl
 
   /* إعادة الـ phase عند فتح الـ Modal من جديد */
   useEffect(() => {
-    if (isOpen) setPhase("confirm");
+    if (isOpen) {
+      setPhase("confirm");
+      setDeleteError(null);
+    }
   }, [isOpen]);
 
-  /* ---- Confirm: confirm → deleting → success ---- */
-  const handleConfirm = () => {
+  /* ---- Confirm: confirm → deleting → (success | error) ---- */
+  const handleConfirm = async () => {
     setPhase("deleting");
-    // تنفيذ الحذف في الـ parent (الكارد يختفي من الـ grid)
-    onConfirm();
-    // بعد 1.5s انتقل للـ success state
-    setTimeout(() => setPhase("success"), 1500);
+    setDeleteError(null);
+    try {
+      // API call حقيقي — يحذف من الـ server ويُحدث الـ state
+      await onConfirm(draftId);
+      setPhase("success");
+    } catch (err) {
+      setDeleteError(err.message || "فشل حذف المسودة، يرجى المحاولة مجدداً");
+      setPhase("confirm");
+    }
   };
 
   /* ---- Back: أغلق الـ modal بعد مرحلة النجاح ---- */
@@ -174,6 +183,25 @@ export default function DeleteDraftModal({ isOpen, onClose, onConfirm, draftTitl
             >
               لا يمكن التراجع عن هذا الإجراء
             </p>
+
+            {/* Error Message */}
+            {deleteError && (
+              <p
+                style={{
+                  fontFamily: "var(--font-tajawal)",
+                  fontSize: "14px",
+                  color: "#f87171",
+                  margin: 0,
+                  padding: "10px 14px",
+                  background: "rgba(248,113,113,0.08)",
+                  borderRadius: "8px",
+                  width: "100%",
+                  textAlign: "center",
+                }}
+              >
+                {deleteError}
+              </p>
+            )}
 
             {/* Buttons */}
             <div className="flex items-center gap-3 w-full" style={{ marginTop: "8px" }}>

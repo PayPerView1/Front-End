@@ -1,4 +1,4 @@
-import DraftsContent from "@/app/[locale]/drafts/components/DraftsContent";
+import DraftsContent from "./components/DraftsContent";
 
 export const metadata = {
   title: "مسوداتي | Pay Per View",
