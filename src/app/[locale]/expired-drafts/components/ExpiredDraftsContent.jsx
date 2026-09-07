@@ -5,7 +5,7 @@ import { FiSearch, FiChevronDown, FiSliders, FiArrowRight } from "react-icons/fi
 import { useTheme } from "@/context/ThemeContext";
 import { Link } from "@/i18n/navigation";
 import ExpiredDraftCard from "./ExpiredDraftCard";
-import DeleteDraftModal from "@/app/[locale]/drafts/components/DeleteDraftModal";
+import DeleteDraftModal from "@/app/[locale]/advertiser/drafts/components/DeleteDraftModal";
 
 /* ------------------------------------------------------------------ */
 /* Mock data                                                            */
@@ -107,7 +107,7 @@ export default function ExpiredDraftsContent() {
       {/* 1. Back Link                                                  */}
       {/* ============================================================ */}
       <Link
-        href="/drafts"
+        href="/advertiser/drafts"
         className="inline-flex items-center gap-2 mb-6 transition-opacity hover:opacity-70"
         style={{
           fontFamily: "var(--font-tajawal)",

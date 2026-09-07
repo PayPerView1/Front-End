@@ -26,7 +26,7 @@ const creatorNavItems = [
   { label: "search", href: "/search", icon: Search },
   { label: "discover", href: "/discover", icon: Discovery },
   { label: "startProject", href: "/new", icon: Plus },
-  { label: "drafts", href: "/drafts", icon: FiFileText, isReactIcon: true },
+  { label: "drafts", href: "/advertiser/drafts", icon: FiFileText, isReactIcon: true },
 ];
 
 const creatorResourceItems = [
@@ -42,6 +42,7 @@ const advertiserNavItems = [
   { label: "campaigns", href: "/advertiser/campaigns", icon: Discovery },
   { label: "analytics", href: "/advertiser/analytics", icon: Document },
   { label: "newCampaign", href: "/advertiser/new", icon: Plus },
+  { label: "drafts", href: "/advertiser/drafts", icon: FiFileText, isReactIcon: true },
 ];
 
 const advertiserResourceItems = [
