@@ -12,6 +12,7 @@ import {
   Message,
   Document,
 } from "react-iconly";
+import { FiFileText } from "react-icons/fi";
 import {
   MdOutlineDashboard,
   MdBarChart,
@@ -29,10 +30,12 @@ import { useUser } from "@/context/UserContext";
 
 // ─── قائمة صانع المحتوى (CLIPPER) ────────────────────────────
 const creatorNavItems = [
-  { label: "home",         href: "/creator/dashboard", icon: Home },
-  { label: "search",       href: "/search",            icon: Search },
-  { label: "discover",     href: "/discover",          icon: Discovery },
-  { label: "startProject", href: "/new",                icon: Plus },
+  { label: "home", href: "/creator/dashboard", icon: Home },
+  { label: "search", href: "/search", icon: Search },
+  { label: "discover", href: "/discover", icon: Discovery },
+  { label: "startProject", href: "/new", icon: Plus },
+  { label: "drafts", href: "/advertiser/drafts", icon: FiFileText, isReactIcon: true },
+  
 ];
 
 const creatorResourceItems = [
@@ -46,38 +49,38 @@ const creatorResourceItems = [
 const advertiserNavItems = [
   {
     label: "dashboard",
-    href:  "/advertiser/dashboard",
-    icon:  MdOutlineDashboard,
+    href: "/advertiser/dashboard",
+    icon: MdOutlineDashboard,
     useMd: true,
   },
   {
     label: "analytics",
-    href:  "/advertiser/analytics",
-    icon:  MdBarChart,
+    href: "/advertiser/analytics",
+    icon: MdBarChart,
     useMd: true,
   },
   {
     label: "clips",
-    href:  "/advertiser/clips",
-    icon:  MdVideoLibrary,
+    href: "/advertiser/clips",
+    icon: MdVideoLibrary,
     useMd: true,
   },
   {
     label: "newCampaign",
-    href:  "/advertiser/campaigns",
-    icon:  MdAddBox,
+    href: "/advertiser/campaigns",
+    icon: MdAddBox,
     useMd: true,
   },
   {
     label: "drafts",
-    href:  "/advertiser/drafts",
-    icon:  MdOutlineDrafts,
+    href: "/advertiser/drafts",
+    icon: MdOutlineDrafts,
     useMd: true,
   },
   {
     label: "billing",
-    href:  "/advertiser/billing",
-    icon:  MdOutlineAccountBalanceWallet,
+    href: "/advertiser/billing",
+    icon: MdOutlineAccountBalanceWallet,
     useMd: true,
   },
 ];
@@ -87,22 +90,24 @@ const advertiserResourceItems = [];
 
 // ─── Fallbacks حسب اللغة ──────────────────────────────────────
 const sidebarFallbacksEn = {
-  home:         "Home",
-  search:       "Search",
-  discover:     "Discover",
+  home: "Home",
+  search: "Search",
+  discover: "Discover",
   startProject: "Start a project",
-  resources:    "Resources",
-  members:      "Members",
-  partners:     "Partners",
-  new:          "New",
-  help:         "Help",
-  blog:         "Blog",
-  dashboard:    "Dashboard",
-  analytics:    "Analytics & Reports",
-  clips:        "Manage Clips",
-  newCampaign:  "Create New Campaign",
-  drafts:       "Drafts",
-  billing:      "Budget & Payments",
+
+  resources: "Resources",
+  members: "Members",
+  partners: "Partners",
+  new: "New",
+  help: "Help",
+  blog: "Blog",
+
+  dashboard: "Dashboard",
+  analytics: "Analytics & Reports",
+  clips: "Manage Clips",
+  newCampaign: "Create New Campaign",
+  drafts: "Drafts",
+  billing: "Budget & Payments",
 };
 
 const sidebarFallbacksAr = {
@@ -249,7 +254,7 @@ export default function Sidebar() {
 
       {/* الروابط الرئيسية */}
       <nav className="flex flex-col gap-1 px-4 mt-2">
-        {navItems.map(renderLink)}
+          {navItems.map(renderLink)}
       </nav>
 
       {/* الموارد — تُعرض فقط إذا كانت القائمة غير فارغة */}
