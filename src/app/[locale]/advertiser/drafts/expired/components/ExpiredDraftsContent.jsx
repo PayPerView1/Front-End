@@ -1,38 +1,18 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { FiSearch, FiChevronDown, FiSliders, FiArrowRight } from "react-icons/fi";
 import { useTheme } from "@/context/ThemeContext";
 import { Link } from "@/i18n/navigation";
 import ExpiredDraftCard from "./ExpiredDraftCard";
 import DeleteDraftModal from "@/app/[locale]/advertiser/drafts/components/DeleteDraftModal";
+import { getExpiredDrafts, deleteDraft } from "@/services/drafts";
 
 /* ------------------------------------------------------------------ */
 /* Mock data                                                            */
 /* ------------------------------------------------------------------ */
-const INITIAL_EXPIRED = [
-  {
-    id: "e1",
-    title: "حملة إطلاق رمضان",
-    lastModified: "آخر تعديل أمس، قبل ساعتين",
-    progress: 40,
-    expiredDays: 35,
-  },
-  {
-    id: "e2",
-    title: "مجموعة إعلانات الصيف العقارية",
-    lastModified: "آخر تعديل أمس، 14:30",
-    progress: 95,
-    expiredDays: 42,
-  },
-  {
-    id: "e3",
-    title: "عروض البلاك فرايداي",
-    lastModified: "آخر تعديل قبل 3 أيام",
-    progress: 15,
-    expiredDays: 60,
-  },
-];
+
+const INITIAL_EXPIRED = [];
 
 const SORT_OPTIONS = [
   "الأحدث تعديلاً",
@@ -42,28 +22,55 @@ const SORT_OPTIONS = [
 ];
 
 export default function ExpiredDraftsContent() {
-  const [drafts, setDrafts]           = useState(INITIAL_EXPIRED);
+  const [drafts, setDrafts] = useState(INITIAL_EXPIRED);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortLabel, setSortLabel]     = useState("الأحدث تعديلاً");
-  const [sortOpen, setSortOpen]       = useState(false);
+  const [sortLabel, setSortLabel] = useState("الأحدث تعديلاً");
+  const [sortOpen, setSortOpen] = useState(false);
 
   /* ---- Modal state ---- */
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
-  const [modalOpen, setModalOpen]             = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const { isDark } = useTheme();
 
+  /* ---- Fetch Expired Drafts from DB ---- */
+  useEffect(() => {
+    async function loadExpired() {
+      setLoading(true);
+      try {
+        const res = await getExpiredDrafts();
+        const list = res?.campaigns || res?.drafts || (Array.isArray(res) ? res : null);
+        if (list && Array.isArray(list) && list.length > 0) {
+          const mapped = list.map((item) => ({
+            id: item._id || item.id,
+            title: item.name || item.title || "مسودة منتهية",
+            lastModified: item.updatedAt ? `آخر تعديل: ${new Date(item.updatedAt).toLocaleDateString("ar-EG")}` : "منذ فترة",
+            progress: item.totalBudget ? 50 : 20,
+            expiredDays: 30,
+          }));
+          setDrafts(mapped);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch expired drafts from DB, using fallback mock:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadExpired();
+  }, []);
+
   /* ---- ألوان حسب الثيم ---- */
-  const pageBg      = isDark ? "#0C0F10" : "#F3F4F6";
+  const pageBg = isDark ? "#0C0F10" : "#F3F4F6";
   const headingColor = isDark ? "#E1E3E4" : "#111827";
-  const subColor    = isDark ? "#BFC9C4" : "#6B7280";
-  const barBg       = isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)";
-  const barBorder   = isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)";
-  const inputColor  = isDark ? "#E1E3E4" : "#1A1A1A";
-  const phColor     = isDark ? "#89938F" : "#9CA3AF";
-  const dividerBg   = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
-  const dropdownBg  = isDark ? "#1A1E20" : "#FFFFFF";
-  const emptyColor  = isDark ? "#89938F" : "#9CA3AF";
+  const subColor = isDark ? "#BFC9C4" : "#6B7280";
+  const barBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)";
+  const barBorder = isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)";
+  const inputColor = isDark ? "#E1E3E4" : "#1A1A1A";
+  const phColor = isDark ? "#89938F" : "#9CA3AF";
+  const dividerBg = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
+  const dropdownBg = isDark ? "#1A1E20" : "#FFFFFF";
+  const emptyColor = isDark ? "#89938F" : "#9CA3AF";
 
   /* ---- Filtered drafts ---- */
   const filteredDrafts = useMemo(() => {
@@ -77,9 +84,16 @@ export default function ExpiredDraftsContent() {
     setModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (pendingDeleteId) {
-      setDrafts((prev) => prev.filter((d) => d.id !== pendingDeleteId));
+  const handleConfirmDelete = async (id) => {
+    const targetId = id || pendingDeleteId;
+    if (targetId) {
+      try {
+        await deleteDraft(targetId);
+      } catch (err) {
+        console.warn("Delete draft error:", err);
+      } finally {
+        setDrafts((prev) => prev.filter((d) => d.id !== targetId && d._id !== targetId));
+      }
     }
   };
 
@@ -129,8 +143,8 @@ export default function ExpiredDraftsContent() {
           style={{
             fontFamily: "var(--font-tajawal)",
             fontWeight: 400,
-            fontSize: "48px",
-            lineHeight: "52.8px",
+            fontSize: "40px",
+            lineHeight: "44px",
             letterSpacing: "-0.96px",
             color: headingColor,
             margin: 0,

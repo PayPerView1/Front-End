@@ -1,4 +1,4 @@
-import ExpiredDraftsContent from "@/app/[locale]/expired-drafts/components/ExpiredDraftsContent";
+import ExpiredDraftsContent from "./components/ExpiredDraftsContent";
 
 export const metadata = {
   title: "المسودات منتهية الصلاحية | Pay Per View",

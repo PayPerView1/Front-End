@@ -134,14 +134,14 @@ export function useDrafts() {
     setError(null);
     try {
       const data = await getDrafts(search ? { search } : {});
-      if (data?.campaigns && Array.isArray(data.campaigns)) {
-        setRawDrafts(data.campaigns);
+      const list = data?.campaigns || data?.drafts || (Array.isArray(data) ? data : null);
+      if (list && Array.isArray(list)) {
+        setRawDrafts(list);
       } else {
         setRawDrafts(MOCK_DRAFTS);
       }
     } catch (err) {
       console.warn("Drafts API call failed, falling back to mock drafts:", err);
-      // تجنب إظهار شاشة الخطأ 404 عند عدم توفر الـ API واستخدام بيانات توضيحية
       setRawDrafts(MOCK_DRAFTS);
     } finally {
       setLoading(false);

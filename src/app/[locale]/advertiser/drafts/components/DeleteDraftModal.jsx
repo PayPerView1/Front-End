@@ -3,7 +3,7 @@
 import { useEffect, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 import { FiTrash2 } from "react-icons/fi";
-import DeletingState from "./DeletingState";
+import PageLoader from "@/components/PageLoader";
 import DeleteSuccessModal from "./DeleteSuccessModal";
 
 /**
@@ -54,8 +54,11 @@ export default function DeleteDraftModal({ isOpen, onClose, onConfirm, draftId, 
     setPhase("deleting");
     setDeleteError(null);
     try {
-      // API call حقيقي — يحذف من الـ server ويُحدث الـ state
-      await onConfirm(draftId);
+      // API call حقيقي + تأخير 800ms لإظهار انيميشن اللودينج بسلاسة
+      await Promise.all([
+        onConfirm(draftId),
+        new Promise((resolve) => setTimeout(resolve, 800)),
+      ]);
       setPhase("success");
     } catch (err) {
       setDeleteError(err.message || "فشل حذف المسودة، يرجى المحاولة مجدداً");
@@ -69,6 +72,13 @@ export default function DeleteDraftModal({ isOpen, onClose, onConfirm, draftId, 
   };
 
   if (!isOpen) return null;
+
+  /* ---- في مرحلة الحذف: نعرض PageLoader مباشرة كـ overlay كامل الشاشة ---- */
+  if (phase === "deleting") {
+    return typeof window !== "undefined"
+      ? createPortal(<PageLoader />, document.body)
+      : null;
+  }
 
   /* ---- حسب الـ phase: يُحدد هل الـ Backdrop قابل للإغلاق ---- */
   const backdropClickable = phase === "confirm";
@@ -275,9 +285,6 @@ export default function DeleteDraftModal({ isOpen, onClose, onConfirm, draftId, 
             </div>
           </>
         )}
-
-        {/* ============ Phase: deleting ============ */}
-        {phase === "deleting" && <DeletingState />}
 
         {/* ============ Phase: success ============ */}
         {phase === "success" && <DeleteSuccessModal onBack={handleBack} />}

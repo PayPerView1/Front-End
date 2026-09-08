@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FiPlus, FiRefreshCw } from "react-icons/fi";
 import { useTheme } from "@/context/ThemeContext";
 import { useDrafts } from "@/hooks/useDrafts";
+import { useRouter } from "@/i18n/navigation";
 import SearchFilterBar from "./SearchFilterBar";
 import DraftCard from "./DraftCard";
 import ExpiredDraftsCard from "./ExpiredDraftsCard";
@@ -76,6 +77,7 @@ function DraftSkeleton({ isDark }) {
 /* ------------------------------------------------------------------ */
 export default function DraftsContent() {
   const { isDark } = useTheme();
+  const router     = useRouter();
 
   const {
     drafts,
@@ -109,9 +111,9 @@ export default function DraftsContent() {
     setPendingDeleteId(null);
   };
 
-  const handleEdit          = (id) => console.log("Edit draft:", id);
-  const handleNewCampaign   = ()   => console.log("Create new campaign");
-  const handleReviewExpired = ()   => console.log("Review expired drafts");
+  const handleEdit          = (id) => router.push(`/advertiser/campaigns?draftId=${id}`);
+  const handleNewCampaign   = ()   => router.push("/advertiser/campaigns");
+  const handleReviewExpired = ()   => router.push("/advertiser/expired-drafts");
 
   const pendingDraft = drafts.find((d) => d.id === pendingDeleteId);
 

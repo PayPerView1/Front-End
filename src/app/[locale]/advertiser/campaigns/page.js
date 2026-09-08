@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
+import { useRouter } from "@/i18n/navigation";
 import { FiCalendar, FiFileText } from "react-icons/fi"; 
 import { saveDraft, autoSaveDraft, submitDraft, createCampaign } from "@/lib/campaignApi";
+import { getDraftById } from "@/services/drafts";
 import {
   MdVolumeUp,
   MdImage,
@@ -604,6 +606,7 @@ function Step4({ t, dark, form, files }) {
 export default function NewCampaignPage() {
   const locale = useLocale();
   const { isDark } = useTheme();
+  const router = useRouter();
   const t = useTranslations("newCampaign");
   const isRtl = locale === "ar";
   const dark = isDark;
@@ -640,9 +643,62 @@ export default function NewCampaignPage() {
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState([]);
   const [dragging, setDragging] = useState(false);
-  const MAX_MB = 20; // تعديل الحد الأقصى إلى 20 MB
+  const MAX_MB = 20; 
   const [draftId, setDraftId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ─── تحميل بيانات المسودة عند فتح الرابط للتعديل ───────────────────────────
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const urlDraftId = new URLSearchParams(window.location.search).get("draftId");
+    if (!urlDraftId) return;
+
+    setDraftId(urlDraftId);
+    async function loadDraftData() {
+      try {
+        const res = await getDraftById(urlDraftId);
+        const d = res?.draft || res?.campaign || res;
+        if (d) {
+          setForm({
+            name: d.name || d.title || "",
+            totalBudget: d.totalBudget ? String(d.totalBudget) : "",
+            cpm: d.cpm ? String(d.cpm) : "",
+            startDate: d.startDate ? d.startDate.split("T")[0] : "",
+            endDate: d.endDate ? d.endDate.split("T")[0] : "",
+            contentType: d.contentType || d.category || "",
+            category: d.category || d.contentType || "",
+            audience: d.brief?.audience || d.audience || "",
+            subCategories: d.subCategories || [],
+            targetCountries: d.targetCountries || [],
+            brief: {
+              mainIdea: d.brief?.mainIdea || "",
+              tone: d.brief?.tone || "",
+              keyMessages: d.brief?.keyMessages || "",
+              keywords: d.brief?.keywords || [],
+              visualReferences: d.brief?.visualReferences || "",
+            },
+          });
+          if (d.brief?.mainIdea || d.description) {
+            setDescription(d.brief?.mainIdea || d.description || "");
+          }
+          if (d.halalDeclared || d.halalDeclaration) {
+            const h = typeof d.halalDeclaration === "object" ? d.halalDeclaration : {};
+            setChecked({
+              noGambling: h.noGambling ?? true,
+              noSexualContent: h.noSexualContent ?? true,
+              noExplicitMusic: h.noExplicitMusic ?? true,
+              noAlcohol: h.noAlcohol ?? true,
+              noSuspiciousCurrencies: h.noSuspiciousCurrencies ?? true,
+              noUnrealisticProfit: h.noUnrealisticProfit ?? true,
+            });
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to load draft data:", err);
+      }
+    }
+    loadDraftData();
+  }, []);
 
   const step1Valid = Boolean(form.name.trim() && form.totalBudget && form.cpm && form.startDate && form.endDate && form.contentType);
   const step2Valid = Object.values(checked).every(Boolean) && Boolean(description.trim());
@@ -651,43 +707,36 @@ export default function NewCampaignPage() {
   const canNext = () => [step1Valid, step2Valid, step3Valid, true][step - 1];
 
   const handleSaveDraft = async () => {
-    if (!form.name.trim()) {
-      alert("اسم الحملة مطلوب للحفظ");
-      return;
-    }
-
     const payload = {
       name: form.name,
       contentType: form.contentType || undefined,
       category: form.category || undefined,
       totalBudget: form.totalBudget ? Number(form.totalBudget) : undefined,
       cpm: form.cpm ? Number(form.cpm) : undefined,
+      startDate: form.startDate || undefined,
+      endDate: form.endDate || undefined,
       targetCountries: form.targetCountries,
       brief: {
         ...form.brief,
         mainIdea: description || form.brief.mainIdea,
+        audience: form.audience,
       },
       halalDeclared: Object.values(checked).every(Boolean),
     };
 
     try {
       if (draftId) {
-        const res = await autoSaveDraft(draftId, payload);
-        if (res.success === "true") {
-          alert("تم الحفظ التلقائي ✅");
-        }
+        await autoSaveDraft(draftId, payload);
       } else {
         const res = await saveDraft(payload);
-        if (res.success === "true") {
+        if (res?.data?.draft?._id) {
           setDraftId(res.data.draft._id);
-          alert("تم حفظ المسودة ✅");
-        } else {
-          alert(res.message);
         }
       }
     } catch (err) {
       console.error("خطأ في حفظ المسودة:", err);
-      alert("حدث خطأ، حاول مرة أخرى");
+    } finally {
+      router.push("/advertiser/drafts");
     }
   };
 

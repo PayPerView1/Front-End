@@ -34,8 +34,6 @@ const creatorNavItems = [
   { label: "search", href: "/search", icon: Search },
   { label: "discover", href: "/discover", icon: Discovery },
   { label: "startProject", href: "/new", icon: Plus },
-  { label: "drafts", href: "/advertiser/drafts", icon: FiFileText, isReactIcon: true },
-  
 ];
 
 const creatorResourceItems = [

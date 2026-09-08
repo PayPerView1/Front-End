@@ -87,7 +87,7 @@ export default function ExpiredDraftsCard() {
 
       {/* Action Button → Link to expired-drafts page */}
       <Link
-        href="/expired-drafts"
+        href="/advertiser/drafts/expired"
         id="expired-drafts-review-btn"
         className="flex items-center justify-center transition-opacity hover:opacity-90 active:opacity-80"
         style={{
