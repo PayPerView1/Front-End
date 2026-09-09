@@ -55,7 +55,7 @@ export default function AIAssistantPanel({ side = "left" }) {
 
   return (
     <aside
-      className={`ai-panel fixed top-14 h-[calc(100vh-64px)] w-full xl:max-w-[380px] z-40 flex flex-col justify-between overflow-y-auto px-4 sm:px-8 md:px-12 xl:px-4 py-6 border ${
+      className={`ai-panel fixed top-14 h-[calc(100vh-56px)] w-full xl:max-w-[380px] z-40 flex flex-col justify-between overflow-y-auto px-4 sm:px-8 md:px-12 xl:px-4 py-6 border ${
         isDark ? "border-white/10" : "border-[#E5E5E5]"
       } ${sideClass}`}
       data-side={side}

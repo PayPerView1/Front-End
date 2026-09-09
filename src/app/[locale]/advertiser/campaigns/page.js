@@ -47,27 +47,31 @@ const STEP_IDS = [1, 2, 3, 4];
 // ─── DateInput ────────────────────────────────────────────────
 function DateInput({ value, onChange, hasError, isRtl }) {
   const ref = useRef(null);
+  const placeholder = isRtl ? "أدخل التاريخ" : "Enter date";
+
   return (
     <div className="relative w-full">
+      <div
+        className={`w-full rounded-lg border py-2.5 text-sm box-border bg-white ${
+          hasError ? "border-[#E53535]" : "border-[#E5E5E5]"
+        } ${isRtl ? "pr-10 pl-3.5 text-right" : "pl-10 pr-3.5 text-left"}`}
+        style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
+      >
+        <span className={value ? "text-[#111]" : "text-[#999]"}>{value || placeholder}</span>
+      </div>
       <input
         ref={ref}
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full rounded-lg border py-2.5 text-sm outline-none box-border bg-white text-[#111]
-          ${isRtl ? "pr-10 pl-3.5 text-right" : "pl-10 pr-3.5 text-left"}
-          ${hasError ? "border-[#E53535]" : "border-[#E5E5E5]"}
-          [&::-webkit-calendar-picker-indicator]:opacity-0
-          [&::-webkit-calendar-picker-indicator]:absolute
-          [&::-webkit-calendar-picker-indicator]:inset-0
-          [&::-webkit-calendar-picker-indicator]:w-full
-          [&::-webkit-calendar-picker-indicator]:cursor-pointer`}
-        style={{ direction: "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
+        onClick={() => ref.current?.showPicker?.()}
+        aria-label={placeholder}
+        className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
       />
       <button
         type="button"
         onClick={() => ref.current?.showPicker?.()}
-        className={`absolute top-1/2 -translate-y-1/2 pointer-events-none text-[#9A9A9A] ${
+        className={`absolute top-1/2 z-20 -translate-y-1/2 pointer-events-none text-[#9A9A9A] ${
           isRtl ? "right-3" : "left-3"
         }`}
       >
