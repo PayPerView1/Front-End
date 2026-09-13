@@ -1,0 +1,139 @@
+{
+  "nav": {
+    "orders": "订单",
+    "partners": "合作伙伴",
+    "finance": "财务",
+    "support": "帮助与支持",
+    "language": "语言",
+    "logout": "退出登录"
+  },
+  "sidebar": { "home": "首页", "search": "搜索", "discover": "发现", "startProject": "创建项目", "resources": "资源", "members": "成员", "partners": "合作伙伴", "new": "新", "help": "帮助", "blog": "博客" },
+  "profile": {
+    "edit": "编辑资料",
+    "manageOrders": "管理订单",
+    "share": "分享",
+    "copyLink": "复制链接",
+    "tabs": {
+      "creator": "创作者",
+      "joined": "已加入",
+      "reviews": "评论"
+    },
+    "user": {
+      "joined": "加入时间2026年7月",
+      "followers": "关注者",
+      "following": "关注"
+    },
+    "buttons": {
+      "editProfile": "编辑个人资料",
+      "manageRequests": "管理请求",
+      "createWork": "创建新作品",
+      "exploreCampaigns": "探索活动"
+    },
+    "coverMenu": {
+      "share": "分享",
+      "copyLink": "复制链接",
+      "edit": "编辑个人资料"
+    },
+    "empty": {
+      "noCreatedWorks": "尚未创作作品",
+      "noJoinedCampaigns": "尚未加入活动"
+    },
+    "campaigns": {
+      "arabClips": "阿拉伯剪辑社区",
+      "creators": "创作者平台",
+      "academy": "内容学院",
+      "followers": "{count}个关注者"
+    },
+    "cardMenu": {
+      "markRead": "标记为已读",
+      "invite": "邀请其他人",
+      "copyLink": "复制链接",
+      "writeReview": "写评论",
+      "leave": "留下"
+    },
+    "reviews": {
+      "noReviews": "尚未评论",
+      "noUserReviews": "该用户还没有评论",
+      "beFirst": "成为第一个写评论的人！",
+      "leaveReview": "留下评论"
+    }
+  },
+  "auth": {
+    "required": "此字段为必填项",
+    "loginTitle": "登录",
+    "loginWelcome": "欢迎回到按次付费",
+    "emailOrUsername": "电子邮件或用户名",
+    "emailPlaceholder": "输入您的电子邮件地址",
+    "password": "密码",
+    "passwordPlaceholder": "输入密码",
+    "showPassword": "显示密码",
+    "hidePassword": "隐藏密码",
+    "forgotPassword": "忘记密码？",
+    "signIn": "登录",
+    "signingIn": "登录...",
+    "orContinueWith": "或继续",
+    "noAccount": "没有帐户？",
+    "createAccount": "创建帐户",
+    "invalidCredentials": "电子邮件或密码不正确",
+    "invalidLoginData": "登录详细信息无效。请检查您的输入。",
+    "connectionFailed": "无法连接到服务器。检查您的互联网连接。",
+    "genericLoginError": "登录时出现问题。请稍后重试。",
+    "invalidServerResponse": "服务器响应无效",
+    "forgotTitle": "忘记密码？",
+    "forgotDescription": "输入你注册的电子邮件地址，我们将在一小时内向您发送密码重置链接。",
+    "sendResetLink": "发送重置链接",
+    "sending": "正在发送...",
+    "backToSignIn": "返回登录",
+    "signOut": "退出",
+    "signOutTitle": "退出",
+    "confirmSignOut": "你确定要退出吗？",
+    "signOutDescription": "你当前的会话将结束。",
+    "cancel": "取消"
+  },
+  "register": {
+    "createTitle": "创建一个新帐户",
+    "createSubtitle": "输入你的详细信息以开始",
+    "selectAccountType": "选择一个帐户类型",
+    "creator": "内容创建者",
+    "creatorDescription": "我提供服务",
+    "brand": "活动所有者",
+    "brandDescription": "我正在寻找服务",
+    "fullName": "全名",
+    "fullNamePlaceholder": "输入您的全名",
+    "email": "电子邮件地址",
+    "continue": "继续",
+    "or": "或",
+    "alreadyHaveAccount": "已经有帐户？",
+    "requiredAccountType": "选择帐户类型",
+    "requiredName": "输入你的全名",
+    "requiredEmail": "输入你的电子邮件地址",
+    "invalidEmail": "输入有效的电子邮件地址",
+    "signIn": "登录",
+    "resetPassword": "重置密码"
+  },
+  "editProfile": {
+    "accountSettings": "帐户设置",
+    "signOut": "退出",
+    "name": "姓名",
+    "username": "用户名",
+    "bio": "个人简介",
+    "bioPlaceholder": "向我们介绍一下你自己",
+    "birthDate": "出生日期",
+    "additionalSettings": "其他设置",
+    "additionalDescription": "选择在您的个人资料上显示的内容并允许其他人发现您",
+    "earnings": "总收入",
+    "location": "位置",
+    "openCommunities": "打开社区",
+    "joinedCommunities": "加入社区",
+    "save": "保存更改",
+    "saving": "保存...",
+    "saved": "保存成功",
+    "saveError": "出现错误",
+    "profile": "编辑个人资料",
+    "payments": "付款",
+    "services": "连接服务",
+    "security": "帐户安全",
+    "subscriptions": "订阅",
+    "disputes": "争议中心"
+  }
+}

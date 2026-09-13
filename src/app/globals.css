@@ -1,26 +1,99 @@
 @import "tailwindcss";
+@variant dark (&:is(.dark *));
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
 
 body {
+  font-family: var(--font-tajawal), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes messages-panel-from-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes messages-panel-from-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.messages-panel[data-side="left"],
+.ai-panel[data-side="left"],
+.notifications-panel[data-side="left"] {
+  animation: messages-panel-from-left 0.3s ease-out;
+}
+
+.messages-panel[data-side="right"],
+.ai-panel[data-side="right"],
+.notifications-panel[data-side="right"] {
+  animation: messages-panel-from-right 0.3s ease-out;
+}
+
+/* تخصيص لون تحديد النصوص */
+::selection {
+  background-color: #ea580c;
+  color: #ffffff;
+}
+
+/* تخصيص شريط التمرير (Scrollbar) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ea580c;
+}
+
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+}
+/* السكرول تبع قائمة اللغات */
+.lang-scroll::-webkit-scrollbar {
+  display: none;
+}
+.lang-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
