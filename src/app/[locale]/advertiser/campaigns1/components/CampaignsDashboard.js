@@ -516,7 +516,7 @@ export default function CampaignsDashboard() {
                       {/* اسم الحملة */}
                       <td className="px-4 py-3.5">
                         <div
-                          className={`flex items-center gap-3 ${locale === "ar" ? "flex-row-reverse justify-end" : "flex-row"}`}
+                          className={`flex items-center gap-3 ${locale === "ar" ?  "flex-row-reverse justify-end" : "flex-row-reverse justify-end"}`}
                         >
                           <div>
                             <p

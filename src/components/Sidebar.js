@@ -19,7 +19,6 @@ import {
   MdAddBox,
   MdOutlineDrafts,
   MdOutlineAccountBalanceWallet,
-  MdOutlineCampaign,
 } from "react-icons/md";
 
 import { useTheme } from "@/context/ThemeContext";
@@ -45,12 +44,7 @@ const creatorResourceItems = [
 
 // ─── قائمة صاحب الحملة (BRAND/ADVERTISER) ────────────────────
 const advertiserNavItems = [
-  {
-    label: "dashboard",
-    href: "/advertiser/dashboard",
-    icon: MdOutlineDashboard,
-    useMd: true,
-  },
+  { label: "dashboard", href: "/advertiser/campaigns", icon: MdOutlineDashboard, useMd: true },
   {
     label: "analytics",
     href: "/advertiser/analytics",
@@ -73,12 +67,6 @@ const advertiserNavItems = [
     label: "drafts",
     href: "/advertiser/drafts",
     icon: MdOutlineDrafts,
-    useMd: true,
-  },
-  {
-    label: "manageCampaigns",
-    href: "/advertiser/campaigns",
-    icon: MdOutlineCampaign,
     useMd: true,
   },
   {
