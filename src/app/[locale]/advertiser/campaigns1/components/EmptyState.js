@@ -18,12 +18,13 @@ export default function EmptyState() {
         className="flex flex-col items-center gap-5 p-10 rounded-2xl text-center max-w-sm w-full"
         style={{
           background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-          border: isDark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.06)",
+          border: isDark
+            ? "1px solid rgba(255,255,255,0.07)"
+            : "1px solid rgba(0,0,0,0.06)",
         }}
       >
         {/* الأيقونة الرئيسية */}
         <div className="relative mt-2">
-          {/* الكارت الكبير */}
           <div
             className="w-28 h-28 rounded-2xl flex items-center justify-center"
             style={{
@@ -35,7 +36,7 @@ export default function EmptyState() {
             <HiOutlineSpeakerphone size={48} color="#FF6B00" />
           </div>
 
-          {/* الكارت الصغير — يسار تحت */}
+          {/* الكارت الصغير */}
           <div
             className="absolute -bottom-3 -left-3 w-11 h-11 rounded-xl flex items-center justify-center"
             style={{
@@ -51,10 +52,14 @@ export default function EmptyState() {
 
         {/* النص */}
         <div className="flex flex-col gap-2 mt-4">
-          <h3 className={`text-lg font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+          <h3
+            className={`text-lg font-bold ${isDark ? "text-white" : "text-gray-900"}`}
+          >
             {tc("emptyTitle")}
           </h3>
-          <p className={`text-sm leading-relaxed ${isDark ? "text-[#9A9A9A]" : "text-gray-500"}`}>
+          <p
+            className={`text-sm leading-relaxed ${isDark ? "text-[#9A9A9A]" : "text-gray-500"}`}
+          >
             {tc("emptyDesc")}
           </p>
         </div>
@@ -62,7 +67,7 @@ export default function EmptyState() {
         {/* الزر */}
         <button
           type="button"
-          onClick={() => router.push(`/${locale}/advertiser/campaigns/create`)}
+          onClick={() => router.push(`/${locale}/advertiser/create-campaign`)}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white border-none cursor-pointer transition-all hover:opacity-90"
           style={{ background: "linear-gradient(90deg, #FFA600, #FF4B04)" }}
         >

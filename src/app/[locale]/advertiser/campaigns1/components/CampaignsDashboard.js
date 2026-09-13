@@ -611,7 +611,7 @@ export default function CampaignsDashboard() {
                                 onClick={() => {
                                   setOpenMenu(null);
                                   router.push(
-                                    `/${locale}/advertiser/campaigns/${campaign._id}`,
+                                    `/${locale}/advertiser/campaigns1/${campaign._id}`,
                                   );
                                 }}
                                 className={`w-full flex items-center gap-2 px-3 py-2 text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all hover:bg-[#94D3C1]/10 ${t.text}`}
@@ -624,7 +624,7 @@ export default function CampaignsDashboard() {
                                 onClick={() => {
                                   setOpenMenu(null);
                                   router.push(
-                                    `/${locale}/advertiser/campaigns/${campaign._id}/stats`,
+                                    `/${locale}/advertiser/campaigns1/${campaign._id}/stats`,
                                   );
                                 }}
                                 className={`w-full flex items-center gap-2 px-3 py-2 text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all hover:bg-[#94D3C1]/10 ${t.text}`}

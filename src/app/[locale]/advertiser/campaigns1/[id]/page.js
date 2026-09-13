@@ -1,4 +1,4 @@
-// app/[locale]/advertiser/campaigns/[id]/page.jsx
+// app/[locale]/advertiser/campaigns1/[id]/page.jsx
 import CampaignDetailsClient from "./components/CampaignDetailsClient";
 
 export default function CampaignDetailsPage({ params }) {

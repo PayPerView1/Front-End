@@ -66,35 +66,3 @@ export default function CampaignDetailsClient({ campaignId }) {
 
   return <CampaignDetails campaign={campaign} />;
 }
-
-// "use client";
-// import { useEffect, useState } from "react";
-// import { getCampaignById } from "@/services/campaign";
-// import CampaignDetails from "./CampaignDetails";
-
-// export default function CampaignDetailsClient({ campaignId }) {
-//   const [campaign, setCampaign] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     getCampaignById(campaignId)
-//       .then((res) => setCampaign(res.data.campaign))
-//       .catch((err) => setError(err.message))
-//       .finally(() => setLoading(false));
-//   }, [campaignId]);
-
-//   if (loading) return (
-//     <div className="flex items-center justify-center min-h-screen">
-//       <div className="w-8 h-8 border-2 border-[#94D3C1] border-t-transparent rounded-full animate-spin" />
-//     </div>
-//   );
-
-//   if (error) return (
-//     <div className="flex items-center justify-center min-h-screen text-red-400">
-//       {error}
-//     </div>
-//   );
-
-//   return <CampaignDetails campaign={campaign} />;
-// }

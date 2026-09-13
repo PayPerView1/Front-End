@@ -174,7 +174,7 @@ export default function CampaignDetails({ campaign }) {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <button type="button"
-              onClick={() => router.push(`/${locale}/advertiser/campaigns/${campaign._id}/copy`)}
+              onClick={() => router.push(`/${locale}/advertiser/campaigns1/${campaign._id}/copy`)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold cursor-pointer bg-transparent transition-all hover:opacity-80"
               style={{ borderColor: th.copyBorder, color: th.copyText }}>
               <HiOutlineDocumentDuplicate size={14} color={th.copyText} />
