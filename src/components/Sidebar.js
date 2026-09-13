@@ -44,7 +44,7 @@ const creatorResourceItems = [
 
 // ─── قائمة صاحب الحملة (BRAND/ADVERTISER) ────────────────────
 const advertiserNavItems = [
-  { label: "dashboard", href: "/advertiser/campaigns", icon: MdOutlineDashboard, useMd: true },
+  { label: "dashboard", href: "/advertiser/campaigns1", icon: MdOutlineDashboard, useMd: true },
   {
     label: "analytics",
     href: "/advertiser/analytics",
