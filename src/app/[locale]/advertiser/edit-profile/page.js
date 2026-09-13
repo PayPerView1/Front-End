@@ -1,9 +1,0 @@
-import EditProfileContent from "@/app/[locale]/creator/edit-profile/components/EditProfileContent";
-
-export const metadata = {
-  title: "تعديل الملف الشخصي | Pay Per View",
-};
-
-export default function AdvertiserEditProfilePage() {
-  return <EditProfileContent />;
-}
