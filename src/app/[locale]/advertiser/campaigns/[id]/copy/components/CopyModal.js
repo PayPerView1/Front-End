@@ -31,7 +31,7 @@ export default function CopyModal({ campaign }) {
     // الـ API بيرجع draft جديد ← نروح لصفحة الحملات
     // res = { success, message, data: { draft: { _id, name, status } } }
     console.log("Copied draft:", res?.data?.draft);
-    router.push(`/${locale}/advertiser/campaigns1`);
+    router.push(`/${locale}/advertiser/campaigns`);
 
   } catch (err) {
     console.error("Copy failed:", err);

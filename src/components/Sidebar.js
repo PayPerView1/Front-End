@@ -67,7 +67,7 @@ const advertiserNavItems = [
   {
     label: "newCampaign",
 
-    href: "/advertiser/creat-compign",
+    href: "/advertiser/create-campaign",
 
     icon: MdAddBox,
     useMd: true,

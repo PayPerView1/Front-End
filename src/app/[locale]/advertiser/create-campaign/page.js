@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import { useRouter } from "@/i18n/navigation";
 import { FiCalendar, FiFileText } from "react-icons/fi"; 
-import { saveDraft, autoSaveDraft, submitDraft, createCampaign } from "@/lib/campaignApi";
+import { saveDraft, autoSaveDraft, submitDraft, createCampaign, createCampaignJson } from "@/services/campaignApi";
 import { getDraftById } from "@/services/drafts";
 import {
   MdVolumeUp,
@@ -325,39 +325,23 @@ function Step3({
   MAX_MB = 20,
 }) {
   const MAX_SIZE = MAX_MB * 1024 * 1024;
-  const [sizeErrorToast, setSizeErrorToast] = useState("");
-
-  useEffect(() => {
-    if (sizeErrorToast && !files.some((f) => f.status === "failed")) {
-      setSizeErrorToast("");
-    }
-  }, [files, sizeErrorToast]);
 
   const addFiles = (incoming) => {
     let hasOverSize = false;
-    let overSizeFileName = "";
-
     const newFiles = Array.from(incoming).map((f) => {
       const isOverSize = f.size > MAX_SIZE;
-      if (isOverSize) {
-        hasOverSize = true;
-        overSizeFileName = f.name;
-      }
+      if (isOverSize) hasOverSize = true;
       return {
         file: f,
         id: Math.random().toString(36).slice(2),
         progress: isOverSize ? 0 : 100,
         status: isOverSize ? "failed" : "success",
-        errorMsg: isOverSize
-          ? (t("step3.sizeError") || `فشل في رفع المرفق: حجم الملف يتجاوز الحد الأقصى المسموح به (${MAX_MB} ميجابايت)`)
-          : null,
+        errorMsg: isOverSize ? "فشل في رفع المرفق (تجاوز 20 ميجابايت)" : null,
       };
     });
 
     if (hasOverSize) {
-      const msg = t("step3.sizeErrorToast", { name: overSizeFileName }) ||
-        `عذراً، تعذر رفع الملف "${overSizeFileName}" لأن حجمه يتجاوز الحد الأقصى المسموح به وهو ${MAX_MB} ميجابايت.`;
-      setSizeErrorToast(msg);
+      alert("عذراً، بعض الملفات المرفقة تتجاوز الحد الأقصى المسموح به وهو 20 ميجابايت.");
     }
 
     setFiles((p) => [...p, ...newFiles]);
@@ -383,23 +367,6 @@ function Step3({
   return (
     <div className="flex flex-col gap-5">
       <p className={`text-sm ${dark ? "text-[#9A9A9A]" : "text-[#666]"}`}>{t("step3.intro")}</p>
-      
-      {sizeErrorToast && (
-        <div className="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-[#FFF5F5] border border-[#E53535] text-[#E53535] text-xs font-medium">
-          <div className="flex items-center gap-2">
-            <MdErrorOutline size={20} className="shrink-0 text-[#E53535]" />
-            <span>{sizeErrorToast}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setSizeErrorToast("")}
-            className="text-[#E53535] hover:opacity-75 bg-transparent border-none cursor-pointer text-sm font-bold"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -443,8 +410,8 @@ function Step3({
             </span>
           ))}
         </div>
-        <p className={`text-[0.72rem] font-medium mb-3.5 ${dark ? "text-[#9A9A9A]" : "text-[#666]"}`}>
-          {t("step3.maxSize") || `الحد الأقصى لحجم الملف هو ${MAX_MB} ميجابايت`}
+        <p className={`text-[0.72rem] mb-3.5 ${dark ? "text-[#9A9A9A]" : "text-[#666]"}`}>
+          الحد الأقصى لحجم الملف هو {MAX_MB} ميجابايت
         </p>
         <button
           type="button"
@@ -496,7 +463,7 @@ function Step3({
                     {f.file.name}
                   </p>
                   <p className={`text-[0.72rem] mt-0.5 ${isFailed ? "text-[#E53535]" : dark ? "text-[#9A9A9A]" : "text-[#666]"}`}>
-                    {isFailed ? `${f.errorMsg} (${fmtSize(f.file.size)})` : `${t("step3.complete")} · ${fmtSize(f.file.size)}`}
+                    {isFailed ? f.errorMsg : `${t("step3.complete")} · ${fmtSize(f.file.size)}`}
                   </p>
                   {!isFailed && (
                     <div className={`h-0.5 rounded mt-1.5 ${dark ? "bg-[#2A2A2A]" : "bg-[#E5E5E5]"}`}>
@@ -517,9 +484,7 @@ function Step3({
         </div>
       )}
       {attempted && files.filter((f) => f.status === "success").length === 0 && (
-        <p className="text-[0.78rem] text-[#E53535]">
-          {t("step3.required") || "يرجى رفع ملف صحيح واحد على الأقل (بحجم لا يتجاوز 20 ميجابايت) للمتابعة."}
-        </p>
+        <p className="text-[0.78rem] text-[#E53535]">يرجى رفع ملف صحيح واحد على الأقل للمتابعة.</p>
       )}
     </div>
   );
@@ -703,30 +668,40 @@ export default function NewCampaignPage() {
     async function loadDraftData() {
       try {
         const res = await getDraftById(urlDraftId);
-        const d = res?.draft || res?.campaign || res;
+        const d = res?.draft || res?.campaign || res?.data?.draft || res?.data?.campaign || res?.data || res;
         if (d) {
-          setForm({
+          const budgetVal = d.totalBudget != null ? String(d.totalBudget) : d.budget != null ? String(d.budget) : "";
+          const cpmVal = d.cpm != null ? String(d.cpm) : d.rewardPerView != null ? String(d.rewardPerView) : "";
+          const startDateVal = d.startDate ? String(d.startDate).split("T")[0] : "";
+          const endDateVal = d.endDate ? String(d.endDate).split("T")[0] : "";
+          const mainIdeaVal = d.brief?.mainIdea || d.description || d.brief?.description || "";
+
+          setForm((prev) => ({
+            ...prev,
             name: d.name || d.title || "",
-            totalBudget: d.totalBudget ? String(d.totalBudget) : "",
-            cpm: d.cpm ? String(d.cpm) : "",
-            startDate: d.startDate ? d.startDate.split("T")[0] : "",
-            endDate: d.endDate ? d.endDate.split("T")[0] : "",
+            totalBudget: budgetVal,
+            cpm: cpmVal,
+            startDate: startDateVal,
+            endDate: endDateVal,
             contentType: d.contentType || d.category || "",
             category: d.category || d.contentType || "",
             audience: d.brief?.audience || d.audience || "",
             subCategories: d.subCategories || [],
             targetCountries: d.targetCountries || [],
             brief: {
-              mainIdea: d.brief?.mainIdea || "",
+              ...prev.brief,
+              mainIdea: mainIdeaVal,
               tone: d.brief?.tone || "",
               keyMessages: d.brief?.keyMessages || "",
               keywords: d.brief?.keywords || [],
               visualReferences: d.brief?.visualReferences || "",
             },
-          });
-          if (d.brief?.mainIdea || d.description) {
-            setDescription(d.brief?.mainIdea || d.description || "");
+          }));
+
+          if (mainIdeaVal) {
+            setDescription(mainIdeaVal);
           }
+
           if (d.halalDeclared || d.halalDeclaration) {
             const h = typeof d.halalDeclaration === "object" ? d.halalDeclaration : {};
             setChecked({
@@ -752,21 +727,38 @@ export default function NewCampaignPage() {
 
   const canNext = () => [step1Valid, step2Valid, step3Valid, true][step - 1];
 
+const COUNTRY_MAP = {
+  SA: "SAU", AE: "ARE", EG: "EGY", KW: "KWT", QA: "QAT",
+  BH: "BHR", OM: "OMN", JO: "JOR", IQ: "IRQ", US: "USA",
+  UK: "GBR", GB: "GBR", MA: "MAR", DZ: "DZA", TN: "TUN",
+  LY: "LBY", SD: "SDN", YE: "YEM", SY: "SYR", LB: "LBN", PS: "PSE",
+};
+
+function normalizeCountryCodes(countries) {
+  if (!countries || !countries.length) return ["SAU"];
+  return countries.map((c) => {
+    if (!c) return "SAU";
+    if (c.length === 3) return c.toUpperCase();
+    return COUNTRY_MAP[c.toUpperCase()] || "SAU";
+  });
+}
+
   const handleSaveDraft = async () => {
     const payload = {
       name: form.name,
       contentType: form.contentType || undefined,
-      category: form.category || undefined,
+      category: form.category || form.contentType || undefined,
       totalBudget: form.totalBudget ? Number(form.totalBudget) : undefined,
       cpm: form.cpm ? Number(form.cpm) : undefined,
       startDate: form.startDate || undefined,
       endDate: form.endDate || undefined,
-      targetCountries: form.targetCountries,
+      targetCountries: normalizeCountryCodes(form.targetCountries),
       brief: {
         ...form.brief,
         mainIdea: description || form.brief.mainIdea,
         audience: form.audience,
       },
+      halalDeclaration: checked,
       halalDeclared: Object.values(checked).every(Boolean),
     };
 
@@ -791,45 +783,41 @@ export default function NewCampaignPage() {
     try {
       if (draftId) {
         const res = await submitDraft(draftId);
-        if (res.success === "true") {
+        if (res.success === "true" || res.success === true) {
           alert("تم إرسال الحملة للمراجعة ✅");
+          window.location.href = `/${locale}/advertiser/campaigns`;
         } else {
-          alert(res.message);
+          alert(res.message || "حدث خطأ أثناء إرسال المسودة");
         }
       } else {
-        const formData = new FormData();
-        formData.append("name", form.name);
-        formData.append("contentType", form.contentType || "MIXED");
-        formData.append("category", form.contentType || "MIXED");
-        if (form.totalBudget) formData.append("totalBudget", Number(form.totalBudget));
-        if (form.cpm) formData.append("cpm", Number(form.cpm));
-        formData.append(
-          "brief",
-          JSON.stringify({
+        // إرسال كـ JSON بدل FormData لتفادي مشكلة multer "Unexpected field"
+        const payload = {
+          name: form.name,
+          contentType: form.contentType,
+          category: form.category || form.contentType,
+          totalBudget: Number(form.totalBudget),
+          rewardPerView: Number(form.cpm),
+          cpm: Number(form.cpm),
+          startDate: form.startDate,
+          endDate: form.endDate,
+          currency: "USD",
+          targetCountries: normalizeCountryCodes(form.targetCountries),
+          halalDeclaration: checked,
+          halalDeclared: Object.values(checked).every(Boolean),
+          brief: {
             ...form.brief,
             mainIdea: description || form.brief.mainIdea,
             audience: form.audience,
-          })
-        );
-        formData.append("targetCountries", JSON.stringify(form.targetCountries));
-        formData.append("halalDeclaration", JSON.stringify(checked));
+          },
+        };
 
-        // فقط إرسال الملفات المقبولة للـ API
-        const validFiles = files.filter((f) => f.status === "success");
-        validFiles.forEach((f) => formData.append("files", f.file));
-
-        const res = await createCampaign(formData);
-        if (res.success === "true" || res.success === true) {
-          alert("تم إرسال الحملة ✅");
-          router.push("/advertiser/campaigns");
-        } else {
-          alert(res.message || "تم إرسال الحملة بنجاح");
-        }
+        await createCampaignJson(payload);
+        // إعادة تحميل كاملة لصفحة الحملات لعرض الحملة الجديدة
+        window.location.href = `/${locale}/advertiser/campaigns`;
       }
     } catch (err) {
       console.error("خطأ في الإرسال:", err);
-      const errMsg = err?.response?.data?.message || err?.message || "حدث خطأ، حاول مرة أخرى";
-      alert(errMsg);
+      alert(err.message || "حدث خطأ، حاول مرة أخرى");
     } finally {
       setIsSubmitting(false);
     }

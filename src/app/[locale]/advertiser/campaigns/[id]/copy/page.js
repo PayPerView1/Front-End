@@ -8,6 +8,7 @@ async function getCampaign(id) {
 }
 
 export default async function CopyPage({ params }) {
-  const campaign = await getCampaign(params.id);
-  return <CopyOverlay campaignId={params.id}/>;
+  const { id } = await params;
+  const campaign = await getCampaign(id);
+  return <CopyOverlay campaignId={id}/>;
 }

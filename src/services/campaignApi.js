@@ -59,11 +59,32 @@ export async function createCampaign(formData) {
     });
     return response.data;
   } catch (error) {
-    console.warn("API createCampaign error:", error.message);
-    return {
-      success: "true",
-      message: "تم إرسال الحملة بنجاح",
-    };
+    const errData = error?.response?.data;
+    let msg = errData?.message;
+    if (!msg && Array.isArray(errData?.errors)) {
+      msg = errData.errors.map((e) => (typeof e === "object" ? e.message || JSON.stringify(e) : e)).join(", ");
+    }
+    if (!msg) msg = error.message || "حدث خطأ في إنشاء الحملة";
+    throw new Error(msg);
+  }
+}
+
+
+// ─── CREATE Campaign as JSON (no file upload) ────────────────────────────────
+export async function createCampaignJson(data) {
+  try {
+    const response = await axiosInstance.post("/api/v1/campaigns", data, {
+      headers: { "Content-Type": "application/json" },
+    });
+    return response.data;
+  } catch (error) {
+    const errData = error?.response?.data;
+    let msg = errData?.message;
+    if (!msg && Array.isArray(errData?.errors)) {
+      msg = errData.errors.map((e) => (typeof e === "object" ? e.message || JSON.stringify(e) : e)).join(", ");
+    }
+    if (!msg) msg = error.message || "حدث خطأ في إنشاء الحملة";
+    throw new Error(msg);
   }
 }
 

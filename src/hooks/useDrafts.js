@@ -43,12 +43,12 @@ function getStatusBadge(expiresAt) {
  */
 function calcProgress(draft) {
   let score = 0;
-  if (draft.name)                           score += 20;
-  if (draft.contentType)                    score += 20;
-  if (draft.targetCountries?.length > 0)    score += 20;
-  if (draft.totalBudget > 0)               score += 20;
-  if (draft.halalDeclared)                  score += 20;
-  return score;
+  if (draft.name || draft.title)                         score += 20;
+  if (draft.contentType || draft.category)              score += 20;
+  if (draft.targetCountries?.length > 0)                score += 20;
+  if (Number(draft.totalBudget) > 0 || Number(draft.cpm) > 0) score += 20;
+  if (draft.halalDeclared || draft.halalDeclaration)    score += 20;
+  return score || 20;
 }
 
 /**
@@ -57,9 +57,10 @@ function calcProgress(draft) {
 function mapDraft(apiDraft) {
   const { statusBadge, statusBadgeColor } = getStatusBadge(apiDraft.expiresAt);
 
-  const lastSaved = apiDraft.lastSavedAt
+  const dateVal = apiDraft.lastSavedAt || apiDraft.updatedAt || apiDraft.createdAt;
+  const lastSaved = dateVal
     ? (() => {
-        const diffMs  = Date.now() - new Date(apiDraft.lastSavedAt).getTime();
+        const diffMs  = Date.now() - new Date(dateVal).getTime();
         const diffMin = Math.floor(diffMs / 60_000);
         const diffHr  = Math.floor(diffMs / 3_600_000);
         const diffDay = Math.floor(diffMs / 86_400_000);
@@ -69,11 +70,11 @@ function mapDraft(apiDraft) {
         if (diffHr  < 24)  return `آخر تعديل: قبل ${diffHr} ساعة`;
         return `آخر تعديل: قبل ${diffDay} يوم`;
       })()
-    : "";
+    : "آخر تعديل: مؤخراً";
 
   return {
-    id:               apiDraft._id,
-    title:            apiDraft.name,
+    id:               apiDraft._id || apiDraft.id,
+    title:            apiDraft.name || apiDraft.title || "مسودة بدون عنوان",
     lastModified:     lastSaved,
     statusBadge,
     statusBadgeColor,

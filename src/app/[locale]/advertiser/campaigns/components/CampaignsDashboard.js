@@ -65,32 +65,7 @@ const contentTypeConfig = {
   },
 };
 
-const MOCK_CAMPAIGNS = [
-  {
-    _id: "1",
-    name: "حملة الربع الرابع - ألفا",
-    contentType: "CLIPPING",
-    status: "ACTIVE",
-    totalBudget: 100000,
-    createdAt: "2024-10-01T00:00:00.000Z",
-  },
-  {
-    _id: "2",
-    name: "حملة الصيف 2024",
-    contentType: "UGC",
-    status: "DRAFT",
-    totalBudget: 50000,
-    createdAt: "2024-06-01T00:00:00.000Z",
-  },
-  {
-    _id: "3",
-    name: "حملة رمضان",
-    contentType: "MIXED",
-    status: "COMPLETED",
-    totalBudget: 75000,
-    createdAt: "2024-03-01T00:00:00.000Z",
-  },
-];
+
 
 export default function CampaignsDashboard() {
   const router = useRouter();
@@ -376,11 +351,10 @@ export default function CampaignsDashboard() {
       <div className="py-3 flex items-center justify-between gap-3">
         <div
           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border
-  ${
-    isDark
-      ? "bg-[#1A1A1A] border-[#2D2D2D]"
-      : "bg-white border-[#E2E8F0] shadow-sm"
-  }
+  ${isDark
+              ? "bg-[#1A1A1A] border-[#2D2D2D]"
+              : "bg-white border-[#E2E8F0] shadow-sm"
+            }
   hover:border-[#94D3C1] transition-all`}
         >
           <MdSearch size={16} color="#9A9A9A" />
@@ -402,12 +376,11 @@ export default function CampaignsDashboard() {
             <button
               onClick={() => setStatusDropdown(!statusDropdown)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer hover:border-[#94D3C1]
-                ${
-                  statusFilter !== "ALL"
-                    ? "border-[#94D3C1] bg-[#94D3C1]/10 text-[#94D3C1]"
-                    : isDark
-                      ? "bg-[#1A1A1A] border-[#2D2D2D] text-[#E1E3E4]"
-                      : "bg-white border-[#E2E8F0] text-[#374151] shadow-sm"
+                ${statusFilter !== "ALL"
+                  ? "border-[#94D3C1] bg-[#94D3C1]/10 text-[#94D3C1]"
+                  : isDark
+                    ? "bg-[#1A1A1A] border-[#2D2D2D] text-[#E1E3E4]"
+                    : "bg-white border-[#E2E8F0] text-[#374151] shadow-sm"
                 }`}
             >
               <MdOutlineFilterList
@@ -518,7 +491,7 @@ export default function CampaignsDashboard() {
                       {/* اسم الحملة */}
                       <td className="px-4 py-3.5">
                         <div
-                          className={`flex items-center gap-3 ${locale === "ar" ?  "flex-row-reverse justify-end" : "flex-row-reverse justify-end"}`}
+                          className={`flex items-center gap-3 ${locale === "ar" ? "flex-row-reverse justify-end" : "flex-row-reverse justify-end"}`}
                         >
                           <div>
                             <p
@@ -578,13 +551,13 @@ export default function CampaignsDashboard() {
                       >
                         {campaign.createdAt
                           ? new Date(campaign.createdAt).toLocaleDateString(
-                              locale === "ar" ? "ar-SA" : "en-US",
-                              {
-                                year: "numeric",
-                                month: "short",
-                                day: "2-digit",
-                              },
-                            )
+                            locale === "ar" ? "ar-SA" : "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "2-digit",
+                            },
+                          )
                           : "-"}
                       </td>
 
@@ -613,7 +586,7 @@ export default function CampaignsDashboard() {
                                 onClick={() => {
                                   setOpenMenu(null);
                                   router.push(
-                                    `/${locale}/advertiser/campaigns1/${campaign._id}`,
+                                    `/${locale}/advertiser/campaigns/${campaign._id}`,
                                   );
                                 }}
                                 className={`w-full flex items-center gap-2 px-3 py-2 text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all hover:bg-[#94D3C1]/10 ${t.text}`}
@@ -626,7 +599,7 @@ export default function CampaignsDashboard() {
                                 onClick={() => {
                                   setOpenMenu(null);
                                   router.push(
-                                    `/${locale}/advertiser/campaigns1/${campaign._id}/stats`,
+                                    `/${locale}/advertiser/campaigns/${campaign._id}/stats`,
                                   );
                                 }}
                                 className={`w-full flex items-center gap-2 px-3 py-2 text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all hover:bg-[#94D3C1]/10 ${t.text}`}

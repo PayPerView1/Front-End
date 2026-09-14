@@ -1,6 +1,7 @@
-// app/[locale]/advertiser/campaigns1/[id]/page.jsx
+// app/[locale]/advertiser/campaigns/[id]/page.jsx
 import CampaignDetailsClient from "./components/CampaignDetailsClient";
 
-export default function CampaignDetailsPage({ params }) {
-  return <CampaignDetailsClient campaignId={params.id} />;
+export default async function CampaignDetailsPage({ params }) {
+  const { id } = await params;
+  return <CampaignDetailsClient campaignId={id} />;
 }

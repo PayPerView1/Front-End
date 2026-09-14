@@ -125,77 +125,84 @@ export default function CampaignStats({ campaignId }) {
     },
   };
 
-  const legendItems = [
-    { label: t("legendUGC"), pct: 45 },
-    { label: t("legendClipping"), pct: 30 },
-    { label: t("legendSponsorship"), pct: 20 },
-    { label: t("legendOther"), pct: 5 },
-  ];
-
   const [campaign, setCampaign] = useState(null);
   const [loading, setLoading] = useState(!!campaignId);
+  const [error, setError] = useState(null);
 
-   useEffect(() => {
-  if (!campaignId) return; // ← بدون setLoading
+  useEffect(() => {
+    if (!campaignId) return;
+    setLoading(true);
 
-  Promise.all([
-    getCampaignById(campaignId),
-    getCampaignStatistics(),
-  ])
-    .then(([campaignRes, statsRes]) => {
-      const campaignData = campaignRes?.data?.campaign;
-      const statistics   = statsRes?.data?.statistics;
-      const byCategory   = statistics?.byCategory || {};
-      const totalCat     = Object.values(byCategory).reduce((s, v) => s + v, 0) || 1;
+    Promise.all([
+      getCampaignById(campaignId),
+      getCampaignStatistics(),
+    ])
+      .then(([campaignRes, statsRes]) => {
+        const campaignData = campaignRes?.data?.campaign || campaignRes?.campaign || (campaignRes?.data && typeof campaignRes.data === "object" ? campaignRes.data : null);
+        const statistics   = statsRes?.data?.statistics || statsRes?.statistics || statsRes?.data;
+        const byCategory   = statistics?.byCategory || {};
+        const totalCat     = Object.values(byCategory).reduce((s, v) => s + v, 0) || 1;
 
-      const categoryBreakdown = Object.entries(byCategory).map(([type, count]) => ({
-        type,
-        spent:    Math.round((count / totalCat) * (campaignData?.stats?.totalSpent || 0)),
-        reach:    Math.round((count / totalCat) * (campaignData?.stats?.totalViews  || 0)),
-        ctr:      0,
-        roi:      0,
-        progress: Math.round((count / totalCat) * 100),
-      }));
+        if (campaignData) {
+          const categoryBreakdown = Object.entries(byCategory).length > 0
+            ? Object.entries(byCategory).map(([type, count]) => ({
+                type,
+                spent:    Math.round((count / totalCat) * (campaignData?.stats?.totalSpent || campaignData?.totalBudget || 0)),
+                reach:    Math.round((count / totalCat) * (campaignData?.stats?.totalViews  || 0)),
+                ctr:      0,
+                roi:      0,
+                progress: Math.round((count / totalCat) * 100),
+              }))
+            : [
+                {
+                  type: campaignData.contentType || campaignData.category || "CLIPPING",
+                  spent: Number(campaignData.stats?.totalSpent || campaignData.spent || 0),
+                  reach: Number(campaignData.stats?.totalViews || campaignData.views || 0),
+                  ctr: 0,
+                  roi: 0,
+                  progress: Number(campaignData.totalBudget) > 0 ? Math.min(100, Math.round(((campaignData.stats?.totalSpent || 0) / Number(campaignData.totalBudget)) * 100)) : 0,
+                },
+              ];
 
-      setCampaign(campaignData ? { ...campaignData, categoryBreakdown } : {
-        _id: campaignId,
-        name: "حملة الربع الرابع",
-        totalBudget: 210000,
-        stats: { totalSpent: 210000, totalViews: 3500000, totalApprovedVideos: 91, totalCreators: 124 },
-        categoryBreakdown: [
-          { type: "UGC",      spent: 124000, reach: 2400000, ctr: 4.2, roi: 340, progress: 85, badge: "+12% نمو" },
-          { type: "CLIPPING", spent: 86000,  reach: 1100000, ctr: 2.8, roi: 210, progress: 60 },
-        ],
-      });
-    })
-    .catch(() => {
-      setCampaign({
-        _id: campaignId,
-        name: "حملة الربع الرابع",
-        totalBudget: 210000,
-        stats: { totalSpent: 210000, totalViews: 3500000, totalApprovedVideos: 91, totalCreators: 124 },
-        categoryBreakdown: [
-          { type: "UGC",      spent: 124000, reach: 2400000, ctr: 4.2, roi: 340, progress: 85, badge: "+12% نمو" },
-          { type: "CLIPPING", spent: 86000,  reach: 1100000, ctr: 2.8, roi: 210, progress: 60 },
-        ],
-      });
-    })
-    .finally(() => setLoading(false)); // ← هون بس
-}, [campaignId]);
-const handleExport = async () => {
-  try {
-    const res = await exportCampaign(campaignId);
-    const url  = window.URL.createObjectURL(new Blob([res.data]));
-    const link = document.createElement("a");
-    link.href  = url;
-    link.setAttribute("download", `campaign-${campaignId}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  } catch (err) {
-    console.error("Export failed", err);
-  }
-};
+          setCampaign({
+            ...campaignData,
+            categoryBreakdown,
+          });
+        } else {
+          setError("لم يتم العثور على بيانات هذه الحملة في قاعدة البيانات");
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load campaign stats:", err);
+        // Fallback try loading campaign directly
+        getCampaignById(campaignId)
+          .then((res) => {
+            const cData = res?.data?.campaign || res?.campaign || (res?.data && typeof res.data === "object" ? res.data : null);
+            if (cData) {
+              setCampaign(cData);
+            } else {
+              setError("تعذر جلب إحصائيات الحملة");
+            }
+          })
+          .catch(() => setError("حدث خطأ أثناء الاتصال بالسيرفر"));
+      })
+      .finally(() => setLoading(false));
+  }, [campaignId]);
+
+  const handleExport = async () => {
+    try {
+      const res = await exportCampaign(campaignId);
+      const url  = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href  = url;
+      link.setAttribute("download", `campaign-${campaignId}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("Export failed", err);
+    }
+  };
 
   const th = {
     bg: isDark ? "bg-[#0D0D0D]" : "bg-[#F0F2F5]",
@@ -213,10 +220,38 @@ const handleExport = async () => {
       </div>
     );
 
-  if (!campaign) return null;
+  if (error || !campaign)
+    return (
+      <div className={`flex flex-col items-center justify-center min-h-screen p-4 ${th.bg}`}>
+        <p className="text-red-400 text-sm font-semibold mb-4">{error || "لم يتم العثور على إحصائيات هذه الحملة"}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 text-xs rounded-lg bg-[#94D3C1] text-black font-bold cursor-pointer"
+        >
+          إعادة المحاولة
+        </button>
+      </div>
+    );
 
-  const breakdown = campaign.categoryBreakdown || [];
-  const total = campaign.stats?.totalCreators || 0;
+  const breakdown = campaign.categoryBreakdown?.length
+    ? campaign.categoryBreakdown
+    : [
+        {
+          type: campaign.contentType || campaign.category || "CLIPPING",
+          spent: Number(campaign.stats?.totalSpent || campaign.spent || 0),
+          reach: Number(campaign.stats?.totalViews || campaign.views || 0),
+          ctr: 0,
+          roi: 0,
+          progress: Number(campaign.totalBudget) > 0 ? Math.min(100, Math.round(((campaign.stats?.totalSpent || 0) / Number(campaign.totalBudget)) * 100)) : 0,
+        },
+      ];
+
+  const total = Number(campaign.stats?.totalCreators || campaign.creatorsCount || 0);
+
+  const legendItems = breakdown.map((item) => ({
+    label: categoryConfig[item.type]?.label || item.type,
+    pct: item.progress || (breakdown.length === 1 ? 100 : Math.round(100 / breakdown.length)),
+  }));
 
   return (
     <div

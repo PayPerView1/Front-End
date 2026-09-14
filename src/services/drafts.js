@@ -9,99 +9,96 @@ import axiosInstance from "@/lib/axiosInstance";
 
 const STORAGE_KEY = "ppv_local_drafts";
 
-// ─── Local Storage Helpers ───────────────────────────────────────────────────
+// ─── Local Storage Helpers ────────────────────────────────────────────────────
 
-function getLocalDrafts() {
-  if (typeof window === "undefined") return [];
+export function getLocalDrafts() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const raw1 = localStorage.getItem(STORAGE_KEY);
+    const raw2 = localStorage.getItem("ppv_drafts");
+    const d1 = raw1 ? JSON.parse(raw1) : [];
+    const d2 = raw2 ? JSON.parse(raw2) : [];
+    // دمج وتصفية المكررات
+    const map = new Map();
+    [...d1, ...d2].forEach((item) => {
+      const id = item._id || item.id;
+      if (id && !map.has(id)) map.set(id, item);
+    });
+    return Array.from(map.values());
   } catch {
     return [];
   }
 }
 
 export function saveLocalDraft(data) {
-  if (typeof window === "undefined") return null;
-  try {
-    const drafts = getLocalDrafts();
-    const newDraft = {
-      _id: "draft-" + Date.now(),
-      name: data.name || "مسودة جديدة",
-      contentType: data.contentType || "CLIPPING",
-      totalBudget: data.totalBudget || 0,
-      cpm: data.cpm || 0,
-      status: "DRAFT",
-      version: 1,
-      lastSavedAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 30 * 86400000).toISOString(),
-      createdAt: new Date().toISOString(),
-      ...data,
-    };
-    drafts.unshift(newDraft);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(drafts));
-    return newDraft;
-  } catch {
-    return null;
-  }
+  const drafts = getLocalDrafts();
+  const newDraft = {
+    _id: `local_${Date.now()}`,
+    ...data,
+    status: "DRAFT",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isLocal: true,
+  };
+  drafts.unshift(newDraft);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(drafts));
+  return newDraft;
 }
 
 export function updateLocalDraft(draftId, data) {
-  if (typeof window === "undefined") return null;
-  try {
-    const drafts = getLocalDrafts();
-    const idx = drafts.findIndex((d) => d._id === draftId);
-    if (idx !== -1) {
-      drafts[idx] = {
-        ...drafts[idx],
-        ...data,
-        lastSavedAt: new Date().toISOString(),
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(drafts));
-      return drafts[idx];
-    }
-  } catch {}
-  return null;
+  const drafts = getLocalDrafts();
+  const idx = drafts.findIndex((d) => d._id === draftId || d.id === draftId);
+  if (idx === -1) return null;
+  drafts[idx] = { ...drafts[idx], ...data, updatedAt: new Date().toISOString() };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(drafts));
+  return drafts[idx];
 }
 
 export function removeLocalDraft(draftId) {
-  if (typeof window === "undefined") return;
-  try {
-    const drafts = getLocalDrafts().filter((d) => d._id !== draftId);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(drafts));
-  } catch {}
+  const drafts = getLocalDrafts();
+  const filtered = drafts.filter((d) => d._id !== draftId && d.id !== draftId);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
 }
+
+
 
 // ─── GET Active Drafts ────────────────────────────────────────────────────────
 export async function getDrafts(params = {}) {
   let apiCampaigns = [];
   try {
-    const response = await axiosInstance.get("/api/v1/campaigns", {
-      params: {
-        status: "DRAFT",
-        limit: 50,
-        sortBy: "createdAt",
-        sortOrder: "desc",
-        ...params,
-      },
-    });
-    const d = response?.data?.data;
-    apiCampaigns = d?.campaigns || d?.drafts || (Array.isArray(d) ? d : []);
+    let response;
+    try {
+      response = await axiosInstance.get("/api/v1/campaigns/drafts", { params });
+    } catch {
+      response = await axiosInstance.get("/api/v1/campaigns", {
+        params: {
+          status: "DRAFT",
+          limit: 50,
+          sortBy: "createdAt",
+          sortOrder: "desc",
+          ...params,
+        },
+      });
+    }
+    const resData = response?.data;
+    const d = resData?.data || resData;
+    apiCampaigns =
+      d?.drafts ||
+      d?.campaigns ||
+      resData?.drafts ||
+      resData?.campaigns ||
+      (Array.isArray(d) ? d : Array.isArray(resData) ? resData : []);
   } catch (error) {
-    console.warn(
-      "API getDrafts 404/Error, loading local drafts fallback:",
-      error.message
-    );
+    console.warn("API getDrafts Error, loading local drafts fallback:", error.message);
   }
 
   const local = getLocalDrafts().filter((d) => d.status !== "EXPIRED");
-  const existingIds = new Set(apiCampaigns.map((c) => c._id));
+  const existingIds = new Set(apiCampaigns.map((c) => c._id || c.id));
   const merged = [
-    ...local.filter((l) => !existingIds.has(l._id)),
+    ...local.filter((l) => !existingIds.has(l._id) && !existingIds.has(l.id)),
     ...apiCampaigns,
   ];
 
-  return { campaigns: merged };
+  return { campaigns: merged, drafts: merged };
 }
 
 // ─── GET Expired Drafts ───────────────────────────────────────────────────────
@@ -147,10 +144,19 @@ export async function getDraftById(draftId) {
     const response = await axiosInstance.get(
       `/api/v1/campaigns/drafts/${draftId}`
     );
-    return response.data.data;
+    const resData = response?.data;
+    const d = resData?.data || resData;
+    return { draft: d?.draft || d?.campaign || d };
   } catch (error) {
-    if (local) return { draft: local };
-    throw error;
+    try {
+      const response2 = await axiosInstance.get(`/api/v1/campaigns/${draftId}`);
+      const resData2 = response2?.data;
+      const d2 = resData2?.data || resData2;
+      return { draft: d2?.campaign || d2?.draft || d2 };
+    } catch {
+      if (local) return { draft: local };
+      throw error;
+    }
   }
 }
 

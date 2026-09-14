@@ -38,8 +38,8 @@ export default function CampaignDetailsClient({ campaignId }) {
 
   getCampaignById(campaignId)
     .then((res) => {
-      const data = res?.data?.campaign;
-      if (data) {
+      const data = res?.data?.campaign || res?.campaign || (res?.data && typeof res.data === "object" ? res.data : null);
+      if (data && (data._id || data.id || data.name)) {
         setCampaign(data);
       } else {
         console.warn("No campaign data returned, using mock.");
