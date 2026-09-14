@@ -24,7 +24,7 @@ import {
 
 import { useTheme } from "@/context/ThemeContext";
 import { BsList, BsX } from "react-icons/bs";
-import { useLocale, useTranslations  } from "next-intl";
+import { useLocale, useTranslations, useMessages } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useUser } from "@/context/UserContext";
 
@@ -45,8 +45,13 @@ const creatorResourceItems = [
 
 // ─── قائمة صاحب الحملة (BRAND/ADVERTISER) ────────────────────
 const advertiserNavItems = [
-{ label: "dashboard", href: "/advertiser/campaigns1", icon: MdOutlineDashboard, useMd: true },
-
+  { label: "dashboard", href: "/advertiser/dashboard", icon: MdOutlineDashboard, useMd: true },
+  {
+    label: "manageCampaigns",
+    href: "/advertiser/campaigns",
+    icon: MdBarChart,
+    useMd: true,
+  },
   {
     label: "analytics",
     href: "/advertiser/analytics",
@@ -61,7 +66,7 @@ const advertiserNavItems = [
   },
   {
     label: "newCampaign",
-    href: "/advertiser/campaigns",
+    href: "/advertiser/create-campaign",
     icon: MdAddBox,
     useMd: true,
   },
@@ -96,6 +101,7 @@ const sidebarFallbacksEn = {
   blog: "Blog",
 
   dashboard: "Dashboard",
+  manageCampaigns: "Manage Campaigns",
   analytics: "Analytics & Reports",
   clips: "Manage Clips",
   newCampaign: "Create New Campaign",
@@ -115,6 +121,7 @@ const sidebarFallbacksAr = {
   help: "المساعدة",
   blog: "المدونة",
   dashboard: "لوحة التحكم الرئيسية",
+  manageCampaigns: "إدارة الحملات",
   analytics: "التقارير والتحليلات",
   clips: "إدارة المقاطع",
   newCampaign: "إنشاء حملة جديدة",

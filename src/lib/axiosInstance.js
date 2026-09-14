@@ -62,6 +62,7 @@ export function clearAuthData() {
 }
 
 function getCookie(name) {
+  if (typeof document === "undefined") return null;
   const value = document.cookie
     .split("; ")
     .find((cookie) => cookie.startsWith(`${name}=`))
@@ -72,12 +73,14 @@ function getCookie(name) {
 }
 
 function setCookie(name, value) {
+  if (typeof document === "undefined") return;
   document.cookie = `${name}=${encodeURIComponent(
     typeof value === "string" ? value : JSON.stringify(value),
   )}; Path=/; Max-Age=604800; SameSite=Lax`;
 }
 
 function deleteCookie(name) {
+  if (typeof document === "undefined") return;
   document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax`;
 }
 

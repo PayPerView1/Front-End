@@ -606,6 +606,15 @@ export default function ChatWindow({
                 const file = e.target.files?.[0];
 
                 if (file) {
+                  if (file.size > 20 * 1024 * 1024) {
+                    alert(
+                      isArabic
+                        ? `عذراً، حجم الملف يتجاوز الحد الأقصى المسموح به وهو 20 ميجابايت.`
+                        : `File size exceeds the maximum limit of 20MB.`
+                    );
+                    e.target.value = "";
+                    return;
+                  }
                   setSelectedFile(file);
                 }
 

@@ -253,7 +253,8 @@
     "legendSponsorship": "Sponsorship",
     "legendOther": "Other",
     "ugcSubtitle": "Yesterday: Revenue - 56 active campaigns",
-    "clippingSubtitle": "Ongoing - {progress} active efficiency",
+    "clippingSubtitle": "Ongoing - {progress} active efficiency"
+  },
   "assistant": {
     "close": "Close assistant",
     "title": "How can I help you today?",
@@ -391,9 +392,10 @@
       "intro": "Provide the creative assets for your campaign. Ensure all files meet the specified guidelines for optimal delivery across networks.",
       "dropTitle": "Drag and drop your files here",
       "dropSub": "Or click to browse from your computer. Files will be securely processed and analyzed.",
-      "maxSize": "Maximum size 20MB per file · up to {mb} files",
+      "maxSize": "Maximum size is 20MB per file",
       "choose": "Choose Files",
-      "sizeError": "File size exceeds the allowed limit",
+      "sizeError": "Failed to upload: File size exceeds maximum limit (20MB)",
+      "sizeErrorToast": "Sorry, failed to upload file \"{name}\" because it exceeds the 20MB limit.",
       "complete": "Complete",
       "required": "Please upload at least one file"
     },
@@ -418,4 +420,4 @@
       "submit": "Submit for Review →"
     }
   }
-}
+}
