@@ -211,7 +211,14 @@ export default function AIAssistantPanel({ side = "left" }) {
               className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0];
-                if (file) setSelectedFile(file);
+                if (file) {
+                  if (file.size > 20 * 1024 * 1024) {
+                    alert("حجم الملف يتجاوز الحد الأقصى المسموح به وهو 20 ميجابايت.");
+                    e.target.value = "";
+                    return;
+                  }
+                  setSelectedFile(file);
+                }
                 e.target.value = "";
               }}
             />

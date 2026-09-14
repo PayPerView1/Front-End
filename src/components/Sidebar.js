@@ -24,7 +24,7 @@ import {
 
 import { useTheme } from "@/context/ThemeContext";
 import { BsList, BsX } from "react-icons/bs";
-import { useLocale, useMessages } from "next-intl";
+import { useLocale, useTranslations, useMessages } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useUser } from "@/context/UserContext";
 
@@ -45,10 +45,11 @@ const creatorResourceItems = [
 
 // ─── قائمة صاحب الحملة (BRAND/ADVERTISER) ────────────────────
 const advertiserNavItems = [
+  { label: "dashboard", href: "/advertiser/dashboard", icon: MdOutlineDashboard, useMd: true },
   {
-    label: "dashboard",
-    href: "/advertiser/dashboard",
-    icon: MdOutlineDashboard,
+    label: "manageCampaigns",
+    href: "/advertiser/campaigns",
+    icon: MdBarChart,
     useMd: true,
   },
   {
@@ -65,7 +66,7 @@ const advertiserNavItems = [
   },
   {
     label: "newCampaign",
-    href: "/advertiser/campaigns",
+    href: "/advertiser/create-campaign",
     icon: MdAddBox,
     useMd: true,
   },
@@ -82,7 +83,6 @@ const advertiserNavItems = [
     useMd: true,
   },
 ];
-
 // لا resources section للـ advertiser
 const advertiserResourceItems = [];
 
@@ -101,6 +101,7 @@ const sidebarFallbacksEn = {
   blog: "Blog",
 
   dashboard: "Dashboard",
+  manageCampaigns: "Manage Campaigns",
   analytics: "Analytics & Reports",
   clips: "Manage Clips",
   newCampaign: "Create New Campaign",
@@ -109,40 +110,44 @@ const sidebarFallbacksEn = {
 };
 
 const sidebarFallbacksAr = {
-  home:         "الرئيسية",
-  search:       "البحث",
-  discover:     "استكشاف",
+  home: "الرئيسية",
+  search: "البحث",
+  discover: "استكشاف",
   startProject: "بدء مشروع",
-  resources:    "الموارد",
-  members:      "الأعضاء",
-  partners:     "الشركاء",
-  new:          "جديد",
-  help:         "المساعدة",
-  blog:         "المدونة",
-  dashboard:    "لوحة التحكم الرئيسية",
-  analytics:    "التقارير والتحليلات",
-  clips:        "إدارة المقاطع",
-  newCampaign:  "إنشاء حملة جديدة",
-  drafts:       "المسودات",
-  billing:      "الميزانية والمدفوعات",
+  resources: "الموارد",
+  members: "الأعضاء",
+  partners: "الشركاء",
+  new: "جديد",
+  help: "المساعدة",
+  blog: "المدونة",
+  dashboard: "لوحة التحكم الرئيسية",
+  manageCampaigns: "إدارة الحملات",
+  analytics: "التقارير والتحليلات",
+  clips: "إدارة المقاطع",
+  newCampaign: "إنشاء حملة جديدة",
+  drafts: "المسودات",
+  billing: "الميزانية والمدفوعات",
 };
 
 // ─── Component ────────────────────────────────────────────────
 export default function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const pathname    = usePathname();
-  const locale      = useLocale();
-  const messages    = useMessages();
+  const pathname = usePathname();
+  const locale = useLocale();
+  const messages = useMessages();
 
   const { user: contextUser } = useUser() || {};
-  const role         = (contextUser?.role || "").toUpperCase();
+  const role = (contextUser?.role || "").toUpperCase();
   const isAdvertiser =
     role === "BRAND" ||
     role === "ADVERTISER" ||
     pathname?.includes("/advertiser");
 
-  const navItems      = isAdvertiser ? advertiserNavItems      : creatorNavItems;
-  const resourceItems = isAdvertiser ? advertiserResourceItems : creatorResourceItems;
+  const navItems = isAdvertiser ? advertiserNavItems : creatorNavItems;
+  const resourceItems = isAdvertiser
+    ? advertiserResourceItems
+    : creatorResourceItems;
+
 
   useEffect(() => {
     function handleResize() {
@@ -152,30 +157,34 @@ export default function Sidebar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+
   const fallbacks = locale === "ar" ? sidebarFallbacksAr : sidebarFallbacksEn;
   const sidebar = (key) => messages?.sidebar?.[key] || fallbacks[key] || key;
 
   const { isDark } = useTheme();
 
   const t = {
-    bg:         isDark ? "bg-[#0D0D0D] border-[#2D2D2D]" : "bg-white border-[#E5E5E5]",
-    text:       isDark ? "text-white"   : "text-[#1A1A1A]",
-    subText:    isDark ? "text-[#9A9A9A]" : "text-[#666666]",
+    bg: isDark ? "bg-[#0D0D0D] border-[#2D2D2D]" : "bg-white border-[#E5E5E5]",
+    text: isDark ? "text-white" : "text-[#1A1A1A]",
+    subText: isDark ? "text-[#9A9A9A]" : "text-[#666666]",
     activeLink: isDark ? "bg-white/10 text-white" : "bg-[#F0F0F0] text-black",
-    hoverLink:  isDark ? "hover:text-white hover:bg-white/5" : "hover:text-black hover:bg-[#F5F5F5]",
-    logoText:   isDark ? "text-white" : "text-black",
+    hoverLink: isDark
+      ? "hover:text-white hover:bg-white/5"
+      : "hover:text-black hover:bg-[#F5F5F5]",
+    logoText: isDark ? "text-white" : "text-black",
+
   };
 
   // ─── لون الأيقونة ─────────────────────────────────────────
   const iconColor = (isActive) =>
-    isActive
-      ? isDark ? "white" : "#1A1A1A"
-      : isDark ? "#9A9A9A" : "#666666";
+    isActive ? (isDark ? "white" : "#1A1A1A") : isDark ? "#9A9A9A" : "#666666";
+
 
   // ─── رندر رابط واحد ───────────────────────────────────────
   const renderLink = (item) => {
     const isActive = pathname === item.href;
-    const Icon     = item.icon;
+    const Icon = item.icon;
+
 
     return (
       <Link
@@ -195,11 +204,8 @@ export default function Sidebar() {
           />
         ) : (
           /* أيقونة react-iconly */
-          <Icon
-            set="light"
-            size={20}
-            primaryColor={iconColor(isActive)}
-          />
+          <Icon set="light" size={20} primaryColor={iconColor(isActive)} />
+
         )}
 
         <span className={isDark ? "text-white" : "text-black"}>
@@ -207,7 +213,10 @@ export default function Sidebar() {
         </span>
 
         {item.badge && (
-          <span className={`${locale === "ar" ? "mr-auto" : "ml-auto"} bg-[#94D3C1] text-white text-xs rounded px-1.5 py-0.5`}>
+          <span
+            className={`${locale === "ar" ? "mr-auto" : "ml-auto"} bg-[#94D3C1] text-white text-xs rounded px-1.5 py-0.5`}
+          >
+
             {sidebar(item.badge)}
           </span>
         )}
@@ -226,6 +235,7 @@ export default function Sidebar() {
           width={isDark ? 40 : 60}
           height={isDark ? 50 : 65}
           className="rounded-lg"
+          style={{ width: "auto", height: "auto" }}
         />
         <span
           className={`font-bold text-lg ${locale === "ar" ? "mr-2" : "ml-2"} ${t.logoText}`}
@@ -241,9 +251,12 @@ export default function Sidebar() {
             min-[1280px]:hidden absolute top-1/2 -translate-y-1/2
             ${locale === "ar" ? "left-4" : "right-4"}
             w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
-            ${isDark
-              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"}
+            ${
+              isDark
+                ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+                : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+            }
+
           `}
         >
           <BsX size={18} />
@@ -252,7 +265,8 @@ export default function Sidebar() {
 
       {/* الروابط الرئيسية */}
       <nav className="flex flex-col gap-1 px-4 mt-2">
-          {navItems.map(renderLink)}
+        {navItems.map(renderLink)}
+
       </nav>
 
       {/* الموارد — تُعرض فقط إذا كانت القائمة غير فارغة */}
@@ -264,7 +278,8 @@ export default function Sidebar() {
           <nav className="flex flex-col gap-1">
             {resourceItems.map((item) => {
               const isActive = pathname === item.href;
-              const Icon     = item.icon;
+              const Icon = item.icon;
+
               return (
                 <Link
                   key={item.href}
@@ -276,7 +291,12 @@ export default function Sidebar() {
                   `}
                 >
                   <div className="flex items-center gap-2">
-                    <Icon set="light" size={20} primaryColor={iconColor(isActive)} />
+                    <Icon
+                      set="light"
+                      size={20}
+                      primaryColor={iconColor(isActive)}
+                    />
+
                     <span className={isDark ? "text-white" : "text-black"}>
                       {sidebar(item.label)}
                     </span>
@@ -307,9 +327,12 @@ export default function Sidebar() {
           min-[1280px]:hidden fixed top-4
           ${locale === "ar" ? "right-4" : "left-4"}
           z-[999999999999] w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
-          ${isDark
-            ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-            : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"}
+          ${
+            isDark
+              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+          }
+
         `}
       >
         <BsList size={18} />
@@ -332,9 +355,14 @@ export default function Sidebar() {
           ${t.bg}
           transition-transform duration-300 ease-in-out
           min-[1280px]:translate-x-0
-          ${sidebarOpen
-            ? "translate-x-0"
-            : locale === "ar" ? "translate-x-full" : "-translate-x-full"}
+          ${
+            sidebarOpen
+              ? "translate-x-0"
+              : locale === "ar"
+                ? "translate-x-full"
+                : "-translate-x-full"
+          }
+
         `}
       >
         {sidebarContent}
