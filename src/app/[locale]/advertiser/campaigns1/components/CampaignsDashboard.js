@@ -112,6 +112,7 @@ export default function CampaignsDashboard() {
     totalCampaigns: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL"); // ← ALL مش "الكل"
   const [currentPage, setCurrentPage] = useState(1);
@@ -278,6 +279,7 @@ export default function CampaignsDashboard() {
         });
       } finally {
         setLoading(false);
+        setInitialLoad(false);
       }
     }
 
@@ -286,14 +288,14 @@ export default function CampaignsDashboard() {
     return () => clearTimeout(delay);
   }, [currentPage, statusFilter, search]);
 
-  if (loading)
+  if (initialLoad)
     return (
       <div className={`flex items-center justify-center min-h-screen ${t.bg}`}>
         <div className="w-8 h-8 border-2 border-[#94D3C1] border-t-transparent rounded-full animate-spin" />
       </div>
     );
 
-  if (!loading && campaigns.length === 0 && statusFilter === "ALL" && !search) {
+  if (!initialLoad && campaigns.length === 0 && statusFilter === "ALL" && !search) {
     return (
       <div dir={dir} className={`flex flex-col flex-1 min-h-screen ${t.bg}`}>
         <EmptyState />
@@ -486,7 +488,7 @@ export default function CampaignsDashboard() {
                 ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody className={`transition-opacity duration-200 ${loading ? "opacity-50 pointer-events-none" : ""}`}>
               {campaigns.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-16 text-center">
