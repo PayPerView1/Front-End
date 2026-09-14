@@ -64,8 +64,9 @@ const advertiserNavItems = [
   },
   {
     label: "newCampaign",
-    href:  "/advertiser/campaigns",
-    icon:  MdAddBox,
+
+    href: "/advertiser/creat-compign",
+    icon: MdAddBox,
     useMd: true,
   },
   {
@@ -223,6 +224,7 @@ export default function Sidebar() {
           width={isDark ? 40 : 60}
           height={isDark ? 50 : 65}
           className="rounded-lg"
+          style={{ width: "auto", height: "auto" }}
         />
         <span
           className={`font-bold text-lg ${locale === "ar" ? "mr-2" : "ml-2"} ${t.logoText}`}
