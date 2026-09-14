@@ -12,6 +12,7 @@ import {
   Message,
   Document,
 } from "react-iconly";
+import { FiFileText } from "react-icons/fi";
 import {
   MdOutlineDashboard,
   MdBarChart,
@@ -36,15 +37,16 @@ const creatorNavItems = [
 ];
 
 const creatorResourceItems = [
-  { label: "members", href: "/members", icon: Bag },
+  { label: "members",  href: "/members",  icon: Bag },
   { label: "partners", href: "/partners", icon: People, badge: "new" },
-  { label: "help", href: "/help", icon: Message },
-  { label: "blog", href: "/blog", icon: Document },
+  { label: "help",     href: "/help",     icon: Message },
+  { label: "blog",     href: "/blog",     icon: Document },
 ];
 
 // ─── قائمة صاحب الحملة (BRAND/ADVERTISER) ────────────────────
 const advertiserNavItems = [
 { label: "dashboard", href: "/advertiser/campaigns1", icon: MdOutlineDashboard, useMd: true },
+
   {
     label: "analytics",
     href: "/advertiser/analytics",
@@ -59,7 +61,7 @@ const advertiserNavItems = [
   },
   {
     label: "newCampaign",
-    href: "/advertiser/create-campaign",
+    href: "/advertiser/campaigns",
     icon: MdAddBox,
     useMd: true,
   },
@@ -76,15 +78,56 @@ const advertiserNavItems = [
     useMd: true,
   },
 ];
-
 // لا resources section للـ advertiser
 const advertiserResourceItems = [];
+
+// ─── Fallbacks حسب اللغة ──────────────────────────────────────
+const sidebarFallbacksEn = {
+  home: "Home",
+  search: "Search",
+  discover: "Discover",
+  startProject: "Start a project",
+
+  resources: "Resources",
+  members: "Members",
+  partners: "Partners",
+  new: "New",
+  help: "Help",
+  blog: "Blog",
+
+  dashboard: "Dashboard",
+  analytics: "Analytics & Reports",
+  clips: "Manage Clips",
+  newCampaign: "Create New Campaign",
+  drafts: "Drafts",
+  billing: "Budget & Payments",
+};
+
+const sidebarFallbacksAr = {
+  home: "الرئيسية",
+  search: "البحث",
+  discover: "استكشاف",
+  startProject: "بدء مشروع",
+  resources: "الموارد",
+  members: "الأعضاء",
+  partners: "الشركاء",
+  new: "جديد",
+  help: "المساعدة",
+  blog: "المدونة",
+  dashboard: "لوحة التحكم الرئيسية",
+  analytics: "التقارير والتحليلات",
+  clips: "إدارة المقاطع",
+  newCampaign: "إنشاء حملة جديدة",
+  drafts: "المسودات",
+  billing: "الميزانية والمدفوعات",
+};
+
 // ─── Component ────────────────────────────────────────────────
 export default function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const locale = useLocale();
-  const sidebar = useTranslations("sidebar");
+  const messages = useMessages();
 
   const { user: contextUser } = useUser() || {};
   const role = (contextUser?.role || "").toUpperCase();
@@ -98,6 +141,7 @@ export default function Sidebar() {
     ? advertiserResourceItems
     : creatorResourceItems;
 
+
   useEffect(() => {
     function handleResize() {
       if (window.innerWidth >= 1280) setSidebarOpen(false);
@@ -106,6 +150,9 @@ export default function Sidebar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+
+  const fallbacks = locale === "ar" ? sidebarFallbacksAr : sidebarFallbacksEn;
+  const sidebar = (key) => messages?.sidebar?.[key] || fallbacks[key] || key;
 
   const { isDark } = useTheme();
 
@@ -118,16 +165,19 @@ export default function Sidebar() {
       ? "hover:text-white hover:bg-white/5"
       : "hover:text-black hover:bg-[#F5F5F5]",
     logoText: isDark ? "text-white" : "text-black",
+
   };
 
   // ─── لون الأيقونة ─────────────────────────────────────────
   const iconColor = (isActive) =>
     isActive ? (isDark ? "white" : "#1A1A1A") : isDark ? "#9A9A9A" : "#666666";
 
+
   // ─── رندر رابط واحد ───────────────────────────────────────
   const renderLink = (item) => {
     const isActive = pathname === item.href;
     const Icon = item.icon;
+
 
     return (
       <Link
@@ -148,6 +198,7 @@ export default function Sidebar() {
         ) : (
           /* أيقونة react-iconly */
           <Icon set="light" size={20} primaryColor={iconColor(isActive)} />
+
         )}
 
         <span className={isDark ? "text-white" : "text-black"}>
@@ -158,6 +209,7 @@ export default function Sidebar() {
           <span
             className={`${locale === "ar" ? "mr-auto" : "ml-auto"} bg-[#94D3C1] text-white text-xs rounded px-1.5 py-0.5`}
           >
+
             {sidebar(item.badge)}
           </span>
         )}
@@ -196,6 +248,7 @@ export default function Sidebar() {
                 ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
                 : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
             }
+
           `}
         >
           <BsX size={18} />
@@ -205,6 +258,7 @@ export default function Sidebar() {
       {/* الروابط الرئيسية */}
       <nav className="flex flex-col gap-1 px-4 mt-2">
         {navItems.map(renderLink)}
+
       </nav>
 
       {/* الموارد — تُعرض فقط إذا كانت القائمة غير فارغة */}
@@ -217,6 +271,7 @@ export default function Sidebar() {
             {resourceItems.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
+
               return (
                 <Link
                   key={item.href}
@@ -233,6 +288,7 @@ export default function Sidebar() {
                       size={20}
                       primaryColor={iconColor(isActive)}
                     />
+
                     <span className={isDark ? "text-white" : "text-black"}>
                       {sidebar(item.label)}
                     </span>
@@ -268,6 +324,7 @@ export default function Sidebar() {
               ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
               : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
           }
+
         `}
       >
         <BsList size={18} />
@@ -297,6 +354,7 @@ export default function Sidebar() {
                 ? "translate-x-full"
                 : "-translate-x-full"
           }
+
         `}
       >
         {sidebarContent}

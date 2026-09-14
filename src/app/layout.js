@@ -32,7 +32,9 @@ export default async function RootLayout({ children, params }) {
       dir={dir}
       className={`${geistSans.variable} ${geistMono.variable} ${tajawal.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col font-tajawal">{children}</body>
+      <body suppressHydrationWarning className="min-h-full flex flex-col font-tajawal">
+        {children}
+      </body>
     </html>
   );
 }
