@@ -85,41 +85,6 @@ function mapDraft(apiDraft) {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
-const MOCK_DRAFTS = [
-  {
-    _id: "mock-1",
-    name: "حملة إطلاق عطور الصيف",
-    lastSavedAt: new Date(Date.now() - 3600000).toISOString(),
-    expiresAt: new Date(Date.now() + 15 * 86400000).toISOString(),
-    status: "DRAFT",
-    contentType: "UGC",
-    totalBudget: 5000,
-    targetCountries: ["SAU"],
-    halalDeclared: true,
-  },
-  {
-    _id: "mock-2",
-    name: "مجموعة إعلانات العودة للمدارس",
-    lastSavedAt: new Date(Date.now() - 86400000).toISOString(),
-    expiresAt: new Date(Date.now() + 2 * 86400000).toISOString(),
-    status: "DRAFT",
-    contentType: "CLIPPING",
-    totalBudget: 3000,
-    targetCountries: ["SAU", "EGY"],
-    halalDeclared: false,
-  },
-  {
-    _id: "mock-3",
-    name: "عروض الجمعة البيضاء",
-    lastSavedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
-    expiresAt: new Date(Date.now() + 25 * 86400000).toISOString(),
-    status: "DRAFT",
-    contentType: "SLIDESHOW",
-    totalBudget: 10000,
-    targetCountries: ["ARE"],
-    halalDeclared: true,
-  },
-];
 
 export function useDrafts() {
   const [rawDrafts, setRawDrafts]   = useState([]);
@@ -134,15 +99,16 @@ export function useDrafts() {
     setError(null);
     try {
       const data = await getDrafts(search ? { search } : {});
-      const list = data?.campaigns || data?.drafts || (Array.isArray(data) ? data : null);
-      if (list && Array.isArray(list)) {
-        setRawDrafts(list);
-      } else {
-        setRawDrafts(MOCK_DRAFTS);
-      }
-    } catch (err) {
-      console.warn("Drafts API call failed, falling back to mock drafts:", err);
-      setRawDrafts(MOCK_DRAFTS);
+const list =
+  data?.campaigns ||
+  data?.drafts ||
+  (Array.isArray(data) ? data : []);
+
+setRawDrafts(list);
+} catch (err) {
+  console.warn("Drafts API call failed:", err);
+  setError("حدث خطأ أثناء جلب المسودات");
+  setRawDrafts([]);
     } finally {
       setLoading(false);
     }
@@ -158,7 +124,7 @@ export function useDrafts() {
     const mapped = rawDrafts.map(mapDraft);
     if (!searchQuery.trim()) return mapped;
     return mapped.filter((d) =>
-      d.title.toLowerCase().includes(searchQuery.trim().toLowerCase())
+d.title?.toLowerCase().includes(searchQuery.trim().toLowerCase())
     );
   }, [rawDrafts, searchQuery]);
 
