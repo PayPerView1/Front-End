@@ -91,7 +91,7 @@ export default function NotificationsPanel({ side = "left" }) {
       />
 
       <aside
-        className={`notifications-panel fixed top-14 h-[calc(100vh-64px)] w-full max-w-full xl:w-[380px] xl:max-w-[380px] z-40 flex flex-col overflow-y-auto border transition-all duration-300 ${sideClass} ${t.border}`}
+        className={`notifications-panel fixed top-14 h-[calc(100vh-56px)] w-full max-w-full xl:w-[380px] xl:max-w-[380px] z-40 flex flex-col overflow-y-auto border transition-all duration-300 ${sideClass} ${t.border}`}
         data-side={side}
         style={{
           backgroundColor: isDark ? "#0C0F10" : "#FFFFFF",

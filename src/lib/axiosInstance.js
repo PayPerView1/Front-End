@@ -62,6 +62,7 @@ export function clearAuthData() {
 }
 
 function getCookie(name) {
+  if (typeof document === "undefined") return null;
   const value = document.cookie
     .split("; ")
     .find((cookie) => cookie.startsWith(`${name}=`))
@@ -72,12 +73,14 @@ function getCookie(name) {
 }
 
 function setCookie(name, value) {
+  if (typeof document === "undefined") return;
   document.cookie = `${name}=${encodeURIComponent(
     typeof value === "string" ? value : JSON.stringify(value),
   )}; Path=/; Max-Age=604800; SameSite=Lax`;
 }
 
 function deleteCookie(name) {
+  if (typeof document === "undefined") return;
   document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax`;
 }
 
@@ -103,8 +106,14 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.data && Object.keys(error.response.data).length > 0) {
+    const isHtmlResponse =
+      typeof error.response?.data === "string" &&
+      error.response.data.includes("<html");
+
+    if (error.response?.data && !isHtmlResponse) {
       console.error("[Axios Response Error]:", error.config?.url, error.response.status, error.response.data);
+    } else if (isHtmlResponse) {
+      console.warn(`[Axios Response Warning]: ${error.config?.url} returned ${error.response.status} HTML response`);
     }
 
     const skipRedirect = error.config?._skipAuthRedirect;
@@ -132,7 +141,11 @@ axiosInstance.interceptors.response.use(
 // ─── Error Handler ────────────────────────────────────────────────────────────
 
 export function handleError(error) {
-  if (error.response?.data) {
+  const isHtml =
+    typeof error.response?.data === "string" &&
+    error.response.data.includes("<html");
+
+  if (error.response?.data && !isHtml) {
     console.error(
       "API Error Response Data:",
       typeof error.response.data === "string"

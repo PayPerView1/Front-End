@@ -113,6 +113,7 @@ export default function DraftsContent() {
 
   const handleEdit          = (id) => router.push(`/advertiser/creat-compign?draftId=${id}`);
   const handleNewCampaign   = ()   => router.push("/advertiser/creat-compign");
+
   const handleReviewExpired = ()   => router.push("/advertiser/expired-drafts");
 
   const pendingDraft = drafts.find((d) => d.id === pendingDeleteId);

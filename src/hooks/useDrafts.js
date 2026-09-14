@@ -85,6 +85,7 @@ function mapDraft(apiDraft) {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+
 export function useDrafts() {
   const [rawDrafts, setRawDrafts]   = useState([]);
   const [loading, setLoading]       = useState(true);
@@ -98,12 +99,16 @@ export function useDrafts() {
     setError(null);
     try {
       const data = await getDrafts(search ? { search } : {});
-      const list = data?.campaigns || data?.drafts || (Array.isArray(data) ? data : []);
-      setRawDrafts(list);
-    } catch (err) {
-      console.warn("Drafts API call failed:", err);
-      setError("حدث خطأ أثناء جلب المسودات");
-      setRawDrafts([]);
+const list =
+  data?.campaigns ||
+  data?.drafts ||
+  (Array.isArray(data) ? data : []);
+
+setRawDrafts(list);
+} catch (err) {
+  console.warn("Drafts API call failed:", err);
+  setError("حدث خطأ أثناء جلب المسودات");
+  setRawDrafts([]);
     } finally {
       setLoading(false);
     }
@@ -119,7 +124,7 @@ export function useDrafts() {
     const mapped = rawDrafts.map(mapDraft);
     if (!searchQuery.trim()) return mapped;
     return mapped.filter((d) =>
-      d.title?.toLowerCase().includes(searchQuery.trim().toLowerCase())
+d.title?.toLowerCase().includes(searchQuery.trim().toLowerCase())
     );
   }, [rawDrafts, searchQuery]);
 

@@ -6,6 +6,7 @@
 
 import * as auth from "@/services/auth";
 import * as profile from "@/services/profile";
+import * as drafts from "@/services/drafts";
 import {
   getToken,
   getSavedUser,
@@ -32,6 +33,7 @@ const api = {
   // Namespaced
   auth,
   profile,
+  drafts,
 
   // Auth shortcuts
   register: auth.register,
@@ -45,6 +47,10 @@ const api = {
   updateProfile: profile.updateProfile,
   updateInterests: profile.updateInterests,
   syncPendingInterests: profile.syncPendingInterests,
+
+  // Drafts shortcuts
+  getDrafts: drafts.getDrafts,
+  deleteDraft: drafts.deleteDraft,
 
   // Helpers
   getToken,
