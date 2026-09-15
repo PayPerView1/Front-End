@@ -256,31 +256,47 @@
     "clippingSubtitle": "Ongoing - {progress} active efficiency"
   },
   "assistant": {
-    "close": "Close assistant",
-    "title": "How can I help you today?",
-    "description": "I am your smart assistant. I can help you create content, manage your account, or answer any inquiries.",
-    "preview": "Preview",
-    "placeholder": "Type your message here...",
-    "disclaimer": "The assistant may make mistakes sometimes. Please verify important information.",
-    "actions": {
-      "messageMembers": {
-        "title": "Message recent members",
-        "desc": "Draft a welcome message for new subscribers"
-      },
-      "createAd": {
-        "title": "Create creative ad",
-        "desc": "Generate engaging ad copies for your next campaign"
-      },
-      "startLive": {
-        "title": "Start a live stream",
-        "desc": "Set up a live stream session to connect with your audience"
-      },
-      "sendInvoice": {
-        "title": "Send client invoice",
-        "desc": "Create and send a professional invoice quickly"
-      }
-    }
+  "close": "Close assistant",
+  "title": "How can I help you today?",
+  "description": "I’m your smart assistant. I can help you create content, manage your account, or answer any questions.",
+  "preview": "Preview",
+  "placeholder": "Write your message here...",
+  "disclaimer": "The assistant may occasionally make mistakes. Please verify important information.",
+
+  "viewConversations": "View conversations",
+  "conversations": "Conversations",
+  "newConversation": "New conversation",
+  "loading": "Loading",
+
+  "errors": {
+    "loadMessages": "Failed to load messages",
+    "createThread": "Failed to create conversation",
+    "sendMessage": "Failed to send message",
+    "deleteThread": "Failed to delete conversation"
   },
+
+  "actions": {
+    "messageMembers": {
+      "title": "Message recent members",
+      "desc": "Draft a welcome message for new subscribers"
+    },
+
+    "createAd": {
+      "title": "Create a creative ad",
+      "desc": "Generate engaging ad copy for your upcoming campaign"
+    },
+
+    "startLive": {
+      "title": "Start a live stream",
+      "desc": "Set up a live session to connect with your audience"
+    },
+
+    "sendInvoice": {
+      "title": "Send an invoice to a client",
+      "desc": "Create and send a professional invoice quickly"
+    }
+  }
+},
   "messages": {
     "title": "Messages",
     "minimizePanel": "Minimize messages panel",
@@ -420,4 +436,4 @@
       "submit": "Submit for Review →"
     }
   }
-}
+}
