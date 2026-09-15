@@ -126,7 +126,7 @@ axiosInstance.interceptors.response.use(
       !skipRedirect &&
       !isLoginRequest &&
       error.response &&
-      (error.response.status === 401 || error.response.status === 403)
+      error.response.status === 401
     ) {
       if (typeof window !== "undefined") {
         clearAuthData();
