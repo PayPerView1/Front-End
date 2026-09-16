@@ -230,14 +230,13 @@ export default function Sidebar() {
   const sidebarContent = (
     <>
       {/* الهيدر */}
-      <div className="relative flex items-center px-6 py-5">
+    <div className="relative flex items-center px-2 py-1">
         <Image
-          src={isDark ? "/logo.png" : "/images/image-PPV-light.png"}
+          src={isDark ? "/images/logo11.jpg" : "/images/image-PPV-light.png"}
           alt="logo"
-          width={isDark ? 40 : 60}
-          height={isDark ? 50 : 65}
-          className="rounded-lg"
-          style={{ width: "auto", height: "auto" }}
+          width={70}
+          height={70}
+          className="rounded-lg w-[70px] h-[70px] object-contain"
         />
         <span
           className={`font-bold text-lg ${locale === "ar" ? "mr-2" : "ml-2"} ${t.logoText}`}
@@ -245,7 +244,6 @@ export default function Sidebar() {
         >
           Pay Per View
         </span>
-
         <button
           type="button"
           onClick={() => setSidebarOpen(false)}
@@ -258,7 +256,6 @@ export default function Sidebar() {
                 ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
                 : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
             }
-
           `}
         >
           <BsX size={18} />
@@ -266,7 +263,7 @@ export default function Sidebar() {
       </div>
 
       {/* الروابط الرئيسية */}
-      <nav className="flex flex-col gap-1 px-4 mt-2">
+      <nav className="flex flex-col gap-1 px-4 mt-0">
         {navItems.map(renderLink)}
 
       </nav>
