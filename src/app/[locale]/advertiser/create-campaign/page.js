@@ -115,49 +115,61 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
 
       {/* الميزانية + CPM */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1.5">
-          <label className={`text-xs ${dark ? "text-white" : "text-[#111]"}`}>
-            {t("step1.budget")}<span className="text-[rgba(178,34,34,1)]"> *</span>
-          </label>
-          <input
-            type="text"
-            value={form.totalBudget}
-            onChange={(e) => setForm((p) => ({ ...p, totalBudget: e.target.value }))}
-            placeholder="10,000$"
-            className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors
-              focus:border-[rgba(148,211,193,1)]
-              ${dark
-                ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
-                : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"}
-              ${attempted && !form.totalBudget ? "!border-[#E53535]" : ""}`}
-            style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
-          />
-          {attempted && !form.totalBudget && (
-            <span className="text-[0.7rem] text-[#E53535]">{t("step1.required")}</span>
-          )}
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={`text-xs ${dark ? "text-white" : "text-[#111]"}`}>
-            {t("step1.cpm")}<span className="text-[rgba(178,34,34,1)]"> *</span>
-          </label>
-          <input
-            type="text"
-            value={form.cpm}
-            onChange={(e) => setForm((p) => ({ ...p, cpm: e.target.value }))}
-            placeholder="15.50$"
-            className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors
-              focus:border-[rgba(148,211,193,1)]
-              ${dark
-                ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
-                : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"}
-              ${attempted && !form.cpm ? "!border-[#E53535]" : ""}`}
-            style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
-          />
-          {attempted && !form.cpm && (
-            <span className="text-[0.7rem] text-[#E53535]">{t("step1.required")}</span>
-          )}
-        </div>
-      </div>
+  {/* Total Budget Input */}
+  <div className="flex flex-col gap-1.5">
+    <label className={`text-xs ${dark ? "text-white" : "text-[#111]"}`}>
+      {t("step1.budget")}<span className="text-[rgba(178,34,34,1)]"> *</span>
+    </label>
+    <input
+      type="number"
+      value={form.totalBudget}
+      onChange={(e) => setForm((p) => ({ ...p, totalBudget: e.target.value }))}
+      placeholder="10,000$"
+      className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors
+        focus:border-[rgba(148,211,193,1)]
+        ${dark
+          ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+          : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"}
+        ${attempted && !form.totalBudget ? "!border-[#E53535]" : ""}`}
+      style={{ 
+        direction: isRtl ? "rtl" : "ltr", 
+        fontFamily: "var(--font-tajawal,inherit)",
+        colorScheme: dark ? "dark" : "light"
+      }}
+    />
+    {attempted && !form.totalBudget && (
+      <span className="text-[0.7rem] text-[#E53535]">{t("step1.required")}</span>
+    )}
+  </div>
+
+  {/* CPM Input */}
+  <div className="flex flex-col gap-1.5">
+    <label className={`text-xs ${dark ? "text-white" : "text-[#111]"}`}>
+      {t("step1.cpm")}<span className="text-[rgba(178,34,34,1)]"> *</span>
+    </label>
+    <input
+      type="number"
+      value={form.cpm}
+      onChange={(e) => setForm((p) => ({ ...p, cpm: e.target.value }))}
+      placeholder="15.50$"
+      className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors
+       
+        focus:border-[rgba(148,211,193,1)]
+        ${dark
+          ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+          : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"}
+        ${attempted && !form.cpm ? "!border-[#E53535]" : ""}`}
+      style={{ 
+        direction: isRtl ? "rtl" : "ltr", 
+        fontFamily: "var(--font-tajawal,inherit)",
+        colorScheme: dark ? "dark" : "light"
+      }}
+    />
+    {attempted && !form.cpm && (
+      <span className="text-[0.7rem] text-[#E53535]">{t("step1.required")}</span>
+    )}
+  </div>
+</div>
 
       {/* التواريخ */}
       <div className="flex flex-col gap-1.5">
