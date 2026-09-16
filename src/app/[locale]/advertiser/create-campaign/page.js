@@ -45,19 +45,24 @@ const COMPLIANCE_IDS = [
 const STEP_IDS = [1, 2, 3, 4];
 
 // ─── DateInput ────────────────────────────────────────────────
-function DateInput({ value, onChange, hasError, isRtl }) {
+function DateInput({ value, onChange, hasError, isRtl, dark }) {
   const ref = useRef(null);
   const placeholder = isRtl ? "أدخل التاريخ" : "Enter date";
 
   return (
     <div className="relative w-full">
       <div
-        className={`w-full rounded-lg border py-2.5 text-sm box-border bg-white ${
-          hasError ? "border-[#E53535]" : "border-[#E5E5E5]"
-        } ${isRtl ? "pr-10 pl-3.5 text-right" : "pl-10 pr-3.5 text-left"}`}
+        className={`w-full rounded-lg border py-2.5 text-sm box-border transition-colors
+          ${dark
+            ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)]"
+            : "bg-white border-[#E5E5E5]"}
+          ${hasError ? "!border-[#E53535]" : ""}
+          ${isRtl ? "pr-10 pl-3.5 text-right" : "pl-10 pr-3.5 text-left"}`}
         style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
       >
-        <span className={value ? "text-[#111]" : "text-[#999]"}>{value || placeholder}</span>
+        <span className={value ? (dark ? "text-white" : "text-[#111]") : "text-[#999]"}>
+          {value || placeholder}
+        </span>
       </div>
       <input
         ref={ref}
@@ -95,8 +100,12 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
           value={form.name}
           onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
           placeholder={t("step1.namePlaceholder")}
-          className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border bg-white text-[#111] placeholder:text-[#999]
-            ${attempted && !form.name.trim() ? "border-[#E53535]" : "border-[#E5E5E5]"}`}
+          className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors
+            focus:border-[rgba(148,211,193,1)]
+            ${dark
+              ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+              : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"}
+            ${attempted && !form.name.trim() ? "!border-[#E53535]" : ""}`}
           style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
         />
         {attempted && !form.name.trim() && (
@@ -111,12 +120,16 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
             {t("step1.budget")}<span className="text-[rgba(178,34,34,1)]"> *</span>
           </label>
           <input
-            type="number"
+            type="text"
             value={form.totalBudget}
             onChange={(e) => setForm((p) => ({ ...p, totalBudget: e.target.value }))}
             placeholder="10,000$"
-            className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border bg-white text-[#111] placeholder:text-[#999]
-              ${attempted && !form.totalBudget ? "border-[#E53535]" : "border-[#E5E5E5]"}`}
+            className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors
+              focus:border-[rgba(148,211,193,1)]
+              ${dark
+                ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+                : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"}
+              ${attempted && !form.totalBudget ? "!border-[#E53535]" : ""}`}
             style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
           />
           {attempted && !form.totalBudget && (
@@ -128,12 +141,16 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
             {t("step1.cpm")}<span className="text-[rgba(178,34,34,1)]"> *</span>
           </label>
           <input
-            type="number"
+            type="text"
             value={form.cpm}
             onChange={(e) => setForm((p) => ({ ...p, cpm: e.target.value }))}
             placeholder="15.50$"
-            className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border bg-white text-[#111] placeholder:text-[#999]
-              ${attempted && !form.cpm ? "border-[#E53535]" : "border-[#E5E5E5]"}`}
+            className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors
+              focus:border-[rgba(148,211,193,1)]
+              ${dark
+                ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+                : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"}
+              ${attempted && !form.cpm ? "!border-[#E53535]" : ""}`}
             style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
           />
           {attempted && !form.cpm && (
@@ -153,12 +170,14 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
             onChange={(v) => setForm((p) => ({ ...p, startDate: v }))}
             hasError={attempted && !form.startDate}
             isRtl={isRtl}
+            dark={dark}
           />
           <DateInput
             value={form.endDate}
             onChange={(v) => setForm((p) => ({ ...p, endDate: v }))}
             hasError={attempted && !form.endDate}
             isRtl={isRtl}
+            dark={dark}
           />
         </div>
         {attempted && (!form.startDate || !form.endDate) && (
@@ -187,7 +206,7 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
                         ? "bg-[#3D2516] border-[#FF8C00]"
                         : "bg-[#FF8C00]/25 border-[#FF8C00]"
                       : dark
-                      ? "bg-[#111] border-[#2D2D2D]"
+                      ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)]"
                       : "bg-white border-[#E5E5E5]"
                   }`}
               >
@@ -214,12 +233,11 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
           onChange={(e) => setForm((p) => ({ ...p, audience: e.target.value }))}
           placeholder={t("step1.audiencePlaceholder")}
           rows={5}
-          className={`w-full min-h-[140px] rounded-lg border px-3.5 py-2.5 text-sm outline-none resize-y box-border
-            ${
-              dark
-                ? "bg-[#0D0D0D] border-[#2D2D2D] text-white placeholder:text-[#9A9A9A]"
-                : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
-            }`}
+          className={`w-full min-h-[140px] rounded-lg border px-3.5 py-2.5 text-sm outline-none resize-y box-border transition-colors
+            focus:border-[rgba(148,211,193,1)]
+            ${dark
+              ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+              : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"}`}
           style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
         />
       </div>
@@ -250,7 +268,7 @@ function Step2({ t, dark, checked, setChecked, attempted, description, setDescri
                       ? "bg-[#1E2E1E] border-[#4CAF50]"
                       : "bg-[#F0FFF4] border-[#4CAF50]"
                     : dark
-                    ? "border-[#2D2D2D]"
+                    ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)]"
                     : "border-[#E5E5E5]"
                 }`}
             >
@@ -287,15 +305,16 @@ function Step2({ t, dark, checked, setChecked, attempted, description, setDescri
           onChange={(e) => setDescription(e.target.value)}
           placeholder={t("compliance.descPlaceholder")}
           rows={5}
-          className={`w-full rounded-lg border p-3 text-sm outline-none resize-y
-            ${
-              attempted && !description.trim()
-                ? "border-[#E53535]"
-                : dark
-                ? "border-[#2D2D2D]"
-                : "border-[#E5E5E5]"
-            }
-            ${dark ? "bg-[#0A0A0A] text-white placeholder:text-[#9A9A9A]" : "bg-white text-[#111] placeholder:text-[#999]"}`}
+          className={`w-full rounded-lg border p-3 text-sm outline-none resize-y transition-colors
+            focus:border-[rgba(148,211,193,1)]
+            ${attempted && !description.trim()
+              ? "border-[#E53535]"
+              : dark
+              ? "border-[rgba(63,73,69,1)]"
+              : "border-[#E5E5E5]"}
+            ${dark
+              ? "bg-[rgba(17,20,21,1)] text-white placeholder:text-[#9A9A9A]"
+              : "bg-white text-[#111] placeholder:text-[#999]"}`}
           style={{ fontFamily: "var(--font-tajawal,inherit)" }}
         />
         {attempted && !description.trim() && (
@@ -384,10 +403,10 @@ function Step3({
             dragging
               ? "border-[rgba(148,211,193,1)]"
               : dark
-              ? "border-[#2D2D2D]"
+              ? "border-[rgba(63,73,69,1)]"
               : "border-[#E5E5E5]"
           }
-          ${dragging ? (dark ? "bg-[#1E1E1E]" : "bg-[#FFF8F5]") : dark ? "bg-[#141414]" : "bg-white"}`}
+          ${dragging ? (dark ? "bg-[#1E1E1E]" : "bg-[#FFF8F5]") : dark ? "bg-[rgba(17,20,21,1)]" : "bg-white"}`}
       >
         <div
           className={`w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center ${
@@ -420,7 +439,7 @@ function Step3({
             document.getElementById("fileInput")?.click();
           }}
           className={`border rounded-lg px-5 py-2 text-sm cursor-pointer bg-transparent ${
-            dark ? "border-[#2D2D2D] text-white" : "border-[#E5E5E5] text-[#111]"
+            dark ? "border-[rgba(63,73,69,1)] text-white" : "border-[#E5E5E5] text-[#111]"
           }`}
           style={{ fontFamily: "var(--font-tajawal,inherit)" }}
         >
@@ -447,7 +466,7 @@ function Step3({
                   isFailed
                     ? "border-[#E53535] bg-[#FFF5F5]"
                     : dark
-                    ? "bg-[#0D0D0D] border-[#2D2D2D]"
+                    ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)]"
                     : "bg-white border-[#E5E5E5]"
                 }`}
               >
@@ -654,11 +673,10 @@ export default function NewCampaignPage() {
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState([]);
   const [dragging, setDragging] = useState(false);
-  const MAX_MB = 20; 
+  const MAX_MB = 20;
   const [draftId, setDraftId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ─── تحميل بيانات المسودة عند فتح الرابط للتعديل ───────────────────────────
   useEffect(() => {
     if (typeof window === "undefined") return;
     const urlDraftId = new URLSearchParams(window.location.search).get("draftId");
@@ -698,9 +716,7 @@ export default function NewCampaignPage() {
             },
           }));
 
-          if (mainIdeaVal) {
-            setDescription(mainIdeaVal);
-          }
+          if (mainIdeaVal) setDescription(mainIdeaVal);
 
           if (d.halalDeclared || d.halalDeclaration) {
             const h = typeof d.halalDeclaration === "object" ? d.halalDeclaration : {};
@@ -727,21 +743,21 @@ export default function NewCampaignPage() {
 
   const canNext = () => [step1Valid, step2Valid, step3Valid, true][step - 1];
 
-const COUNTRY_MAP = {
-  SA: "SAU", AE: "ARE", EG: "EGY", KW: "KWT", QA: "QAT",
-  BH: "BHR", OM: "OMN", JO: "JOR", IQ: "IRQ", US: "USA",
-  UK: "GBR", GB: "GBR", MA: "MAR", DZ: "DZA", TN: "TUN",
-  LY: "LBY", SD: "SDN", YE: "YEM", SY: "SYR", LB: "LBN", PS: "PSE",
-};
+  const COUNTRY_MAP = {
+    SA: "SAU", AE: "ARE", EG: "EGY", KW: "KWT", QA: "QAT",
+    BH: "BHR", OM: "OMN", JO: "JOR", IQ: "IRQ", US: "USA",
+    UK: "GBR", GB: "GBR", MA: "MAR", DZ: "DZA", TN: "TUN",
+    LY: "LBY", SD: "SDN", YE: "YEM", SY: "SYR", LB: "LBN", PS: "PSE",
+  };
 
-function normalizeCountryCodes(countries) {
-  if (!countries || !countries.length) return ["SAU"];
-  return countries.map((c) => {
-    if (!c) return "SAU";
-    if (c.length === 3) return c.toUpperCase();
-    return COUNTRY_MAP[c.toUpperCase()] || "SAU";
-  });
-}
+  function normalizeCountryCodes(countries) {
+    if (!countries || !countries.length) return ["SAU"];
+    return countries.map((c) => {
+      if (!c) return "SAU";
+      if (c.length === 3) return c.toUpperCase();
+      return COUNTRY_MAP[c.toUpperCase()] || "SAU";
+    });
+  }
 
   const handleSaveDraft = async () => {
     const payload = {
@@ -767,9 +783,7 @@ function normalizeCountryCodes(countries) {
         await autoSaveDraft(draftId, payload);
       } else {
         const res = await saveDraft(payload);
-        if (res?.data?.draft?._id) {
-          setDraftId(res.data.draft._id);
-        }
+        if (res?.data?.draft?._id) setDraftId(res.data.draft._id);
       }
     } catch (err) {
       console.error("خطأ في حفظ المسودة:", err);
@@ -790,7 +804,6 @@ function normalizeCountryCodes(countries) {
           alert(res.message || "حدث خطأ أثناء إرسال المسودة");
         }
       } else {
-        // إرسال كـ JSON بدل FormData لتفادي مشكلة multer "Unexpected field"
         const payload = {
           name: form.name,
           contentType: form.contentType,
@@ -812,7 +825,6 @@ function normalizeCountryCodes(countries) {
         };
 
         await createCampaignJson(payload);
-        // إعادة تحميل كاملة لصفحة الحملات لعرض الحملة الجديدة
         window.location.href = `/${locale}/advertiser/campaigns`;
       }
     } catch (err) {
@@ -938,7 +950,7 @@ function normalizeCountryCodes(countries) {
                 type="button"
                 onClick={handleBack}
                 className={`px-6 py-2.5 rounded-lg text-sm font-semibold border bg-transparent cursor-pointer
-                  ${dark ? "border-[#2D2D2D] text-white" : "border-[#E5E5E5] text-[#111]"}`}
+                  ${dark ? "border-[rgba(63,73,69,1)] text-white" : "border-[#E5E5E5] text-[#111]"}`}
                 style={{ fontFamily: "var(--font-tajawal,inherit)" }}
               >
                 {t("nav.back")}
@@ -950,7 +962,7 @@ function normalizeCountryCodes(countries) {
               type="button"
               onClick={handleSaveDraft}
               className={`px-6 py-2.5 rounded-lg text-sm font-semibold border bg-transparent cursor-pointer
-                ${dark ? "border-[#2D2D2D] text-white" : "border-[#E5E5E5] text-[#111]"}`}
+                ${dark ? "border-[rgba(63,73,69,1)] text-white" : "border-[#E5E5E5] text-[#111]"}`}
               style={{ fontFamily: "var(--font-tajawal,inherit)" }}
             >
               {t("nav.saveDraft")}
