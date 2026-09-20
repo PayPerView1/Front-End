@@ -20,6 +20,16 @@ const tajawal = Tajawal({
 export const metadata = {
   title: "Pay Per View",
   description: "منصة Pay Per View",
+  icons: {
+    icon: [
+      { url: "/logo1.png", sizes: "64x64", type: "image/png" },
+      { url: "/logo1.png", sizes: "64x64", type: "image/png" },
+    ],
+    shortcut: "/logo1.png",
+    apple: [
+      { url: "/logo1.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export default async function RootLayout({ children, params }) {
