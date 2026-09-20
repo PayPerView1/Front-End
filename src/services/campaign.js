@@ -206,6 +206,26 @@ export const getCampaignStatistics = async () => {
   }
 };
 
+// 18b. إحصائيات حملة مخصصة
+export const getCampaignStatisticsById = async (campaignId) => {
+  try {
+    const response = await axiosInstance.get(`/api/v1/campaigns/${campaignId}/statistics`);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// 18c. جلب المسودات المنتهية الصلاحية
+export const getExpiredDrafts = async () => {
+  try {
+    const response = await axiosInstance.get("/api/v1/campaigns/drafts/expired");
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 // 19. جلب كل الفئات
 export const getCategories = async () => {
   try {

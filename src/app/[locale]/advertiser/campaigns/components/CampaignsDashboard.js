@@ -218,9 +218,16 @@ export default function CampaignsDashboard() {
           getCampaignStatistics(),
         ]);
 
+        console.log("📋 [Campaigns API Response]:", JSON.stringify(campaignsRes, null, 2));
+
         // campaigns
         if (campaignsRes?.data?.campaigns) {
-          setCampaigns(campaignsRes.data.campaigns);
+          const fetchedCampaigns = campaignsRes.data.campaigns;
+          console.log(`🗂️ [Campaigns Count]: ${fetchedCampaigns.length} حملة`);
+          fetchedCampaigns.forEach((c, i) => {
+            console.log(`📌 [Campaign #${i + 1}] ID: ${c._id} | Name: ${c.name} | Status: ${c.status}`);
+          });
+          setCampaigns(fetchedCampaigns);
           setPagination(
             campaignsRes.data.pagination || {
               currentPage: 1,
@@ -228,6 +235,8 @@ export default function CampaignsDashboard() {
               totalCampaigns: 0,
             },
           );
+        } else {
+          console.warn("⚠️ [Campaigns] لا توجد حملات في الاستجابة:", campaignsRes);
         }
 
         // stats cards

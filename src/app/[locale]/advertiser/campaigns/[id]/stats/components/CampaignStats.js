@@ -12,7 +12,7 @@ import {
   MdOutlineBadge,
   MdOutlineGridView,
 } from "react-icons/md";
-import { getCampaignById, getCampaignStatistics, exportCampaign } from "@/services/campaign";
+import { getCampaignById, getCampaignStatisticsById, getCampaignStatistics, exportCampaign } from "@/services/campaign";
 
 const donutColors = ["#94D3C1", "#E9C349", "#284943", "#3F4945"];
 
@@ -133,39 +133,60 @@ export default function CampaignStats({ campaignId }) {
     if (!campaignId) return;
     setLoading(true);
 
-    Promise.all([
+    Promise.allSettled([
       getCampaignById(campaignId),
-      getCampaignStatistics(),
+      getCampaignStatisticsById(campaignId),
     ])
       .then(([campaignRes, statsRes]) => {
-        const campaignData = campaignRes?.data?.campaign || campaignRes?.campaign || (campaignRes?.data && typeof campaignRes.data === "object" ? campaignRes.data : null);
-        const statistics   = statsRes?.data?.statistics || statsRes?.statistics || statsRes?.data;
-        const byCategory   = statistics?.byCategory || {};
-        const totalCat     = Object.values(byCategory).reduce((s, v) => s + v, 0) || 1;
+        const campaignData = campaignRes.status === "fulfilled"
+          ? (campaignRes.value?.data?.campaign || campaignRes.value?.campaign || (campaignRes.value?.data && typeof campaignRes.value.data === "object" ? campaignRes.value.data : null))
+          : null;
+        
+        const statistics = statsRes.status === "fulfilled"
+          ? (statsRes.value?.data || statsRes.value)
+          : null;
+
+        const categoriesStats = statistics?.categoriesStats || [];
+        const categoryDistribution = statistics?.categoryDistribution || [];
 
         if (campaignData) {
-          const categoryBreakdown = Object.entries(byCategory).length > 0
-            ? Object.entries(byCategory).map(([type, count]) => ({
-                type,
-                spent:    Math.round((count / totalCat) * (campaignData?.stats?.totalSpent || campaignData?.totalBudget || 0)),
-                reach:    Math.round((count / totalCat) * (campaignData?.stats?.totalViews  || 0)),
-                ctr:      0,
-                roi:      0,
-                progress: Math.round((count / totalCat) * 100),
-              }))
-            : [
-                {
-                  type: campaignData.contentType || campaignData.category || "CLIPPING",
-                  spent: Number(campaignData.stats?.totalSpent || campaignData.spent || 0),
-                  reach: Number(campaignData.stats?.totalViews || campaignData.views || 0),
-                  ctr: 0,
-                  roi: 0,
-                  progress: Number(campaignData.totalBudget) > 0 ? Math.min(100, Math.round(((campaignData.stats?.totalSpent || 0) / Number(campaignData.totalBudget)) * 100)) : 0,
-                },
-              ];
+          let categoryBreakdown = [];
+          if (categoriesStats.length > 0) {
+            categoryBreakdown = categoriesStats.map((cs) => ({
+              type: cs.category,
+              spent: cs.totalSpent ?? 0,
+              reach: cs.reach ?? 0,
+              ctr: cs.ctr ?? 0,
+              roi: cs.roi ?? 0,
+              progress: cs.budgetUtilizationPercentage ?? 0,
+              activeCampaignsCount: cs.activeCampaignsCount ?? 0,
+              growthRate: cs.growthRate ?? 0,
+            }));
+          } else if (categoryDistribution.length > 0) {
+            categoryBreakdown = categoryDistribution.map((cd) => ({
+              type: cd.category,
+              spent: Math.round((cd.percentage / 100) * (campaignData?.stats?.totalSpent || campaignData?.totalBudget || 0)),
+              reach: Math.round((cd.percentage / 100) * (campaignData?.stats?.totalViews || 0)),
+              ctr: 0,
+              roi: 0,
+              progress: cd.percentage,
+            }));
+          } else {
+            categoryBreakdown = [
+              {
+                type: campaignData.contentType || campaignData.category || "CLIPPING",
+                spent: Number(campaignData.stats?.totalSpent || campaignData.spent || 0),
+                reach: Number(campaignData.stats?.totalViews || campaignData.views || 0),
+                ctr: 0,
+                roi: 0,
+                progress: Number(campaignData.totalBudget) > 0 ? Math.min(100, Math.round(((campaignData.stats?.totalSpent || 0) / Number(campaignData.totalBudget)) * 100)) : 0,
+              },
+            ];
+          }
 
           setCampaign({
             ...campaignData,
+            statistics,
             categoryBreakdown,
           });
         } else {
