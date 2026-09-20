@@ -5,8 +5,9 @@ import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import { useRouter } from "@/i18n/navigation";
 import { FiCalendar, FiFileText } from "react-icons/fi"; 
-import { saveDraft, autoSaveDraft, submitDraft, createCampaign, createCampaignJson } from "@/services/campaignApi";
-import { getDraftById } from "@/services/drafts";
+import { saveDraft, autoSaveDraft, createCampaign, createCampaignJson } from "@/services/campaignApi";
+import { getDraftById, deleteDraft } from "@/services/drafts";
+import { submitDraft as submitDraftToCampaign } from "@/services/campaign";
 import {
   MdVolumeUp,
   MdImage,
@@ -781,39 +782,69 @@ function normalizeCountryCodes(countries) {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      if (draftId) {
-        const res = await submitDraft(draftId);
-        if (res.success === "true" || res.success === true) {
-          alert("تم إرسال الحملة للمراجعة ✅");
-          window.location.href = `/${locale}/advertiser/campaigns`;
-        } else {
-          alert(res.message || "حدث خطأ أثناء إرسال المسودة");
-        }
-      } else {
-        // إرسال كـ JSON بدل FormData لتفادي مشكلة multer "Unexpected field"
-        const payload = {
-          name: form.name,
-          contentType: form.contentType,
-          category: form.category || form.contentType,
-          totalBudget: Number(form.totalBudget),
-          rewardPerView: Number(form.cpm),
-          cpm: Number(form.cpm),
-          startDate: form.startDate,
-          endDate: form.endDate,
-          currency: "USD",
-          targetCountries: normalizeCountryCodes(form.targetCountries),
-          halalDeclaration: checked,
-          halalDeclared: Object.values(checked).every(Boolean),
-          brief: {
-            ...form.brief,
-            mainIdea: description || form.brief.mainIdea,
-            audience: form.audience,
-          },
-        };
+      const payload = {
+        name: form.name,
+        contentType: form.contentType,
+        category: form.category || form.contentType,
+        totalBudget: Number(form.totalBudget),
+        rewardPerView: Number(form.cpm),
+        cpm: Number(form.cpm),
+        startDate: form.startDate,
+        endDate: form.endDate,
+        currency: "USD",
+        clientVersion: "1.0.0",
+        targetCountries: normalizeCountryCodes(form.targetCountries),
+        halalDeclaration: checked,
+        halalDeclared: Object.values(checked).every(Boolean),
+        brief: {
+          ...form.brief,
+          mainIdea: description || form.brief.mainIdea,
+          audience: form.audience,
+        },
+      };
 
+      console.log("📤 [Payload] البيانات المرسلة:", JSON.stringify(payload, null, 2));
+
+      if (draftId) {
+        // 1. محاولة تحديث المسودة (تجاهل الخطأ إذا فشل، لأننا سنلجأ للخطة البديلة)
+        try {
+          await autoSaveDraft(draftId, payload);
+          console.log("✅ [Draft Updated] تم حفظ التعديلات");
+        } catch (updateErr) {
+          console.warn("⚠️ [Draft Update Error]:", updateErr);
+        }
+
+        // 2. محاولة تحويل المسودة إلى حملة عبر الـ API
+        try {
+          const res = await submitDraftToCampaign(draftId);
+          if (res && (res.success === "true" || res.success === true || res.data)) {
+            alert("تم إرسال الحملة للمراجعة ✅");
+            router.push(`/${locale}/advertiser/campaigns`);
+            return;
+          }
+        } catch (submitErr) {
+          console.warn("⚠️ [Submit Draft Error]:", submitErr.message);
+        }
+
+        // 3. الخطة البديلة: إذا فشل تحويل المسودة، نقوم بإنشاء حملة جديدة بالكامل كحل جذري
+        console.log("🚀 [Fallback] جاري إنشاء حملة جديدة...");
+        payload.status = "PENDING_REVIEW";
         await createCampaignJson(payload);
-        // إعادة تحميل كاملة لصفحة الحملات لعرض الحملة الجديدة
-        window.location.href = `/${locale}/advertiser/campaigns`;
+        
+        // محاولة حذف المسودة محلياً وعلى السيرفر حتى لا تظهر مجدداً
+        try { await deleteDraft(draftId); } catch(e) {}
+        
+        alert("تم إرسال الحملة للمراجعة ✅");
+        router.push(`/${locale}/advertiser/campaigns`);
+        return;
+
+      } else {
+        // إنشاء حملة جديدة بشكل طبيعي
+        payload.status = "PENDING_REVIEW";
+        const result = await createCampaignJson(payload);
+        console.log("✅ [Campaign Response]:", JSON.stringify(result, null, 2));
+        alert("تم إرسال الحملة للمراجعة ✅");
+        router.push(`/${locale}/advertiser/campaigns`);
       }
     } catch (err) {
       console.error("خطأ في الإرسال:", err);

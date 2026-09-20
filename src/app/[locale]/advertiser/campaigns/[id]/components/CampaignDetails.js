@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
 import { useLocale, useTranslations } from "next-intl";
-import { MdOutlineFileDownload, MdOutlineChevronRight } from "react-icons/md";
+import { MdOutlineFileDownload, MdOutlineChevronRight, MdOutlineBarChart } from "react-icons/md";
 import { HiOutlineDocumentDuplicate } from "react-icons/hi";
 import { MdTrendingUp, MdTrendingDown } from "react-icons/md";
 import { exportCampaign } from "@/services/campaign";
@@ -41,6 +41,11 @@ function buildTimeline(campaign, locale) {
       item.date = formatDate(h.createdAt, locale);
     }
   });
+
+  if (campaign.status === "PENDING_REVIEW" || campaign.status === "SUBMITTED") {
+    const item = base.find((b) => b.key === "underReview");
+    if (item) { item.active = true; item.done = false; }
+  }
 
   if (campaign.status === "ACTIVE") {
     const item = base.find((b) => b.key === "activeStatus");
@@ -173,6 +178,13 @@ export default function CampaignDetails({ campaign }) {
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
+            <button type="button"
+              onClick={() => router.push(`/${locale}/advertiser/campaigns/${campaign._id}/stats`)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold cursor-pointer bg-transparent transition-all hover:opacity-80"
+              style={{ borderColor: "#94D3C1", color: isDark ? "#94D3C1" : "#4B7A6E" }}>
+              <MdOutlineBarChart size={16} />
+              {isRTL ? "صفحة الإحصائيات" : "Statistics"}
+            </button>
             <button type="button"
               onClick={() => router.push(`/${locale}/advertiser/campaigns/${campaign._id}/copy`)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold cursor-pointer bg-transparent transition-all hover:opacity-80"
@@ -322,6 +334,81 @@ export default function CampaignDetails({ campaign }) {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* قسم تفاصيل Brief وإعدادات الحملة الكاملة من API الديتيلز */}
+      <div className="px-4 py-5 mx-1 flex flex-col gap-5 relative overflow-hidden rounded-xl"
+        style={{ border: `1px solid ${th.cardBorder}`, background: th.cardBg, backdropFilter: "blur(20px)" }}>
+        <div className="absolute top-0 left-0 w-full h-[3px]" style={{ background: th.gradientLine }} />
+        
+        <h2 className={`text-lg font-bold ${th.text}`}>
+          {isRTL ? "تفاصيل إعدادات الحملة والـ Brief" : "Campaign Brief & Full Configuration"}
+        </h2>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* الفكرة الرئيسية والوصف */}
+          <div className={`p-4 rounded-xl border flex flex-col gap-2.5 ${isDark ? "bg-white/[0.02] border-white/10" : "bg-gray-50 border-gray-200"}`}>
+            <h3 className={`text-sm font-bold ${th.text}`}>
+              {isRTL ? "الفكرة الرئيسية والشرح" : "Main Concept & Idea"}
+            </h3>
+            <p className={`text-xs leading-relaxed ${th.subText}`}>
+              {campaign.brief?.mainIdea || campaign.description || campaign.brief?.description || (isRTL ? "لا يوجد شرح تفصيلي متاح" : "No detailed description provided")}
+            </p>
+            {campaign.brief?.productUrl && (
+              <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between text-xs">
+                <span className={th.subText}>{isRTL ? "رابط المنتج / الموقع:" : "Product URL:"}</span>
+                <a href={campaign.brief.productUrl} target="_blank" rel="noreferrer" className="text-[#94D3C1] font-semibold underline truncate max-w-[200px]">
+                  {campaign.brief.productUrl}
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* معلومات الميزانية والنموذج */}
+          <div className={`p-4 rounded-xl border flex flex-col gap-2.5 ${isDark ? "bg-white/[0.02] border-white/10" : "bg-gray-50 border-gray-200"}`}>
+            <h3 className={`text-sm font-bold ${th.text}`}>
+              {isRTL ? "إعدادات الميزانية والتسعير" : "Budget & Pricing Model"}
+            </h3>
+            <div className="flex flex-col gap-2 text-xs">
+              <div className="flex items-center justify-between py-1 border-b border-gray-200 dark:border-gray-800">
+                <span className={th.subText}>{isRTL ? "الميزانية الكلية:" : "Total Budget:"}</span>
+                <span className={`font-bold ${th.text}`}>{formatBudget(campaign.totalBudget || campaign.budget)}</span>
+              </div>
+              <div className="flex items-center justify-between py-1 border-b border-gray-200 dark:border-gray-800">
+                <span className={th.subText}>{isRTL ? "الميزانية اليومية:" : "Daily Budget:"}</span>
+                <span className={`font-bold ${th.text}`}>{campaign.dailyBudget ? formatBudget(campaign.dailyBudget) : "-"}</span>
+              </div>
+              <div className="flex items-center justify-between py-1 border-b border-gray-200 dark:border-gray-800">
+                <span className={th.subText}>{isRTL ? "نموذج التسعير:" : "Pricing Model:"}</span>
+                <span className="font-semibold text-[#94D3C1]">{campaign.pricingModel || campaign.billingModel || "CPV"}</span>
+              </div>
+              <div className="flex items-center justify-between py-1">
+                <span className={th.subText}>{isRTL ? "إقرار المحتوى الحلال:" : "Halal Declaration:"}</span>
+                <span className={`font-semibold ${campaign.halalDeclared !== false ? "text-green-400" : "text-amber-400"}`}>
+                  {campaign.halalDeclared !== false ? (isRTL ? "مُؤكّد ✓" : "Confirmed ✓") : (isRTL ? "غير مؤكد" : "Unconfirmed")}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* التعليمات والضوابط إن وجدت */}
+        {(campaign.brief?.dos || campaign.brief?.donts || campaign.brief?.requirements) && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1">
+            {campaign.brief?.dos && (
+              <div className={`p-4 rounded-xl border flex flex-col gap-2 ${isDark ? "bg-emerald-950/10 border-emerald-500/20 text-emerald-300" : "bg-emerald-50 border-emerald-200 text-emerald-900"}`}>
+                <h4 className="text-xs font-bold text-emerald-400">{isRTL ? "ما يجب فعله (Dos):" : "Dos:"}</h4>
+                <p className="text-xs whitespace-pre-line leading-relaxed">{campaign.brief.dos}</p>
+              </div>
+            )}
+            {campaign.brief?.donts && (
+              <div className={`p-4 rounded-xl border flex flex-col gap-2 ${isDark ? "bg-rose-950/10 border-rose-500/20 text-rose-300" : "bg-rose-50 border-rose-200 text-rose-900"}`}>
+                <h4 className="text-xs font-bold text-rose-400">{isRTL ? "ما يجب تجنبه (Don'ts):" : "Don'ts:"}</h4>
+                <p className="text-xs whitespace-pre-line leading-relaxed">{campaign.brief.donts}</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

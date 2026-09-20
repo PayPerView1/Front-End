@@ -105,31 +105,23 @@ export async function getDrafts(params = {}) {
 export async function getExpiredDrafts(params = {}) {
   let apiExpired = [];
   try {
-    const response = await axiosInstance.get("/api/v1/campaigns", {
-      params: {
-        status: "EXPIRED",
-        limit: 50,
-        sortBy: "createdAt",
-        sortOrder: "desc",
-        ...params,
-      },
-    });
-    const d = response?.data?.data;
-    apiExpired = d?.campaigns || d?.drafts || (Array.isArray(d) ? d : []);
+    const response = await axiosInstance.get("/api/v1/campaigns/drafts/expired", { params });
+    const resData = response?.data;
+    apiExpired = resData?.drafts || resData?.data?.drafts || (Array.isArray(resData?.data) ? resData.data : []);
   } catch (error) {
-    console.warn("API getExpiredDrafts 404/Error:", error.message);
+    console.warn("API getExpiredDrafts Error:", error.message);
   }
 
   const localExpired = getLocalDrafts().filter(
     (d) => d.status === "EXPIRED"
   );
-  const existingIds = new Set(apiExpired.map((c) => c._id));
+  const existingIds = new Set(apiExpired.map((c) => c._id || c.id));
   const merged = [
-    ...localExpired.filter((l) => !existingIds.has(l._id)),
+    ...localExpired.filter((l) => !existingIds.has(l._id || l.id)),
     ...apiExpired,
   ];
 
-  return { campaigns: merged };
+  return { drafts: merged, campaigns: merged };
 }
 
 // ─── GET Draft By ID ──────────────────────────────────────────────────────────
