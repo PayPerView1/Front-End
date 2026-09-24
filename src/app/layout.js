@@ -22,12 +22,12 @@ export const metadata = {
   description: "منصة Pay Per View",
   icons: {
     icon: [
-      { url: "/logo1.png", sizes: "64x64", type: "image/png" },
-      { url: "/logo1.png", sizes: "64x64", type: "image/png" },
+      { url: "/images/logo6.png", sizes: "64x64", type: "image/png" },
+      { url: "/images/logo6.png", sizes: "192x192", type: "image/png" },
     ],
-    shortcut: "/logo1.png",
+    shortcut: "/images/logo6.png",
     apple: [
-      { url: "/logo1.png", sizes: "180x180", type: "image/png" },
+      { url: "/images/logo6.png", sizes: "180x180", type: "image/png" },
     ],
   },
 };
