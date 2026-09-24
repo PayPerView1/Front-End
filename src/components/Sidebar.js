@@ -47,12 +47,6 @@ const creatorResourceItems = [
 const advertiserNavItems = [
   { label: "dashboard", href: "/advertiser/dashboard", icon: MdOutlineDashboard, useMd: true },
   {
-    label: "manageCampaigns",
-    href: "/advertiser/campaigns",
-    icon: MdBarChart,
-    useMd: true,
-  },
-  {
     label: "analytics",
     href: "/advertiser/analytics",
     icon: MdBarChart,
