@@ -179,7 +179,7 @@ export default function Sidebar() {
 
   // ─── لون الأيقونة ─────────────────────────────────────────
   const iconColor = (isActive) =>
-    isActive ? (isDark ? "white" : "#1A1A1A") : isDark ? "#9A9A9A" : "#666666";
+    isActive ? (isDark ? "#94D3C1" : "#70B8A0") : isDark ? "#9A9A9A" : "#666666";
 
 
   // ─── رندر رابط واحد ───────────────────────────────────────

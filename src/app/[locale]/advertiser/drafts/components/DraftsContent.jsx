@@ -178,7 +178,7 @@ export default function DraftsContent() {
           className="flex items-center justify-center gap-2 shrink-0 transition-opacity hover:opacity-90 active:opacity-80 cursor-pointer"
           style={{
             minWidth: "157px",
-            height: "50px",
+            height: "45px",
             borderRadius: "8px",
             padding: "12px 24px",
             gap: "8px",
