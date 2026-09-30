@@ -7,7 +7,25 @@
     "language": "Lingua",
     "logout": "Esci"
   },
-  "sidebar": { "home": "Home", "search": "Cerca", "discover": "Scopri", "startProject": "Avvia un progetto", "resources": "Risorse", "members": "Membri", "partners": "Partner", "new": "Nuovo", "help": "Aiuto", "blog": "Blog" },
+  "sidebar": {
+    "home": "Home",
+    "search": "Cerca",
+    "discover": "Scopri",
+    "startProject": "Avvia un progetto",
+    "resources": "Risorse",
+    "members": "Membri",
+    "partners": "Partner",
+    "new": "Nuovo",
+    "help": "Aiuto",
+    "blog": "Blog",
+    "dashboard": "Dashboard",
+    "analytics": "Analisi e report",
+    "clips": "Gestisci clip",
+    "newCampaign": "Crea campagna",
+    "drafts": "Bozze",
+    "manageCampaigns": "Gestisci campagne",
+    "billing": "Budget e pagamenti"
+  },
   "profile": {
     "edit": "Modifica profilo",
     "manageOrders": "Gestisci ordini",
@@ -21,7 +39,11 @@
     "user": {
       "joined": "Iscritto a luglio 2026",
       "followers": "Follower",
-      "following": "Segui"
+      "following": "Segui",
+      "name": "Shatha Al-Banna",
+      "email": "@gmail.com",
+      "location": "Gaza, Palestina",
+      "profile": "Profilo"
     },
     "buttons": {
       "editProfile": "Modifica profilo",
@@ -134,6 +156,423 @@
     "services": "Servizi connessi",
     "security": "Sicurezza dell'account",
     "subscriptions": "Abbonamenti",
-    "disputes": "Centro controversie"
+    "disputes": "Centro controversie",
+    "email": "E-mail",
+    "cancel": "Annulla"
+  },
+  "landing": {
+    "language": "Lingua",
+    "theme": "Cambia tema",
+    "dark": "Scuro",
+    "light": "Chiaro",
+    "nav": [
+      "Come funziona",
+      "Per i brand",
+      "Per i creator",
+      "Inizia",
+      "Accedi"
+    ],
+    "heroEyebrow": "PAYPERVIEW · IN SVILUPPO",
+    "heroTitle": "Trasforma le visualizzazioni\nin [[valore.]]",
+    "heroText": "PayPerView mette in contatto brand e creator per trasformare video brevi e visualizzazioni verificate in risultati misurabili.",
+    "explore": "Scopri come funziona",
+    "proof": "Una piattaforma. Opportunità condivise.",
+    "flowEyebrow": "UNA PORTATA MIGLIORE",
+    "flowTitle": "Ogni visualizzazione\nha [[valore.]]",
+    "flowIntro": "Dal primo brief alla visualizzazione verificata, ogni passaggio collega contenuti e risultati con chiarezza.",
+    "steps": [
+      "Brand",
+      "Campagna",
+      "Clip",
+      "Visualizzazioni",
+      "Verifica",
+      "Ricompensa"
+    ],
+    "stepDetails": [
+      "Definisci il brief",
+      "Finanzia un’idea",
+      "Falla tua",
+      "Il pubblico guarda",
+      "Verifica l’autenticità",
+      "Guadagna dall’impatto"
+    ],
+    "flowLabel": "FLUSSO DELLA CAMPAGNA",
+    "loopEyebrow": "IL CICLO PAYPERVIEW",
+    "loopTitle": "Crea.\nTaglia. Guarda.\n[[Guadagna.]]",
+    "loopText": "Un ciclo continuo in cui i contenuti di qualità trovano il pubblico e le performance creano opportunità.",
+    "loop": [
+      "CREA",
+      "CAMPAGNA",
+      "CLIP",
+      "GUARDA",
+      "VERIFICA",
+      "GUADAGNA"
+    ],
+    "brandsEyebrow": "PER I BRAND",
+    "brandsTitle": "I tuoi contenuti.\nLa loro [[portata.]]",
+    "brandsText": "Lancia una campagna, coinvolgi i creator nella tua storia e scopri il flusso di lavoro mentre la piattaforma cresce.",
+    "brandsLink": "Esplora la piattaforma",
+    "workspace": "SPAZIO CAMPAGNA",
+    "campaign": "La tua campagna",
+    "preview": "Anteprima",
+    "inDevelopment": "IN SVILUPPO",
+    "tabs": [
+      "Panoramica",
+      "Creator",
+      "Contenuti",
+      "Verifica"
+    ],
+    "workspaceEyebrow": "LA TUA PROSSIMA STORIA INIZIA QUI",
+    "workspaceTitle": "Crea una campagna partendo dalla tua idea.",
+    "workspaceText": "Brief, creator abbinati e attività della campagna saranno raccolti qui.",
+    "workflow": [
+      "Brief della campagna",
+      "Storie dei creator",
+      "Verifica visualizzazioni"
+    ],
+    "workspaceFoot": "Monitoraggio trasparente delle campagne",
+    "workspaceLabel": "ANTEPRIMA SPAZIO",
+    "clippersEyebrow": "PER I CREATOR",
+    "clipperTitle": "La tua portata.\nLa tua [[ricompensa.]]",
+    "clipperText": "Scopri campagne adatte al tuo stile, crea contenuti per il tuo pubblico e guadagna in base alle performance verificate.",
+    "clipperLink": "Scopri l’esperienza creator",
+    "creatorWorkspace": "SPAZIO CREATOR",
+    "readyCreate": "Pronto a creare",
+    "rewardsHere": "Le ricompense appariranno qui",
+    "nextClip": "La tua prossima clip",
+    "campaignDetails": "I dettagli appariranno qui",
+    "verifiedEyebrow": "IL CUORE DELLA PIATTAFORMA",
+    "verifiedTitle": "Non solo visualizzazioni.\n[[Visualizzazioni verificate.]]",
+    "verifiedText": "La verifica collega con chiarezza attività della campagna, contenuti e risultati.",
+    "checks": [
+      "Controllo autenticità",
+      "Attività tracciabile",
+      "Collegata alla campagna"
+    ],
+    "verification": "VERIFICA VISUALIZZAZIONI",
+    "status": "IN SVILUPPO",
+    "statusTitle": "STATO VERIFICA",
+    "readyActivity": "In attesa di attività",
+    "verifySteps": [
+      "Contenuto inviato",
+      "Attività controllata",
+      "Visualizzazioni verificate"
+    ],
+    "verifyFoot": "I dettagli appariranno all’attivazione della campagna",
+    "whyEyebrow": "PERCHÉ PAYPERVIEW",
+    "whyTitle": "Performance\ncon [[uno scopo.]]",
+    "whyText": "Pensato per ciò che conta per tutti.",
+    "why": [
+      [
+        "BRAND",
+        "Lancia. Segui. Misura.",
+        "Trasforma un brief in copertura creata dai creator."
+      ],
+      [
+        "CREATOR",
+        "Scopri. Crea. Guadagna.",
+        "Trova campagne e condividi i risultati."
+      ],
+      [
+        "ECOSISTEMA",
+        "Trasparenza integrata.",
+        "Contenuti, performance e ricompense collegati."
+      ]
+    ],
+    "wallEyebrow": "CONTENUTI IN MOVIMENTO",
+    "wallTitle": "I contenuti sono la [[valuta.]]",
+    "wallText": "Le idee arrivano più lontano quando le plasmano le persone giuste.",
+    "wallTitles": [
+      "Una pausa caffè sopra la città",
+      "Un momento all’aperto",
+      "Ora dorata",
+      "Tramonto in ripresa"
+    ],
+    "wallNote": "UN’IDEA.\nTANTI PUNTI\nDI VISTA.",
+    "mediaCredit": "Video di Michelle Leman via",
+    "photosCredit": "Foto via",
+    "ctaEyebrow": "LA PROSSIMA VISUALIZZAZIONE INIZIA QUI",
+    "ctaTitle": "Pronto a mettere\nal lavoro le tue [[visualizzazioni?]]",
+    "ctaText": "Che tu stia creando una campagna o contenuti, PayPerView collega performance e opportunità.",
+    "forBrands": "Per i brand",
+    "forCreators": "Per i creator",
+    "ctaLoop": "BRAND → CONTENUTI → VISUALIZZAZIONI VERIFICATE → VALORE",
+    "footerText": "I contenuti di qualità meritano\ndi arrivare più lontano.",
+    "exploreLabel": "ESPLORA",
+    "accountLabel": "IL TUO ACCOUNT",
+    "platformLabel": "LA PIATTAFORMA",
+    "backTop": "Torna su ↑",
+    "verifiedViews": "Visualizzazioni verificate",
+    "footerTag": "Per l’economia delle visualizzazioni"
+  },
+  "assistant": {
+    "close": "Chiudi assistente",
+    "title": "Come posso aiutarti oggi?",
+    "description": "Sono il tuo assistente intelligente. Posso aiutarti a creare contenuti, gestire il tuo account o rispondere alle tue domande.",
+    "preview": "Anteprima",
+    "placeholder": "Scrivi qui il tuo messaggio...",
+    "disclaimer": "L’assistente può commettere errori. Verifica le informazioni importanti.",
+    "viewConversations": "Visualizza conversazioni",
+    "conversations": "Conversazioni",
+    "newConversation": "Nuova conversazione",
+    "loading": "Caricamento",
+    "errors": {
+      "loadMessages": "Impossibile caricare i messaggi",
+      "createThread": "Impossibile creare la conversazione",
+      "sendMessage": "Impossibile inviare il messaggio",
+      "deleteThread": "Impossibile eliminare la conversazione"
+    },
+    "actions": {
+      "messageMembers": {
+        "title": "Scrivi ai membri recenti",
+        "desc": "Prepara un messaggio di benvenuto per i nuovi iscritti"
+      },
+      "createAd": {
+        "title": "Crea un annuncio creativo",
+        "desc": "Genera un testo accattivante per la prossima campagna"
+      },
+      "startLive": {
+        "title": "Avvia una diretta",
+        "desc": "Configura una sessione live per entrare in contatto con il pubblico"
+      },
+      "sendInvoice": {
+        "title": "Invia una fattura a un cliente",
+        "desc": "Crea e invia rapidamente una fattura professionale"
+      }
+    }
+  },
+  "messages": {
+    "title": "Messaggi",
+    "minimizePanel": "Riduci il pannello dei messaggi",
+    "maximizePanel": "Espandi il pannello dei messaggi",
+    "close": "Chiudi",
+    "searchPlaceholder": "Cerca messaggi...",
+    "filters": {
+      "all": "Tutti",
+      "unread": "Non letti",
+      "orders": "Ordini"
+    },
+    "newMessage": "Nuovo messaggio",
+    "noConversations": "Nessuna conversazione corrisponde alla ricerca"
+  },
+  "emptyState": {
+    "title": "Seleziona un messaggio per iniziare",
+    "description": "Scegli una conversazione nella barra laterale per contattare gli iscritti o il team di supporto",
+    "encrypted": "I messaggi sono completamente crittografati e sicuri."
+  },
+  "campaigns": {
+    "title": "Gestione campagne",
+    "subtitle": "Monitora prestazioni, budget e stato delle campagne attive",
+    "dateFilter": "Data: ultimi 30 giorni",
+    "statusLabel": "Stato",
+    "search": "Cerca campagne...",
+    "all": "Tutte",
+    "active": "Attiva",
+    "draft": "Bozza",
+    "completed": "Completata",
+    "paused": "In pausa",
+    "campaignName": "Nome campagna",
+    "status": "Stato",
+    "budget": "Budget",
+    "startDate": "Data di inizio",
+    "action": "Azione",
+    "view": "Dettagli",
+    "modify": "Modifica",
+    "stop": "Metti in pausa",
+    "delete": "Elimina",
+    "prev": "Precedente",
+    "next": "Successiva",
+    "noCampaigns": "Nessuna campagna corrispondente",
+    "totalCampaigns": "Campagne totali",
+    "activeCampaigns": "Campagne attive",
+    "totalBudget": "Budget totale (T3)",
+    "stable": "Stabile",
+    "export": "Esporta dati",
+    "back": "Indietro",
+    "copy": "Copia",
+    "campaignNumber": "ID campagna",
+    "client": "Cliente",
+    "kpi": "Indicatori chiave di prestazione",
+    "budgetUsed": "Budget utilizzato",
+    "impressions": "Impression",
+    "clicks": "Clic",
+    "conversionRate": "Tasso di conversione",
+    "viewDetails": "Dettagli campagna",
+    "startDateLabel": "Data di inizio",
+    "endDate": "Data di fine",
+    "targetType": "Tipo di obiettivo",
+    "platforms": "Piattaforme",
+    "campaignStatus": "Stato campagna",
+    "created": "Creata",
+    "underReview": "In revisione",
+    "approved": "Approvata",
+    "activeStatus": "Attiva",
+    "completedStatus": "Completata",
+    "copyTitle": "Copia campagna",
+    "newCampaignName": "Nuovo nome campagna",
+    "copyOptions": "Opzioni di copia",
+    "copyMedia": "Copia media e clip",
+    "copyMediaDesc": "Copia anche i video collegati alla campagna, le funzionalità abilitate e le risorse del brand",
+    "copyTargeting": "Copia impostazioni di targeting",
+    "copyTargetingDesc": "Mantieni le stesse impostazioni di targeting, pubblico, area geografica e dati demografici",
+    "startCopy": "Avvia copia",
+    "copying": "Copia in corso...",
+    "cancel": "Annulla",
+    "showing": "Visualizzazione da {from} a {to} di {total} risultati",
+    "from": "di",
+    "statusActive": "Attiva",
+    "statusDraft": "Bozza",
+    "statusCompleted": "Completata",
+    "statusPendingReview": "In attesa di revisione",
+    "statusRejected": "Rifiutata",
+    "statusManualReview": "Revisione manuale",
+    "statusCancelled": "Annullata",
+    "statusArchived": "Archiviata",
+    "statusExpired": "Scaduta",
+    "campaignStats": "Statistiche campagna",
+    "emptyTitle": "Nessuna campagna creata",
+    "emptyDesc": "Il tuo spazio pubblicitario è pronto. Crea la tua prima campagna per raggiungere il pubblico desiderato.",
+    "createNew": "Avvia la prima campagna",
+    "statsTitle": "Statistiche delle campagne per categoria",
+    "overviewLabel": "Panoramica delle prestazioni",
+    "last30days": "Ultimi 30 giorni",
+    "distribution": "Distribuzione",
+    "totalCampaignsLabel": "Campagne totali",
+    "reach": "Copertura",
+    "roi": "ROI",
+    "ctr": "CTR",
+    "spentLabel": "Spesa",
+    "categoryUGC": "Contenuti generati dagli utenti (UGC)",
+    "categoryClipping": "Montaggio clip",
+    "categorySlideshow": "Presentazione",
+    "categoryAudio": "Contenuti audio",
+    "categoryLogo": "Logo",
+    "categoryMixed": "Misto",
+    "legendUGC": "Contenuti degli utenti (UGC)",
+    "legendClipping": "Montaggio clip",
+    "legendSponsorship": "Sponsorizzazione",
+    "legendOther": "Altro",
+    "ugcSubtitle": "Ieri: ricavi - 56 campagne attive",
+    "clippingSubtitle": "In corso - efficienza attiva: {progress}"
+  },
+  "newCampaign": {
+    "steps": {
+      "s1": "Informazioni di base",
+      "s2": "Conformità",
+      "s3": "Contenuti",
+      "s4": "Revisione"
+    },
+    "titles": {
+      "t1": "Crea una nuova campagna",
+      "t2": "Certificato di conformità halal",
+      "t3": "Carica contenuti",
+      "t4": "Rivedi e invia"
+    },
+    "subtitles": {
+      "s1": "Inserisci i dati di base della campagna pubblicitaria.",
+      "s2": "Conferma che la campagna rispetti le seguenti linee guida islamiche.",
+      "s3": "Aggiungi i materiali creativi della campagna.",
+      "s4": "Rivedi i dettagli prima dell’invio."
+    },
+    "step1": {
+      "name": "Nome campagna",
+      "namePlaceholder": "Esempio: campagna del primo trimestre 2024",
+      "budget": "Budget (USD)",
+      "cpm": "Costo per mille impressioni (CPM)",
+      "period": "Periodo della campagna",
+      "startDate": "Data di inizio",
+      "endDate": "Data di fine",
+      "contentType": "Tipo di contenuto",
+      "contentTypes": {
+        "VIDEO": "Video breve",
+        "IMAGE": "Immagine statica",
+        "TEXT": "Testo",
+        "MIXED": "Contenuto misto",
+        "LOGO": "Logo",
+        "AUDIO": "Audio",
+        "SLIDESHOW": "Presentazione",
+        "UGC": "Contenuti generati dagli utenti",
+        "CLIPPING": "Montaggio clip"
+      },
+      "audience": "Pubblico di destinazione",
+      "audiencePlaceholder": "Breve descrizione o parole chiave per il targeting...",
+      "required": "Questo campo è obbligatorio"
+    },
+    "compliance": {
+      "intro": "Conferma che la campagna rispetti queste linee guida islamiche. Il requisito è obbligatorio per tutte le campagne PayPerView.",
+      "items": {
+        "noHaram": {
+          "title": "Nessun contenuto illecito",
+          "desc": "La campagna non promuove alcol, gioco d’azzardo, contenuti per adulti o altri prodotti o servizi vietati."
+        },
+        "islamicValues": {
+          "title": "Rispetto dei valori islamici",
+          "desc": "Immagini, messaggi e ambiente rispettano i principi islamici e non li deridono né li contraddicono."
+        },
+        "honestRep": {
+          "title": "Rappresentazione onesta",
+          "desc": "La campagna evita marketing ingannevole e false dichiarazioni e presenta le offerte con trasparenza."
+        },
+        "noGambling": {
+          "title": "Nessun gioco d’azzardo",
+          "desc": "La campagna non promuove gioco d’azzardo o scommesse."
+        },
+        "noSexualContent": {
+          "title": "Nessun contenuto sessuale",
+          "desc": "La campagna non contiene contenuti sessuali né allusioni esplicite."
+        },
+        "noExplicitMusic": {
+          "title": "Nessuna musica esplicita",
+          "desc": "La campagna non contiene musica o testi inappropriati."
+        },
+        "noAlcohol": {
+          "title": "Nessuna promozione di alcol",
+          "desc": "La campagna non promuove bevande alcoliche."
+        },
+        "noSuspiciousCurrencies": {
+          "title": "Nessuna transazione finanziaria sospetta",
+          "desc": "La campagna non promuove valute o transazioni finanziarie sospette o inaffidabili."
+        },
+        "noUnrealisticProfit": {
+          "title": "Nessuna promessa di profitti irrealistici",
+          "desc": "La campagna non promette profitti irrealistici o fuorvianti."
+        }
+      },
+      "descTitle": "Descrizione della campagna",
+      "descSub": "Descrizione dettagliata",
+      "descPlaceholder": "Descrivi obiettivi, pubblico di destinazione e messaggi principali della campagna...",
+      "error": "Leggi e accetta i termini per consentire l’approvazione della campagna."
+    },
+    "step3": {
+      "intro": "Aggiungi i materiali creativi. Assicurati che i file rispettino le linee guida per la distribuzione sulle reti.",
+      "dropTitle": "Trascina e rilascia qui i file",
+      "dropSub": "Oppure fai clic per cercarli sul computer. I file saranno elaborati in modo sicuro.",
+      "maxSize": "Dimensione massima: 20 MB per file",
+      "choose": "Scegli file",
+      "sizeError": "Caricamento non riuscito: file oltre 20 MB",
+      "sizeErrorToast": "Impossibile caricare \"{name}\" perché supera il limite di 20 MB.",
+      "complete": "Completato",
+      "required": "Carica almeno un file"
+    },
+    "step4": {
+      "identity": "Identità della campagna",
+      "campaignName": "Nome campagna",
+      "goal": "Obiettivo",
+      "startDate": "Data di inizio",
+      "endDate": "Data di fine",
+      "budget": "Budget assegnato",
+      "budgetTotal": "Budget totale della campagna",
+      "reach": "Copertura prevista",
+      "assets": "Materiali creativi",
+      "uploaded": "Caricati {count} elementi",
+      "targeting": "Targeting",
+      "notSpecified": "Non specificato"
+    },
+    "nav": {
+      "back": "Indietro",
+      "saveDraft": "Salva come bozza",
+      "next": "Avanti →",
+      "submit": "Invia per la revisione →"
+    }
   }
 }

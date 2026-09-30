@@ -36,7 +36,7 @@ export default function SearchFilterBar({ onSearch, onSort }) {
     <div
       className="flex flex-row items-center justify-between w-full rounded-xl px-4 gap-4 relative"
       style={{
-        height: "76px",
+        height: "50px",
         border: `1px solid ${barBorder}`,
         background: barBg,
         backdropFilter: "blur(20px)",

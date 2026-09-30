@@ -7,7 +7,25 @@
     "language": "Taal",
     "logout": "Uitloggen"
   },
-  "sidebar": { "home": "Home", "search": "Zoeken", "discover": "Ontdekken", "startProject": "Een project starten", "resources": "Bronnen", "members": "Leden", "partners": "Partners", "new": "Nieuw", "help": "Hulp", "blog": "Blog" },
+  "sidebar": {
+    "home": "Home",
+    "search": "Zoeken",
+    "discover": "Ontdekken",
+    "startProject": "Een project starten",
+    "resources": "Bronnen",
+    "members": "Leden",
+    "partners": "Partners",
+    "new": "Nieuw",
+    "help": "Hulp",
+    "blog": "Blog",
+    "dashboard": "Dashboard",
+    "analytics": "Analyses en rapporten",
+    "clips": "Clips beheren",
+    "newCampaign": "Nieuwe campagne maken",
+    "drafts": "Concepten",
+    "manageCampaigns": "Campagnes beheren",
+    "billing": "Budget en betalingen"
+  },
   "profile": {
     "edit": "Profiel bewerken",
     "manageOrders": "Bestellingen beheren",
@@ -21,7 +39,11 @@
     "user": {
       "joined": "Aangesloten in juli 2026",
       "followers": "Volgers",
-      "following": "Volgende"
+      "following": "Volgende",
+      "name": "Shatha Al-Banna",
+      "email": "@gmail.com",
+      "location": "Gaza, Palestina",
+      "profile": "Profiel"
     },
     "buttons": {
       "editProfile": "Profiel bewerken",
@@ -134,6 +156,423 @@
     "services": "Verbonden services",
     "security": "Accountbeveiliging",
     "subscriptions": "Abonnementen",
-    "disputes": "Geschillencentrum"
+    "disputes": "Geschillencentrum",
+    "email": "E-mail",
+    "cancel": "Annuleren"
+  },
+  "landing": {
+    "language": "Taal",
+    "theme": "Thema wijzigen",
+    "dark": "Donker",
+    "light": "Licht",
+    "nav": [
+      "Hoe het werkt",
+      "Voor merken",
+      "Voor makers",
+      "Aan de slag",
+      "Inloggen"
+    ],
+    "heroEyebrow": "PAYPERVIEW · IN ONTWIKKELING",
+    "heroTitle": "Maak van views\n[[waarde.]]",
+    "heroText": "PayPerView verbindt merken en makers om korte video's en geverifieerde views om te zetten in meetbare resultaten.",
+    "explore": "Ontdek hoe het werkt",
+    "proof": "Eén platform. Gedeelde kansen.",
+    "flowEyebrow": "BETER BEREIK",
+    "flowTitle": "Elke view\nheeft [[waarde.]]",
+    "flowIntro": "Van briefing tot geverifieerde view: elke stap verbindt content duidelijk met resultaat.",
+    "steps": [
+      "Merk",
+      "Campagne",
+      "Clip",
+      "Views",
+      "Geverifieerd",
+      "Beloning"
+    ],
+    "stepDetails": [
+      "Bepaal de briefing",
+      "Steun een idee",
+      "Geef er je draai aan",
+      "Mensen kijken",
+      "Controleer echtheid",
+      "Verdien aan impact"
+    ],
+    "flowLabel": "CAMPAGNEVERLOOP",
+    "loopEyebrow": "DE PAYPERVIEW-CYCLUS",
+    "loopTitle": "Creëer.\nKnip. Kijk.\n[[Verdien.]]",
+    "loopText": "Een doorlopende cyclus waarin goede content het publiek vindt en prestaties kansen creëren.",
+    "loop": [
+      "MAKEN",
+      "CAMPAGNE",
+      "CLIP",
+      "KIJKEN",
+      "CONTROLEREN",
+      "VERDIENEN"
+    ],
+    "brandsEyebrow": "VOOR MERKEN",
+    "brandsTitle": "Jouw content.\nHun [[bereik.]]",
+    "brandsText": "Start een campagne, betrek makers bij je verhaal en ontdek de workflow terwijl het platform groeit.",
+    "brandsLink": "Ontdek het platform",
+    "workspace": "CAMPAGNERUIMTE",
+    "campaign": "Jouw campagne",
+    "preview": "Voorbeeld",
+    "inDevelopment": "IN ONTWIKKELING",
+    "tabs": [
+      "Overzicht",
+      "Makers",
+      "Content",
+      "Verificatie"
+    ],
+    "workspaceEyebrow": "JOUW VOLGENDE VERHAAL BEGINT HIER",
+    "workspaceTitle": "Bouw een campagne rond jouw idee.",
+    "workspaceText": "Je briefing, makers en campagneactiviteit komen hier samen.",
+    "workflow": [
+      "Campagnebriefing",
+      "Verhalen van makers",
+      "Viewverificatie"
+    ],
+    "workspaceFoot": "Transparant campagnebeheer",
+    "workspaceLabel": "WERKRUIMTEVOORBEELD",
+    "clippersEyebrow": "VOOR MAKERS",
+    "clipperTitle": "Jouw bereik.\nJouw [[beloning.]]",
+    "clipperText": "Ontdek campagnes die bij je passen, maak content voor je publiek en verdien op basis van geverifieerde prestaties.",
+    "clipperLink": "Ontdek de makerervaring",
+    "creatorWorkspace": "MAKERSPLEK",
+    "readyCreate": "Klaar om te maken",
+    "rewardsHere": "Campagnebeloningen verschijnen hier",
+    "nextClip": "Je volgende clip",
+    "campaignDetails": "Campagnegegevens verschijnen hier",
+    "verifiedEyebrow": "HET HART VAN HET PLATFORM",
+    "verifiedTitle": "Meer dan views.\n[[Geverifieerde views.]]",
+    "verifiedText": "Verificatie verbindt campagneactiviteit, content en resultaat op een heldere manier.",
+    "checks": [
+      "Echtheidscontrole",
+      "Traceerbare activiteit",
+      "Gekoppeld aan campagne"
+    ],
+    "verification": "VIEWVERIFICATIE",
+    "status": "IN ONTWIKKELING",
+    "statusTitle": "VERIFICATIESTATUS",
+    "readyActivity": "Wacht op campagneactiviteit",
+    "verifySteps": [
+      "Content ingediend",
+      "Activiteit gecontroleerd",
+      "Views geverifieerd"
+    ],
+    "verifyFoot": "Details verschijnen zodra een campagne actief is",
+    "whyEyebrow": "WAAROM PAYPERVIEW",
+    "whyTitle": "Prestaties\nmet [[een doel.]]",
+    "whyText": "Gebouwd rond wat voor iedereen telt.",
+    "why": [
+      [
+        "MERKEN",
+        "Start. Volg. Meet.",
+        "Zet een briefing om in bereik via makers."
+      ],
+      [
+        "MAKERS",
+        "Ontdek. Maak. Verdien.",
+        "Vind campagnes en deel in het resultaat."
+      ],
+      [
+        "ECOSYSTEEM",
+        "Transparant ontworpen.",
+        "Content, prestaties en beloning verbonden."
+      ]
+    ],
+    "wallEyebrow": "IN BEWEGING",
+    "wallTitle": "Content is de [[valuta.]]",
+    "wallText": "Ideeën komen verder wanneer de juiste mensen ze vormgeven.",
+    "wallTitles": [
+      "Koffie boven de stad",
+      "Een moment buiten",
+      "Golden hour",
+      "Zonsondergang vastgelegd"
+    ],
+    "wallNote": "ÉÉN IDEE.\nVEEL KIJKEN.",
+    "mediaCredit": "Video van Michelle Leman via",
+    "photosCredit": "Foto’s via",
+    "ctaEyebrow": "DE VOLGENDE VIEW BEGINT HIER",
+    "ctaTitle": "Klaar om views\nvoor je te laten [[werken?]]",
+    "ctaText": "Of je nu een campagne start of content maakt, PayPerView verbindt prestaties met kansen.",
+    "forBrands": "Voor merken",
+    "forCreators": "Voor makers",
+    "ctaLoop": "MERKEN → CONTENT → GEVERIFIEERDE VIEWS → WAARDE",
+    "footerText": "Goede content verdient\neen groter bereik.",
+    "exploreLabel": "ONTDEK",
+    "accountLabel": "JOUW ACCOUNT",
+    "platformLabel": "HET PLATFORM",
+    "backTop": "Terug naar boven ↑",
+    "verifiedViews": "Geverifieerde views",
+    "footerTag": "Voor de view-economie"
+  },
+  "assistant": {
+    "close": "Assistent sluiten",
+    "title": "Waarmee kan ik je vandaag helpen?",
+    "description": "Ik ben je slimme assistent. Ik help je met content, je account en je vragen.",
+    "preview": "Voorbeeld",
+    "placeholder": "Schrijf hier je bericht…",
+    "disclaimer": "De assistent kan fouten maken. Controleer belangrijke informatie.",
+    "viewConversations": "Gesprekken bekijken",
+    "conversations": "Gesprekken",
+    "newConversation": "Nieuw gesprek",
+    "loading": "Laden",
+    "errors": {
+      "loadMessages": "Berichten laden is mislukt",
+      "createThread": "Gesprek maken is mislukt",
+      "sendMessage": "Bericht verzenden is mislukt",
+      "deleteThread": "Gesprek verwijderen is mislukt"
+    },
+    "actions": {
+      "messageMembers": {
+        "title": "Recente leden een bericht sturen",
+        "desc": "Een welkomstbericht voor nieuwe abonnees opstellen"
+      },
+      "createAd": {
+        "title": "Een creatieve advertentie maken",
+        "desc": "Aansprekende advertentietekst voor je volgende campagne maken"
+      },
+      "startLive": {
+        "title": "Livestream starten",
+        "desc": "Een livesessie instellen om contact te maken met je publiek"
+      },
+      "sendInvoice": {
+        "title": "Een factuur naar een klant sturen",
+        "desc": "Snel een professionele factuur maken en versturen"
+      }
+    }
+  },
+  "messages": {
+    "title": "Berichten",
+    "minimizePanel": "Berichtenpaneel minimaliseren",
+    "maximizePanel": "Berichtenpaneel maximaliseren",
+    "close": "Sluiten",
+    "searchPlaceholder": "Berichten zoeken…",
+    "filters": {
+      "all": "Alle",
+      "unread": "Ongelezen",
+      "orders": "Bestellingen"
+    },
+    "newMessage": "Nieuw bericht",
+    "noConversations": "Geen gesprekken gevonden die overeenkomen met de zoekopdracht"
+  },
+  "emptyState": {
+    "title": "Selecteer een bericht om te beginnen",
+    "description": "Kies een gesprek in de zijbalk om contact op te nemen met abonnees of het ondersteuningsteam",
+    "encrypted": "Berichten zijn volledig versleuteld en beveiligd."
+  },
+  "campaigns": {
+    "title": "Campagnebeheer",
+    "subtitle": "Volg prestaties, budgetten en de status van actieve campagnes",
+    "dateFilter": "Datum: afgelopen 30 dagen",
+    "statusLabel": "Status",
+    "search": "Campagnes zoeken…",
+    "all": "Alle",
+    "active": "Actief",
+    "draft": "Concept",
+    "completed": "Voltooid",
+    "paused": "Gepauzeerd",
+    "campaignName": "Campagnenaam",
+    "status": "Status",
+    "budget": "Budget",
+    "startDate": "Startdatum",
+    "action": "Actie",
+    "view": "Details",
+    "modify": "Bewerken",
+    "stop": "Pauzeren",
+    "delete": "Verwijderen",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "noCampaigns": "Geen overeenkomende campagnes",
+    "totalCampaigns": "Totaal aantal campagnes",
+    "activeCampaigns": "Actieve campagnes",
+    "totalBudget": "Totaalbudget (Q3)",
+    "stable": "Stabiel",
+    "export": "Gegevens exporteren",
+    "back": "Terug",
+    "copy": "Kopiëren",
+    "campaignNumber": "Campagne-ID",
+    "client": "Klant",
+    "kpi": "Belangrijke prestatie-indicatoren",
+    "budgetUsed": "Gebruikt budget",
+    "impressions": "Vertoningen",
+    "clicks": "Klikken",
+    "conversionRate": "Conversiepercentage",
+    "viewDetails": "Campagnedetails",
+    "startDateLabel": "Startdatum",
+    "endDate": "Einddatum",
+    "targetType": "Doeltype",
+    "platforms": "Platforms",
+    "campaignStatus": "Campagnestatus",
+    "created": "Aangemaakt",
+    "underReview": "Wordt beoordeeld",
+    "approved": "Goedgekeurd",
+    "activeStatus": "Actief",
+    "completedStatus": "Voltooid",
+    "copyTitle": "Campagne kopiëren",
+    "newCampaignName": "Nieuwe campagnenaam",
+    "copyOptions": "Kopieeropties",
+    "copyMedia": "Media en clips kopiëren",
+    "copyMediaDesc": "Kopieer ook gekoppelde video's, ingeschakelde functies en merkmateriaal",
+    "copyTargeting": "Targetinginstellingen kopiëren",
+    "copyTargetingDesc": "Behoud dezelfde targeting, doelgroep, regio en demografische gegevens",
+    "startCopy": "Kopiëren starten",
+    "copying": "Kopiëren…",
+    "cancel": "Annuleren",
+    "showing": "Resultaten {from} t/m {to} van {total}",
+    "from": "van",
+    "statusActive": "Actief",
+    "statusDraft": "Concept",
+    "statusCompleted": "Voltooid",
+    "statusPendingReview": "In afwachting van beoordeling",
+    "statusRejected": "Afgewezen",
+    "statusManualReview": "Handmatige beoordeling",
+    "statusCancelled": "Geannuleerd",
+    "statusArchived": "Gearchiveerd",
+    "statusExpired": "Verlopen",
+    "campaignStats": "Campagnestatistieken",
+    "emptyTitle": "Nog geen campagnes aangemaakt",
+    "emptyDesc": "Je advertentieruimte is klaar. Maak je eerste campagne om je doelgroep te bereiken.",
+    "createNew": "Start je eerste campagne",
+    "statsTitle": "Campagnestatistieken per categorie",
+    "overviewLabel": "Prestatieoverzicht",
+    "last30days": "Afgelopen 30 dagen",
+    "distribution": "Verdeling",
+    "totalCampaignsLabel": "Totaal aantal campagnes",
+    "reach": "Bereik",
+    "roi": "ROI",
+    "ctr": "CTR",
+    "spentLabel": "Uitgegeven",
+    "categoryUGC": "Door gebruikers gemaakte content (UGC)",
+    "categoryClipping": "Clips bewerken",
+    "categorySlideshow": "Diavoorstelling",
+    "categoryAudio": "Audiocontent",
+    "categoryLogo": "Logo",
+    "categoryMixed": "Gemengd",
+    "legendUGC": "Gebruikerscontent (UGC)",
+    "legendClipping": "Clips bewerken",
+    "legendSponsorship": "Sponsoring",
+    "legendOther": "Overig",
+    "ugcSubtitle": "Gisteren: inkomsten - 56 actieve campagnes",
+    "clippingSubtitle": "Lopend - actieve efficiëntie: {progress}"
+  },
+  "newCampaign": {
+    "steps": {
+      "s1": "Basisgegevens",
+      "s2": "Naleving",
+      "s3": "Inhoud",
+      "s4": "Controleren"
+    },
+    "titles": {
+      "t1": "Nieuwe campagne maken",
+      "t2": "Halal-nalevingscertificaat",
+      "t3": "Media uploaden",
+      "t4": "Controleren en verzenden"
+    },
+    "subtitles": {
+      "s1": "Voer de basisgegevens van je advertentiecampagne in.",
+      "s2": "Bevestig dat de inhoud van je campagne voldoet aan de volgende islamitische richtlijnen.",
+      "s3": "Voeg creatieve middelen voor je campagne toe.",
+      "s4": "Controleer de campagnegegevens voordat je deze indient."
+    },
+    "step1": {
+      "name": "Campagnenaam",
+      "namePlaceholder": "Bijvoorbeeld: campagne Q1 2024",
+      "budget": "Budget (USD)",
+      "cpm": "Kosten per duizend vertoningen (CPM)",
+      "period": "Campagneperiode",
+      "startDate": "Startdatum",
+      "endDate": "Einddatum",
+      "contentType": "Inhoudstype",
+      "contentTypes": {
+        "VIDEO": "Videoclip",
+        "IMAGE": "Statische afbeelding",
+        "TEXT": "Tekst",
+        "MIXED": "Gemengde inhoud",
+        "LOGO": "Logo",
+        "AUDIO": "Audio",
+        "SLIDESHOW": "Diavoorstelling",
+        "UGC": "Door gebruikers gemaakte inhoud",
+        "CLIPPING": "Fragment"
+      },
+      "audience": "Doelgroep",
+      "audiencePlaceholder": "Korte omschrijving of trefwoorden voor targeting...",
+      "required": "Dit veld is verplicht"
+    },
+    "compliance": {
+      "intro": "Bevestig dat de inhoud van je campagne voldoet aan de volgende islamitische richtlijnen. Dit is verplicht voor alle campagnes op PayPerView.",
+      "items": {
+        "noHaram": {
+          "title": "Geen verboden inhoud",
+          "desc": "De campagne promoot geen alcohol, gokken, inhoud voor volwassenen of andere verboden producten of diensten."
+        },
+        "islamicValues": {
+          "title": "Islamitische waarden respecteren",
+          "desc": "Afbeeldingen, berichten en de algemene sfeer zijn respectvol en bespotten of tegenspreken islamitische principes niet."
+        },
+        "honestRep": {
+          "title": "Eerlijke voorstelling",
+          "desc": "De campagne vermijdt misleidende marketing en valse claims en is transparant over aanbiedingen."
+        },
+        "noGambling": {
+          "title": "Geen gokken",
+          "desc": "De campagne promoot geen gokken of weddenschappen."
+        },
+        "noSexualContent": {
+          "title": "Geen seksuele inhoud",
+          "desc": "De campagne bevat geen seksuele inhoud of expliciete toespelingen."
+        },
+        "noExplicitMusic": {
+          "title": "Geen expliciete muziek",
+          "desc": "De campagne bevat geen ongepaste muziek of songteksten."
+        },
+        "noAlcohol": {
+          "title": "Geen alcoholpromotie",
+          "desc": "De campagne promoot geen alcoholische dranken."
+        },
+        "noSuspiciousCurrencies": {
+          "title": "Geen verdachte financiële transacties",
+          "desc": "De campagne promoot geen verdachte of onbetrouwbare valuta of financiële transacties."
+        },
+        "noUnrealisticProfit": {
+          "title": "Geen onrealistische winstbeloften",
+          "desc": "De campagne belooft geen onrealistische of misleidende winsten."
+        }
+      },
+      "descTitle": "Campagnebeschrijving",
+      "descSub": "Gedetailleerde beschrijving",
+      "descPlaceholder": "Beschrijf de doelen, doelgroep en belangrijkste boodschappen van je campagne...",
+      "error": "Je hebt de voorwaarden mogelijk niet gelezen en geaccepteerd. Je moet aan alle voorwaarden voldoen om je campagne goedgekeurd te krijgen."
+    },
+    "step3": {
+      "intro": "Voeg creatieve middelen voor je campagne toe. Zorg dat alle bestanden aan de richtlijnen voldoen voor optimale verspreiding via netwerken.",
+      "dropTitle": "Sleep bestanden hierheen",
+      "dropSub": "Of klik om bestanden op je computer te kiezen. Bestanden worden veilig verwerkt en geanalyseerd.",
+      "maxSize": "Maximaal 20 MB per bestand",
+      "choose": "Bestanden kiezen",
+      "sizeError": "Upload mislukt: bestand is groter dan de limiet van 20 MB",
+      "sizeErrorToast": "Bestand „{name}” kon niet worden geüpload omdat het groter is dan 20 MB.",
+      "complete": "Voltooid",
+      "required": "Upload ten minste één bestand"
+    },
+    "step4": {
+      "identity": "Campagnegegevens",
+      "campaignName": "Campagnenaam",
+      "goal": "Doel",
+      "startDate": "Startdatum",
+      "endDate": "Einddatum",
+      "budget": "Budgetverdeling",
+      "budgetTotal": "Totaal campagnebudget",
+      "reach": "Verwacht bereik",
+      "assets": "Creatieve middelen",
+      "uploaded": "{count} bestanden geüpload",
+      "targeting": "Targeting",
+      "notSpecified": "Niet opgegeven"
+    },
+    "nav": {
+      "back": "Terug",
+      "saveDraft": "Opslaan als concept",
+      "next": "Volgende →",
+      "submit": "Indienen ter beoordeling →"
+    }
   }
 }
