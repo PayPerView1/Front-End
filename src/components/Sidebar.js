@@ -80,7 +80,7 @@ const advertiserNavItems = [
   },
   {
     label: "billing",
-    href: "/advertiser/billing",
+    href: "/advertiser/budget",
     icon: MdOutlineAccountBalanceWallet,
     useMd: true,
   },
