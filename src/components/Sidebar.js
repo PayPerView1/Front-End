@@ -74,7 +74,7 @@ const advertiserNavItems = [
   },
   {
     label: "billing",
-    href: "/advertiser/billing",
+    href: "/advertiser/wallet",
     icon: MdOutlineAccountBalanceWallet,
     useMd: true,
   },
