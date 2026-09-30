@@ -14,6 +14,9 @@ export default function MainLayout({ children, locale }) {
   const pathname = usePathname();
   const { isDark } = useTheme();
 
+  // The public homepage has its own navigation and full-width composition.
+  if (pathname === "/") return children;
+
   // Pages where Navbar/Sidebar should NOT be displayed (Auth flows)
   const excludedPaths = [
     "/login",

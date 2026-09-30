@@ -256,47 +256,41 @@
     "clippingSubtitle": "Ongoing - {progress} active efficiency"
   },
   "assistant": {
-  "close": "Close assistant",
-  "title": "How can I help you today?",
-  "description": "I’m your smart assistant. I can help you create content, manage your account, or answer any questions.",
-  "preview": "Preview",
-  "placeholder": "Write your message here...",
-  "disclaimer": "The assistant may occasionally make mistakes. Please verify important information.",
-
-  "viewConversations": "View conversations",
-  "conversations": "Conversations",
-  "newConversation": "New conversation",
-  "loading": "Loading",
-
-  "errors": {
-    "loadMessages": "Failed to load messages",
-    "createThread": "Failed to create conversation",
-    "sendMessage": "Failed to send message",
-    "deleteThread": "Failed to delete conversation"
-  },
-
-  "actions": {
-    "messageMembers": {
-      "title": "Message recent members",
-      "desc": "Draft a welcome message for new subscribers"
+    "close": "Close assistant",
+    "title": "How can I help you today?",
+    "description": "I’m your smart assistant. I can help you create content, manage your account, or answer any questions.",
+    "preview": "Preview",
+    "placeholder": "Write your message here...",
+    "disclaimer": "The assistant may occasionally make mistakes. Please verify important information.",
+    "viewConversations": "View conversations",
+    "conversations": "Conversations",
+    "newConversation": "New conversation",
+    "loading": "Loading",
+    "errors": {
+      "loadMessages": "Failed to load messages",
+      "createThread": "Failed to create conversation",
+      "sendMessage": "Failed to send message",
+      "deleteThread": "Failed to delete conversation"
     },
-
-    "createAd": {
-      "title": "Create a creative ad",
-      "desc": "Generate engaging ad copy for your upcoming campaign"
-    },
-
-    "startLive": {
-      "title": "Start a live stream",
-      "desc": "Set up a live session to connect with your audience"
-    },
-
-    "sendInvoice": {
-      "title": "Send an invoice to a client",
-      "desc": "Create and send a professional invoice quickly"
+    "actions": {
+      "messageMembers": {
+        "title": "Message recent members",
+        "desc": "Draft a welcome message for new subscribers"
+      },
+      "createAd": {
+        "title": "Create a creative ad",
+        "desc": "Generate engaging ad copy for your upcoming campaign"
+      },
+      "startLive": {
+        "title": "Start a live stream",
+        "desc": "Set up a live session to connect with your audience"
+      },
+      "sendInvoice": {
+        "title": "Send an invoice to a client",
+        "desc": "Create and send a professional invoice quickly"
+      }
     }
-  }
-},
+  },
   "messages": {
     "title": "Messages",
     "minimizePanel": "Minimize messages panel",
@@ -659,6 +653,152 @@
     "downloadBtn": "Start File Download Now",
     "cancelExport": "Cancel",
     "footerSecurityNote": "File is encrypted with AES-256 and compliant with ZATCA e-invoicing standards"
+  },
+  "landing": {
+    "language": "Language",
+    "theme": "Switch color theme",
+    "dark": "Dark",
+    "light": "Light",
+    "nav": [
+      "How it works",
+      "For brands",
+      "For creators",
+      "Get started",
+      "Log in"
+    ],
+    "heroEyebrow": "PAYPERVIEW · IN DEVELOPMENT",
+    "heroTitle": "Turn views\ninto [[value.]]",
+    "heroText": "PayPerView connects brands with creators to turn short-form content and verified views into measurable performance.",
+    "explore": "Explore how it works",
+    "proof": "One platform. Shared opportunity.",
+    "flowEyebrow": "A BETTER KIND OF REACH",
+    "flowTitle": "Every view\nhas [[value.]]",
+    "flowIntro": "From the first brief to the final verified view, every step connects to the next. A clear path from content to outcome.",
+    "steps": [
+      "Brand",
+      "Campaign",
+      "Clip",
+      "Views",
+      "Verified",
+      "Reward"
+    ],
+    "stepDetails": [
+      "Set the brief",
+      "Fund an idea",
+      "Make it yours",
+      "People watch",
+      "Authenticity checked",
+      "Earn from impact"
+    ],
+    "flowLabel": "CAMPAIGN FLOW",
+    "loopEyebrow": "THE PAYPERVIEW LOOP",
+    "loopTitle": "Create.\nClip. Watch.\n[[Earn.]]",
+    "loopText": "A continuous cycle where good content finds its audience, and performance creates opportunity for everyone involved.",
+    "loop": [
+      "CREATE",
+      "CAMPAIGN",
+      "CLIP",
+      "WATCH",
+      "VERIFY",
+      "EARN"
+    ],
+    "brandsEyebrow": "FOR BRANDS",
+    "brandsTitle": "Your content.\nTheir [[reach.]]",
+    "brandsText": "Launch a campaign, bring creators into your story, and see how the workflow comes together as the platform takes shape.",
+    "brandsLink": "Explore the platform",
+    "workspace": "CAMPAIGN WORKSPACE",
+    "campaign": "Your campaign",
+    "preview": "Preview",
+    "inDevelopment": "IN DEVELOPMENT",
+    "tabs": [
+      "Overview",
+      "Creators",
+      "Content",
+      "Verification"
+    ],
+    "workspaceEyebrow": "YOUR NEXT STORY STARTS HERE",
+    "workspaceTitle": "Build a campaign around your idea.",
+    "workspaceText": "Your brief, creator matches, and campaign activity will come together here.",
+    "workflow": [
+      "Campaign brief",
+      "Creator stories",
+      "View verification"
+    ],
+    "workspaceFoot": "Built for transparent campaign tracking",
+    "workspaceLabel": "WORKSPACE PREVIEW",
+    "clippersEyebrow": "FOR CREATORS",
+    "clipperTitle": "Your reach.\nYour [[reward.]]",
+    "clipperText": "Discover campaigns that fit your style, create content your audience loves, and earn based on verified performance.",
+    "clipperLink": "Explore the creator experience",
+    "creatorWorkspace": "CREATOR WORKSPACE",
+    "readyCreate": "Ready to create",
+    "rewardsHere": "Campaign rewards will appear here",
+    "nextClip": "Your next clip",
+    "campaignDetails": "Campaign details appear here",
+    "verifiedEyebrow": "THE HEART OF THE PLATFORM",
+    "verifiedTitle": "Not just views.\n[[Verified views.]]",
+    "verifiedText": "Verification is designed to make campaign activity clear and connected from content to outcome.",
+    "checks": [
+      "Authenticity checks",
+      "Trackable activity",
+      "Campaign-linked"
+    ],
+    "verification": "VIEW VERIFICATION",
+    "status": "IN DEVELOPMENT",
+    "statusTitle": "VERIFICATION STATUS",
+    "readyActivity": "Ready for campaign activity",
+    "verifySteps": [
+      "Content submitted",
+      "Activity checked",
+      "Views verified"
+    ],
+    "verifyFoot": "VERIFICATION DETAILS WILL APPEAR WHEN A CAMPAIGN IS ACTIVE",
+    "whyEyebrow": "WHY PAYPERVIEW",
+    "whyTitle": "Performance\nwith [[purpose.]]",
+    "whyText": "Built around what matters to everyone in the loop.",
+    "why": [
+      [
+        "BRANDS",
+        "Launch. Track. Measure.",
+        "Turn a campaign brief into creator-led reach."
+      ],
+      [
+        "CREATORS",
+        "Discover. Create. Earn.",
+        "Find campaigns, make it your own, share in the outcome."
+      ],
+      [
+        "THE ECOSYSTEM",
+        "Transparent by design.",
+        "One connected view of content, performance, and reward."
+      ]
+    ],
+    "wallEyebrow": "MADE TO MOVE",
+    "wallTitle": "Content is the [[currency.]]",
+    "wallText": "Ideas move further when the right people get to shape them.",
+    "wallTitles": [
+      "A coffee break above the city",
+      "A moment outside",
+      "Golden hour",
+      "Sunset in record"
+    ],
+    "wallNote": "ONE IDEA.\nMANY POINTS\nOF VIEW.",
+    "mediaCredit": "Stock footage by Michelle Leman via",
+    "photosCredit": "Photos via",
+    "ctaEyebrow": "THE NEXT VIEW STARTS HERE",
+    "ctaTitle": "Ready to put your\nviews to [[work?]]",
+    "ctaText": "Whether you're building a campaign or creating the content, PayPerView connects performance with opportunity.",
+    "forBrands": "For brands",
+    "forCreators": "For creators",
+    "ctaLoop": "BRANDS → CONTENT → VERIFIED VIEWS → VALUE",
+    "footerText": "Good content deserves\nto go further.",
+    "exploreLabel": "EXPLORE",
+    "accountLabel": "YOUR ACCOUNT",
+    "platformLabel": "THE PLATFORM",
+    "backTop": "Back to top ↑",
+    "verifiedViews": "Verified views",
+    "footerTag": "Built for the view economy"
+
   }
 
 }

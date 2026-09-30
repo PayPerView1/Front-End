@@ -7,7 +7,25 @@
     "language": "Dil",
     "logout": "Çıkış Yap"
   },
-  "sidebar": { "home": "Ana sayfa", "search": "Ara", "discover": "Keşfet", "startProject": "Proje başlat", "resources": "Kaynaklar", "members": "Üyeler", "partners": "Ortaklar", "new": "Yeni", "help": "Yardım", "blog": "Blog" },
+  "sidebar": {
+    "home": "Ana sayfa",
+    "search": "Ara",
+    "discover": "Keşfet",
+    "startProject": "Proje başlat",
+    "resources": "Kaynaklar",
+    "members": "Üyeler",
+    "partners": "Ortaklar",
+    "new": "Yeni",
+    "help": "Yardım",
+    "blog": "Blog",
+    "dashboard": "Kontrol Paneli",
+    "analytics": "Analizler ve Raporlar",
+    "clips": "Klipleri Yönet",
+    "newCampaign": "Yeni Kampanya Oluştur",
+    "drafts": "Taslaklar",
+    "manageCampaigns": "Kampanyaları Yönet",
+    "billing": "Bütçe ve Ödemeler"
+  },
   "profile": {
     "edit": "Profili Düzenle",
     "manageOrders": "Siparişleri Yönet",
@@ -21,7 +39,11 @@
     "user": {
       "joined": "Tem 2026'da katıldı",
       "followers": "Takipçiler",
-      "following": "Takip Ediyor"
+      "following": "Takip Ediyor",
+      "name": "Shatha Al-Banna",
+      "email": "@gmail.com",
+      "location": "Gazze, Filistin",
+      "profile": "Profil"
     },
     "buttons": {
       "editProfile": "Profili Düzenle",
@@ -134,6 +156,423 @@
     "services": "Bağlı hizmetler",
     "security": "Hesap güvenliği",
     "subscriptions": "Abonelikler",
-    "disputes": "Anlaşmazlık merkezi"
+    "disputes": "Anlaşmazlık merkezi",
+    "email": "E-posta",
+    "cancel": "İptal"
+  },
+  "landing": {
+    "language": "Dil",
+    "theme": "Temayı değiştir",
+    "dark": "Koyu",
+    "light": "Açık",
+    "nav": [
+      "Nasıl çalışır",
+      "Markalar için",
+      "Üreticiler için",
+      "Başla",
+      "Giriş yap"
+    ],
+    "heroEyebrow": "PAYPERVIEW · GELİŞTİRİLİYOR",
+    "heroTitle": "İzlenmeleri\n[[değere dönüştür.]]",
+    "heroText": "PayPerView, markaları içerik üreticileriyle buluşturarak kısa videoları ve doğrulanmış izlenmeleri ölçülebilir performansa dönüştürür.",
+    "explore": "Nasıl çalıştığını gör",
+    "proof": "Tek platform. Paylaşılan fırsatlar.",
+    "flowEyebrow": "DAHA İYİ ERİŞİM",
+    "flowTitle": "Her izlenmenin\n[[değeri var.]]",
+    "flowIntro": "İlk kampanya özetinden doğrulanmış izlenmeye kadar her adım içeriği sonuçla buluşturur.",
+    "steps": [
+      "Marka",
+      "Kampanya",
+      "Klip",
+      "İzlenme",
+      "Doğrulama",
+      "Ödül"
+    ],
+    "stepDetails": [
+      "Özeti belirle",
+      "Bir fikri destekle",
+      "Kendi tarzını kat",
+      "İzleyiciler izlesin",
+      "Gerçekliği kontrol et",
+      "Etkiden kazan"
+    ],
+    "flowLabel": "KAMPANYA AKIŞI",
+    "loopEyebrow": "PAYPERVIEW DÖNGÜSÜ",
+    "loopTitle": "Üret.\nKes. İzle.\n[[Kazan.]]",
+    "loopText": "İyi içeriğin izleyicisine ulaştığı ve performansın herkes için fırsat oluşturduğu sürekli bir döngü.",
+    "loop": [
+      "ÜRET",
+      "KAMPANYA",
+      "KLİP",
+      "İZLE",
+      "DOĞRULA",
+      "KAZAN"
+    ],
+    "brandsEyebrow": "MARKALAR İÇİN",
+    "brandsTitle": "İçeriğin.\nOnların [[erişimi.]]",
+    "brandsText": "Kampanya başlat, içerik üreticilerini hikâyene kat ve platform geliştikçe iş akışını keşfet.",
+    "brandsLink": "Platformu keşfet",
+    "workspace": "KAMPANYA ALANI",
+    "campaign": "Kampanyan",
+    "preview": "Önizleme",
+    "inDevelopment": "GELİŞTİRİLİYOR",
+    "tabs": [
+      "Genel bakış",
+      "Üreticiler",
+      "İçerik",
+      "Doğrulama"
+    ],
+    "workspaceEyebrow": "YENİ HİKÂYEN BURADA BAŞLIYOR",
+    "workspaceTitle": "Fikrinden bir kampanya oluştur.",
+    "workspaceText": "Özetin, eşleşen üreticiler ve kampanya etkinliği burada bir araya gelecek.",
+    "workflow": [
+      "Kampanya özeti",
+      "Üretici hikâyeleri",
+      "İzlenme doğrulaması"
+    ],
+    "workspaceFoot": "Şeffaf kampanya takibi",
+    "workspaceLabel": "ÇALIŞMA ALANI ÖNİZLEMESİ",
+    "clippersEyebrow": "İÇERİK ÜRETİCİLERİ İÇİN",
+    "clipperTitle": "Erişimin.\n[[Ödülün.]]",
+    "clipperText": "Tarzına uygun kampanyalar bul, kitlenin seveceği içerikler üret ve doğrulanmış performansına göre kazan.",
+    "clipperLink": "Üretici deneyimini keşfet",
+    "creatorWorkspace": "ÜRETİCİ ALANI",
+    "readyCreate": "Üretmeye hazır",
+    "rewardsHere": "Kampanya ödülleri burada görünür",
+    "nextClip": "Sıradaki klibin",
+    "campaignDetails": "Kampanya detayları burada görünür",
+    "verifiedEyebrow": "PLATFORMUN KALBİ",
+    "verifiedTitle": "Sadece izlenme değil.\n[[Doğrulanmış izlenme.]]",
+    "verifiedText": "Doğrulama; kampanya etkinliğini, içeriği ve sonuçları net biçimde birbirine bağlar.",
+    "checks": [
+      "Gerçeklik kontrolü",
+      "İzlenebilir etkinlik",
+      "Kampanyayla bağlantılı"
+    ],
+    "verification": "İZLENME DOĞRULAMASI",
+    "status": "GELİŞTİRİLİYOR",
+    "statusTitle": "DOĞRULAMA DURUMU",
+    "readyActivity": "Kampanya etkinliği bekleniyor",
+    "verifySteps": [
+      "İçerik gönderildi",
+      "Etkinlik kontrol edildi",
+      "İzlenmeler doğrulandı"
+    ],
+    "verifyFoot": "Kampanya etkin olduğunda ayrıntılar burada görünür",
+    "whyEyebrow": "NEDEN PAYPERVIEW",
+    "whyTitle": "Amaçlı\n[[performans.]]",
+    "whyText": "Döngüdeki herkes için önemli olanlara göre tasarlandı.",
+    "why": [
+      [
+        "MARKALAR",
+        "Başlat. İzle. Ölç.",
+        "Kampanya özetini üretici erişimine dönüştür."
+      ],
+      [
+        "ÜRETİCİLER",
+        "Keşfet. Üret. Kazan.",
+        "Kampanyaları bul ve sonuçları paylaş."
+      ],
+      [
+        "EKOSİSTEM",
+        "Tasarımdan itibaren şeffaf.",
+        "İçerik, performans ve ödüller bir arada."
+      ]
+    ],
+    "wallEyebrow": "HAREKET İÇİN TASARLANDI",
+    "wallTitle": "İçerik bir [[değerdir.]]",
+    "wallText": "Doğru kişiler şekillendirdiğinde fikirler daha uzağa ulaşır.",
+    "wallTitles": [
+      "Şehre karşı kahve molası",
+      "Dışarıda bir an",
+      "Altın saat",
+      "Gün batımını kaydet"
+    ],
+    "wallNote": "TEK FİKİR.\nBİRDEN ÇOK\nBAKIŞ AÇISI.",
+    "mediaCredit": "Michelle Leman videosu:",
+    "photosCredit": "Fotoğraflar:",
+    "ctaEyebrow": "SIRADAKİ İZLENME BURADA BAŞLIYOR",
+    "ctaTitle": "İzlenmelerini\n[[değere dönüştürmeye hazır mısın?]]",
+    "ctaText": "İster kampanya oluştur ister içerik üret, PayPerView performansı fırsatla buluşturur.",
+    "forBrands": "Markalar için",
+    "forCreators": "Üreticiler için",
+    "ctaLoop": "MARKA → İÇERİK → DOĞRULANMIŞ İZLENME → DEĞER",
+    "footerText": "İyi içerik daha uzağa\nulaşmayı hak eder.",
+    "exploreLabel": "KEŞFET",
+    "accountLabel": "HESABIN",
+    "platformLabel": "PLATFORM",
+    "backTop": "Başa dön ↑",
+    "verifiedViews": "Doğrulanmış izlenmeler",
+    "footerTag": "İzlenme ekonomisi için"
+  },
+  "assistant": {
+    "close": "Asistanı kapat",
+    "title": "Bugün sana nasıl yardımcı olabilirim?",
+    "description": "İçerik oluşturma, hesabını yönetme ve sorularını yanıtlama konusunda yardımcı olurum.",
+    "preview": "Önizleme",
+    "placeholder": "Mesajını buraya yaz...",
+    "disclaimer": "Asistan bazen hata yapabilir. Önemli bilgileri doğrula.",
+    "viewConversations": "Sohbetleri görüntüle",
+    "conversations": "Sohbetler",
+    "newConversation": "Yeni sohbet",
+    "loading": "Yükleniyor",
+    "errors": {
+      "loadMessages": "Mesajlar yüklenemedi",
+      "createThread": "Sohbet oluşturulamadı",
+      "sendMessage": "Mesaj gönderilemedi",
+      "deleteThread": "Sohbet silinemedi"
+    },
+    "actions": {
+      "messageMembers": {
+        "title": "Son üyelere mesaj gönder",
+        "desc": "Yeni aboneler için hoş geldiniz mesajı hazırla"
+      },
+      "createAd": {
+        "title": "Yaratıcı bir reklam oluştur",
+        "desc": "Yaklaşan kampanyan için ilgi çekici reklam metni hazırla"
+      },
+      "startLive": {
+        "title": "Canlı yayın başlat",
+        "desc": "Kitlenle bağlantı kurmak için canlı oturum ayarla"
+      },
+      "sendInvoice": {
+        "title": "Müşteriye fatura gönder",
+        "desc": "Profesyonel bir faturayı hızlıca oluşturup gönder"
+      }
+    }
+  },
+  "messages": {
+    "title": "Mesajlar",
+    "minimizePanel": "Mesaj panelini küçült",
+    "maximizePanel": "Mesaj panelini büyüt",
+    "close": "Kapat",
+    "searchPlaceholder": "Mesajlarda ara...",
+    "filters": {
+      "all": "Tümü",
+      "unread": "Okunmamış",
+      "orders": "Siparişler"
+    },
+    "newMessage": "Yeni mesaj",
+    "noConversations": "Aramayla eşleşen sohbet yok"
+  },
+  "emptyState": {
+    "title": "Başlamak için bir mesaj seç",
+    "description": "Abonelerinle veya destek ekibiyle iletişim kurmak için kenar çubuğundan bir sohbet seç",
+    "encrypted": "Mesajlar tamamen şifrelenir ve güvende tutulur."
+  },
+  "campaigns": {
+    "title": "Kampanya yönetimi",
+    "subtitle": "Performansı, bütçeleri ve etkin kampanyaların durumunu izle",
+    "dateFilter": "Tarih: Son 30 gün",
+    "statusLabel": "Durum",
+    "search": "Kampanya ara...",
+    "all": "Tümü",
+    "active": "Etkin",
+    "draft": "Taslak",
+    "completed": "Tamamlandı",
+    "paused": "Duraklatıldı",
+    "campaignName": "Kampanya adı",
+    "status": "Durum",
+    "budget": "Bütçe",
+    "startDate": "Başlangıç tarihi",
+    "action": "İşlem",
+    "view": "Detaylar",
+    "modify": "Düzenle",
+    "stop": "Duraklat",
+    "delete": "Sil",
+    "prev": "Önceki",
+    "next": "Sonraki",
+    "noCampaigns": "Eşleşen kampanya yok",
+    "totalCampaigns": "Toplam kampanya",
+    "activeCampaigns": "Etkin kampanyalar",
+    "totalBudget": "Toplam bütçe (3. çeyrek)",
+    "stable": "Sabit",
+    "export": "Verileri dışa aktar",
+    "back": "Geri",
+    "copy": "Kopyala",
+    "campaignNumber": "Kampanya kimliği",
+    "client": "Müşteri",
+    "kpi": "Temel performans göstergeleri",
+    "budgetUsed": "Kullanılan bütçe",
+    "impressions": "Gösterimler",
+    "clicks": "Tıklamalar",
+    "conversionRate": "Dönüşüm oranı",
+    "viewDetails": "Kampanya detayları",
+    "startDateLabel": "Başlangıç tarihi",
+    "endDate": "Bitiş tarihi",
+    "targetType": "Hedef türü",
+    "platforms": "Platformlar",
+    "campaignStatus": "Kampanya durumu",
+    "created": "Oluşturuldu",
+    "underReview": "İncelemede",
+    "approved": "Onaylandı",
+    "activeStatus": "Etkin",
+    "completedStatus": "Tamamlandı",
+    "copyTitle": "Kampanyayı kopyala",
+    "newCampaignName": "Yeni kampanya adı",
+    "copyOptions": "Kopyalama seçenekleri",
+    "copyMedia": "Medya ve klipleri kopyala",
+    "copyMediaDesc": "Kampanyaya bağlı videoları, etkin özellikleri ve marka varlıklarını da kopyala",
+    "copyTargeting": "Hedefleme ayarlarını kopyala",
+    "copyTargetingDesc": "Aynı hedefleme, kitle, bölge ve demografik ayarları koru",
+    "startCopy": "Kopyalamayı başlat",
+    "copying": "Kopyalanıyor...",
+    "cancel": "İptal",
+    "showing": "{total} sonuçtan {from}-{to} arası gösteriliyor",
+    "from": "/",
+    "statusActive": "Etkin",
+    "statusDraft": "Taslak",
+    "statusCompleted": "Tamamlandı",
+    "statusPendingReview": "İnceleme bekliyor",
+    "statusRejected": "Reddedildi",
+    "statusManualReview": "Manuel inceleme",
+    "statusCancelled": "İptal edildi",
+    "statusArchived": "Arşivlendi",
+    "statusExpired": "Süresi doldu",
+    "campaignStats": "Kampanya istatistikleri",
+    "emptyTitle": "Henüz kampanya oluşturulmadı",
+    "emptyDesc": "Reklam alanın hazır. Hedef kitlene ulaşmak için ilk kampanyanı oluştur.",
+    "createNew": "İlk kampanyanı başlat",
+    "statsTitle": "Kategoriye göre kampanya istatistikleri",
+    "overviewLabel": "Performans özeti",
+    "last30days": "Son 30 gün",
+    "distribution": "Dağılım",
+    "totalCampaignsLabel": "Toplam kampanya",
+    "reach": "Erişim",
+    "roi": "ROI",
+    "ctr": "CTR",
+    "spentLabel": "Harcanan",
+    "categoryUGC": "Kullanıcı tarafından oluşturulan içerik (UGC)",
+    "categoryClipping": "Klip düzenleme",
+    "categorySlideshow": "Slayt gösterisi",
+    "categoryAudio": "Ses içeriği",
+    "categoryLogo": "Logo",
+    "categoryMixed": "Karma",
+    "legendUGC": "Kullanıcı içeriği (UGC)",
+    "legendClipping": "Klip düzenleme",
+    "legendSponsorship": "Sponsorluk",
+    "legendOther": "Diğer",
+    "ugcSubtitle": "Dün: gelir - 56 etkin kampanya",
+    "clippingSubtitle": "Devam ediyor - etkin verimlilik: {progress}"
+  },
+  "newCampaign": {
+    "steps": {
+      "s1": "Temel Bilgiler",
+      "s2": "Uyumluluk",
+      "s3": "İçerik",
+      "s4": "Gözden Geçir"
+    },
+    "titles": {
+      "t1": "Yeni Kampanya Oluştur",
+      "t2": "Helal Uyumluluk Sertifikası",
+      "t3": "Medya Yükle",
+      "t4": "İncele ve Gönder"
+    },
+    "subtitles": {
+      "s1": "Reklam kampanyanızın temel bilgilerini girin.",
+      "s2": "Kampanya içeriğinizin aşağıdaki İslami kurallara uygun olduğunu onaylayın.",
+      "s3": "Kampanyanız için yaratıcı içerikler ekleyin.",
+      "s4": "Göndermeden önce kampanya ayrıntılarını inceleyin."
+    },
+    "step1": {
+      "name": "Kampanya Adı",
+      "namePlaceholder": "Örnek: 2024 1. Çeyrek Kampanyası",
+      "budget": "Bütçe (USD)",
+      "cpm": "Bin Gösterim Başına Maliyet (CPM)",
+      "period": "Kampanya Süresi",
+      "startDate": "Başlangıç Tarihi",
+      "endDate": "Bitiş Tarihi",
+      "contentType": "İçerik Türü",
+      "contentTypes": {
+        "VIDEO": "Video Klip",
+        "IMAGE": "Sabit Görsel",
+        "TEXT": "Metin",
+        "MIXED": "Karma İçerik",
+        "LOGO": "Logo",
+        "AUDIO": "Ses",
+        "SLIDESHOW": "Slayt Gösterisi",
+        "UGC": "Kullanıcı Tarafından Oluşturulan İçerik",
+        "CLIPPING": "Kesit"
+      },
+      "audience": "Hedef Kitle",
+      "audiencePlaceholder": "Hedefleme için kısa açıklama veya anahtar kelimeler...",
+      "required": "Bu alan zorunludur"
+    },
+    "compliance": {
+      "intro": "Kampanya içeriğinizin aşağıdaki İslami kurallara uygun olduğunu onaylayın. Bu, PayPerView platformundaki tüm kampanyalar için zorunludur.",
+      "items": {
+        "noHaram": {
+          "title": "Haram içerik yok",
+          "desc": "Kampanya alkolü, kumarı, yetişkin içeriklerini veya yasaklanmış başka ürün ve hizmetleri tanıtmaz."
+        },
+        "islamicValues": {
+          "title": "İslami değerlere saygı",
+          "desc": "Görseller, mesajlar ve genel ortam saygılıdır; İslami ilkelerle alay etmez veya çelişmez."
+        },
+        "honestRep": {
+          "title": "Dürüst Tanıtım",
+          "desc": "Kampanya yanıltıcı pazarlamadan ve yanlış iddialardan kaçınır, tekliflerini şeffaf biçimde sunar."
+        },
+        "noGambling": {
+          "title": "Kumar yok",
+          "desc": "Kampanya içeriği kumar veya bahis tanıtımı içermez."
+        },
+        "noSexualContent": {
+          "title": "Cinsel içerik yok",
+          "desc": "Kampanya içeriği cinsel içerik veya açık imalar içermez."
+        },
+        "noExplicitMusic": {
+          "title": "Uygunsuz müzik yok",
+          "desc": "Kampanya içeriği uygunsuz müzik veya sözler içermez."
+        },
+        "noAlcohol": {
+          "title": "Alkol tanıtımı yok",
+          "desc": "Kampanya içeriği alkollü içecek tanıtımı içermez."
+        },
+        "noSuspiciousCurrencies": {
+          "title": "Şüpheli finansal işlem yok",
+          "desc": "Kampanya şüpheli veya güven vermeyen para birimlerini ya da finansal işlemleri tanıtmaz."
+        },
+        "noUnrealisticProfit": {
+          "title": "Gerçek dışı kazanç vaadi yok",
+          "desc": "Kampanya gerçek dışı veya yanıltıcı kazanç vaatlerinde bulunmaz."
+        }
+      },
+      "descTitle": "Kampanya Açıklaması",
+      "descSub": "Ayrıntılı Açıklama",
+      "descPlaceholder": "Kampanyanızın amaçlarını, hedef kitlesini ve temel mesajlarını ayrıntılı olarak yazın...",
+      "error": "Koşulları okuyup kabul etmemiş görünüyorsunuz. Kampanyanızın onaylanması için tüm koşullara uymanız gerekir."
+    },
+    "step3": {
+      "intro": "Kampanyanız için yaratıcı içerikleri yükleyin. Ağlarda en iyi şekilde yayınlanması için tüm dosyaların belirtilen kurallara uyduğundan emin olun.",
+      "dropTitle": "Dosyalarınızı buraya sürükleyip bırakın",
+      "dropSub": "Veya bilgisayarınızdan göz atmak için tıklayın. Dosyalar güvenli biçimde işlenip analiz edilir.",
+      "maxSize": "Dosya başına en fazla 20 MB",
+      "choose": "Dosya Seç",
+      "sizeError": "Yükleme başarısız: Dosya boyutu 20 MB sınırını aşıyor",
+      "sizeErrorToast": "“{name}” dosyası 20 MB sınırını aştığı için yüklenemedi.",
+      "complete": "Tamamlandı",
+      "required": "Lütfen en az bir dosya yükleyin"
+    },
+    "step4": {
+      "identity": "Kampanya Kimliği",
+      "campaignName": "Kampanya Adı",
+      "goal": "Hedef",
+      "startDate": "Başlangıç Tarihi",
+      "endDate": "Bitiş Tarihi",
+      "budget": "Bütçe Dağılımı",
+      "budgetTotal": "Toplam Kampanya Bütçesi",
+      "reach": "Beklenen Erişim",
+      "assets": "Yaratıcı İçerikler",
+      "uploaded": "{count} içerik yüklendi",
+      "targeting": "Hedefleme",
+      "notSpecified": "Belirtilmedi"
+    },
+    "nav": {
+      "back": "Geri",
+      "saveDraft": "Taslak Olarak Kaydet",
+      "next": "İleri →",
+      "submit": "İncelemeye Gönder →"
+    }
   }
 }

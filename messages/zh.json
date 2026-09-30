@@ -7,7 +7,25 @@
     "language": "语言",
     "logout": "退出登录"
   },
-  "sidebar": { "home": "首页", "search": "搜索", "discover": "发现", "startProject": "创建项目", "resources": "资源", "members": "成员", "partners": "合作伙伴", "new": "新", "help": "帮助", "blog": "博客" },
+  "sidebar": {
+    "home": "首页",
+    "search": "搜索",
+    "discover": "发现",
+    "startProject": "创建项目",
+    "resources": "资源",
+    "members": "成员",
+    "partners": "合作伙伴",
+    "new": "新",
+    "help": "帮助",
+    "blog": "博客",
+    "dashboard": "仪表板",
+    "analytics": "分析与报告",
+    "clips": "管理短片",
+    "newCampaign": "创建新活动",
+    "drafts": "草稿",
+    "manageCampaigns": "管理活动",
+    "billing": "预算与付款"
+  },
   "profile": {
     "edit": "编辑资料",
     "manageOrders": "管理订单",
@@ -21,7 +39,11 @@
     "user": {
       "joined": "加入时间2026年7月",
       "followers": "关注者",
-      "following": "关注"
+      "following": "关注",
+      "name": "Shatha Al-Banna",
+      "email": "@gmail.com",
+      "location": "巴勒斯坦加沙",
+      "profile": "个人资料"
     },
     "buttons": {
       "editProfile": "编辑个人资料",
@@ -134,6 +156,423 @@
     "services": "连接服务",
     "security": "帐户安全",
     "subscriptions": "订阅",
-    "disputes": "争议中心"
+    "disputes": "争议中心",
+    "email": "电子邮件",
+    "cancel": "取消"
+  },
+  "landing": {
+    "language": "语言",
+    "theme": "切换主题",
+    "dark": "深色",
+    "light": "浅色",
+    "nav": [
+      "运作方式",
+      "品牌方",
+      "创作者",
+      "开始使用",
+      "登录"
+    ],
+    "heroEyebrow": "PAYPERVIEW · 开发中",
+    "heroTitle": "让观看\n创造[[价值。]]",
+    "heroText": "PayPerView 连接品牌与创作者，将短视频和经过验证的观看转化为可衡量的表现。",
+    "explore": "了解运作方式",
+    "proof": "一个平台，共享机会。",
+    "flowEyebrow": "更有效的触达",
+    "flowTitle": "每一次观看\n都[[有价值。]]",
+    "flowIntro": "从最初的活动简报到最终的观看验证，每一步都清晰衔接内容与成果。",
+    "steps": [
+      "品牌",
+      "活动",
+      "短片",
+      "观看",
+      "验证",
+      "奖励"
+    ],
+    "stepDetails": [
+      "确定活动简报",
+      "支持创意",
+      "加入你的风格",
+      "观众观看",
+      "核验真实性",
+      "从成效中获益"
+    ],
+    "flowLabel": "活动流程",
+    "loopEyebrow": "PAYPERVIEW 循环",
+    "loopTitle": "创作。\n剪辑。观看。\n[[获益。]]",
+    "loopText": "优质内容持续触达受众，表现也为参与者带来更多机会。",
+    "loop": [
+      "创作",
+      "活动",
+      "短片",
+      "观看",
+      "验证",
+      "获益"
+    ],
+    "brandsEyebrow": "品牌方",
+    "brandsTitle": "你的内容。\n他们的[[触达。]]",
+    "brandsText": "发起活动，让创作者参与品牌故事，并随着平台发展了解整个工作流程。",
+    "brandsLink": "探索平台",
+    "workspace": "活动工作区",
+    "campaign": "你的活动",
+    "preview": "预览",
+    "inDevelopment": "开发中",
+    "tabs": [
+      "概览",
+      "创作者",
+      "内容",
+      "验证"
+    ],
+    "workspaceEyebrow": "下一个故事从这里开始",
+    "workspaceTitle": "围绕你的创意创建活动。",
+    "workspaceText": "活动简报、创作者匹配和活动动态将在这里汇总。",
+    "workflow": [
+      "活动简报",
+      "创作者故事",
+      "观看验证"
+    ],
+    "workspaceFoot": "让活动跟踪清晰透明",
+    "workspaceLabel": "工作区预览",
+    "clippersEyebrow": "创作者",
+    "clipperTitle": "你的触达。\n你的[[回报。]]",
+    "clipperText": "寻找适合你风格的活动，创作受众喜爱的内容，并依据经验证的表现获得回报。",
+    "clipperLink": "了解创作者体验",
+    "creatorWorkspace": "创作者工作区",
+    "readyCreate": "准备开始创作",
+    "rewardsHere": "活动奖励将在这里显示",
+    "nextClip": "你的下一个短片",
+    "campaignDetails": "活动详情将在这里显示",
+    "verifiedEyebrow": "平台核心",
+    "verifiedTitle": "不只是观看。\n[[更是经过验证的观看。]]",
+    "verifiedText": "验证功能旨在清楚关联活动动态、内容和成果。",
+    "checks": [
+      "真实性核验",
+      "动态可追踪",
+      "关联活动"
+    ],
+    "verification": "观看验证",
+    "status": "开发中",
+    "statusTitle": "验证状态",
+    "readyActivity": "等待活动动态",
+    "verifySteps": [
+      "已提交内容",
+      "已检查动态",
+      "已验证观看"
+    ],
+    "verifyFoot": "活动开始后将在此显示验证详情",
+    "whyEyebrow": "为什么选择 PAYPERVIEW",
+    "whyTitle": "让表现\n更有[[意义。]]",
+    "whyText": "围绕所有参与者真正关心的事而设计。",
+    "why": [
+      [
+        "品牌方",
+        "发起。跟踪。衡量。",
+        "将活动简报转化为创作者带来的触达。"
+      ],
+      [
+        "创作者",
+        "发现。创作。获益。",
+        "寻找活动，发挥创意，共享成果。"
+      ],
+      [
+        "生态系统",
+        "透明融入设计。",
+        "连接内容、表现和奖励。"
+      ]
+    ],
+    "wallEyebrow": "让内容流动",
+    "wallTitle": "内容就是[[价值。]]",
+    "wallText": "由合适的人共同塑造，创意才能传播得更远。",
+    "wallTitles": [
+      "城市上空的咖啡时光",
+      "户外片刻",
+      "黄金时刻",
+      "记录日落"
+    ],
+    "wallNote": "一个创意。\n多种视角。\n共同呈现。",
+    "mediaCredit": "视频由 Michelle Leman 提供，来源：",
+    "photosCredit": "图片来源：",
+    "ctaEyebrow": "下一次观看，从这里开始",
+    "ctaTitle": "准备好让观看\n创造[[价值了吗？]]",
+    "ctaText": "无论你要发起活动还是创作内容，PayPerView 都将表现与机会连接起来。",
+    "forBrands": "品牌方",
+    "forCreators": "创作者",
+    "ctaLoop": "品牌 → 内容 → 验证观看 → 价值",
+    "footerText": "优质内容值得\n传播得更远。",
+    "exploreLabel": "探索",
+    "accountLabel": "账户",
+    "platformLabel": "平台",
+    "backTop": "返回顶部 ↑",
+    "verifiedViews": "经过验证的观看",
+    "footerTag": "为观看经济而打造"
+  },
+  "assistant": {
+    "close": "关闭助手",
+    "title": "今天我能为你做些什么？",
+    "description": "我是你的智能助手，可以协助你创建内容、管理账户或解答问题。",
+    "preview": "预览",
+    "placeholder": "在此输入消息…",
+    "disclaimer": "助手偶尔可能出错，请核实重要信息。",
+    "viewConversations": "查看对话",
+    "conversations": "对话",
+    "newConversation": "新建对话",
+    "loading": "正在加载",
+    "errors": {
+      "loadMessages": "无法加载消息",
+      "createThread": "无法创建对话",
+      "sendMessage": "无法发送消息",
+      "deleteThread": "无法删除对话"
+    },
+    "actions": {
+      "messageMembers": {
+        "title": "联系近期成员",
+        "desc": "为新订阅者起草欢迎消息"
+      },
+      "createAd": {
+        "title": "创建创意广告",
+        "desc": "为即将开展的活动生成吸引人的广告文案"
+      },
+      "startLive": {
+        "title": "开始直播",
+        "desc": "设置直播，与受众互动"
+      },
+      "sendInvoice": {
+        "title": "向客户发送发票",
+        "desc": "快速创建并发送专业发票"
+      }
+    }
+  },
+  "messages": {
+    "title": "消息",
+    "minimizePanel": "收起消息面板",
+    "maximizePanel": "展开消息面板",
+    "close": "关闭",
+    "searchPlaceholder": "搜索消息…",
+    "filters": {
+      "all": "全部",
+      "unread": "未读",
+      "orders": "订单"
+    },
+    "newMessage": "新消息",
+    "noConversations": "没有符合搜索条件的对话"
+  },
+  "emptyState": {
+    "title": "选择一条消息以开始",
+    "description": "从侧边栏选择对话，与订阅者或支持团队联系",
+    "encrypted": "消息已进行全面加密并受到保护。"
+  },
+  "campaigns": {
+    "title": "活动管理",
+    "subtitle": "监控表现、预算和活动状态",
+    "dateFilter": "日期：最近30天",
+    "statusLabel": "状态",
+    "search": "搜索活动…",
+    "all": "全部",
+    "active": "进行中",
+    "draft": "草稿",
+    "completed": "已完成",
+    "paused": "已暂停",
+    "campaignName": "活动名称",
+    "status": "状态",
+    "budget": "预算",
+    "startDate": "开始日期",
+    "action": "操作",
+    "view": "详情",
+    "modify": "编辑",
+    "stop": "暂停",
+    "delete": "删除",
+    "prev": "上一页",
+    "next": "下一页",
+    "noCampaigns": "没有匹配的活动",
+    "totalCampaigns": "活动总数",
+    "activeCampaigns": "进行中的活动",
+    "totalBudget": "总预算（第三季度）",
+    "stable": "稳定",
+    "export": "导出数据",
+    "back": "返回",
+    "copy": "复制",
+    "campaignNumber": "活动编号",
+    "client": "客户",
+    "kpi": "关键绩效指标",
+    "budgetUsed": "已用预算",
+    "impressions": "展示次数",
+    "clicks": "点击次数",
+    "conversionRate": "转化率",
+    "viewDetails": "活动详情",
+    "startDateLabel": "开始日期",
+    "endDate": "结束日期",
+    "targetType": "目标类型",
+    "platforms": "平台",
+    "campaignStatus": "活动状态",
+    "created": "已创建",
+    "underReview": "审核中",
+    "approved": "已批准",
+    "activeStatus": "进行中",
+    "completedStatus": "已完成",
+    "copyTitle": "复制活动",
+    "newCampaignName": "新活动名称",
+    "copyOptions": "复制选项",
+    "copyMedia": "复制媒体和短片",
+    "copyMediaDesc": "同时复制关联视频、已启用功能和品牌素材",
+    "copyTargeting": "复制定向设置",
+    "copyTargetingDesc": "保留相同的定向设置、受众、地区和人口统计信息",
+    "startCopy": "开始复制",
+    "copying": "正在复制…",
+    "cancel": "取消",
+    "showing": "显示第 {from} 至 {to} 条，共 {total} 条结果",
+    "from": "共",
+    "statusActive": "进行中",
+    "statusDraft": "草稿",
+    "statusCompleted": "已完成",
+    "statusPendingReview": "待审核",
+    "statusRejected": "已拒绝",
+    "statusManualReview": "人工审核",
+    "statusCancelled": "已取消",
+    "statusArchived": "已归档",
+    "statusExpired": "已过期",
+    "campaignStats": "活动统计",
+    "emptyTitle": "尚未创建活动",
+    "emptyDesc": "广告空间已准备就绪。创建首个活动，触达目标受众。",
+    "createNew": "开始创建首个活动",
+    "statsTitle": "按类别划分的活动统计",
+    "overviewLabel": "表现概览",
+    "last30days": "最近30天",
+    "distribution": "分布",
+    "totalCampaignsLabel": "活动总数",
+    "reach": "触达",
+    "roi": "投资回报率",
+    "ctr": "点击率",
+    "spentLabel": "支出",
+    "categoryUGC": "用户生成内容（UGC）",
+    "categoryClipping": "短片剪辑",
+    "categorySlideshow": "幻灯片",
+    "categoryAudio": "音频内容",
+    "categoryLogo": "标志",
+    "categoryMixed": "混合内容",
+    "legendUGC": "用户内容（UGC）",
+    "legendClipping": "短片剪辑",
+    "legendSponsorship": "赞助",
+    "legendOther": "其他",
+    "ugcSubtitle": "昨日：收入 - 56 个进行中的活动",
+    "clippingSubtitle": "进行中 - 当前效率：{progress}"
+  },
+  "newCampaign": {
+    "steps": {
+      "s1": "基本信息",
+      "s2": "合规",
+      "s3": "内容",
+      "s4": "审核"
+    },
+    "titles": {
+      "t1": "创建新活动",
+      "t2": "清真合规证书",
+      "t3": "上传媒体",
+      "t4": "审核并提交"
+    },
+    "subtitles": {
+      "s1": "填写广告活动的基本信息。",
+      "s2": "请确认活动内容符合以下伊斯兰规范。",
+      "s3": "添加活动创意素材。",
+      "s4": "提交前请检查活动详情。"
+    },
+    "step1": {
+      "name": "活动名称",
+      "namePlaceholder": "示例：2024年第一季度活动",
+      "budget": "预算（美元）",
+      "cpm": "千次展示成本（CPM）",
+      "period": "活动周期",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "contentType": "内容类型",
+      "contentTypes": {
+        "VIDEO": "短视频",
+        "IMAGE": "静态图片",
+        "TEXT": "文本",
+        "MIXED": "混合内容",
+        "LOGO": "标志",
+        "AUDIO": "音频",
+        "SLIDESHOW": "幻灯片",
+        "UGC": "用户生成内容",
+        "CLIPPING": "短片剪辑"
+      },
+      "audience": "目标受众",
+      "audiencePlaceholder": "填写简要说明或定向关键词…",
+      "required": "此项为必填项"
+    },
+    "compliance": {
+      "intro": "请确认活动内容符合以下伊斯兰规范。所有 PayPerView 活动均必须满足此要求。",
+      "items": {
+        "noHaram": {
+          "title": "不含违规内容",
+          "desc": "活动不推广酒精、赌博、成人内容或其他违禁产品与服务。"
+        },
+        "islamicValues": {
+          "title": "尊重伊斯兰价值观",
+          "desc": "图片、信息和整体环境尊重伊斯兰原则，不嘲讽或违背相关原则。"
+        },
+        "honestRep": {
+          "title": "如实呈现",
+          "desc": "活动避免误导性营销和虚假声明，并确保优惠信息透明。"
+        },
+        "noGambling": {
+          "title": "不含赌博",
+          "desc": "活动内容不推广赌博或投注。"
+        },
+        "noSexualContent": {
+          "title": "不含色情内容",
+          "desc": "活动内容不含色情内容或露骨暗示。"
+        },
+        "noExplicitMusic": {
+          "title": "不含露骨音乐",
+          "desc": "活动内容不含不当音乐或歌词。"
+        },
+        "noAlcohol": {
+          "title": "不推广酒精",
+          "desc": "活动内容不推广酒精饮品。"
+        },
+        "noSuspiciousCurrencies": {
+          "title": "不涉及可疑金融交易",
+          "desc": "活动内容不推广可疑或不可信的货币及金融交易。"
+        },
+        "noUnrealisticProfit": {
+          "title": "不承诺不切实际的收益",
+          "desc": "活动内容不承诺不切实际或误导性收益。"
+        }
+      },
+      "descTitle": "活动说明",
+      "descSub": "详细说明",
+      "descPlaceholder": "填写活动的详细目标、受众和核心信息…",
+      "error": "你似乎尚未阅读并同意相关条款。请遵守所有条款，活动才能通过审核。"
+    },
+    "step3": {
+      "intro": "添加活动创意素材。请确保文件符合要求，以便在各网络平台顺利投放。",
+      "dropTitle": "将文件拖放到此处",
+      "dropSub": "或点击从电脑中选择。文件将经过安全处理和分析。",
+      "maxSize": "每个文件最大为20 MB",
+      "choose": "选择文件",
+      "sizeError": "上传失败：文件超过20 MB限制",
+      "sizeErrorToast": "无法上传文件“{name}”，因为文件超过20 MB限制。",
+      "complete": "已完成",
+      "required": "请至少上传一个文件"
+    },
+    "step4": {
+      "identity": "活动信息",
+      "campaignName": "活动名称",
+      "goal": "目标",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "budget": "预算分配",
+      "budgetTotal": "活动总预算",
+      "reach": "预计触达",
+      "assets": "创意素材",
+      "uploaded": "已上传 {count} 个素材",
+      "targeting": "定向",
+      "notSpecified": "未指定"
+    },
+    "nav": {
+      "back": "返回",
+      "saveDraft": "保存为草稿",
+      "next": "下一步 →",
+      "submit": "提交审核 →"
+    }
   }
 }
