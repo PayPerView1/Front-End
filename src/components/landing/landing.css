@@ -58,6 +58,51 @@
 .ppv-landing.is-light .ppv-proof-stats strong{color:#17211c}
 .ppv-landing.is-light .ppv-proof-stats small{color:#65736a}
 @media(max-width:520px){.ppv-proof{gap:11px}.ppv-proof-stats{width:100%;max-width:360px}.ppv-proof-stats>span{padding-inline:9px}.ppv-proof-stats strong{font-size:14px}.ppv-proof-stats small{font-size:7px}}
+/* A restrained orange accent sampled from the PayPerView logo. */
+.ppv-brand-dot{color:var(--orange)}
+.ppv-hero h1 em,.ppv-final-cta h2 em{color:var(--orange)}
+.ppv-hero:before{content:"";position:absolute;z-index:0;top:4%;inset-inline-end:12%;width:min(34vw,390px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#fe6b0026 0%,#fe6b000c 43%,transparent 72%);filter:blur(34px);pointer-events:none}
+.ppv-hero:after{background:#1e5b4728}
+.ppv-nav-start svg{color:var(--orange)}
+.ppv-eyebrow-line{background:linear-gradient(90deg,var(--orange),var(--mint))}
+.ppv-proof-stats>span:first-child strong{color:var(--orange)}
+.ppv-loop-node.loop-node-2{border-color:#fe6b0040;color:#ffd0ae}
+.ppv-loop-node.loop-node-2>span{color:var(--orange)}
+.ppv-cta-inner>.ppv-eyebrow .ppv-live-dot{background:var(--orange);box-shadow:0 0 12px #fe6b0080}
+.ppv-landing.is-light .ppv-hero:before{background:radial-gradient(circle,#c9560a1c 0%,#c9560a08 43%,transparent 72%)}
+.ppv-landing.is-light .ppv-loop-node.loop-node-2{border-color:#c9560a35;color:#814019}
+.ppv-landing.is-light .ppv-proof-stats>span:first-child strong{color:var(--orange)}
+/* Logo palette: deep ember, warm amber, and the existing calm mint. */
+.ppv-landing{--orange-soft:#ff9a4d;--orange-pale:#ffd1a6;--orange-rgb:254,107,2}
+.ppv-landing.is-light{--orange-soft:#e77a2c;--orange-pale:#ffe4ca;--orange-rgb:201,86,10}
+.ppv-hero:before{animation:ppv-ember-drift 17s ease-in-out infinite alternate}
+.ppv-hero h1 em,.ppv-final-cta h2 em{background:linear-gradient(105deg,var(--orange-soft) 5%,var(--orange-pale) 48%,var(--orange) 92%);background-size:180% 100%;background-position:0% 50%;background-clip:text;-webkit-background-clip:text;color:transparent;animation:ppv-ember-shift 8s ease-in-out infinite alternate}
+.ppv-brand-dot{ text-shadow:0 0 18px rgba(var(--orange-rgb),.48)}
+.ppv-nav-start,.ppv-hero-actions>.ppv-button,.ppv-cta-inner>div>.ppv-button:first-child{position:relative;isolation:isolate;overflow:hidden;border-color:var(--orange-soft);background:linear-gradient(112deg,#f87512 0%,#ff9a3d 52%,#ffc078 100%);color:#201309!important;box-shadow:0 7px 26px rgba(var(--orange-rgb),.17)}
+.ppv-nav-start:hover,.ppv-hero-actions>.ppv-button:hover,.ppv-cta-inner>div>.ppv-button:first-child:hover{background:linear-gradient(112deg,#ff8a25 0%,#ffad59 55%,#ffd096 100%);box-shadow:0 10px 34px rgba(var(--orange-rgb),.3)}
+.ppv-nav-start:before,.ppv-hero-actions>.ppv-button:before,.ppv-cta-inner>div>.ppv-button:first-child:before{content:"";position:absolute;z-index:-1;inset-block:-20%;left:0;width:32%;transform:translateX(-140%) skewX(-22deg);background:linear-gradient(90deg,transparent,#fff9,transparent);transition:transform .6s ease}
+.ppv-nav-start:hover:before,.ppv-hero-actions>.ppv-button:hover:before,.ppv-cta-inner>div>.ppv-button:first-child:hover:before{transform:translateX(480%) skewX(-22deg)}
+.ppv-nav-start svg{color:#542506}
+.ppv-float-card{border-color:rgba(255,255,255,.11);transition:border-color .35s,box-shadow .35s}
+.ppv-float-card:hover{border-color:rgba(var(--orange-rgb),.43);box-shadow:0 24px 70px #0009,0 0 28px rgba(var(--orange-rgb),.09)}
+.ppv-video-tile:hover{border-color:rgba(var(--orange-rgb),.43);box-shadow:0 20px 50px #0008,0 0 24px rgba(var(--orange-rgb),.1)}
+.ppv-data-pulse:nth-last-child(2){background:var(--orange-soft);box-shadow:0 0 14px 4px rgba(var(--orange-rgb),.5)}
+.ppv-loop-ring{border-color:rgba(var(--orange-rgb),.2);box-shadow:0 0 0 30px rgba(var(--orange-rgb),.025),0 0 0 72px rgba(148,211,193,.035),0 0 50px rgba(var(--orange-rgb),.08)}
+.ppv-clippers-glow{background:radial-gradient(circle,rgba(var(--orange-rgb),.2),rgba(var(--orange-rgb),.04) 52%,transparent 74%);animation:ppv-ember-breathe 9s ease-in-out infinite alternate}
+.ppv-verified-glow{background:radial-gradient(circle,#1b4b3930 0%,rgba(var(--orange-rgb),.08) 48%,transparent 72%)}
+.ppv-final-cta:after{content:"";position:absolute;z-index:0;right:8%;bottom:-28%;width:390px;height:390px;border-radius:50%;background:radial-gradient(circle,rgba(var(--orange-rgb),.12),transparent 70%);filter:blur(54px);pointer-events:none;animation:ppv-ember-breathe 11s ease-in-out infinite alternate}
+.ppv-cta-inner{z-index:1}
+.ppv-proof-stats>span:first-child strong{color:var(--orange-soft);text-shadow:0 0 22px rgba(var(--orange-rgb),.18)}
+.ppv-loop-node.loop-node-2{box-shadow:0 10px 32px rgba(var(--orange-rgb),.12)}
+.ppv-landing.is-light .ppv-nav-start,.ppv-landing.is-light .ppv-hero-actions>.ppv-button,.ppv-landing.is-light .ppv-cta-inner>div>.ppv-button:first-child{border-color:#c9560a;background:linear-gradient(112deg,#db650e 0%,#ef812b 52%,#f7a55d 100%);color:#fff!important}
+.ppv-landing.is-light .ppv-nav-start:hover,.ppv-landing.is-light .ppv-hero-actions>.ppv-button:hover,.ppv-landing.is-light .ppv-cta-inner>div>.ppv-button:first-child:hover{background:linear-gradient(112deg,#c9560a 0%,#e97920 55%,#f49a4b 100%)}
+.ppv-landing.is-light .ppv-nav-start svg{color:#fff3e9}
+@keyframes ppv-ember-drift{0%{transform:translate3d(2%,0,0) scale(.92);opacity:.62}100%{transform:translate3d(-9%,9%,0) scale(1.12);opacity:1}}
+@keyframes ppv-ember-breathe{0%{transform:scale(.9);opacity:.55}100%{transform:scale(1.12);opacity:.9}}
+@keyframes ppv-ember-shift{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+@media(prefers-reduced-motion:reduce){
+ .ppv-landing *, .ppv-landing *:before,.ppv-landing *:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
 /* Responsive refinements for the in-development landing page */
 .ppv-hero h1{font-size:clamp(3.5rem,7.2vw,6.375rem)}
 .ppv-workspace-empty{min-height:250px;margin-top:21px;padding:26px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1px dashed #ffffff20;border-radius:9px;background:radial-gradient(ellipse at 50% 0%,#94d3c10d,transparent 65%),#0e1210}
