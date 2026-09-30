@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import {
@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 
 /* ─────────────────────────────────────────────
-   Design Tokens — MacBook Pro 16_ - 133
+   Design Tokens — MacBook Pro 16_ - 135
 ───────────────────────────────────────────── */
 const T = {
   bg: "#0B0D0E",
@@ -43,23 +43,22 @@ const T = {
   muted: "#8A9490",
 };
 
-export default function WalletTopup133Page() {
+export default function WalletTopup135Page() {
   const router = useRouter();
   const locale = useLocale();
 
-  // Initial state strictly mirrors MacBook Pro 16_ - 133:
-  // Shows "5.00" in input, which is under the $10 minimum deposit threshold
-  const [inputValue, setInputValue] = useState("5.00");
+  // Initial state strictly mirrors MacBook Pro 16_ - 135
+  const [inputValue, setInputValue] = useState("1000$#");
   const [selectedQuickAmount, setSelectedQuickAmount] = useState(10000);
 
   const sarRate = 3.75;
   const currentAvailableBalance = 14250.0;
 
-  const cleanNumber = parseFloat(inputValue.replace(/[^0-9.]/g, "")) || 0;
-  // In 133, the violation is entering an amount below $10.00
-  const isBelowMin = cleanNumber < 10 || inputValue.trim() === "5.00" || inputValue.trim() === "5";
+  // Validation logic: contains non-digits or special characters
   const hasInvalidChars = /[^0-9.,]/.test(inputValue.trim());
-  const isErrorState = isBelowMin || hasInvalidChars || inputValue.trim() === "";
+  const cleanNumber = parseFloat(inputValue.replace(/[^0-9.]/g, "")) || 0;
+  const isOutOfRange = cleanNumber < 10 || cleanNumber > 10000;
+  const isErrorState = hasInvalidChars || isOutOfRange || inputValue.trim() === "";
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -70,8 +69,8 @@ export default function WalletTopup133Page() {
     setInputValue(val.toLocaleString("en-US"));
   };
 
-  const resetToMockup133 = () => {
-    setInputValue("5.00");
+  const resetToMockup135 = () => {
+    setInputValue("1000$#");
     setSelectedQuickAmount(10000);
   };
 
@@ -93,7 +92,7 @@ export default function WalletTopup133Page() {
     >
       <div className="max-w-[1480px] mx-auto px-4 sm:px-6">
 
-        {/* ── Top Bar: Reset & Navigation ── */}
+        {/* ── Top Bar: Reset / Navigation Pill ── */}
         <div className="flex items-center justify-between mb-4">
           <button
             type="button"
@@ -108,12 +107,12 @@ export default function WalletTopup133Page() {
 
           <button
             type="button"
-            onClick={resetToMockup133}
+            onClick={resetToMockup135}
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-all"
-            title="إعادة تعيين القيمة إلى النموذج الأصلي MacBook Pro 16_ - 133"
+            title="إعادة تعيين القيمة إلى النموذج الأصلي MacBook Pro 16_ - 135"
           >
             <FiRotateCcw size={12} />
-            <span>استعادة نموذج 133 (5.00)</span>
+            <span>استعادة نموذج 135 (1000$#)</span>
           </button>
         </div>
 
@@ -123,8 +122,7 @@ export default function WalletTopup133Page() {
           {/* Main Title & Subtitle */}
           <div className="flex-1">
             {/* Top Badge */}
-            <div
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-xs font-medium mb-3"
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-xs font-medium mb-3"
               style={{
                 backgroundColor: "rgba(20, 45, 38, 0.75)",
                 borderColor: "rgba(148, 211, 193, 0.35)",
@@ -137,14 +135,14 @@ export default function WalletTopup133Page() {
 
             {/* Title */}
             <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-white mb-2 leading-tight">
-              شحن المحفظة الرقمية - تجاوز الحد الأدنى للشحن
+              شحن المحفظة الرقمية - استخدام رموز صحيحة للشحن
             </h1>
 
             {/* Description */}
             <p className="text-xs sm:text-sm text-gray-400 leading-relaxed max-w-3xl">
               حدود المعاملة الواحدة تبدأ من{" "}
-              <span className="text-[#94D3C1] font-bold" dir="ltr">$10.00</span>{" "}
-              <span className="text-[#94D3C1] font-bold">(37.50 ر.س)</span> وتصل كحد أقصى إلى{" "}
+              <span className="text-white font-medium" dir="ltr">$10.00</span>{" "}
+              <span className="text-gray-400">(37.50 ر.س)</span> وتصل كحد أقصى إلى{" "}
               <span className="text-[#E9C349] font-bold" dir="ltr">$10,000.00</span>{" "}
               <span className="text-[#E9C349] font-bold">(37,500.00 ر.س)</span>{" "}
               وفقاً لتشريعات الدفع الإلكتروني المصرفي المعتمدة.
@@ -224,11 +222,11 @@ export default function WalletTopup133Page() {
                   </div>
                 </div>
 
-                {/* Red Error Badge: مبلغ غير صالح */}
+                {/* Red Error Badge */}
                 {isErrorState && (
                   <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#DC2626] text-white text-xs font-bold shadow-md">
                     <FiAlertTriangle size={14} className="text-white shrink-0" />
-                    <span>مبلغ غير صالح</span>
+                    <span>إدخال بيانات غير صحيحة</span>
                   </div>
                 )}
               </div>
@@ -247,7 +245,7 @@ export default function WalletTopup133Page() {
                   boxShadow: isErrorState ? "0 0 16px rgba(220, 38, 38, 0.25)" : "none",
                 }}
               >
-                {/* Text / Input Display on the RIGHT in RTL */}
+                {/* Text / Input Display (Right side in RTL) */}
                 <input
                   type="text"
                   value={inputValue}
@@ -274,7 +272,7 @@ export default function WalletTopup133Page() {
                 </div>
               </div>
 
-              {/* Red Error Alert Box — Specific to Minimum Threshold in 133 */}
+              {/* Red Error Alert Box */}
               {isErrorState && (
                 <div className="rounded-xl bg-[#DC2626] p-4 text-white flex items-start gap-3.5 mb-6 shadow-lg shadow-red-900/20">
                   <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0 mt-0.5">
@@ -282,10 +280,11 @@ export default function WalletTopup133Page() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-sm font-bold leading-snug">
-                      الحد الأدنى للشحن هو 10.00$ (ما يعادل 37.50 ر.س تقريباً)
+                      يرجى إدخال مبلغ صالح (أرقام فقط)
                     </h3>
                     <p className="text-xs text-white/90 leading-relaxed font-normal">
-                      القيمة المدخلة ({cleanNumber > 0 ? `${cleanNumber.toFixed(2)}$` : "5.00$"}) أقل من الحد الأدنى المقبول لمعالجة المدفوعات وتغطية تكاليف فتح القنوات الإعلانية الموثقة. يرجى تعديل المبلغ للمتابعة.
+                      الحقل يقبل الأرقام فقط (مثال: 500 أو 1000) ولا يسمح بإدخال نصوص مثل &quot;ألف&quot;،
+                      مسافات، أو رموز خاصة مثل ($، %، #، @). يرجى مسح الرمز $# للمتابعة.
                     </p>
                   </div>
                 </div>
@@ -344,7 +343,7 @@ export default function WalletTopup133Page() {
                 </div>
               </div>
 
-              {/* Currency & Fee Breakdown — Matching 133 */}
+              {/* Currency & Fee Breakdown */}
               <div
                 className="rounded-xl border p-4 sm:p-5"
                 style={{
@@ -360,7 +359,7 @@ export default function WalletTopup133Page() {
                     </span>
                     <span className="font-bold text-white font-mono" dir="ltr">
                       {isErrorState
-                        ? "18.75 ر.س"
+                        ? "56,250.00 ر.س"
                         : `${(cleanNumber * sarRate).toLocaleString("en-US", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
@@ -371,11 +370,11 @@ export default function WalletTopup133Page() {
                   {/* Row 2: VAT */}
                   <div className="flex items-center justify-between text-gray-300">
                     <span className="text-gray-400 text-xs">
-                      ضريبة القيمة المضافة (%15):
+                      ضريبة القيمة المضافة (ZATCA %15):
                     </span>
                     <span className="font-medium text-[#F87171]">
                       {isErrorState
-                        ? "معلقة (تتطلب 10$ كحد أدنى)"
+                        ? "متوقفة (المبلغ يتجاوز سقف البوابة الإلكترونية)"
                         : `${(cleanNumber * 0.15).toLocaleString("en-US", {
                             minimumFractionDigits: 2,
                           })} USD`}
@@ -388,7 +387,7 @@ export default function WalletTopup133Page() {
                       رسوم بوابة الدفع الإلكترونية:
                     </span>
                     <span className="font-medium text-[#94D3C1]">
-                      مجانية (تتحملها المنصة)
+                      مجانية بالكامل (تتحملها المنصة)
                     </span>
                   </div>
 
@@ -407,7 +406,7 @@ export default function WalletTopup133Page() {
                         }}
                       >
                         {isErrorState
-                          ? "غير متاح للإتمام"
+                          ? "غير مسموح بالإتمام (تجاوز الحد الأقصى)"
                           : `$${cleanNumber.toLocaleString("en-US", {
                               minimumFractionDigits: 2,
                             })} USD`}
@@ -539,7 +538,7 @@ export default function WalletTopup133Page() {
               </div>
             </div>
 
-            {/* ── CARD 3: زر المتابعة موقوف مؤقتاً ── */}
+            {/* ── CARD 3: زر المتابعة موقوف ── */}
             <div
               className="rounded-[18px] border p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4"
               style={{
@@ -563,10 +562,10 @@ export default function WalletTopup133Page() {
               <div className="flex items-center gap-3.5 w-full sm:w-auto justify-end">
                 <div className="text-right">
                   <div className="text-xs sm:text-sm font-bold text-white">
-                    زر المتابعة موقوف مؤقتاً:
+                    زر المتابعة موقوف:
                   </div>
                   <div className="text-[11px] text-gray-400 mt-0.5">
-                    يلزم تصحيح المبلغ إلى 10$ على الأقل للمتابعة إلى بوابة الدفع المشفرة.
+                    يلزم تعديل المبلغ وفقاً للمعايير الصحيحة للاستمرار عبر بوابات الدفع.
                   </div>
                 </div>
 
@@ -614,58 +613,66 @@ export default function WalletTopup133Page() {
               {/* Rows */}
               <div className="space-y-3">
 
-                {/* Row 1: فحص نوع البيانات (Numeric) - Shows normal dark state with checkmark */}
-                <div className="py-2.5 px-2 border-b border-white/[0.06] flex items-center justify-between">
-                  <div>
-                    <span className="text-xs text-gray-300 font-medium block">
-                      فحص نوع البيانات (Numeric)
-                    </span>
-                    <span className="text-[10px] text-gray-500 block mt-0.5">
-                      حروف ورموز غير مقبولة ($، #)
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-medium text-gray-400">
-                      غير صالح
-                    </span>
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-white/10 border border-white/20 shrink-0">
-                      <FiCheck size={10} className="text-gray-300" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Row 2: الحد الأدنى للإيداع — FAIL ROW IN 133 (RED BOX) */}
+                {/* Row 1: فحص نوع البيانات (Error Box) */}
                 <div
                   className="rounded-xl border p-3.5 flex items-center justify-between"
                   style={{
-                    backgroundColor: isBelowMin ? T.dangerBg : "transparent",
-                    borderColor: isBelowMin ? T.dangerBorder : "rgba(255,255,255,0.06)",
+                    backgroundColor: isErrorState ? T.dangerBg : "transparent",
+                    borderColor: isErrorState ? T.dangerBorder : "rgba(255,255,255,0.06)",
                   }}
                 >
                   <div>
                     <span className="text-xs font-bold text-white block">
-                      الحد الأدنى للإيداع
+                      فحص نوع البيانات (Numeric)
                     </span>
                     <span
                       className="text-[11px] block mt-0.5"
-                      style={{ color: isBelowMin ? T.dangerText : "#9CA3AF" }}
+                      style={{ color: isErrorState ? T.dangerText : "#9CA3AF" }}
                     >
-                      القيمة المدخلة اقل من الحد الادنى
+                      {hasInvalidChars
+                        ? "حروف ورموز غير مقبولة ($، #)"
+                        : isOutOfRange
+                        ? "المبلغ خارج الحدود المسموحة"
+                        : "بيانات الإدخال مطابقة"}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
+                    {isErrorState ? (
+                      <>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-500/20 border border-red-500/30 text-red-400">
+                          غير صالح
+                        </span>
+                        <FiXCircle size={18} className="text-[#DC2626]" />
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-green-500/20 border border-green-500/30 text-green-400">
+                          صالح
+                        </span>
+                        <FiCheckCircle size={18} className="text-[#94D3C1]" />
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Row 2: الحد الأدنى للإيداع */}
+                <div className="py-2.5 px-2 border-b border-white/[0.06] flex items-center justify-between">
+                  <div>
+                    <span className="text-xs text-gray-300 font-medium block">
+                      الحد الأدنى للإيداع
+                    </span>
+                    <span className="text-[10px] text-gray-500 block mt-0.5">
+                      نظام الإعلانات الذاتي
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
                     <span className="text-xs font-mono text-white font-medium" dir="ltr">
                       $10.00 USD
                     </span>
-                    {isBelowMin ? (
-                      <FiXCircle size={18} className="text-[#DC2626] shrink-0" />
-                    ) : (
-                      <div className="w-4 h-4 rounded-full flex items-center justify-center bg-[#94D3C1]/20 border border-[#94D3C1]/40 shrink-0">
-                        <FiCheck size={10} className="text-[#94D3C1]" />
-                      </div>
-                    )}
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-[#94D3C1]/20 border border-[#94D3C1]/40 shrink-0">
+                      <FiCheck size={10} className="text-[#94D3C1]" />
+                    </div>
                   </div>
                 </div>
 

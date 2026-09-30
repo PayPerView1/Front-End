@@ -162,7 +162,7 @@ export default function DepositSuccessPage() {
               {/* Primary Orange Gradient Button */}
               <button
                 type="button"
-                onClick={() => router.push(`/${locale}/advertiser/deposit`)}
+                onClick={() => router.push(`/${locale}/advertiser/wallet-topup`)}
                 className="w-full flex items-center justify-center gap-2.5 py-3 px-5 rounded-xl font-bold text-sm text-white shadow-lg transition-transform active:scale-[0.98] hover:brightness-110 cursor-pointer"
                 style={{
                   background: "linear-gradient(90deg, #FB9D00 0%, #FC5601 100%)",

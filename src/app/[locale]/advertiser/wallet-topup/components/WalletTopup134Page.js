@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import {
@@ -11,18 +11,20 @@ import {
   FiAlertTriangle,
   FiMessageSquare,
   FiRotateCcw,
+  FiTool,
 } from "react-icons/fi";
 import {
   MdOutlineAccountBalance,
   MdOutlineAccountBalanceWallet,
   MdOutlineCalculate,
+  MdOutlineCallSplit,
 } from "react-icons/md";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 
 /* ─────────────────────────────────────────────
-   Design Tokens — MacBook Pro 16_ - 135
+   Design Tokens — MacBook Pro 16_ - 134
 ───────────────────────────────────────────── */
 const T = {
   bg: "#0B0D0E",
@@ -43,22 +45,41 @@ const T = {
   muted: "#8A9490",
 };
 
-export default function WalletTopup135Page() {
+export default function WalletTopup134Page() {
   const router = useRouter();
   const locale = useLocale();
 
-  // Initial state strictly mirrors MacBook Pro 16_ - 135
-  const [inputValue, setInputValue] = useState("1000$#");
+  // Initial state strictly mirrors MacBook Pro 16_ - 134:
+  // Shows "50.0000" in input (representing 50,000 USD which exceeds the 10,000 limit)
+  const [inputValue, setInputValue] = useState("50.0000");
   const [selectedQuickAmount, setSelectedQuickAmount] = useState(10000);
+  const [toastMessage, setToastMessage] = useState("");
 
   const sarRate = 3.75;
   const currentAvailableBalance = 14250.0;
 
-  // Validation logic: contains non-digits or special characters
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(""), 3000);
+  };
+
+  // Parse amount: handles "50.0000" as 50,000 (thousands representation in mockup)
+  const parseAmount = (val) => {
+    if (!val) return 0;
+    const s = String(val).trim();
+    if (s === "50.0000") return 50000;
+    if (/^\d+\.\d{3,4}$/.test(s)) {
+      return parseFloat(s.replace(".", ""));
+    }
+    return parseFloat(s.replace(/,/g, "")) || 0;
+  };
+
+  const cleanNumber = parseAmount(inputValue);
+  // In MacBook Pro 16_ - 134, entering 50.0000 exceeds the 10,000 maximum daily limit
+  const isExceeded = cleanNumber > 10000 || inputValue.trim() === "50.0000";
+  const isOutOfRange = cleanNumber < 10 || isExceeded;
   const hasInvalidChars = /[^0-9.,]/.test(inputValue.trim());
-  const cleanNumber = parseFloat(inputValue.replace(/[^0-9.]/g, "")) || 0;
-  const isOutOfRange = cleanNumber < 10 || cleanNumber > 10000;
-  const isErrorState = hasInvalidChars || isOutOfRange || inputValue.trim() === "";
+  const isErrorState = isExceeded || isOutOfRange || hasInvalidChars || inputValue.trim() === "";
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -69,8 +90,27 @@ export default function WalletTopup135Page() {
     setInputValue(val.toLocaleString("en-US"));
   };
 
-  const resetToMockup135 = () => {
-    setInputValue("1000$#");
+  // Quick fix 1: Set to maximum ($10,000)
+  const handleFixMax = () => {
+    setInputValue("10,000");
+    setSelectedQuickAmount(10000);
+    showToast("تم ضبط المبلغ إلى الحد الأقصى المسموح ($10,000)");
+  };
+
+  // Quick fix 2: Split into 2 payments (2 x 7,500)
+  const handleSplitPayment = () => {
+    setInputValue("7,500");
+    setSelectedQuickAmount(null);
+    showToast("تم اختيار تجزئة العملية إلى دفعتين ($7,500)");
+  };
+
+  // Quick fix 3: Bank transfer (IBAN)
+  const handleBankTransfer = () => {
+    router.push(`/${locale}/advertiser/bank-transfer`);
+  };
+
+  const resetToMockup134 = () => {
+    setInputValue("50.0000");
     setSelectedQuickAmount(10000);
   };
 
@@ -90,9 +130,17 @@ export default function WalletTopup135Page() {
         fontFamily: "var(--font-tajawal), 'Tajawal', sans-serif",
       }}
     >
+      {/* Toast Feedback */}
+      {toastMessage && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999999] bg-[#151819] border border-[#94D3C1]/50 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+          <FiCheckCircle size={16} className="text-[#94D3C1] shrink-0" />
+          <span className="text-sm font-medium">{toastMessage}</span>
+        </div>
+      )}
+
       <div className="max-w-[1480px] mx-auto px-4 sm:px-6">
 
-        {/* ── Top Bar: Reset / Navigation Pill ── */}
+        {/* ── Top Bar: Reset & Navigation ── */}
         <div className="flex items-center justify-between mb-4">
           <button
             type="button"
@@ -107,12 +155,12 @@ export default function WalletTopup135Page() {
 
           <button
             type="button"
-            onClick={resetToMockup135}
+            onClick={resetToMockup134}
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-all"
-            title="إعادة تعيين القيمة إلى النموذج الأصلي MacBook Pro 16_ - 135"
+            title="إعادة تعيين القيمة إلى النموذج الأصلي MacBook Pro 16_ - 134"
           >
             <FiRotateCcw size={12} />
-            <span>استعادة نموذج 135 (1000$#)</span>
+            <span>استعادة نموذج 134 (50.0000)</span>
           </button>
         </div>
 
@@ -122,7 +170,8 @@ export default function WalletTopup135Page() {
           {/* Main Title & Subtitle */}
           <div className="flex-1">
             {/* Top Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-xs font-medium mb-3"
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-xs font-medium mb-3"
               style={{
                 backgroundColor: "rgba(20, 45, 38, 0.75)",
                 borderColor: "rgba(148, 211, 193, 0.35)",
@@ -135,7 +184,7 @@ export default function WalletTopup135Page() {
 
             {/* Title */}
             <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-white mb-2 leading-tight">
-              شحن المحفظة الرقمية - استخدام رموز صحيحة للشحن
+              شحن المحفظة الرقمية - تجاوز الحد الأقصى للشحن
             </h1>
 
             {/* Description */}
@@ -222,11 +271,11 @@ export default function WalletTopup135Page() {
                   </div>
                 </div>
 
-                {/* Red Error Badge */}
+                {/* Red Error Badge: تجاوز الحد الأقصى ($10,000) */}
                 {isErrorState && (
                   <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#DC2626] text-white text-xs font-bold shadow-md">
                     <FiAlertTriangle size={14} className="text-white shrink-0" />
-                    <span>إدخال بيانات غير صحيحة</span>
+                    <span>تجاوز الحد الأقصى ($10,000)</span>
                   </div>
                 )}
               </div>
@@ -245,7 +294,7 @@ export default function WalletTopup135Page() {
                   boxShadow: isErrorState ? "0 0 16px rgba(220, 38, 38, 0.25)" : "none",
                 }}
               >
-                {/* Text / Input Display (Right side in RTL) */}
+                {/* Text / Input Display on the RIGHT in RTL */}
                 <input
                   type="text"
                   value={inputValue}
@@ -272,23 +321,69 @@ export default function WalletTopup135Page() {
                 </div>
               </div>
 
-              {/* Red Error Alert Box */}
+              {/* Red Error Alert Box — Exactly matching MacBook Pro 16_ - 134 */}
               {isErrorState && (
-                <div className="rounded-xl bg-[#DC2626] p-4 text-white flex items-start gap-3.5 mb-6 shadow-lg shadow-red-900/20">
+                <div className="rounded-xl bg-[#DC2626] p-4 text-white flex items-start gap-3.5 mb-5 shadow-lg shadow-red-900/20">
                   <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0 mt-0.5">
                     <FiCreditCard size={18} className="text-white" />
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-sm font-bold leading-snug">
-                      يرجى إدخال مبلغ صالح (أرقام فقط)
+                      الحد الأقصى للشحن في المعاملة الواحدة هو 10,000.00$ (ما يعادل 37,500.00 ر.س)
                     </h3>
                     <p className="text-xs text-white/90 leading-relaxed font-normal">
-                      الحقل يقبل الأرقام فقط (مثال: 500 أو 1000) ولا يسمح بإدخال نصوص مثل &quot;ألف&quot;،
-                      مسافات، أو رموز خاصة مثل ($، %، #، @). يرجى مسح الرمز $# للمتابعة.
+                      المبلغ المدخل ({cleanNumber > 10000 ? `${cleanNumber.toLocaleString("en-US", { minimumFractionDigits: 2 })}$` : "15,000.00$"}) يتجاوز الحد المسموح به لكل معاملة عبر بوابات الدفع الإلكترونية السريعة. يرجى تقليل المبلغ للمتابعة، أو استخدام خيار التحويل البنكي للمبالغ الكبيرة (+10,000$).
                     </p>
                   </div>
                 </div>
               )}
+
+              {/* ── NEW SECTION: خيارات المعالجة والتصحيح الفوري المقترحة (Quick Fix) ── */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <FiTool size={14} className="text-[#94D3C1]" />
+                  <span className="text-xs font-bold text-gray-300">
+                    خيارات المعالجة والتصحيح الفوري المقترحة (Quick Fix):
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Button 1: ضبط للحد الأقصى (10,000$) */}
+                  <button
+                    type="button"
+                    onClick={handleFixMax}
+                    className="flex items-center justify-center gap-2.5 py-3 px-3 rounded-xl border border-white/10 hover:border-[#94D3C1]/50 bg-[#101213] hover:bg-[#131b18] text-xs font-semibold text-gray-200 hover:text-white transition-all cursor-pointer"
+                  >
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-[#94D3C1]/20 border border-[#94D3C1]/40 shrink-0">
+                      <FiCheck size={10} className="text-[#94D3C1]" />
+                    </div>
+                    <span>ضبط للحد الأقصى (10,000$)</span>
+                  </button>
+
+                  {/* Button 2: تجزئة: دفعتين (2 × 7,500$) */}
+                  <button
+                    type="button"
+                    onClick={handleSplitPayment}
+                    className="flex items-center justify-center gap-2.5 py-3 px-3 rounded-xl border border-white/10 hover:border-[#E9C349]/50 bg-[#101213] hover:bg-[#1a1811] text-xs font-semibold text-gray-200 hover:text-white transition-all cursor-pointer"
+                  >
+                    <MdOutlineCallSplit size={16} className="text-[#E9C349]" />
+                    <span>
+                      تجزئة: دفعتين{" "}
+                      <span className="text-[#E9C349] font-mono font-bold">(2 × 7,500$)</span>
+                    </span>
+                  </button>
+
+                  {/* Button 3: حوالة بنكية للمؤسسات (IBAN) */}
+                  <button
+                    type="button"
+                    onClick={handleBankTransfer}
+                    className="flex items-center justify-center gap-2.5 py-3 px-3 rounded-xl border border-white/10 hover:border-white/30 bg-[#101213] hover:bg-white/5 text-xs font-semibold text-gray-200 hover:text-white transition-all cursor-pointer"
+                  >
+                    <MdOutlineAccountBalance size={15} className="text-gray-400" />
+                    <span>حوالة بنكية للمؤسسات (IBAN)</span>
+                  </button>
+                </div>
+              </div>
 
               {/* Quick Amounts */}
               <div className="mb-6">
@@ -565,7 +660,7 @@ export default function WalletTopup135Page() {
                     زر المتابعة موقوف:
                   </div>
                   <div className="text-[11px] text-gray-400 mt-0.5">
-                    يلزم تعديل المبلغ وفقاً للمعايير الصحيحة للاستمرار عبر بوابات الدفع.
+                    يلزم تعديل المبلغ إلى 10,000$ أو أقل للاستمرار عبر بوابات الدفع.
                   </div>
                 </div>
 
@@ -613,46 +708,24 @@ export default function WalletTopup135Page() {
               {/* Rows */}
               <div className="space-y-3">
 
-                {/* Row 1: فحص نوع البيانات (Error Box) */}
-                <div
-                  className="rounded-xl border p-3.5 flex items-center justify-between"
-                  style={{
-                    backgroundColor: isErrorState ? T.dangerBg : "transparent",
-                    borderColor: isErrorState ? T.dangerBorder : "rgba(255,255,255,0.06)",
-                  }}
-                >
+                {/* Row 1: فحص نوع البيانات (Numeric) - Shows normal dark state with checkmark in 134 */}
+                <div className="py-2.5 px-2 border-b border-white/[0.06] flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-bold text-white block">
+                    <span className="text-xs text-gray-300 font-medium block">
                       فحص نوع البيانات (Numeric)
                     </span>
-                    <span
-                      className="text-[11px] block mt-0.5"
-                      style={{ color: isErrorState ? T.dangerText : "#9CA3AF" }}
-                    >
-                      {hasInvalidChars
-                        ? "حروف ورموز غير مقبولة ($، #)"
-                        : isOutOfRange
-                        ? "المبلغ خارج الحدود المسموحة"
-                        : "بيانات الإدخال مطابقة"}
+                    <span className="text-[10px] text-gray-500 block mt-0.5">
+                      حروف ورموز غير مقبولة ($، #)
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {isErrorState ? (
-                      <>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-500/20 border border-red-500/30 text-red-400">
-                          غير صالح
-                        </span>
-                        <FiXCircle size={18} className="text-[#DC2626]" />
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-green-500/20 border border-green-500/30 text-green-400">
-                          صالح
-                        </span>
-                        <FiCheckCircle size={18} className="text-[#94D3C1]" />
-                      </>
-                    )}
+                    <span className="text-[10px] font-medium text-gray-400">
+                      غير صالح
+                    </span>
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-white/10 border border-white/20 shrink-0">
+                      <FiCheck size={10} className="text-gray-300" />
+                    </div>
                   </div>
                 </div>
 
@@ -670,29 +743,43 @@ export default function WalletTopup135Page() {
                     <span className="text-xs font-mono text-white font-medium" dir="ltr">
                       $10.00 USD
                     </span>
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-[#94D3C1]/20 border border-[#94D3C1]/40 shrink-0">
-                      <FiCheck size={10} className="text-[#94D3C1]" />
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-white/10 border border-white/20 shrink-0">
+                      <FiCheck size={10} className="text-gray-300" />
                     </div>
                   </div>
                 </div>
 
-                {/* Row 3: الحد الأقصى للمعاملة اليومية */}
-                <div className="py-2.5 px-2 border-b border-white/[0.06] flex items-center justify-between">
+                {/* Row 3: الحد الأقصى للمعاملة اليومية — FAIL ROW IN 134 (RED BOX) */}
+                <div
+                  className="rounded-xl border p-3.5 flex items-center justify-between"
+                  style={{
+                    backgroundColor: isExceeded ? T.dangerBg : "transparent",
+                    borderColor: isExceeded ? T.dangerBorder : "rgba(255,255,255,0.06)",
+                  }}
+                >
                   <div>
-                    <span className="text-xs text-gray-300 font-medium block">
+                    <span className="text-xs font-bold text-white block">
                       الحد الأقصى للمعاملة اليومية
                     </span>
-                    <span className="text-[10px] text-gray-500 block mt-0.5">
+                    <span
+                      className="text-[11px] block mt-0.5"
+                      style={{ color: isExceeded ? T.dangerText : "#9CA3AF" }}
+                    >
                       حساب معتمد موثق
                     </span>
                   </div>
+
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-mono text-white font-medium" dir="ltr">
                       $10,000.00 USD
                     </span>
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-[#94D3C1]/20 border border-[#94D3C1]/40 shrink-0">
-                      <FiCheck size={10} className="text-[#94D3C1]" />
-                    </div>
+                    {isExceeded ? (
+                      <FiXCircle size={18} className="text-[#DC2626] shrink-0" />
+                    ) : (
+                      <div className="w-4 h-4 rounded-full flex items-center justify-center bg-[#94D3C1]/20 border border-[#94D3C1]/40 shrink-0">
+                        <FiCheck size={10} className="text-[#94D3C1]" />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -710,8 +797,8 @@ export default function WalletTopup135Page() {
                     <span className="text-xs font-mono text-white font-medium" dir="ltr">
                       USD (3.75 SAR)
                     </span>
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-[#94D3C1]/20 border border-[#94D3C1]/40 shrink-0">
-                      <FiCheck size={10} className="text-[#94D3C1]" />
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center bg-white/10 border border-white/20 shrink-0">
+                      <FiCheck size={10} className="text-gray-300" />
                     </div>
                   </div>
                 </div>

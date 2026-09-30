@@ -12,7 +12,7 @@ import {
   Message,
   Document,
 } from "react-iconly";
-import { FiFileText } from "react-icons/fi";
+import { FiFileText, FiCreditCard, FiGrid, FiBarChart2, FiLayers } from "react-icons/fi";
 
 import { useTheme } from "@/context/ThemeContext";
 import { BsList, BsX } from "react-icons/bs";
@@ -38,11 +38,12 @@ const creatorResourceItems = [
 
 // قائمة صاحب الحملة (BRAND)
 const advertiserNavItems = [
-  { label: "home", href: "/advertiser/dashboard", icon: Home },
-  { label: "campaigns", href: "/advertiser/campaigns", icon: Discovery },
-  { label: "analytics", href: "/advertiser/analytics", icon: Document },
-  { label: "newCampaign", href: "/advertiser/new", icon: Plus },
-  { label: "drafts", href: "/advertiser/drafts", icon: FiFileText, isReactIcon: true },
+  { label: "home",        href: "/advertiser/dashboard",     icon: FiGrid,      isReactIcon: true },
+  { label: "analytics",  href: "/advertiser/analytics",     icon: FiBarChart2, isReactIcon: true },
+  { label: "campaigns",  href: "/advertiser/campaigns",     icon: FiLayers,    isReactIcon: true },
+  { label: "newCampaign",href: "/advertiser/new",           icon: Plus },
+  { label: "drafts",     href: "/advertiser/drafts",        icon: FiFileText,  isReactIcon: true },
+  { label: "bankTransfer",href: "/advertiser/wallet-topup",  icon: FiCreditCard,isReactIcon: true },
 ];
 
 const advertiserResourceItems = [
@@ -52,11 +53,11 @@ const advertiserResourceItems = [
 ];
 
 const sidebarFallbacks = {
-  home: "Home",
+  home: "لوحة التحكم الرئيسية",
   search: "Search",
   discover: "Discover",
   startProject: "Start a project",
-  drafts: "مسوداتي",
+  drafts: "المسودات",
   resources: "Resources",
   members: "Members",
   partners: "Partners",
@@ -64,10 +65,11 @@ const sidebarFallbacks = {
   help: "Help",
   blog: "Blog",
   // advertiser labels
-  campaigns: "Campaigns",
-  analytics: "Analytics",
-  newCampaign: "New Campaign",
+  campaigns: "إدارة المقاطع",
+  analytics: "التقارير والتحليلات",
+  newCampaign: "انشاء حملة جديدة",
   creators: "Creators",
+  bankTransfer: "الميزانية والمدفوعات",
 };
 
 export default function Sidebar() {
@@ -180,7 +182,13 @@ export default function Sidebar() {
       {/* الروابط الرئيسية */}
       <nav className="flex flex-col gap-1 px-4 mt-2">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive =
+            pathname === item.href ||
+            (item.label === "bankTransfer" &&
+              (pathname?.includes("/advertiser/wallet-topup") ||
+                pathname?.includes("/advertiser/bank-transfer") ||
+                pathname?.includes("/advertiser/payment-receipt") ||
+                pathname?.includes("/advertiser/deposit-confirmed")));
           const Icon = item.icon;
           const iconColor = isActive
             ? isDark ? "white" : "#1A1A1A"

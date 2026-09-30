@@ -441,7 +441,7 @@ export default function PaymentReceiptPage() {
                   {/* Button 1: To Budget/Payments */}
                   <button
                     type="button"
-                    onClick={() => router.push(`/${locale}/advertiser/wallet-topup-142`)}
+                    onClick={() => router.push(`/${locale}/advertiser/wallet-topup`)}
                     className="py-3 px-4 rounded-xl font-bold text-xs sm:text-sm text-white flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-orange-500/25"
                     style={{
                       background: "linear-gradient(90deg, #FB9D00 0%, #FC5601 100%)",
@@ -775,7 +775,7 @@ export default function PaymentReceiptPage() {
               {/* Transactions History Link */}
               <button
                 type="button"
-                onClick={() => router.push(`/${locale}/advertiser/wallet-topup-142`)}
+                onClick={() => router.push(`/${locale}/advertiser/wallet-topup`)}
                 className="w-full mt-3 text-center text-xs text-gray-400 hover:text-white transition-colors cursor-pointer"
               >
                 عرض سجل حركات الإيداع والسحب

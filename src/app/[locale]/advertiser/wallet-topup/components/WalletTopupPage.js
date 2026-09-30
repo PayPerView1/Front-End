@@ -141,7 +141,7 @@ export default function WalletTopupPage() {
       if (selectedMethod === "bank_transfer") {
         router.push(`/${locale}/advertiser/bank-transfer`);
       } else {
-        router.push(`/${locale}/advertiser/multi-deposit`);
+        router.push(`/${locale}/advertiser/deposit-success`);
       }
     }, 800);
   };
@@ -536,7 +536,7 @@ export default function WalletTopupPage() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => router.push(`/${locale}/advertiser/deposit`)}
+                  onClick={() => router.push(`/${locale}/advertiser/wallet-topup`)}
                   className="px-5 py-2.5 rounded-xl border border-white/10 bg-[#161819] text-xs font-medium text-gray-300 hover:text-white hover:border-white/20 transition-all cursor-pointer w-full sm:w-auto text-center"
                 >
                   إلغاء وعودة للمحفظة
