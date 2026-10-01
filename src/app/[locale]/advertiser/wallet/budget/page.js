@@ -1,5 +1,5 @@
 import BudgetManagement from "./components/BudgetManagement";
 
-export default function BudgetPage() {
+export default function WalletBudgetPage() {
   return <BudgetManagement />;
 }
