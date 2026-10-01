@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import PaymentSuccessPage from "./components/PaymentSuccessPage";
+import PaymentSuccessPage from "@/app/[locale]/advertiser/wallet/payment/success/components/PaymentSuccessPage";
 
 export const metadata = {
   title: "التحقق من الدفعة | Pay Per View",

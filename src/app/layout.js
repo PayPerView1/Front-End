@@ -1,20 +1,30 @@
 import "./globals.css";
-import { Geist, Geist_Mono, Tajawal } from "next/font/google";
+import { Geist, Geist_Mono, Tajawal, JetBrains_Mono } from "next/font/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  fallback: ["system-ui", "sans-serif"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  fallback: ["monospace"],
 });
 
 const tajawal = Tajawal({
   variable: "--font-tajawal",
   subsets: ["arabic"],
   weight: ["400", "500", "700"],
+  fallback: ["Tajawal", "system-ui", "sans-serif"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  fallback: ["JetBrains Mono", "monospace"],
 });
 
 export const metadata = {
@@ -40,7 +50,7 @@ export default async function RootLayout({ children, params }) {
     <html
       lang={locale}
       dir={dir}
-      className={`${geistSans.variable} ${geistMono.variable} ${tajawal.variable} h-full antialiased dark`}
+      className={`${geistSans.variable} ${geistMono.variable} ${tajawal.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col font-tajawal">
         {children}
