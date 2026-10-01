@@ -163,7 +163,8 @@
   "campaigns": {
     "title": "Campaign Management",
     "subtitle": "Monitor performance, budgets, and active campaign status",
-    "dateFilter": "Date: Last 30 days",
+    "dateFilter": "All dates",
+"dateClear": "Clear dates",
     "statusLabel": "Status",
     "search": "Search campaigns...",
     "all": "All",
@@ -420,4 +421,4 @@
       "submit": "Submit for Review →"
     }
   }
-}
+}

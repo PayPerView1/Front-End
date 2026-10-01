@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { Discovery, TickSquare } from "react-iconly";
 import {
@@ -65,32 +65,107 @@ const contentTypeConfig = {
   },
 };
 
-const MOCK_CAMPAIGNS = [
-  {
-    _id: "1",
-    name: "حملة الربع الرابع - ألفا",
-    contentType: "CLIPPING",
-    status: "ACTIVE",
-    totalBudget: 100000,
-    createdAt: "2024-10-01T00:00:00.000Z",
-  },
-  {
-    _id: "2",
-    name: "حملة الصيف 2024",
-    contentType: "UGC",
-    status: "DRAFT",
-    totalBudget: 50000,
-    createdAt: "2024-06-01T00:00:00.000Z",
-  },
-  {
-    _id: "3",
-    name: "حملة رمضان",
-    contentType: "MIXED",
-    status: "COMPLETED",
-    totalBudget: 75000,
-    createdAt: "2024-03-01T00:00:00.000Z",
-  },
-];
+// YYYY-MM-DD بالتوقيت المحلي (بدون toISOString عشان ما يتأثر بفرق التوقيت)
+const toLocalDateString = (d) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+// ── قائمة إجراءات الصف (fixed، بتفتح لفوق إذا ما في مساحة تحت) ─────────────
+function RowActions({ locale, isDark, t, tc, onView, onStats }) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const btnRef = useRef(null);
+  const isRTL = locale === "ar";
+
+  const MENU_WIDTH = 160;
+  const MENU_HEIGHT = 88;
+  const GAP = 6;
+
+  // القائمة fixed، فنسكرها عند السكرول أو تغيير حجم الشاشة
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [open]);
+
+  const toggle = () => {
+    if (open) return setOpen(false);
+    const btn = btnRef.current;
+    if (!btn) return;
+    const rect = btn.getBoundingClientRect();
+
+    // افتح لفوق إذا ما في مساحة كافية تحت
+    const openAbove = window.innerHeight - rect.bottom < MENU_HEIGHT + GAP;
+    const top = openAbove ? rect.top - MENU_HEIGHT - GAP : rect.bottom + GAP;
+
+    // محاذاة حسب اتجاه اللغة، مع منع الخروج من الشاشة
+    const rawLeft = isRTL ? rect.left : rect.right - MENU_WIDTH;
+    const left = Math.max(
+      8,
+      Math.min(rawLeft, window.innerWidth - MENU_WIDTH - 8),
+    );
+
+    setPos({ top, left });
+    setOpen(true);
+  };
+
+  const itemCls = `w-full flex items-center gap-2 px-3 py-2 text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all hover:bg-[#94D3C1]/10 ${t.text}`;
+
+  return (
+    <div>
+      <button
+        ref={btnRef}
+        type="button"
+        onClick={toggle}
+        className="w-8 h-8 rounded-lg flex items-center justify-center border-none cursor-pointer transition-all hover:bg-[#94D3C1]/10"
+      >
+        <MdOutlineMoreVert size={18} color="#9A9A9A" />
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div
+            dir={isRTL ? "rtl" : "ltr"}
+            className={`fixed z-50 rounded-xl shadow-2xl p-1 border ${
+              isDark
+                ? "bg-[#1A1A1A] border-white/20"
+                : "bg-white border-black/10"
+            }`}
+            style={{ top: pos.top, left: pos.left, width: MENU_WIDTH }}
+          >
+            <button
+              type="button"
+              className={itemCls}
+              onClick={() => {
+                setOpen(false);
+                onView();
+              }}
+            >
+              <FiExternalLink size={14} color="#9A9A9A" />
+              <span>{tc("view")}</span>
+            </button>
+            <button
+              type="button"
+              className={itemCls}
+              onClick={() => {
+                setOpen(false);
+                onStats();
+              }}
+            >
+              <HiOutlineLink size={14} color="#9A9A9A" />
+              <span>{tc("campaignStats")}</span>
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function CampaignsDashboard() {
   const router = useRouter();
@@ -98,6 +173,7 @@ export default function CampaignsDashboard() {
   const locale = useLocale();
   const tc = useTranslations("campaigns");
   const dir = locale === "ar" ? "rtl" : "ltr";
+  const isRtl = locale === "ar";
 
   const [campaigns, setCampaigns] = useState([]);
   const [apiStats, setApiStats] = useState({
@@ -114,11 +190,31 @@ export default function CampaignsDashboard() {
   const [loading, setLoading] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL"); // ← ALL مش "الكل"
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
-  const [openMenu, setOpenMenu] = useState(null);
   const [statusDropdown, setStatusDropdown] = useState(false);
   const [hoveredBtn, setHoveredBtn] = useState(null);
+
+  // ── فلتر التاريخ ──
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const n = new Date();
+    return new Date(n.getFullYear(), n.getMonth(), 1);
+  });
+  const calRef = useRef(null);
+
+  // سكّر قائمة التاريخ بالضغط برا
+  useEffect(() => {
+    if (!showCalendar) return;
+    const onDown = (e) => {
+      if (calRef.current && !calRef.current.contains(e.target))
+        setShowCalendar(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [showCalendar]);
 
   const t = {
     bg: isDark ? "bg-[#0D0D0D]" : "bg-[#F0F2F5]",
@@ -225,6 +321,87 @@ export default function CampaignsDashboard() {
     },
   ];
 
+  // ── حسابات التقويم ──
+  const dateFormatter = new Intl.DateTimeFormat(isRtl ? "ar" : "en", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  // النص الظاهر على زر التقويم
+  const dateRangeLabel = (() => {
+    if (!startDate) return tc("dateFilter");
+    const s = dateFormatter.format(new Date(`${startDate}T00:00:00`));
+    if (!endDate || startDate === endDate) return s; // يوم واحد
+    return `${s} - ${dateFormatter.format(new Date(`${endDate}T00:00:00`))}`; // نطاق
+  })();
+
+  const firstWeekday =
+    (new Date(
+      calendarMonth.getFullYear(),
+      calendarMonth.getMonth(),
+      1,
+    ).getDay() -
+      (isRtl ? 6 : 0) +
+      7) %
+    7;
+  const daysInMonth = new Date(
+    calendarMonth.getFullYear(),
+    calendarMonth.getMonth() + 1,
+    0,
+  ).getDate();
+
+  const calendarDays = Array.from(
+    { length: daysInMonth + firstWeekday },
+    (_, i) =>
+      i < firstWeekday
+        ? null
+        : new Date(
+            calendarMonth.getFullYear(),
+            calendarMonth.getMonth(),
+            i - firstWeekday + 1,
+          ),
+  );
+
+  const weekdayLabels = Array.from({ length: 7 }, (_, i) =>
+    new Intl.DateTimeFormat(isRtl ? "ar" : "en", { weekday: "short" }).format(
+      new Date(2020, 10, 1 + (((isRtl ? 6 : 0) + i) % 7)),
+    ),
+  );
+
+  // اختيار يوم واحد أو بين تاريخين
+  const selectCalendarDate = (date) => {
+    const picked = toLocalDateString(date);
+    if (!startDate || (startDate && endDate)) {
+      // بداية اختيار جديد
+      setStartDate(picked);
+      setEndDate("");
+      setCurrentPage(1);
+    } else if (picked < startDate) {
+      // أقدم من البداية → يصير هو البداية
+      setStartDate(picked);
+    } else if (picked === startDate) {
+      // نفس اليوم مرتين → يوم واحد
+      setShowCalendar(false);
+    } else {
+      setEndDate(picked);
+      setCurrentPage(1);
+      setShowCalendar(false);
+    }
+  };
+
+  const clearDates = () => {
+    setStartDate("");
+    setEndDate("");
+    setCurrentPage(1);
+    setShowCalendar(false);
+  };
+
+  const changeCalendarMonth = (offset) =>
+    setCalendarMonth(
+      (m) => new Date(m.getFullYear(), m.getMonth() + offset, 1),
+    );
+
   useEffect(() => {
     async function loadCampaigns() {
       setLoading(true);
@@ -236,6 +413,8 @@ export default function CampaignsDashboard() {
           sortOrder: "desc",
           ...(statusFilter !== "ALL" && { status: statusFilter }),
           ...(search.trim() && { search: search.trim() }),
+          ...(startDate && { startDate }),
+          ...(startDate && { endDate: endDate || startDate }), // يوم واحد = نفس التاريخ
         };
 
         const [campaignsRes, statsRes] = await Promise.all([
@@ -261,22 +440,8 @@ export default function CampaignsDashboard() {
         }
       } catch (error) {
         console.error("❌ Error:", error.message);
-
-        // ← فلتري الـ mock بنفس الفلاتر
-        const filteredMock = MOCK_CAMPAIGNS.filter(
-          (c) => statusFilter === "ALL" || c.status === statusFilter,
-        ).filter(
-          (c) =>
-            !search.trim() ||
-            c.name.toLowerCase().includes(search.toLowerCase()),
-        );
-
-        setCampaigns(filteredMock);
-        setPagination({
-          currentPage: 1,
-          totalPages: 1,
-          totalCampaigns: filteredMock.length,
-        });
+        setCampaigns([]);
+        setPagination({ currentPage: 1, totalPages: 1, totalCampaigns: 0 });
       } finally {
         setLoading(false);
         setInitialLoad(false);
@@ -286,7 +451,7 @@ export default function CampaignsDashboard() {
     // debounce 400ms للبحث بس
     const delay = setTimeout(loadCampaigns, search ? 400 : 0);
     return () => clearTimeout(delay);
-  }, [currentPage, statusFilter, search]);
+  }, [currentPage, statusFilter, search, startDate, endDate]);
 
   if (initialLoad)
     return (
@@ -295,7 +460,13 @@ export default function CampaignsDashboard() {
       </div>
     );
 
-  if (!initialLoad && campaigns.length === 0 && statusFilter === "ALL" && !search) {
+  if (
+    !initialLoad &&
+    campaigns.length === 0 &&
+    statusFilter === "ALL" &&
+    !search &&
+    !startDate
+  ) {
     return (
       <div dir={dir} className={`flex flex-col flex-1 min-h-screen ${t.bg}`}>
         <EmptyState />
@@ -310,7 +481,7 @@ export default function CampaignsDashboard() {
     >
       {/* الهيدر + الإحصائيات */}
       <div className="flex flex-col gap-5">
-        <div className={locale === "ar" ? "text-right" : "text-left"}>
+        <div className={isRtl ? "text-right" : "text-left"}>
           <h1 className={`text-2xl sm:text-3xl font-bold ${t.text}`}>
             {tc("title")}
           </h1>
@@ -360,7 +531,7 @@ export default function CampaignsDashboard() {
                     </span>
                   )}
                 </div>
-                <div className={locale === "ar" ? "text-right" : "text-left"}>
+                <div className={isRtl ? "text-right" : "text-left"}>
                   <p className={`text-xs ${t.subText}`}>{tc(stat.labelKey)}</p>
                   <p className={`text-2xl font-bold mt-0.5 ${t.text}`}>
                     {stat.value}
@@ -392,7 +563,7 @@ export default function CampaignsDashboard() {
               setCurrentPage(1);
             }}
             placeholder={tc("search")}
-            className={`bg-transparent outline-none text-sm ${locale === "ar" ? "text-right" : "text-left"} w-48 ${t.text} placeholder-[#9A9A9A]`}
+            className={`bg-transparent outline-none text-sm ${isRtl ? "text-right" : "text-left"} w-48 ${t.text} placeholder-[#9A9A9A]`}
           />
         </div>
 
@@ -414,14 +585,13 @@ export default function CampaignsDashboard() {
                 size={14}
                 color={statusFilter !== "ALL" ? "#94D3C1" : "#E1E3E4"}
               />
-              {/* ← عرض الـ label الصح */}
               {tc("statusLabel")}:{" "}
               {statusFilter === "ALL" ? tc("all") : statusLabel[statusFilter]}
             </button>
 
             {statusDropdown && (
               <div
-                className={`absolute top-9 ${locale === "ar" ? "left-0" : "right-0"} z-20 w-40 rounded-xl border shadow-2xl p-1 ${t.cardBg} ${t.cardBorder}`}
+                className={`absolute top-9 ${isRtl ? "left-0" : "right-0"} z-20 w-40 rounded-xl border shadow-2xl p-1 ${t.cardBg} ${t.cardBorder}`}
               >
                 {[
                   "ALL",
@@ -439,7 +609,7 @@ export default function CampaignsDashboard() {
                       setStatusDropdown(false);
                     }}
                     className={`w-full flex items-center px-3 py-2 text-xs rounded-lg bg-transparent border-none cursor-pointer
-                      ${locale === "ar" ? "text-right" : "text-left"} transition-all
+                      ${isRtl ? "text-right" : "text-left"} transition-all
                       ${statusFilter === s ? "text-[#94D3C1]" : `${t.subText} hover:bg-[#94D3C1]/10`}`}
                   >
                     {s === "ALL" ? tc("all") : statusLabel[s]}
@@ -449,13 +619,100 @@ export default function CampaignsDashboard() {
             )}
           </div>
 
-          <button
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer hover:border-[#94D3C1]
-            ${isDark ? "bg-[#1A1A1A] border-[#2D2D2D] text-[#E1E3E4]" : "bg-white border-[#E2E8F0] text-[#374151] shadow-sm"}`}
-          >
-            <MdOutlineCalendarToday size={14} />
-            {tc("dateFilter")}
-          </button>
+          {/* فلتر التاريخ */}
+          <div ref={calRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setShowCalendar((v) => !v)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer hover:border-[#94D3C1]
+                ${
+                  startDate
+                    ? "border-[#94D3C1] bg-[#94D3C1]/10 text-[#94D3C1]"
+                    : isDark
+                      ? "bg-[#1A1A1A] border-[#2D2D2D] text-[#E1E3E4]"
+                      : "bg-white border-[#E2E8F0] text-[#374151] shadow-sm"
+                }`}
+            >
+              <MdOutlineCalendarToday size={14} />
+              {dateRangeLabel}
+            </button>
+
+            {showCalendar && (
+              <div
+                dir={dir}
+                className={`absolute top-10 z-30 w-72 rounded-xl border p-3 shadow-2xl ${isRtl ? "left-0" : "right-0"} ${t.cardBg} ${t.cardBorder} ${t.text}`}
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => changeCalendarMonth(-1)}
+                    className="h-7 w-7 rounded-lg hover:bg-[#94D3C1]/10"
+                  >
+                    {isRtl ? "›" : "‹"}
+                  </button>
+                  <span className="text-xs font-bold">
+                    {new Intl.DateTimeFormat(isRtl ? "ar" : "en", {
+                      month: "long",
+                      year: "numeric",
+                    }).format(calendarMonth)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => changeCalendarMonth(1)}
+                    className="h-7 w-7 rounded-lg hover:bg-[#94D3C1]/10"
+                  >
+                    {isRtl ? "‹" : "›"}
+                  </button>
+                </div>
+
+                <div
+                  className={`grid grid-cols-7 gap-1 text-center text-[10px] ${t.subText}`}
+                >
+                  {weekdayLabels.map((w, i) => (
+                    <span key={i}>{w}</span>
+                  ))}
+                </div>
+
+                <div className="mt-1 grid grid-cols-7 gap-1">
+                  {calendarDays.map((day, i) => {
+                    if (!day) return <span key={i} />;
+                    const ds = toLocalDateString(day);
+                    const edge = ds === startDate || ds === endDate;
+                    const inRange =
+                      startDate && endDate && ds > startDate && ds < endDate;
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => selectCalendarDate(day)}
+                        className="h-8 rounded-lg text-xs transition-colors hover:bg-[#94D3C1]/10"
+                        style={{
+                          background: edge
+                            ? "#94D3C1"
+                            : inRange
+                              ? "rgba(148,211,193,0.2)"
+                              : undefined,
+                          color: edge ? "#0B1F19" : undefined,
+                        }}
+                      >
+                        {day.getDate()}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {startDate && (
+                  <button
+                    type="button"
+                    onClick={clearDates}
+                    className={`mt-3 w-full text-center text-xs opacity-70 hover:opacity-100 ${t.subText}`}
+                  >
+                    {tc("dateClear")}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -481,14 +738,16 @@ export default function CampaignsDashboard() {
                 ].map((col) => (
                   <th
                     key={col}
-                    className={`px-4 py-3 text-xs font-medium ${locale === "ar" ? "text-right" : "text-left"}`}
+                    className={`px-4 py-3 text-xs font-medium ${isRtl ? "text-right" : "text-left"}`}
                   >
                     {col}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className={`transition-opacity duration-200 ${loading ? "opacity-50 pointer-events-none" : ""}`}>
+            <tbody
+              className={`transition-opacity duration-200 ${loading ? "opacity-50 pointer-events-none" : ""}`}
+            >
               {campaigns.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-16 text-center">
@@ -518,16 +777,16 @@ export default function CampaignsDashboard() {
                       {/* اسم الحملة */}
                       <td className="px-4 py-3.5">
                         <div
-                          className={`flex items-center gap-3 ${locale === "ar" ?  "flex-row-reverse justify-end" : "flex-row-reverse justify-end"}`}
+                          className={`flex items-center gap-3 ${isRtl ? "flex-row-reverse justify-end" : "flex-row-reverse justify-end"}`}
                         >
                           <div>
                             <p
-                              className={`text-sm font-bold ${locale === "ar" ? "text-right" : "text-left"} ${t.text}`}
+                              className={`text-sm font-bold ${isRtl ? "text-right" : "text-left"} ${t.text}`}
                             >
                               {campaign.name}
                             </p>
                             <p
-                              className={`text-xs ${locale === "ar" ? "text-right" : "text-left"} ${t.subText}`}
+                              className={`text-xs ${isRtl ? "text-right" : "text-left"} ${t.subText}`}
                             >
                               {campaign.contentType || "-"}
                             </p>
@@ -566,19 +825,19 @@ export default function CampaignsDashboard() {
 
                       {/* الميزانية */}
                       <td
-                        className={`px-4 py-3.5 text-sm font-bold ${locale === "ar" ? "text-right" : "text-left"} ${t.text}`}
+                        className={`px-4 py-3.5 text-sm font-bold ${isRtl ? "text-right" : "text-left"} ${t.text}`}
                       >
                         ${Number(campaign.totalBudget || 0).toLocaleString()}
                       </td>
 
                       {/* تاريخ البدء */}
                       <td
-                        className={`px-4 py-3.5 text-sm ${locale === "ar" ? "text-right" : "text-left"}`}
+                        className={`px-4 py-3.5 text-sm ${isRtl ? "text-right" : "text-left"}`}
                         style={{ color: isDark ? "#BFC9C4" : "#475569" }}
                       >
                         {campaign.createdAt
                           ? new Date(campaign.createdAt).toLocaleDateString(
-                              locale === "ar" ? "ar-SA" : "en-US",
+                              isRtl ? "ar-SA" : "en-US",
                               {
                                 year: "numeric",
                                 month: "short",
@@ -590,53 +849,22 @@ export default function CampaignsDashboard() {
 
                       {/* إجراء */}
                       <td className="px-4 py-3.5">
-                        <div className="relative">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setOpenMenu(
-                                openMenu === campaign._id ? null : campaign._id,
-                              )
-                            }
-                            className="w-8 h-8 rounded-lg flex items-center justify-center border-none cursor-pointer transition-all hover:bg-[#94D3C1]/10"
-                          >
-                            <MdOutlineMoreVert size={18} color="#9A9A9A" />
-                          </button>
-
-                          {openMenu === campaign._id && (
-                            <div
-                              className={`absolute ${locale === "ar" ? "left-0" : "right-0"} top-9 z-20 w-40 rounded-xl shadow-2xl p-1 border
-                              ${isDark ? "bg-[#1A1A1A] border-white/20" : "bg-white border-black/10"}`}
-                            >
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setOpenMenu(null);
-                                  router.push(
-                                    `/${locale}/advertiser/campaigns1/${campaign._id}`,
-                                  );
-                                }}
-                                className={`w-full flex items-center gap-2 px-3 py-2 text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all hover:bg-[#94D3C1]/10 ${t.text}`}
-                              >
-                                <FiExternalLink size={14} color="#9A9A9A" />
-                                <span>{tc("view")}</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setOpenMenu(null);
-                                  router.push(
-                                    `/${locale}/advertiser/campaigns1/${campaign._id}/stats`,
-                                  );
-                                }}
-                                className={`w-full flex items-center gap-2 px-3 py-2 text-xs rounded-lg bg-transparent border-none cursor-pointer transition-all hover:bg-[#94D3C1]/10 ${t.text}`}
-                              >
-                                <HiOutlineLink size={14} color="#9A9A9A" />
-                                <span>{tc("campaignStats")}</span>
-                              </button>
-                            </div>
-                          )}
-                        </div>
+                        <RowActions
+                          locale={locale}
+                          isDark={isDark}
+                          t={t}
+                          tc={tc}
+                          onView={() =>
+                            router.push(
+                              `/${locale}/advertiser/campaigns/${campaign._id}`,
+                            )
+                          }
+                          onStats={() =>
+                            router.push(
+                              `/${locale}/advertiser/campaigns/${campaign._id}/stats`,
+                            )
+                          }
+                        />
                       </td>
                     </tr>
                   );
