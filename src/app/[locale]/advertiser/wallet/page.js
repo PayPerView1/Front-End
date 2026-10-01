@@ -1,5 +1,5 @@
-import TopupMain from './components/TopupMain';
+import { redirect } from 'next/navigation';
 
 export default function WalletPage() {
-  return <TopupMain />;
+  redirect('./wallet/budget');
 }
