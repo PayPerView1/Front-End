@@ -343,6 +343,7 @@
       "period": "Campaign Period",
       "startDate": "Start Date",
       "endDate": "End Date",
+      "platforms": "Platforms",
       "contentType": "Content Type",
       "contentTypes": {
         "VIDEO": "Video Reel",

@@ -341,6 +341,7 @@
       "period": "فترة الحملة",
       "startDate": "تاريخ البدء",
       "endDate": "تاريخ الانتهاء",
+      "platforms": "المنصات",
       "contentType": "نوع المحتوى",
       "contentTypes": {
         "VIDEO": "فيديو ريلز",

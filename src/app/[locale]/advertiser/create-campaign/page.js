@@ -6,6 +6,14 @@ import { useTheme } from "@/context/ThemeContext";
 import { useRouter } from "@/i18n/navigation";
 import { FiCalendar, FiFileText } from "react-icons/fi";
 import {
+  SiTiktok,
+  SiInstagram,
+  SiYoutube,
+  SiX,
+  SiFacebook,
+} from "react-icons/si";
+import { FaLinkedinIn } from "react-icons/fa";
+import {
   saveDraft,
   autoSaveDraft,
   createCampaignJson,
@@ -60,6 +68,16 @@ const COMPLIANCE_IDS = [
 
 const STEP_IDS = [1, 2, 3, 4];
 
+const PLATFORM_LIST = [
+  { name: "TikTok", Icon: SiTiktok },
+  { name: "Instagram", Icon: SiInstagram },
+  { name: "YouTube", Icon: SiYoutube },
+  { name: " X", Icon: SiX },
+  { name: "Facebook", Icon: SiFacebook },
+  { name: "LinkedIn", Icon: FaLinkedinIn },
+
+];
+
 // ─── DateInput ────────────────────────────────────────────────
 function DateInput({ value, onChange, hasError, isRtl, dark }) {
   const ref = useRef(null);
@@ -69,10 +87,9 @@ function DateInput({ value, onChange, hasError, isRtl, dark }) {
     <div className="relative w-full">
       <div
         className={`w-full rounded-lg border py-2.5 text-sm box-border transition-colors
-          ${
-            dark
-              ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)]"
-              : "bg-white border-[#E5E5E5]"
+          ${dark
+            ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)]"
+            : "bg-white border-[#E5E5E5]"
           }
           ${hasError ? "!border-[#E53535]" : ""}
           ${isRtl ? "pr-10 pl-3.5 text-right" : "pl-10 pr-3.5 text-left"}`}
@@ -103,9 +120,8 @@ function DateInput({ value, onChange, hasError, isRtl, dark }) {
       <button
         type="button"
         onClick={() => ref.current?.showPicker?.()}
-        className={`absolute top-1/2 z-20 -translate-y-1/2 pointer-events-none text-[#9A9A9A] ${
-          isRtl ? "right-3" : "left-3"
-        }`}
+        className={`absolute top-1/2 z-20 -translate-y-1/2 pointer-events-none text-[#9A9A9A] ${isRtl ? "right-3" : "left-3"
+          }`}
       >
         <FiCalendar size={16} />
       </button>
@@ -133,15 +149,13 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
           placeholder={t("step1.namePlaceholder")}
           className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors
             focus:border-[rgba(148,211,193,1)]
-            ${
-              dark
-                ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
-                : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
+            ${dark
+              ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+              : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
             }
-            ${
-              attempted && !form.name.trim()
-                ? "!border-[#E53535]"
-                : ""
+            ${attempted && !form.name.trim()
+              ? "!border-[#E53535]"
+              : ""
             }`}
           style={{
             direction: isRtl ? "rtl" : "ltr",
@@ -179,15 +193,13 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
             placeholder="10,000$"
             className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors
               focus:border-[rgba(148,211,193,1)]
-              ${
-                dark
-                  ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
-                  : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
+              ${dark
+                ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+                : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
               }
-              ${
-                attempted && !form.totalBudget
-                  ? "!border-[#E53535]"
-                  : ""
+              ${attempted && !form.totalBudget
+                ? "!border-[#E53535]"
+                : ""
               }`}
             style={{
               direction: isRtl ? "rtl" : "ltr",
@@ -224,15 +236,13 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
             placeholder="15.50$"
             className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors
               focus:border-[rgba(148,211,193,1)]
-              ${
-                dark
-                  ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
-                  : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
+              ${dark
+                ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+                : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
               }
-              ${
-                attempted && !form.cpm
-                  ? "!border-[#E53535]"
-                  : ""
+              ${attempted && !form.cpm
+                ? "!border-[#E53535]"
+                : ""
               }`}
             style={{
               direction: isRtl ? "rtl" : "ltr",
@@ -290,13 +300,130 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
           </span>
         )}
       </div>
+      {/* المنصات */}
+      <div className="flex flex-col gap-1.5">
+        <label className={`text-xs ${dark ? "text-white" : "text-[#111]"}`}>
+          {t("step1.platforms")}
+          <span className="text-[rgba(178,34,34,1)]"> *</span>
+        </label>
 
+        <div className="relative">
+          <div
+            className={`w-full rounded-lg border px-3 py-2 flex flex-wrap items-center gap-2 min-h-[44px] transition-colors
+              ${attempted && form.platforms.length === 0 ? "!border-[#E53535]" : ""}
+              ${dark
+                ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)]"
+                : "bg-white border-[#E5E5E5]"
+              }`}
+          >
+            {form.platforms.length === 0 && (
+              <span className={`text-sm ${dark ? "text-[#9A9A9A]" : "text-[#999]"}`}>
+                {isRtl ? "اختر منصة..." : "Select a platform..."}
+              </span>
+            )}
+
+            {/* Tags */}
+            {form.platforms.map((tag) => {
+              const platformMeta = PLATFORM_LIST.find((p) => p.name === tag);
+              const TagIcon = platformMeta?.Icon;
+              return (
+                <span
+                  key={tag}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-lg text-white cursor-default select-none"
+                  style={{
+                    background:
+                      "linear-gradient(108.21deg,#FF9900 0%,#FF5603 100%)",
+                  }}
+                >
+                  {TagIcon && <TagIcon size={12} color="white" />}
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setForm((p) => ({
+                        ...p,
+                        platforms: p.platforms.filter((pt) => pt !== tag),
+                      }));
+                    }}
+                    className="flex items-center justify-center cursor-pointer bg-transparent border-none p-0 text-white/80 hover:text-white transition-colors leading-none"
+                  >
+                    ×
+                  </button>
+                </span>
+              );
+            })}
+          </div>
+
+          {/* Platform Suggestions */}
+          <div
+            className={`mt-2 flex flex-wrap gap-2`}
+          >
+            {PLATFORM_LIST.map(({ name, Icon, color }) => {
+              const isSelected = form.platforms.includes(name);
+              return (
+                <button
+                  key={name}
+                  type="button"
+                  onClick={() => {
+                    if (isSelected) {
+                      setForm((p) => ({
+                        ...p,
+                        platforms: p.platforms.filter((pt) => pt !== name),
+                      }));
+                    } else {
+                      setForm((p) => ({
+                        ...p,
+                        platforms: [...p.platforms, name],
+                      }));
+                    }
+                  }}
+                  className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-all cursor-pointer select-none
+                    ${isSelected
+                      ? "font-semibold"
+                      : dark
+                        ? "border-[rgba(63,73,69,1)] text-[#9A9A9A] hover:border-[rgba(148,211,193,0.5)] hover:text-[rgba(148,211,193,1)]"
+                        : "border-[#E5E5E5] text-[#666] hover:border-[#FF8C00]/50 hover:text-[#FF8C00]"
+                    }`}
+                  style={{
+                    fontFamily: "var(--font-tajawal,inherit)",
+                    border: isSelected ? "1.5px solid transparent" : undefined,
+                    background: isSelected
+                      ? `linear-gradient(${dark ? "#0B0B0B" : "#FFFFFF"}, ${dark ? "#0B0B0B" : "#FFFFFF"}) padding-box, linear-gradient(108.21deg, #FFBF00 0%, #FF8C00 100%) border-box`
+                      : "transparent",
+                  }}
+                >
+                  <Icon
+                    size={13}
+                    color={isSelected ? "#FF8C00" : dark ? "#9A9A9A" : "#666"}
+                  />
+                  <span
+                    style={isSelected ? {
+                      backgroundImage: "linear-gradient(108.21deg, #FFBF00 0%, #FF8C00 100%)",
+                      backgroundClip: "text",
+                      WebkitBackgroundClip: "text",
+                      color: "transparent",
+                    } : undefined}
+                  >
+                    {name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {attempted && form.platforms.length === 0 && (
+          <span className="text-[0.7rem] text-[#E53535]">
+            {t("step1.required")}
+          </span>
+        )}
+      </div>
       {/* نوع المحتوى */}
       <div>
         <label
-          className={`text-xs block mb-2.5 ${
-            dark ? "text-white" : "text-[#111]"
-          }`}
+          className={`text-xs block mb-2.5 ${dark ? "text-white" : "text-[#111]"
+            }`}
         >
           {t("step1.contentType")}
           <span className="text-[rgba(178,34,34,1)]"> *</span>
@@ -318,12 +445,11 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
                   }))
                 }
                 className={`flex flex-col items-center gap-2 py-[18px] px-3 rounded-xl border transition-all cursor-pointer
-                  ${
-                    active
-                      ? dark
-                        ? "bg-[#3D2516] border-[#FF8C00]"
-                        : "bg-[#FF8C00]/25 border-[#FF8C00]"
-                      : dark
+                  ${active
+                    ? dark
+                      ? "bg-[#3D2516] border-[#FF8C00]"
+                      : "bg-[#FF8C00]/25 border-[#FF8C00]"
+                    : dark
                       ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)]"
                       : "bg-white border-[#E5E5E5]"
                   }`}
@@ -334,21 +460,20 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
                     active
                       ? "#FF8C00"
                       : dark
-                      ? "#9A9A9A"
-                      : "#666666"
+                        ? "#9A9A9A"
+                        : "#666666"
                   }
                 />
 
                 <span
-                  className={`text-[0.8rem] font-semibold ${
-                    active
-                      ? dark
-                        ? "text-white"
-                        : "text-[#FF8C00]"
-                      : dark
+                  className={`text-[0.8rem] font-semibold ${active
+                    ? dark
+                      ? "text-white"
+                      : "text-[#FF8C00]"
+                    : dark
                       ? "text-[#9A9A9A]"
                       : "text-[#666666]"
-                  }`}
+                    }`}
                   style={{
                     fontFamily: "var(--font-tajawal,inherit)",
                   }}
@@ -379,10 +504,9 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
           rows={5}
           className={`w-full min-h-[140px] rounded-lg border px-3.5 py-2.5 text-sm outline-none resize-y box-border transition-colors
             focus:border-[rgba(148,211,193,1)]
-            ${
-              dark
-                ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
-                : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
+            ${dark
+              ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+              : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
             }`}
           style={{
             direction: isRtl ? "rtl" : "ltr",
@@ -411,9 +535,8 @@ function Step2({
   return (
     <div className="flex flex-col gap-5">
       <p
-        className={`text-sm leading-relaxed ${
-          dark ? "text-[#9A9A9A]" : "text-[#666666]"
-        }`}
+        className={`text-sm leading-relaxed ${dark ? "text-[#9A9A9A]" : "text-[#666666]"
+          }`}
       >
         {t("compliance.intro")}
       </p>
@@ -432,12 +555,11 @@ function Step2({
                 }))
               }
               className={`flex gap-3 items-start cursor-pointer p-3.5 rounded-xl border transition-all
-                ${
-                  isChecked
-                    ? dark
-                      ? "bg-[#1E2E1E] border-[#4CAF50]"
-                      : "bg-[#F0FFF4] border-[#4CAF50]"
-                    : dark
+                ${isChecked
+                  ? dark
+                    ? "bg-[#1E2E1E] border-[#4CAF50]"
+                    : "bg-[#F0FFF4] border-[#4CAF50]"
+                  : dark
                     ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)]"
                     : "border-[#E5E5E5]"
                 }`}
@@ -455,17 +577,15 @@ function Step2({
 
               <div>
                 <p
-                  className={`text-sm font-semibold mb-1 ${
-                    dark ? "text-white" : "text-[#111]"
-                  }`}
+                  className={`text-sm font-semibold mb-1 ${dark ? "text-white" : "text-[#111]"
+                    }`}
                 >
                   {t(`compliance.items.${id}.title`)}
                 </p>
 
                 <p
-                  className={`text-xs leading-relaxed ${
-                    dark ? "text-[#9A9A9A]" : "text-[#666]"
-                  }`}
+                  className={`text-xs leading-relaxed ${dark ? "text-[#9A9A9A]" : "text-[#666]"
+                    }`}
                 >
                   {t(`compliance.items.${id}.desc`)}
                 </p>
@@ -478,9 +598,8 @@ function Step2({
       {/* وصف الحملة */}
       <div className="flex flex-col gap-1.5">
         <label
-          className={`text-sm font-semibold flex items-center gap-1.5 ${
-            dark ? "text-white" : "text-[#111]"
-          }`}
+          className={`text-sm font-semibold flex items-center gap-1.5 ${dark ? "text-white" : "text-[#111]"
+            }`}
         >
           <FiFileText
             size={18}
@@ -495,9 +614,8 @@ function Step2({
         </label>
 
         <label
-          className={`text-xs ${
-            dark ? "text-[#9A9A9A]" : "text-[#666]"
-          }`}
+          className={`text-xs ${dark ? "text-[#9A9A9A]" : "text-[#666]"
+            }`}
         >
           {t("compliance.descSub")}
         </label>
@@ -509,17 +627,15 @@ function Step2({
           rows={5}
           className={`w-full rounded-lg border p-3 text-sm outline-none resize-y transition-colors
             focus:border-[rgba(148,211,193,1)]
-            ${
-              attempted && !description.trim()
-                ? "border-[#E53535]"
-                : dark
+            ${attempted && !description.trim()
+              ? "border-[#E53535]"
+              : dark
                 ? "border-[rgba(63,73,69,1)]"
                 : "border-[#E5E5E5]"
             }
-            ${
-              dark
-                ? "bg-[rgba(17,20,21,1)] text-white placeholder:text-[#9A9A9A]"
-                : "bg-white text-[#111] placeholder:text-[#999]"
+            ${dark
+              ? "bg-[rgba(17,20,21,1)] text-white placeholder:text-[#9A9A9A]"
+              : "bg-white text-[#111] placeholder:text-[#999]"
             }`}
           style={{
             fontFamily: "var(--font-tajawal,inherit)",
@@ -627,9 +743,8 @@ function Step3({
   return (
     <div className="flex flex-col gap-5">
       <p
-        className={`text-sm ${
-          dark ? "text-[#9A9A9A]" : "text-[#666]"
-        }`}
+        className={`text-sm ${dark ? "text-[#9A9A9A]" : "text-[#666]"
+          }`}
       >
         {t("step3.intro")}
       </p>
@@ -649,29 +764,26 @@ function Step3({
           document.getElementById("fileInput")?.click()
         }
         className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all
-          ${
-            dragging
-              ? "border-[rgba(148,211,193,1)]"
-              : dark
+          ${dragging
+            ? "border-[rgba(148,211,193,1)]"
+            : dark
               ? "border-[rgba(63,73,69,1)]"
               : "border-[#E5E5E5]"
           }
-          ${
-            dragging
-              ? dark
-                ? "bg-[#1E1E1E]"
-                : "bg-[#FFF8F5]"
-              : dark
+          ${dragging
+            ? dark
+              ? "bg-[#1E1E1E]"
+              : "bg-[#FFF8F5]"
+            : dark
               ? "bg-[rgba(17,20,21,1)]"
               : "bg-white"
           }`}
       >
         <div
-          className={`w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center ${
-            dark
-              ? "bg-[rgba(148,211,193,0.1)]"
-              : "bg-[#E6F4F1]"
-          }`}
+          className={`w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center ${dark
+            ? "bg-[rgba(148,211,193,0.1)]"
+            : "bg-[#E6F4F1]"
+            }`}
         >
           <MdCloudUpload
             size={24}
@@ -680,17 +792,15 @@ function Step3({
         </div>
 
         <p
-          className={`font-semibold text-base mb-1.5 ${
-            dark ? "text-white" : "text-[#111]"
-          }`}
+          className={`font-semibold text-base mb-1.5 ${dark ? "text-white" : "text-[#111]"
+            }`}
         >
           {t("step3.dropTitle")}
         </p>
 
         <p
-          className={`text-sm mb-3.5 ${
-            dark ? "text-[#9A9A9A]" : "text-[#666]"
-          }`}
+          className={`text-sm mb-3.5 ${dark ? "text-[#9A9A9A]" : "text-[#666]"
+            }`}
         >
           {t("step3.dropSub")}
         </p>
@@ -700,11 +810,10 @@ function Step3({
             (ext) => (
               <span
                 key={ext}
-                className={`rounded px-2 py-0.5 text-[0.7rem] ${
-                  dark
-                    ? "bg-[#2A2A2A] text-[#9A9A9A]"
-                    : "bg-[#F0F0F0] text-[#666]"
-                }`}
+                className={`rounded px-2 py-0.5 text-[0.7rem] ${dark
+                  ? "bg-[#2A2A2A] text-[#9A9A9A]"
+                  : "bg-[#F0F0F0] text-[#666]"
+                  }`}
               >
                 {ext}
               </span>
@@ -713,9 +822,8 @@ function Step3({
         </div>
 
         <p
-          className={`text-[0.72rem] mb-3.5 ${
-            dark ? "text-[#9A9A9A]" : "text-[#666]"
-          }`}
+          className={`text-[0.72rem] mb-3.5 ${dark ? "text-[#9A9A9A]" : "text-[#666]"
+            }`}
         >
           الحد الأقصى لحجم الملف هو {MAX_MB} ميجابايت
         </p>
@@ -726,11 +834,10 @@ function Step3({
             e.stopPropagation();
             document.getElementById("fileInput")?.click();
           }}
-          className={`border rounded-lg px-5 py-2 text-sm cursor-pointer bg-transparent ${
-            dark
-              ? "border-[rgba(63,73,69,1)] text-white"
-              : "border-[#E5E5E5] text-[#111]"
-          }`}
+          className={`border rounded-lg px-5 py-2 text-sm cursor-pointer bg-transparent ${dark
+            ? "border-[rgba(63,73,69,1)] text-white"
+            : "border-[#E5E5E5] text-[#111]"
+            }`}
           style={{
             fontFamily: "var(--font-tajawal,inherit)",
           }}
@@ -756,62 +863,57 @@ function Step3({
             return (
               <div
                 key={f.id}
-                className={`flex items-center gap-3 border rounded-xl px-4 py-3 ${
-                  isFailed
-                    ? "border-[#E53535] bg-[#FFF5F5]"
-                    : dark
+                className={`flex items-center gap-3 border rounded-xl px-4 py-3 ${isFailed
+                  ? "border-[#E53535] bg-[#FFF5F5]"
+                  : dark
                     ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)]"
                     : "bg-white border-[#E5E5E5]"
-                }`}
+                  }`}
               >
                 <div
-                  className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                    isFailed
-                      ? "bg-[#FFE5E5]"
-                      : dark
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isFailed
+                    ? "bg-[#FFE5E5]"
+                    : dark
                       ? "bg-[#2A2A2A]"
                       : "bg-[#F0F0F0]"
-                  }`}
+                    }`}
                 >
                   {fileIcon(f.file.name, f.status)}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <p
-                    className={`text-[0.82rem] font-semibold truncate ${
-                      isFailed
-                        ? "text-[#E53535]"
-                        : dark
+                    className={`text-[0.82rem] font-semibold truncate ${isFailed
+                      ? "text-[#E53535]"
+                      : dark
                         ? "text-white"
                         : "text-[#111]"
-                    }`}
+                      }`}
                   >
                     {f.file.name}
                   </p>
 
                   <p
-                    className={`text-[0.72rem] mt-0.5 ${
-                      isFailed
-                        ? "text-[#E53535]"
-                        : dark
+                    className={`text-[0.72rem] mt-0.5 ${isFailed
+                      ? "text-[#E53535]"
+                      : dark
                         ? "text-[#9A9A9A]"
                         : "text-[#666]"
-                    }`}
+                      }`}
                   >
                     {isFailed
                       ? f.errorMsg
                       : `${t("step3.complete")} · ${fmtSize(
-                          f.file.size
-                        )}`}
+                        f.file.size
+                      )}`}
                   </p>
 
                   {!isFailed && (
                     <div
-                      className={`h-0.5 rounded mt-1.5 ${
-                        dark
-                          ? "bg-[#2A2A2A]"
-                          : "bg-[#E5E5E5]"
-                      }`}
+                      className={`h-0.5 rounded mt-1.5 ${dark
+                        ? "bg-[#2A2A2A]"
+                        : "bg-[#E5E5E5]"
+                        }`}
                     >
                       <div
                         className="h-full bg-[rgba(148,211,193,1)] rounded"
@@ -826,9 +928,8 @@ function Step3({
                 <button
                   type="button"
                   onClick={() => removeFile(f.id)}
-                  className={`bg-transparent border-none cursor-pointer p-1 ${
-                    dark ? "text-[#9A9A9A]" : "text-[#666]"
-                  }`}
+                  className={`bg-transparent border-none cursor-pointer p-1 ${dark ? "text-[#9A9A9A]" : "text-[#666]"
+                    }`}
                 >
                   <MdDelete size={18} />
                 </button>
@@ -840,7 +941,7 @@ function Step3({
 
       {attempted &&
         files.filter((f) => f.status === "success").length ===
-          0 && (
+        0 && (
           <p className="text-[0.78rem] text-[#E53535]">
             يرجى رفع ملف صحيح واحد على الأقل للمتابعة.
           </p>
@@ -851,17 +952,15 @@ function Step3({
 
 // ─── Step4 ────────────────────────────────────────────────────
 function Step4({ t, dark, form, files }) {
-  const cardCls = `border rounded-xl p-5 ${
-    dark
-      ? "bg-[#141414] border-[#262626]"
-      : "bg-white border-[#E5E5E5]"
-  }`;
+  const cardCls = `border rounded-xl p-5 ${dark
+    ? "bg-[#141414] border-[#262626]"
+    : "bg-white border-[#E5E5E5]"
+    }`;
 
-  const innerCardCls = `border rounded-xl p-4 ${
-    dark
-      ? "bg-[#0D0D0D] border-[#222222]"
-      : "bg-[#F9F9F9] border-[#E5E5E5]"
-  }`;
+  const innerCardCls = `border rounded-xl p-4 ${dark
+    ? "bg-[#0D0D0D] border-[#222222]"
+    : "bg-[#F9F9F9] border-[#E5E5E5]"
+    }`;
 
   const budgetFormatted = form.totalBudget
     ? Number(form.totalBudget).toLocaleString()
@@ -889,9 +988,8 @@ function Step4({ t, dark, form, files }) {
               />
 
               <span
-                className={`text-xs font-semibold ${
-                  dark ? "text-white" : "text-[#111]"
-                }`}
+                className={`text-xs font-semibold ${dark ? "text-white" : "text-[#111]"
+                  }`}
               >
                 {t("step4.identity")}
               </span>
@@ -900,19 +998,17 @@ function Step4({ t, dark, form, files }) {
             <div className="grid grid-cols-2 gap-y-5 gap-x-4">
               <div className="flex flex-col gap-1">
                 <span
-                  className={`text-xs ${
-                    dark
-                      ? "text-[#9A9A9A]"
-                      : "text-[#666]"
-                  }`}
+                  className={`text-xs ${dark
+                    ? "text-[#9A9A9A]"
+                    : "text-[#666]"
+                    }`}
                 >
                   {t("step4.campaignName")}
                 </span>
 
                 <span
-                  className={`text-sm font-semibold ${
-                    dark ? "text-white" : "text-[#111]"
-                  }`}
+                  className={`text-sm font-semibold ${dark ? "text-white" : "text-[#111]"
+                    }`}
                 >
                   {form.name || "-"}
                 </span>
@@ -920,19 +1016,17 @@ function Step4({ t, dark, form, files }) {
 
               <div className="flex flex-col gap-1">
                 <span
-                  className={`text-xs ${
-                    dark
-                      ? "text-[#9A9A9A]"
-                      : "text-[#666]"
-                  }`}
+                  className={`text-xs ${dark
+                    ? "text-[#9A9A9A]"
+                    : "text-[#666]"
+                    }`}
                 >
                   النوع
                 </span>
 
                 <span
-                  className={`text-sm font-semibold ${
-                    dark ? "text-white" : "text-[#111]"
-                  }`}
+                  className={`text-sm font-semibold ${dark ? "text-white" : "text-[#111]"
+                    }`}
                 >
                   {form.contentType || "-"}
                 </span>
@@ -940,19 +1034,17 @@ function Step4({ t, dark, form, files }) {
 
               <div className="flex flex-col gap-1">
                 <span
-                  className={`text-xs ${
-                    dark
-                      ? "text-[#9A9A9A]"
-                      : "text-[#666]"
-                  }`}
+                  className={`text-xs ${dark
+                    ? "text-[#9A9A9A]"
+                    : "text-[#666]"
+                    }`}
                 >
                   {t("step4.startDate")}
                 </span>
 
                 <span
-                  className={`text-sm font-semibold ${
-                    dark ? "text-white" : "text-[#111]"
-                  }`}
+                  className={`text-sm font-semibold ${dark ? "text-white" : "text-[#111]"
+                    }`}
                 >
                   {form.startDate || "-"}
                 </span>
@@ -960,19 +1052,17 @@ function Step4({ t, dark, form, files }) {
 
               <div className="flex flex-col gap-1">
                 <span
-                  className={`text-xs ${
-                    dark
-                      ? "text-[#9A9A9A]"
-                      : "text-[#666]"
-                  }`}
+                  className={`text-xs ${dark
+                    ? "text-[#9A9A9A]"
+                    : "text-[#666]"
+                    }`}
                 >
                   {t("step4.endDate")}
                 </span>
 
                 <span
-                  className={`text-sm font-semibold ${
-                    dark ? "text-white" : "text-[#111]"
-                  }`}
+                  className={`text-sm font-semibold ${dark ? "text-white" : "text-[#111]"
+                    }`}
                 >
                   {form.endDate || "-"}
                 </span>
@@ -992,9 +1082,8 @@ function Step4({ t, dark, form, files }) {
               />
 
               <span
-                className={`text-xs font-semibold ${
-                  dark ? "text-white" : "text-[#111]"
-                }`}
+                className={`text-xs font-semibold ${dark ? "text-white" : "text-[#111]"
+                  }`}
               >
                 {t("step4.budget")}
               </span>
@@ -1002,9 +1091,8 @@ function Step4({ t, dark, form, files }) {
 
             <div className="flex flex-col gap-1 my-2">
               <span
-                className={`text-xs ${
-                  dark ? "text-[#9A9A9A]" : "text-[#666]"
-                }`}
+                className={`text-xs ${dark ? "text-[#9A9A9A]" : "text-[#666]"
+                  }`}
               >
                 إجمالي ميزانية الحملة
               </span>
@@ -1016,22 +1104,19 @@ function Step4({ t, dark, form, files }) {
           </div>
 
           <div
-            className={`w-full flex justify-between items-center border-t pt-3 mt-4 ${
-              dark ? "border-[#222222]" : "border-[#E5E5E5]"
-            }`}
+            className={`w-full flex justify-between items-center border-t pt-3 mt-4 ${dark ? "border-[#222222]" : "border-[#E5E5E5]"
+              }`}
           >
             <span
-              className={`text-xs ${
-                dark ? "text-[#9A9A9A]" : "text-[#666]"
-              }`}
+              className={`text-xs ${dark ? "text-[#9A9A9A]" : "text-[#666]"
+                }`}
             >
               {t("step4.reach")}
             </span>
 
             <span
-              className={`text-xs font-semibold ${
-                dark ? "text-white" : "text-[#111]"
-              }`}
+              className={`text-xs font-semibold ${dark ? "text-white" : "text-[#111]"
+                }`}
             >
               CPM: ${form.cpm || "0"}
             </span>
@@ -1050,9 +1135,8 @@ function Step4({ t, dark, form, files }) {
             />
 
             <span
-              className={`text-xs font-semibold ${
-                dark ? "text-white" : "text-[#111]"
-              }`}
+              className={`text-xs font-semibold ${dark ? "text-white" : "text-[#111]"
+                }`}
             >
               {t("step4.assets")}
             </span>
@@ -1062,19 +1146,17 @@ function Step4({ t, dark, form, files }) {
             <div className="flex items-center justify-between gap-3">
               <div className="flex flex-col gap-1">
                 <span
-                  className={`text-sm font-bold ${
-                    dark ? "text-white" : "text-[#111]"
-                  }`}
+                  className={`text-sm font-bold ${dark ? "text-white" : "text-[#111]"
+                    }`}
                 >
                   تم رفع {validFiles.length} أصول
                 </span>
 
                 <span
-                  className={`text-xs ${
-                    dark
-                      ? "text-[#9A9A9A]"
-                      : "text-[#666]"
-                  }`}
+                  className={`text-xs ${dark
+                    ? "text-[#9A9A9A]"
+                    : "text-[#666]"
+                    }`}
                 >
                   {validFiles
                     .map((f) => f.file.name)
@@ -1085,11 +1167,10 @@ function Step4({ t, dark, form, files }) {
               <div className="flex items-center gap-1.5 shrink-0">
                 <div className="flex -space-x-2 space-x-reverse items-center">
                   <div
-                    className={`w-9 h-9 rounded-lg border flex items-center justify-center ${
-                      dark
-                        ? "bg-[#1E1E1E] border-[#333]"
-                        : "bg-white border-[#DDD]"
-                    }`}
+                    className={`w-9 h-9 rounded-lg border flex items-center justify-center ${dark
+                      ? "bg-[#1E1E1E] border-[#333]"
+                      : "bg-white border-[#DDD]"
+                      }`}
                   >
                     <MdImage
                       size={18}
@@ -1098,11 +1179,10 @@ function Step4({ t, dark, form, files }) {
                   </div>
 
                   <div
-                    className={`w-9 h-9 rounded-lg border flex items-center justify-center ${
-                      dark
-                        ? "bg-[#1E1E1E] border-[#333]"
-                        : "bg-white border-[#DDD]"
-                    }`}
+                    className={`w-9 h-9 rounded-lg border flex items-center justify-center ${dark
+                      ? "bg-[#1E1E1E] border-[#333]"
+                      : "bg-white border-[#DDD]"
+                      }`}
                   >
                     <MdPlayCircle
                       size={18}
@@ -1131,9 +1211,8 @@ function Step4({ t, dark, form, files }) {
             />
 
             <span
-              className={`text-xs font-semibold ${
-                dark ? "text-white" : "text-[#111]"
-              }`}
+              className={`text-xs font-semibold ${dark ? "text-white" : "text-[#111]"
+                }`}
             >
               {t("step4.targeting")}
             </span>
@@ -1143,28 +1222,25 @@ function Step4({ t, dark, form, files }) {
             <div className="flex items-start gap-2.5">
               <MdPublic
                 size={18}
-                className={`mt-0.5 shrink-0 ${
-                  dark
-                    ? "text-[#9A9A9A]"
-                    : "text-[#FF8C00]"
-                }`}
+                className={`mt-0.5 shrink-0 ${dark
+                  ? "text-[#9A9A9A]"
+                  : "text-[#FF8C00]"
+                  }`}
               />
 
               <div className="flex flex-col gap-0.5">
                 <span
-                  className={`text-xs font-semibold ${
-                    dark ? "text-white" : "text-[#111]"
-                  }`}
+                  className={`text-xs font-semibold ${dark ? "text-white" : "text-[#111]"
+                    }`}
                 >
                   الجمهور المستهدف
                 </span>
 
                 <span
-                  className={`text-[0.7rem] ${
-                    dark
-                      ? "text-[#9A9A9A]"
-                      : "text-[#666]"
-                  }`}
+                  className={`text-[0.7rem] ${dark
+                    ? "text-[#9A9A9A]"
+                    : "text-[#666]"
+                    }`}
                 >
                   {form.audience || "غير محدد"}
                 </span>
@@ -1196,6 +1272,7 @@ export default function NewCampaignPage() {
     cpm: "",
     startDate: "",
     endDate: "",
+    platforms: [],
     contentType: "",
     category: "",
     audience: "",
@@ -1257,15 +1334,15 @@ export default function NewCampaignPage() {
             d.totalBudget != null
               ? String(d.totalBudget)
               : d.budget != null
-              ? String(d.budget)
-              : "";
+                ? String(d.budget)
+                : "";
 
           const cpmVal =
             d.cpm != null
               ? String(d.cpm)
               : d.rewardPerView != null
-              ? String(d.rewardPerView)
-              : "";
+                ? String(d.rewardPerView)
+                : "";
 
           const startDateVal = d.startDate
             ? String(d.startDate).split("T")[0]
@@ -1347,11 +1424,11 @@ export default function NewCampaignPage() {
   // ─── Validation ─────────────────────────────────────────────
   const step1Valid = Boolean(
     form.name.trim() &&
-      form.totalBudget &&
-      form.cpm &&
-      form.startDate &&
-      form.endDate &&
-      form.contentType
+    form.totalBudget &&
+    form.cpm &&
+    form.startDate &&
+    form.endDate &&
+    form.contentType
   );
 
   const step2Valid =
@@ -1364,7 +1441,7 @@ export default function NewCampaignPage() {
 
   const canNext = () =>
     [step1Valid, step2Valid, step3Valid, true][
-      step - 1
+    step - 1
     ];
 
   // ─── Country Map ────────────────────────────────────────────
@@ -1578,7 +1655,7 @@ export default function NewCampaignPage() {
           console.warn(
             "⚠️ [Submit Draft Error]:",
             submitErr?.message ||
-              submitErr
+            submitErr
           );
         }
 
@@ -1619,7 +1696,7 @@ export default function NewCampaignPage() {
           console.warn(
             "⚠️ [Draft Delete Error]:",
             deleteErr?.message ||
-              deleteErr
+            deleteErr
           );
         }
 
@@ -1671,7 +1748,7 @@ export default function NewCampaignPage() {
 
       alert(
         err?.message ||
-          "حدث خطأ، حاول مرة أخرى"
+        "حدث خطأ، حاول مرة أخرى"
       );
     } finally {
       setIsSubmitting(false);
@@ -1759,11 +1836,10 @@ export default function NewCampaignPage() {
   return (
     <div
       dir={isRtl ? "rtl" : "ltr"}
-      className={`min-h-screen p-8 transition-colors ${
-        dark
-          ? "bg-[#0A0A0A]"
-          : "bg-[#F4F5F7]"
-      }`}
+      className={`min-h-screen p-8 transition-colors ${dark
+        ? "bg-[#0A0A0A]"
+        : "bg-[#F4F5F7]"
+        }`}
       style={{
         fontFamily:
           "var(--font-tajawal,inherit)",
@@ -1786,37 +1862,34 @@ export default function NewCampaignPage() {
             <React.Fragment key={id}>
               {idx > 0 && (
                 <div
-                  className={`flex-1 h-0.5 mt-5 mx-2 ${
-                    id <= step
-                      ? "bg-[rgba(148,211,193,1)]"
-                      : dark
+                  className={`flex-1 h-0.5 mt-5 mx-2 ${id <= step
+                    ? "bg-[rgba(148,211,193,1)]"
+                    : dark
                       ? "bg-[#2D2D2D]"
                       : "bg-[#E5E5E5]"
-                  }`}
+                    }`}
                 />
               )}
 
               <div className="flex flex-col items-center gap-1 shrink-0 min-w-[60px]">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
-                    active || done
-                      ? "bg-[rgba(148,211,193,1)] text-black"
-                      : dark
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${active || done
+                    ? "bg-[rgba(148,211,193,1)] text-black"
+                    : dark
                       ? "bg-[#2A2A2A] text-[#9A9A9A]"
                       : "bg-[#E5E5E5] text-[#666]"
-                  }`}
+                    }`}
                 >
                   {id}
                 </div>
 
                 <span
-                  className={`text-[0.65rem] whitespace-nowrap text-center ${
-                    active || done
-                      ? "text-[rgba(148,211,193,1)] font-semibold"
-                      : dark
+                  className={`text-[0.65rem] whitespace-nowrap text-center ${active || done
+                    ? "text-[rgba(148,211,193,1)] font-semibold"
+                    : dark
                       ? "text-[#9A9A9A]"
                       : "text-[#666]"
-                  }`}
+                    }`}
                 >
                   {t(`steps.s${id}`)}
                 </span>
@@ -1828,35 +1901,31 @@ export default function NewCampaignPage() {
 
       {/* الكارد */}
       <div
-        className={`border rounded-2xl p-9 w-full max-w-[1401px] mx-auto box-border shadow-[0px_4px_30px_0px_rgba(0,0,0,0.1)] backdrop-blur-[20px] transition-colors ${
-          dark
-            ? "bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.1)]"
-            : "bg-white border-[#E5E5E5]"
-        }`}
+        className={`border rounded-2xl p-9 w-full max-w-[1401px] mx-auto box-border shadow-[0px_4px_30px_0px_rgba(0,0,0,0.1)] backdrop-blur-[20px] transition-colors ${dark
+          ? "bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.1)]"
+          : "bg-white border-[#E5E5E5]"
+          }`}
       >
         <div
-          className={`mb-7 ${
-            isRtl
-              ? "text-right"
-              : "text-left"
-          }`}
+          className={`mb-7 ${isRtl
+            ? "text-right"
+            : "text-left"
+            }`}
         >
           <h1
-            className={`text-[1.4rem] font-bold mb-1.5 ${
-              dark
-                ? "text-white"
-                : "text-[#111]"
-            }`}
+            className={`text-[1.4rem] font-bold mb-1.5 ${dark
+              ? "text-white"
+              : "text-[#111]"
+              }`}
           >
             {t(`titles.t${step}`)}
           </h1>
 
           <p
-            className={`text-sm ${
-              dark
-                ? "text-[#9A9A9A]"
-                : "text-[#666]"
-            }`}
+            className={`text-sm ${dark
+              ? "text-[#9A9A9A]"
+              : "text-[#666]"
+              }`}
           >
             {t(`subtitles.s${step}`)}
           </p>
@@ -1870,11 +1939,10 @@ export default function NewCampaignPage() {
               <button
                 type="button"
                 onClick={handleBack}
-                className={`px-6 py-2.5 rounded-lg text-sm font-semibold border bg-transparent cursor-pointer ${
-                  dark
-                    ? "border-[rgba(63,73,69,1)] text-white"
-                    : "border-[#E5E5E5] text-[#111]"
-                }`}
+                className={`px-6 py-2.5 rounded-lg text-sm font-semibold border bg-transparent cursor-pointer ${dark
+                  ? "border-[rgba(63,73,69,1)] text-white"
+                  : "border-[#E5E5E5] text-[#111]"
+                  }`}
                 style={{
                   fontFamily:
                     "var(--font-tajawal,inherit)",
@@ -1889,11 +1957,10 @@ export default function NewCampaignPage() {
             <button
               type="button"
               onClick={handleSaveDraft}
-              className={`px-6 py-2.5 rounded-lg text-sm font-semibold border bg-transparent cursor-pointer ${
-                dark
-                  ? "border-[rgba(63,73,69,1)] text-white"
-                  : "border-[#E5E5E5] text-[#111]"
-              }`}
+              className={`px-6 py-2.5 rounded-lg text-sm font-semibold border bg-transparent cursor-pointer ${dark
+                ? "border-[rgba(63,73,69,1)] text-white"
+                : "border-[#E5E5E5] text-[#111]"
+                }`}
               style={{
                 fontFamily:
                   "var(--font-tajawal,inherit)",
