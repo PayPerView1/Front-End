@@ -1,5 +1,3 @@
-import { redirect } from 'next/navigation';
+import WalletOverview from "@/features/wallet/pages/WalletOverview";
 
-export default function WalletPage() {
-  redirect('./wallet/budget');
-}
+export default function WalletPage() { return <WalletOverview />; }

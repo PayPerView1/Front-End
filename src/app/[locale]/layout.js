@@ -4,6 +4,7 @@ import { routing } from "../../i18n/routing";
 import { notFound } from "next/navigation";
 import { ThemeProvider } from "@/context/ThemeContext";
 import MainLayout from "@/components/MainLayout";
+import { ToastProvider } from "@/components/ui/Toast";
 import "../globals.css";
 
 export const metadata = {
@@ -23,10 +24,12 @@ export default async function LocaleLayout({ children, params }) {
   return (
     <NextIntlClientProvider messages={messages}>
       <ThemeProvider>
-        <MainLayout locale={locale}>
-          {children}
-        </MainLayout>
+        <ToastProvider>
+          <MainLayout locale={locale}>
+            {children}
+          </MainLayout>
+        </ToastProvider>
       </ThemeProvider>
     </NextIntlClientProvider>
   );
-}
+}

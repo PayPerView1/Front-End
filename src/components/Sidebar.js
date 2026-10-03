@@ -12,7 +12,15 @@ import {
   Message,
   Document,
 } from "react-iconly";
-import { FiFileText, FiCreditCard, FiGrid, FiBarChart2, FiLayers } from "react-icons/fi";
+import { FiFileText } from "react-icons/fi";
+import {
+  MdOutlineDashboard,
+  MdBarChart,
+  MdVideoLibrary,
+  MdAddBox,
+  MdOutlineDrafts,
+  MdOutlineAccountBalanceWallet,
+} from "react-icons/md";
 
 import { useTheme } from "@/context/ThemeContext";
 import { BsList, BsX } from "react-icons/bs";
@@ -29,44 +37,98 @@ const creatorNavItems = [
 ];
 
 const creatorResourceItems = [
-  { label: "members",  href: "/members",  icon: Bag },
+  { label: "members", href: "/members", icon: Bag },
   { label: "partners", href: "/partners", icon: People, badge: "new" },
-  { label: "help",     href: "/help",     icon: Message },
-  { label: "blog",     href: "/blog",     icon: Document },
+  { label: "help", href: "/help", icon: Message },
+  { label: "blog", href: "/blog", icon: Document },
 ];
 
 // ─── قائمة صاحب الحملة (BRAND/ADVERTISER) ────────────────────
 const advertiserNavItems = [
-  { label: "home",        href: "/advertiser/dashboard",     icon: FiGrid,      isReactIcon: true },
-  { label: "analytics",  href: "/advertiser/analytics",     icon: FiBarChart2, isReactIcon: true },
-  { label: "campaigns",  href: "/advertiser/campaigns",     icon: FiLayers,    isReactIcon: true },
-  { label: "newCampaign",href: "/advertiser/new",           icon: Plus },
-  { label: "drafts",     href: "/advertiser/drafts",        icon: FiFileText,  isReactIcon: true },
-  { label: "bankTransfer",href: "/advertiser/wallet-topup", icon: FiCreditCard,isReactIcon: true },
-];
+  { label: "dashboard", href: "/advertiser/dashboard", icon: MdOutlineDashboard, useMd: true },
+  {
+    label: "manageCampaigns",
+    href: "/advertiser/campaigns",
+    icon: MdBarChart,
+    useMd: true,
+  },
+  {
+    label: "analytics",
+    href: "/advertiser/analytics",
+    icon: MdBarChart,
+    useMd: true,
+  },
+  {
+    label: "clips",
+    href: "/advertiser/clips",
+    icon: MdVideoLibrary,
+    useMd: true,
+  },
+  {
+    label: "newCampaign",
 
+    href: "/advertiser/create-campaign",
+
+    icon: MdAddBox,
+    useMd: true,
+  },
+  {
+    label: "drafts",
+    href: "/advertiser/drafts",
+    icon: MdOutlineDrafts,
+    useMd: true,
+  },
+  {
+    label: "billing",
+    href: "/advertiser/wallet",
+    icon: MdOutlineAccountBalanceWallet,
+    useMd: true,
+  },
+];
 // لا resources section للـ advertiser
 const advertiserResourceItems = [];
 
-// ─── Fallbacks ──────────────────────────────────────────────────
-const sidebarFallbacks = {
-  home: "لوحة التحكم الرئيسية",
+// ─── Fallbacks حسب اللغة ──────────────────────────────────────
+const sidebarFallbacksEn = {
+  home: "Home",
   search: "Search",
   discover: "Discover",
   startProject: "Start a project",
-  drafts: "المسودات",
+
   resources: "Resources",
   members: "Members",
   partners: "Partners",
   new: "New",
   help: "Help",
   blog: "Blog",
-  // advertiser labels
-  campaigns: "إدارة المقاطع",
+
+  dashboard: "Dashboard",
+  manageCampaigns: "Manage Campaigns",
+  analytics: "Analytics & Reports",
+  clips: "Manage Clips",
+  newCampaign: "Create New Campaign",
+  drafts: "Drafts",
+  billing: "Budget & Payments",
+};
+
+const sidebarFallbacksAr = {
+  home: "الرئيسية",
+  search: "البحث",
+  discover: "استكشاف",
+  startProject: "بدء مشروع",
+  resources: "الموارد",
+  members: "الأعضاء",
+  partners: "الشركاء",
+  new: "جديد",
+  help: "المساعدة",
+  blog: "المدونة",
+  dashboard: "لوحة التحكم الرئيسية",
+  manageCampaigns: "إدارة الحملات",
   analytics: "التقارير والتحليلات",
-  newCampaign: "انشاء حملة جديدة",
-  creators: "Creators",
-  bankTransfer: "الميزانية والمدفوعات",
+  clips: "إدارة المقاطع",
+  newCampaign: "إنشاء حملة جديدة",
+  drafts: "المسودات",
+  billing: "الميزانية والمدفوعات",
 };
 
 // ─── Component ────────────────────────────────────────────────
@@ -88,6 +150,7 @@ export default function Sidebar() {
     ? advertiserResourceItems
     : creatorResourceItems;
 
+
   useEffect(() => {
     function handleResize() {
       if (window.innerWidth >= 1280) setSidebarOpen(false);
@@ -96,7 +159,9 @@ export default function Sidebar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const sidebar = (key) => messages?.sidebar?.[key] || sidebarFallbacks[key] || key;
+
+  const fallbacks = locale === "ar" ? sidebarFallbacksAr : sidebarFallbacksEn;
+  const sidebar = (key) => messages?.sidebar?.[key] || fallbacks[key] || key;
 
   const { isDark } = useTheme();
 
@@ -109,11 +174,57 @@ export default function Sidebar() {
       ? "hover:text-white hover:bg-white/5"
       : "hover:text-black hover:bg-[#F5F5F5]",
     logoText: isDark ? "text-white" : "text-black",
+
   };
 
   // ─── لون الأيقونة ─────────────────────────────────────────
-  const getIconColor = (isActive) =>
+  const iconColor = (isActive) =>
     isActive ? (isDark ? "#94D3C1" : "#70B8A0") : isDark ? "#9A9A9A" : "#666666";
+
+
+  // ─── رندر رابط واحد ───────────────────────────────────────
+  const renderLink = (item) => {
+    const isActive = pathname === item.href || (item.label === "billing" && pathname?.startsWith("/advertiser/wallet"));
+    const Icon = item.icon;
+
+
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        onClick={() => setSidebarOpen(false)}
+        className={`
+          flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm
+          ${isActive ? "bg-[#94D3C142]" : "bg-transparent hover:bg-[#94D3C142]"}
+        `}
+      >
+        {/* أيقونة react-icons/md */}
+        {item.useMd ? (
+          <Icon
+            size={20}
+            style={{ color: iconColor(isActive), flexShrink: 0 }}
+          />
+        ) : (
+          /* أيقونة react-iconly */
+          <Icon set="light" size={20} primaryColor={iconColor(isActive)} />
+
+        )}
+
+        <span className={isDark ? "text-white" : "text-black"}>
+          {sidebar(item.label)}
+        </span>
+
+        {item.badge && (
+          <span
+            className={`${locale === "ar" ? "mr-auto" : "ml-auto"} bg-[#94D3C1] text-white text-xs rounded px-1.5 py-0.5`}
+          >
+
+            {sidebar(item.badge)}
+          </span>
+        )}
+      </Link>
+    );
+  };
 
   // ─── محتوى السايد بار ─────────────────────────────────────
   const sidebarContent = (
@@ -140,10 +251,9 @@ export default function Sidebar() {
             min-[1280px]:hidden absolute top-1/2 -translate-y-1/2
             ${locale === "ar" ? "left-4" : "right-4"}
             w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
-            ${
-              isDark
-                ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-                : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+            ${isDark
+              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
             }
           `}
         >
@@ -152,55 +262,9 @@ export default function Sidebar() {
       </div>
 
       {/* الروابط الرئيسية */}
-      <nav className="flex flex-col gap-1 px-4 mt-2">
-        {navItems.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.label === "bankTransfer" &&
-              (pathname?.includes("/advertiser/wallet-topup") ||
-                pathname?.includes("/advertiser/bank-transfer") ||
-                pathname?.includes("/advertiser/payment-receipt") ||
-                pathname?.includes("/advertiser/deposit-confirmed")));
-          const Icon = item.icon;
-          const iconColor = isActive
-            ? isDark ? "#94D3C1" : "#70B8A0"
-            : isDark ? "#9A9A9A" : "#666666";
+      <nav className="flex flex-col gap-1 px-4 mt-0">
+        {navItems.map(renderLink)}
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setSidebarOpen(false)}
-              className={`
-                flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm
-                ${isActive ? "bg-[#94D3C142]" : "bg-transparent hover:bg-[#94D3C142]"}
-              `}
-            >
-              {/* أيقونة react-icons */}
-              {item.isReactIcon ? (
-                <Icon
-                  size={20}
-                  style={{ color: iconColor, flexShrink: 0 }}
-                />
-              ) : (
-                /* أيقونة react-iconly */
-                <Icon set="light" size={20} primaryColor={iconColor} />
-              )}
-
-              <span className={isDark ? "text-white" : "text-black"}>
-                {sidebar(item.label)}
-              </span>
-
-              {item.badge && (
-                <span
-                  className={`${locale === "ar" ? "mr-auto" : "ml-auto"} bg-[#94D3C1] text-white text-xs rounded px-1.5 py-0.5`}
-                >
-                  {sidebar(item.badge)}
-                </span>
-              )}
-            </Link>
-          );
-        })}
       </nav>
 
       {/* الموارد — تُعرض فقط إذا كانت القائمة غير فارغة */}
@@ -228,7 +292,7 @@ export default function Sidebar() {
                     <Icon
                       set="light"
                       size={20}
-                      primaryColor={getIconColor(isActive)}
+                      primaryColor={iconColor(isActive)}
                     />
 
                     <span className={isDark ? "text-white" : "text-black"}>
@@ -261,11 +325,11 @@ export default function Sidebar() {
           min-[1280px]:hidden fixed top-4
           ${locale === "ar" ? "right-4" : "left-4"}
           z-[999999999999] w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
-          ${
-            isDark
-              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+          ${isDark
+            ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+            : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
           }
+
         `}
       >
         <BsList size={18} />
@@ -288,13 +352,13 @@ export default function Sidebar() {
           ${t.bg}
           transition-transform duration-300 ease-in-out
           min-[1280px]:translate-x-0
-          ${
-            sidebarOpen
-              ? "translate-x-0"
-              : locale === "ar"
-                ? "translate-x-full"
-                : "-translate-x-full"
+          ${sidebarOpen
+            ? "translate-x-0"
+            : locale === "ar"
+              ? "translate-x-full"
+              : "-translate-x-full"
           }
+
         `}
       >
         {sidebarContent}
