@@ -198,7 +198,7 @@ export default function WalletTopupPage({
         </div>
       )}
 
-      <div className="max-w-[1480px] mx-auto px-4 sm:px-6 pt-4 sm:pt-6">
+      <div  className="max-w-[1480px] mx-auto w-full min-w-0 px-4 sm:px-6 pt-4 sm:pt-6">
 
         {/* ── Page Header ── */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
@@ -311,7 +311,7 @@ export default function WalletTopupPage({
 
               {/* Amount Input */}
               <div
-                className="flex items-center rounded-xl border px-4 py-3 mb-4 gap-3"
+                className="flex min-w-0 items-center rounded-xl border px-4 py-3 mb-4 gap-3"
                 style={{
                   backgroundColor: T.cardInner,
                   borderColor:
@@ -324,13 +324,13 @@ export default function WalletTopupPage({
                       : T.cardBorder,
                 }}
               >
-                <span className="text-xs text-gray-400 font-mono shrink-0">USD</span>
+               <span className="text-xs text-gray-400 font-mono shrink-0">USD</span>
                 <input
                   type="text"
                   value={customAmount}
                   onChange={handleInputChange}
                   placeholder="0"
-                  className="flex-1 bg-transparent text-3xl font-bold text-white outline-none placeholder-gray-600 font-mono tracking-tight"
+                  className="min-w-0 w-full flex-1 bg-transparent text-2xl sm:text-3xl font-bold text-white outline-none placeholder-gray-600 font-mono tracking-tight"
                   style={{ fontFamily: "var(--font-jetbrains-mono), monospace" }}
                   dir="ltr"
                 />
@@ -344,7 +344,7 @@ export default function WalletTopupPage({
                   </span>
                   <span className="text-[10px] text-gray-500">تطبيق فوري معتمد</span>
                 </div>
-                <div className="grid grid-cols-4 gap-2.5">
+                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
                   {quickAmounts.map((q) => {
                     const isActive = amount === q;
                     const isTop = q === 10000;

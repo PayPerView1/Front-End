@@ -26,14 +26,15 @@ export default function CopyOverlay({ campaignId }) {
   }, [campaignId]);
 
   return (
-    <div
-      className="fixed inset-0 z-10 flex items-center justify-center"
-      style={{
-        background: isDark ? "rgba(0,0,0,0.6)" : "rgba(180,180,180,0.4)",
-        backdropFilter: "blur(6px)",
-        ...(locale === "ar" ? { right: "240px" } : { left: "260px" }),
-      }}
-    >
+     <div
+  className={`fixed inset-0 z-10 flex items-center justify-center overflow-y-auto p-4 ${
+    locale === "ar" ? "xl:right-[260px]" : "xl:left-[260px]"
+  }`}
+  style={{
+    background: isDark ? "rgba(0,0,0,0.6)" : "rgba(180,180,180,0.4)",
+    backdropFilter: "blur(6px)",
+  }}
+>
       {loading ? (
         <div className="w-8 h-8 border-2 border-[#94D3C1] border-t-transparent rounded-full animate-spin" />
       ) : campaign ? (

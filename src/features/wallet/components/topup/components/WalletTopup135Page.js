@@ -221,7 +221,7 @@ export default function WalletTopup135Page({ onRetry, initialAmount = "" }) {
 
               {/* Big Input Container */}
               <div
-                className="flex items-center justify-between rounded-xl border px-4 py-3.5 mb-3 gap-3 transition-all"
+                className="flex min-w-0 items-center justify-between rounded-xl border px-4 py-3.5 mb-3 gap-3 transition-all"
                 style={{
                   backgroundColor: T.cardInner,
                   borderColor: isErrorState ? "#DC2626" : T.cardBorder,
@@ -233,7 +233,7 @@ export default function WalletTopup135Page({ onRetry, initialAmount = "" }) {
                   type="text"
                   value={inputValue}
                   onChange={handleInputChange}
-                  className="flex-1 bg-transparent text-2xl sm:text-3xl font-bold text-white outline-none font-mono tracking-wider text-right"
+                  className="min-w-0 w-full flex-1 bg-transparent text-xl sm:text-3xl font-bold text-white outline-none font-mono tracking-normal sm:tracking-wider text-right"
                   dir="ltr"
                   placeholder="0"
                 />

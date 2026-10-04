@@ -379,7 +379,7 @@ export default function CampaignsDashboard() {
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col items-stretch gap-2 lg:flex-row lg:items-center">
           {/* فلتر الحالة */}
           <div className="relative">
             <button
