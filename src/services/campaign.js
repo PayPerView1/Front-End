@@ -245,3 +245,87 @@ export const getSubCategories = async () => {
     handleError(error);
   }
 };
+
+// ─── 3. Campaign Budget (Sprint 3) ───────────────────────────────────────────
+
+/**
+ * 3.1 Allocate / Update Campaign Budget
+ * @param {string} id - Campaign ID
+ * @param {{ amount: number }} data 
+ */
+export const allocateCampaignBudget = async (id, data) => {
+  try {
+    const response = await axiosInstance.put(`/api/v1/campaigns/${id}/budget`, data);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * 3.2 Set / Update Daily Budget Limit
+ * @param {string} id - Campaign ID
+ * @param {{ dailyBudgetLimit: number | null }} data 
+ */
+export const setDailyBudgetLimit = async (id, data) => {
+  try {
+    const response = await axiosInstance.put(`/api/v1/campaigns/${id}/daily-budget`, data);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * 3.3 Recharge Campaign Budget
+ * @param {string} id - Campaign ID
+ * @param {{ amount: number }} data 
+ */
+export const rechargeCampaignBudget = async (id, data) => {
+  try {
+    const response = await axiosInstance.post(`/api/v1/campaigns/${id}/recharge`, data);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * 3.4 Pause Campaign (Manual)
+ * @param {string} id - Campaign ID
+ */
+export const pauseCampaign = async (id) => {
+  try {
+    const response = await axiosInstance.put(`/api/v1/campaigns/${id}/pause`);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * 3.5 Resume Campaign (Manual)
+ * @param {string} id - Campaign ID
+ */
+export const resumeCampaign = async (id) => {
+  try {
+    const response = await axiosInstance.put(`/api/v1/campaigns/${id}/resume`);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * 3.6 Configure Auto-Resume on Recharge
+ * @param {string} id - Campaign ID
+ * @param {{ autoResumeOnRecharge: boolean }} data 
+ */
+export const configureAutoResume = async (id, data) => {
+  try {
+    const response = await axiosInstance.put(`/api/v1/campaigns/${id}/auto-resume`, data);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};

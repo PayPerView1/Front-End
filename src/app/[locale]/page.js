@@ -1,5 +1,13 @@
-import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import LandingPage from "@/components/landing/LandingPage";
+import "@/components/landing/landing.css";
+import { redirect } from "next/navigation";
+
+export const metadata = {
+  title: "PayPerView — Turn Views Into Value",
+  description:
+    "Connect brands with creators and turn short-form content into measurable, verified performance.",
+};
 
 export default async function Home({ params, searchParams }) {
   const { locale } = await params;
@@ -35,8 +43,8 @@ export default async function Home({ params, searchParams }) {
     } else {
       redirect(`/${locale}/creator/dashboard`);
     }
-  } else {
-    redirect(`/${locale}/login`);
   }
+
+  return <LandingPage locale={locale} />;
 }
 

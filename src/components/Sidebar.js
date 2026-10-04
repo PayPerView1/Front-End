@@ -37,10 +37,10 @@ const creatorNavItems = [
 ];
 
 const creatorResourceItems = [
-  { label: "members",  href: "/members",  icon: Bag },
+  { label: "members", href: "/members", icon: Bag },
   { label: "partners", href: "/partners", icon: People, badge: "new" },
-  { label: "help",     href: "/help",     icon: Message },
-  { label: "blog",     href: "/blog",     icon: Document },
+  { label: "help", href: "/help", icon: Message },
+  { label: "blog", href: "/blog", icon: Document },
 ];
 
 // ─── قائمة صاحب الحملة (BRAND/ADVERTISER) ────────────────────
@@ -80,7 +80,7 @@ const advertiserNavItems = [
   },
   {
     label: "billing",
-    href: "/advertiser/billing",
+    href: "/advertiser/wallet",
     icon: MdOutlineAccountBalanceWallet,
     useMd: true,
   },
@@ -184,7 +184,7 @@ export default function Sidebar() {
 
   // ─── رندر رابط واحد ───────────────────────────────────────
   const renderLink = (item) => {
-    const isActive = pathname === item.href;
+    const isActive = pathname === item.href || (item.label === "billing" && pathname?.startsWith("/advertiser/wallet"));
     const Icon = item.icon;
 
 
@@ -230,7 +230,7 @@ export default function Sidebar() {
   const sidebarContent = (
     <>
       {/* الهيدر */}
-    <div className="relative flex items-center px-2 py-1">
+      <div className="relative flex items-center px-2 py-1">
         <Image
           src={isDark ? "/images/logo11.jpg" : "/images/image-PPV-light.png"}
           alt="logo"
@@ -251,10 +251,9 @@ export default function Sidebar() {
             min-[1280px]:hidden absolute top-1/2 -translate-y-1/2
             ${locale === "ar" ? "left-4" : "right-4"}
             w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
-            ${
-              isDark
-                ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-                : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+            ${isDark
+              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
             }
           `}
         >
@@ -326,10 +325,9 @@ export default function Sidebar() {
           min-[1280px]:hidden fixed top-4
           ${locale === "ar" ? "right-4" : "left-4"}
           z-[999999999999] w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
-          ${
-            isDark
-              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+          ${isDark
+            ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+            : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
           }
 
         `}
@@ -354,12 +352,11 @@ export default function Sidebar() {
           ${t.bg}
           transition-transform duration-300 ease-in-out
           min-[1280px]:translate-x-0
-          ${
-            sidebarOpen
-              ? "translate-x-0"
-              : locale === "ar"
-                ? "translate-x-full"
-                : "-translate-x-full"
+          ${sidebarOpen
+            ? "translate-x-0"
+            : locale === "ar"
+              ? "translate-x-full"
+              : "-translate-x-full"
           }
 
         `}

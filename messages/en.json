@@ -26,6 +26,274 @@
     "manageCampaigns": "Manage Campaigns",
     "billing": "Budget & Payments"
   },
+  "budgetManagement": {
+    "title": "Campaign Budget Management & Allocation",
+    "budgetAlert": "Budget consumption reached {percent}% — Only ${remaining} remaining",
+    "campaignStopped": "Campaign stopped automatically because the allocated budget is exhausted",
+    "subtitle": "Control spending policies, daily limits, and ensure compliant ad delivery aligned with approved regulatory standards.",
+    "complianceStatus": "Financial Compliance Status",
+    "compliant": "Compliant & Approved",
+    "active": "Active & Running",
+    "loading": "Loading campaigns...",
+"loadError": "Could not load campaigns. Please try again later.",
+"noCampaigns": "No active or paused campaigns to manage.",
+    "geoRegion": {
+      "title": "Detected Geographic Region: Saudi Arabia (SA)",
+      "badge": "Local IP Verified",
+      "description": "According to the approved financial system and Sharia-compliant standards on the Pay Per View platform, only authorized and regionally stable payment channels are displayed. Non-compliant methods appear restricted and cannot be used for current transactions.",
+      "changeCountry": "Change Country or Request Business Exception"
+      
+    },
+    "summary": {
+      "title": "Overall Budget Summary",
+      "subtitle": "Track actual spending rate and estimated depletion ratio",
+      "refresh": "Live Update",
+      "campaignName": "Campaign \"{name}\"",
+      "campaignType": "Type: {type}",
+      "toggleCampaign": "Switch Campaign",
+      "pauseCampaign": "Pause campaign",
+      "totalBudget": "Total Budget",
+      "totalBudgetNote": "Approved total allocation for campaign",
+      "spent": "Consumed to Date",
+      "spentNote": "Total clicks and impression costs",
+      "remaining": "Remaining in Campaign",
+      "remainingNote": "Sufficient for approximately 7 days at current rate",
+      "bigProgress": "Budget Ceiling",
+      "progressLabel": "Spent {spent} ({percent}%)",
+      "rechargeHint": "Recommended recharge point: less than $200.00",
+      "alert": {
+        "title": "Ad Liquidity Depletion Alert",
+        "message": "Less than {percent}% of your campaign budget remains. To avoid declining impression rates and auto-bidding stoppage, consider increasing budget or adjusting daily spending limits.",
+        "action": "Recharge Now"
+      }
+    },
+    "dailyLimit": {
+      "title": "Daily Spending Limit Settings",
+      "subtitle": "Control daily deduction ceiling to protect campaign from bid cost fluctuations",
+      "toggle": "Enable Daily Limit",
+      "label": "Target Daily Limit (USD)",
+      "quickSelect": "Quick selection for preset values",
+      "applied": "New daily limit (${amount}/day) saved and applied instantly!",
+     "reached": "Daily spending limit reached (${amount})",
+"details": "Details",
+      "ai": {
+        "title": "Smart AI Recommendation",
+        "badge": "EMERALD-AI Algorithm",
+        "message": "We recommend $75.00 daily to achieve maximum advertising ROI (ROAS), based on performance results and competitive analysis of 42 similar product campaigns.",
+        "action": "Apply Recommendation $75"
+      },
+      "today": {
+        "title": "Today's Consumption",
+        "label": "Today's consumption",
+        "description": "Counter will automatically reset at 12:00 AM Mecca time (GMT+3)."
+      }
+    },
+    "recharge": {
+      "title": "Budget Recharge",
+      "subtitle": "Fast & direct transfer from your approved wallet",
+      "available": "Available budget balance for transfer",
+      "availableBadge": "Sufficient Balance",
+      "amountLabel": "Amount to Add (USD)",
+      "preview": {
+        "title": "Live budget preview after recharge",
+        "newTotal": "New total budget",
+        "current": "Current budget ({amount}$)",
+        "adding": "Adding +${amount}"
+      },
+      "autoRecharge": {
+        "title": "Automatic Recharge",
+        "when": "When balance reaches:",
+        "charge": "Execute instant charge of:",
+        "note": "Automatic deduction from wallet without campaign stoppage or loss of budget ranking in live auctions."
+      },
+      "confirm": "Confirm Instant Recharge Now (${amount})",
+      "cancel": "Cancel & Undo",
+      "success": {
+  "title": "Campaign recharged successfully",
+  "added": "Added",
+  "newBudget": "to campaign budget | Updated budget:",
+  "walletLeft": "Remaining wallet balance:",
+  "id": "ID:"
+},
+"insufficient": {
+  "title": "Recharge failed – insufficient wallet balance",
+  "message": "The requested amount <req>${required} ({requiredSar} SAR)</req> exceeds the net available balance in your central wallet of <avail>${available} ({availableSar} SAR)</avail>. You can cover the shortfall now to complete the recharge, or reduce the amount to the maximum available.",
+  "action": "Top up wallet & cover shortfall"
+},
+"fault": {
+  "title": "Recharge failed – sudden technical fault",
+  "message": "The platform experienced an unexpected delay in the response of the banking sync servers connected to your ads wallet. For absolute financial safety, an instant rollback was triggered successfully and any withdrawal from your wallet was halted.",
+  "retry": "Try again"
+}
+    },
+    "notifications": {
+  "title": "Sent alert channels log",
+  "badge": "100% delivered",
+  "instant": {
+    "title": "Instant in-platform notification",
+    "message": "Broadcast of campaign {campaignId} was stopped automatically after the budget reached zero."
+  },
+  "email": {
+    "title": "Official email message",
+    "message": "The report was sent to <mail>{address}</mail> including the spending statement and renewal link."
+  }
+},
+    "security": {
+      "title": "Encrypted Financial Protection & Authentication",
+      "badge": "SSL 256-Bit SHA",
+      "lastModified": "Last modified by: {name} ({role}) on {date} - {time}",
+      "cancelChanges": "Cancel & Undo",
+      "saveChanges": "Save Changes & Apply Budget"
+    },
+    "adsTable": {
+      "title": "Campaign Ads Covered by Recharge",
+      "subtitle": "{count} active ads in this campaign",
+      "columns": {
+        "ad": "Ad",
+        "status": "Current Status",
+        "clicks": "Clicks",
+        "ctr": "Conversion Rate (CR)",
+        "cost": "Actual Cost",
+        "actions": "Actions"
+      },
+      "menu": {
+  "details": "Details",
+  "manageBudget": "Manage & allocate budget"
+},
+      "statusActive": "Active",
+      "statusPaused": "Paused"
+    },
+    "kpi": {
+      "totalBudget": "Total Budget",
+      "spent": "Consumed to Date",
+      "remaining": "Remaining in Campaign"
+    },
+    "presets": {
+      "recharge": [
+        250,
+        500,
+        1000
+      ],
+      "daily": [
+        250,
+        300,
+        350
+      ]
+    },
+    "paused": {
+  "title": "Campaign paused successfully – remaining budget is saved and fully frozen",
+  "message": "Ad delivery and all deduction and publishing tasks have been suspended immediately. Your remaining balance (<b>${amount}</b>) is safe and preserved with no deductions or hidden fees. You can resume delivery with one click at any time.",
+  "resume": "Resume campaign",
+  "spentLabel": "Spent ({pct}% - ${amount})",
+  "frozenLabel": "Frozen and fully preserved ({pct}% - ${amount})",
+  "startedAt": "Started on: {date}",
+  "frozenAt": "Frozen at: today {time}",
+  "validity": "Validity period: does not expire"
+},
+"quickResume": {
+  "title": "Quick resume options and settings",
+  "subtitle": "Set the conditions for resuming campaign ads without creating a new campaign",
+  "badge": "Ready for instant activation",
+  "rate": {
+    "title": "Resume with a custom spend rate",
+    "desc": "Resume delivery at the previous daily limit, or lower it to stretch the remaining budget over a longer period.",
+    "label": "New daily limit ($/day):",
+    "coverage": "≈ {days} days of coverage",
+    "action": "Apply and resume now"
+  },
+  "schedule": {
+    "title": "Schedule automatic resume",
+    "desc": "Automatically reactivate the campaign at a specific future time (for example, with a new product launch or at the start of the month).",
+    "label": "Preferred automatic resume date:",
+    "action": "Save schedule"
+  }
+},
+"bulkRecharge": {
+  "title": "Campaigns selected for bulk recharge",
+  "subtitle": "Split the total amount equally across the list, or set a specific budget for each campaign.",
+  "submitting": "Processing recharge...",
+"partial": {
+  "title": "Partial Recharge Completed",
+  "message": "{ok} campaign(s) were successfully recharged, {failed} failed, and {skipped} were not processed."
+},
+"result": {
+  "ok": "Recharge Successful",
+  "failed": "Recharge Failed",
+  "skipped": "Not Processed"
+},
+  "mode": {
+    "manual": "Set each campaign manually",
+    "equal": "Split amount equally"
+  },
+  "equal": {
+    "label": "Total amount to distribute",
+    "hint": "Will be split across {count} campaigns, ${share} each",
+    "fieldLabel": "Total"
+  },
+  "quickAdd": {
+    "label": "Quick add per campaign",
+    "default": "default"
+  },
+  "filter": {
+    "label": "Filter",
+    "active": "Active campaigns only",
+    "all": "All campaigns"
+  },
+  "empty": "No campaigns match the filter.",
+  "row": {
+    "previous": "Previous balance:",
+    "dailyLimit": "Daily limit:",
+    "day": "day",
+    "creators": "{count} content creators",
+    "amount": "Recharge amount",
+    "paused": "Paused"
+  },
+  "check": {
+    "title": "Balance check",
+    "ok": "Sufficient balance",
+    "fail": "Insufficient balance",
+    "before": "Wallet balance before recharge",
+    "total": "Total recharge for ({count} campaigns)",
+    "remaining": "Remaining wallet balance",
+    "available": "Available for other operations or withdrawal",
+    "sar": "≈ {amount} SAR",
+    "deficit": "You need ${amount} more to complete this",
+    "ratio": "Share deducted from wallet"
+  },
+  "distribution": {
+    "title": "Amount per campaign (detailed)",
+    "empty": "Select at least one campaign.",
+    "total": "Final recharge total:"
+  },
+  "actions": {
+    "confirm": "Confirm recharge and update budgets now",
+    "back": "Back to ad campaigns list"
+  },
+  "audit": {
+    "title": "Transparency log for bulk budget updates",
+    "time": "Transaction time",
+    "today": "Today, {time}",
+    "pending": "Awaiting confirmation",
+    "method": "Verification method",
+    "methodOk": "Automatic available-balance check (100% passed)",
+    "methodFail": "Automatic available-balance check (failed)",
+    "effect": "Effect on wallet",
+    "effectValue": "Instant deduction of ${amount} for campaigns"
+  },
+  "success": {
+    "title": "Bulk recharge completed",
+    "message": "{count} campaigns recharged, ${total} total | Transaction {id}",
+    "close": "Close"
+  },
+  "verified": {
+  "title": "Balance verified and budgets distributed successfully!",
+  "message": "A total of <gold>${total} (SAR {sar})</gold> was allocated from the wallet and distributed across <mint>{count, plural, one {# active campaign} other {# active campaigns}}</mint>. Remaining budgets were updated instantly.",
+  "auditLog": "Financial Audit Log"
+}
+}
+  
+  
+},
   "profile": {
     "edit": "Edit Profile",
     "manageOrders": "Manage Orders",
@@ -256,47 +524,41 @@
     "clippingSubtitle": "Ongoing - {progress} active efficiency"
   },
   "assistant": {
-  "close": "Close assistant",
-  "title": "How can I help you today?",
-  "description": "I’m your smart assistant. I can help you create content, manage your account, or answer any questions.",
-  "preview": "Preview",
-  "placeholder": "Write your message here...",
-  "disclaimer": "The assistant may occasionally make mistakes. Please verify important information.",
-
-  "viewConversations": "View conversations",
-  "conversations": "Conversations",
-  "newConversation": "New conversation",
-  "loading": "Loading",
-
-  "errors": {
-    "loadMessages": "Failed to load messages",
-    "createThread": "Failed to create conversation",
-    "sendMessage": "Failed to send message",
-    "deleteThread": "Failed to delete conversation"
-  },
-
-  "actions": {
-    "messageMembers": {
-      "title": "Message recent members",
-      "desc": "Draft a welcome message for new subscribers"
+    "close": "Close assistant",
+    "title": "How can I help you today?",
+    "description": "I’m your smart assistant. I can help you create content, manage your account, or answer any questions.",
+    "preview": "Preview",
+    "placeholder": "Write your message here...",
+    "disclaimer": "The assistant may occasionally make mistakes. Please verify important information.",
+    "viewConversations": "View conversations",
+    "conversations": "Conversations",
+    "newConversation": "New conversation",
+    "loading": "Loading",
+    "errors": {
+      "loadMessages": "Failed to load messages",
+      "createThread": "Failed to create conversation",
+      "sendMessage": "Failed to send message",
+      "deleteThread": "Failed to delete conversation"
     },
-
-    "createAd": {
-      "title": "Create a creative ad",
-      "desc": "Generate engaging ad copy for your upcoming campaign"
-    },
-
-    "startLive": {
-      "title": "Start a live stream",
-      "desc": "Set up a live session to connect with your audience"
-    },
-
-    "sendInvoice": {
-      "title": "Send an invoice to a client",
-      "desc": "Create and send a professional invoice quickly"
+    "actions": {
+      "messageMembers": {
+        "title": "Message recent members",
+        "desc": "Draft a welcome message for new subscribers"
+      },
+      "createAd": {
+        "title": "Create a creative ad",
+        "desc": "Generate engaging ad copy for your upcoming campaign"
+      },
+      "startLive": {
+        "title": "Start a live stream",
+        "desc": "Set up a live session to connect with your audience"
+      },
+      "sendInvoice": {
+        "title": "Send an invoice to a client",
+        "desc": "Create and send a professional invoice quickly"
+      }
     }
-  }
-},
+  },
   "messages": {
     "title": "Messages",
     "minimizePanel": "Minimize messages panel",
@@ -660,6 +922,152 @@
     "downloadBtn": "Start File Download Now",
     "cancelExport": "Cancel",
     "footerSecurityNote": "File is encrypted with AES-256 and compliant with ZATCA e-invoicing standards"
+  },
+  "landing": {
+    "language": "Language",
+    "theme": "Switch color theme",
+    "dark": "Dark",
+    "light": "Light",
+    "nav": [
+      "How it works",
+      "For brands",
+      "For creators",
+      "Get started",
+      "Log in"
+    ],
+    "heroEyebrow": "PAYPERVIEW · IN DEVELOPMENT",
+    "heroTitle": "Turn views\ninto [[value.]]",
+    "heroText": "PayPerView connects brands with creators to turn short-form content and verified views into measurable performance.",
+    "explore": "Explore how it works",
+    "proof": "One platform. Shared opportunity.",
+    "flowEyebrow": "A BETTER KIND OF REACH",
+    "flowTitle": "Every view\nhas [[value.]]",
+    "flowIntro": "From the first brief to the final verified view, every step connects to the next. A clear path from content to outcome.",
+    "steps": [
+      "Brand",
+      "Campaign",
+      "Clip",
+      "Views",
+      "Verified",
+      "Reward"
+    ],
+    "stepDetails": [
+      "Set the brief",
+      "Fund an idea",
+      "Make it yours",
+      "People watch",
+      "Authenticity checked",
+      "Earn from impact"
+    ],
+    "flowLabel": "CAMPAIGN FLOW",
+    "loopEyebrow": "THE PAYPERVIEW LOOP",
+    "loopTitle": "Create.\nClip. Watch.\n[[Earn.]]",
+    "loopText": "A continuous cycle where good content finds its audience, and performance creates opportunity for everyone involved.",
+    "loop": [
+      "CREATE",
+      "CAMPAIGN",
+      "CLIP",
+      "WATCH",
+      "VERIFY",
+      "EARN"
+    ],
+    "brandsEyebrow": "FOR BRANDS",
+    "brandsTitle": "Your content.\nTheir [[reach.]]",
+    "brandsText": "Launch a campaign, bring creators into your story, and see how the workflow comes together as the platform takes shape.",
+    "brandsLink": "Explore the platform",
+    "workspace": "CAMPAIGN WORKSPACE",
+    "campaign": "Your campaign",
+    "preview": "Preview",
+    "inDevelopment": "IN DEVELOPMENT",
+    "tabs": [
+      "Overview",
+      "Creators",
+      "Content",
+      "Verification"
+    ],
+    "workspaceEyebrow": "YOUR NEXT STORY STARTS HERE",
+    "workspaceTitle": "Build a campaign around your idea.",
+    "workspaceText": "Your brief, creator matches, and campaign activity will come together here.",
+    "workflow": [
+      "Campaign brief",
+      "Creator stories",
+      "View verification"
+    ],
+    "workspaceFoot": "Built for transparent campaign tracking",
+    "workspaceLabel": "WORKSPACE PREVIEW",
+    "clippersEyebrow": "FOR CREATORS",
+    "clipperTitle": "Your reach.\nYour [[reward.]]",
+    "clipperText": "Discover campaigns that fit your style, create content your audience loves, and earn based on verified performance.",
+    "clipperLink": "Explore the creator experience",
+    "creatorWorkspace": "CREATOR WORKSPACE",
+    "readyCreate": "Ready to create",
+    "rewardsHere": "Campaign rewards will appear here",
+    "nextClip": "Your next clip",
+    "campaignDetails": "Campaign details appear here",
+    "verifiedEyebrow": "THE HEART OF THE PLATFORM",
+    "verifiedTitle": "Not just views.\n[[Verified views.]]",
+    "verifiedText": "Verification is designed to make campaign activity clear and connected from content to outcome.",
+    "checks": [
+      "Authenticity checks",
+      "Trackable activity",
+      "Campaign-linked"
+    ],
+    "verification": "VIEW VERIFICATION",
+    "status": "IN DEVELOPMENT",
+    "statusTitle": "VERIFICATION STATUS",
+    "readyActivity": "Ready for campaign activity",
+    "verifySteps": [
+      "Content submitted",
+      "Activity checked",
+      "Views verified"
+    ],
+    "verifyFoot": "VERIFICATION DETAILS WILL APPEAR WHEN A CAMPAIGN IS ACTIVE",
+    "whyEyebrow": "WHY PAYPERVIEW",
+    "whyTitle": "Performance\nwith [[purpose.]]",
+    "whyText": "Built around what matters to everyone in the loop.",
+    "why": [
+      [
+        "BRANDS",
+        "Launch. Track. Measure.",
+        "Turn a campaign brief into creator-led reach."
+      ],
+      [
+        "CREATORS",
+        "Discover. Create. Earn.",
+        "Find campaigns, make it your own, share in the outcome."
+      ],
+      [
+        "THE ECOSYSTEM",
+        "Transparent by design.",
+        "One connected view of content, performance, and reward."
+      ]
+    ],
+    "wallEyebrow": "MADE TO MOVE",
+    "wallTitle": "Content is the [[currency.]]",
+    "wallText": "Ideas move further when the right people get to shape them.",
+    "wallTitles": [
+      "A coffee break above the city",
+      "A moment outside",
+      "Golden hour",
+      "Sunset in record"
+    ],
+    "wallNote": "ONE IDEA.\nMANY POINTS\nOF VIEW.",
+    "mediaCredit": "Stock footage by Michelle Leman via",
+    "photosCredit": "Photos via",
+    "ctaEyebrow": "THE NEXT VIEW STARTS HERE",
+    "ctaTitle": "Ready to put your\nviews to [[work?]]",
+    "ctaText": "Whether you're building a campaign or creating the content, PayPerView connects performance with opportunity.",
+    "forBrands": "For brands",
+    "forCreators": "For creators",
+    "ctaLoop": "BRANDS → CONTENT → VERIFIED VIEWS → VALUE",
+    "footerText": "Good content deserves\nto go further.",
+    "exploreLabel": "EXPLORE",
+    "accountLabel": "YOUR ACCOUNT",
+    "platformLabel": "THE PLATFORM",
+    "backTop": "Back to top ↑",
+    "verifiedViews": "Verified views",
+    "footerTag": "Built for the view economy"
+
   }
 
 }

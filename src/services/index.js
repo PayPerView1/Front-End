@@ -7,6 +7,8 @@
 import * as auth from "@/services/auth";
 import * as profile from "@/services/profile";
 import * as drafts from "@/services/drafts";
+import * as wallet from "@/services/wallet";
+import * as campaign from "@/services/campaign";
 import {
   getToken,
   getSavedUser,
@@ -34,6 +36,8 @@ const api = {
   auth,
   profile,
   drafts,
+  wallet,
+  campaign,
 
   // Auth shortcuts
   register: auth.register,
@@ -51,6 +55,14 @@ const api = {
   // Drafts shortcuts
   getDrafts: drafts.getDrafts,
   deleteDraft: drafts.deleteDraft,
+
+  // Campaign Budget shortcuts
+  allocateCampaignBudget: campaign.allocateCampaignBudget,
+  setDailyBudgetLimit: campaign.setDailyBudgetLimit,
+  rechargeCampaignBudget: campaign.rechargeCampaignBudget,
+  pauseCampaign: campaign.pauseCampaign,
+  resumeCampaign: campaign.resumeCampaign,
+  configureAutoResume: campaign.configureAutoResume,
 
   // Helpers
   getToken,

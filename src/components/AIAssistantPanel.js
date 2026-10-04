@@ -6,6 +6,7 @@ import { BsStars } from "react-icons/bs";
 import { FiUsers, FiMic, FiSend, FiPlus, FiX, FiTrash2, FiArrowLeft } from "react-icons/fi";
 import { MdCampaign, MdLiveTv, MdReceiptLong } from "react-icons/md";
 import { useAssistant } from "@/context/AssistantContext";
+import { toast } from "@/components/ui/Toast";
 import { useTheme } from "@/context/ThemeContext";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -428,7 +429,7 @@ export default function AIAssistantPanel({ side = "left" }) {
               <button
                 type="button"
                 onClick={() => {
-                  alert("ميزة التسجيل الصوتي قيد التطوير حالياً");
+                  toast.info("ميزة التسجيل الصوتي قيد التطوير حالياً");
                 }}
                 className={`transition-colors border-none cursor-pointer bg-transparent shrink-0 ${isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"}`}
               >
@@ -465,7 +466,7 @@ export default function AIAssistantPanel({ side = "left" }) {
                   const file = e.target.files?.[0];
                   if (file) {
                     if (file.size > 20 * 1024 * 1024) {
-                      alert("حجم الملف يتجاوز الحد الأقصى المسموح به وهو 20 ميجابايت.");
+                      toast.warning("حجم الملف يتجاوز الحد الأقصى المسموح به وهو 20 ميجابايت.");
                       e.target.value = "";
                       return;
                     }

@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import axiosInstance, { getSavedUser, getToken, saveAuthData } from "@/lib/axiosInstance";
+import { WalletProvider } from "@/features/wallet/WalletProvider";
 
 /**
  * Advertiser layout - only allows users with role BRAND.
  * - No token → redirect to /login
  * - CLIPPER user → redirect to /creator/dashboard
- * - Unknown role → stay here (prevent redirect loop)
+ * - Any other role → redirect to the localized home page
  */
 export default function AdvertiserLayout({ children }) {
   const router = useRouter();
@@ -48,8 +49,10 @@ export default function AdvertiserLayout({ children }) {
       const role = (user?.role || "").toUpperCase();
       if (role === "CLIPPER") {
         router.replace(`/${locale}/creator/dashboard`);
-      } else {
+      } else if (role === "BRAND") {
         setAllowed(true);
+      } else {
+        router.replace(`/${locale}`);
       }
     };
 
@@ -61,6 +64,6 @@ export default function AdvertiserLayout({ children }) {
   }, [router, locale]);
 
   if (!allowed) return null;
-  return children;
+  return <WalletProvider>{children}</WalletProvider>;
 }
 

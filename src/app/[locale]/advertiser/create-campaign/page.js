@@ -19,7 +19,16 @@ import {
   createCampaignJson,
 } from "@/services/campaignApi";
 import { getDraftById, deleteDraft } from "@/services/drafts";
-import { submitDraft as submitDraftToCampaign } from "@/services/campaign";
+import { submitDraft as submitDraftToCampaign, getCampaignAiReview } from "@/services/campaign";
+import { toast } from "@/components/ui/Toast";
+
+// Helper: trigger AI review in the background (fire-and-forget)
+function triggerAiReview(campaignId) {
+  if (!campaignId) return;
+  getCampaignAiReview(campaignId)
+    .then((res) => console.log("🤖 [AI Review] تم تشغيل المراجعة:", res))
+    .catch((err) => console.warn("⚠️ [AI Review] فشل تشغيل المراجعة:", err?.message));
+}
 
 import {
   MdVolumeUp,
@@ -696,9 +705,7 @@ function Step3({
     });
 
     if (hasOverSize) {
-      alert(
-        "عذراً، بعض الملفات المرفقة تتجاوز الحد الأقصى المسموح به وهو 20 ميجابايت."
-      );
+      toast.warning("عذراً، بعض الملفات المرفقة تتجاوز الحد الأقصى المسموح به وهو 20 ميجابايت.");
     }
 
     setFiles((p) => [...p, ...newFiles]);
@@ -1545,9 +1552,7 @@ export default function NewCampaignPage() {
         err
       );
     } finally {
-      router.push(
-        `/${locale}/advertiser/drafts`
-      );
+      router.push("/advertiser/drafts");
     }
   };
 
@@ -1641,13 +1646,9 @@ export default function NewCampaignPage() {
               res.data
             )
           ) {
-            alert(
-              "تم إرسال الحملة للمراجعة ✅"
-            );
+            toast.success("تم إرسال الحملة للمراجعة بنجاح ✅");
 
-            router.push(
-              `/${locale}/advertiser/campaigns`
-            );
+            router.push("/advertiser/campaigns");
 
             return;
           }
@@ -1683,6 +1684,10 @@ export default function NewCampaignPage() {
           )
         );
 
+        // 🤖 تشغيل AI Review بعد إنشاء الحملة
+        const createdId = result?.data?.id || result?.data?.campaign?.id || result?.id;
+        triggerAiReview(createdId);
+
         // 4. حذف الـ Draft القديم
         try {
           await deleteDraft(
@@ -1700,13 +1705,9 @@ export default function NewCampaignPage() {
           );
         }
 
-        alert(
-          "تم إرسال الحملة للمراجعة ✅"
-        );
+        toast.success("تم إرسال الحملة للمراجعة بنجاح ✅");
 
-        router.push(
-          `/${locale}/advertiser/campaigns`
-        );
+        router.push("/advertiser/campaigns");
 
         return;
       }
@@ -1733,23 +1734,20 @@ export default function NewCampaignPage() {
         )
       );
 
-      alert(
-        "تم إرسال الحملة للمراجعة ✅"
-      );
+      // 🤖 تشغيل AI Review بعد إنشاء الحملة
+      const createdId = result?.data?.id || result?.data?.campaign?.id || result?.id;
+      triggerAiReview(createdId);
 
-      router.push(
-        `/${locale}/advertiser/campaigns`
-      );
+      toast.success("تم إرسال الحملة للمراجعة بنجاح ✅");
+
+      router.push("/advertiser/campaigns");
     } catch (err) {
       console.error(
         "❌ خطأ في الإرسال:",
         err
       );
 
-      alert(
-        err?.message ||
-        "حدث خطأ، حاول مرة أخرى"
-      );
+      toast.error(err?.message || "حدث خطأ، حاول مرة أخرى");
     } finally {
       setIsSubmitting(false);
     }

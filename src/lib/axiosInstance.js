@@ -157,7 +157,7 @@ export function handleError(error) {
     ? error.response.data.errors.map((item) => item?.message).filter(Boolean)
     : [];
 
-  let message =
+    let message =
     validationMessages.join("\n") ||
     (typeof error.response?.data?.message === "string" ? error.response.data.message : null);
 
@@ -171,7 +171,12 @@ export function handleError(error) {
     }
   }
 
-  throw new Error(message);
+  const err = new Error(message);
+  err.code =
+    error.response?.data?.code ||
+    (error.response ? undefined : "NETWORK_ERROR");
+  err.status = error.response?.status;
+  throw err;
 }
 
 export default axiosInstance;

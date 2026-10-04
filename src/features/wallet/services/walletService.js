@@ -4,6 +4,13 @@
 // ============================================================
 
 import axiosInstance, { handleError } from "@/lib/axiosInstance";
+import { normalizeTransaction } from "../utils/normalizeTransaction";
+
+const toApiFilters = (params) => ({
+  ...params,
+  type: params.type === "all" ? "" : { deposit: "CREDIT", adSpend: "DEBIT", refund: "REFUND" }[params.type] || params.type,
+  status: { verified: "COMPLETED", pending: "PENDING" }[params.status] || params.status,
+});
 
 // ─── 1. جلب رصيد المحفظة ─────────────────────────────────────────────────────
 // GET /api/v1/wallet
@@ -17,6 +24,44 @@ export const getWalletBalance = async () => {
   }
 };
 
+// POST /api/v1/wallet/fund — backend accepts PAYPAL or BANK_TRANSFER.
+export const fundWallet = async ({ amount, paymentMethod }) => {
+  try {
+    const response = await axiosInstance.post("/api/v1/wallet/fund", { amount, paymentMethod });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// POST /api/v1/wallet/refund — the backend validates free balance and holds funds.
+export const requestRefund = async ({ amount }) => {
+  try {
+    const response = await axiosInstance.post("/api/v1/wallet/refund", { amount });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const cancelRefund = async (refundRequestId) => {
+  try {
+    const response = await axiosInstance.delete(`/api/v1/wallet/refund/${encodeURIComponent(refundRequestId)}`);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getRefundRequests = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/api/v1/wallet/refunds", { params });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 // ─── 2. جلب قائمة المعاملات (مع pagination وfiltering) ───────────────────────
 // GET /api/v1/wallet/transactions
 // يُستخدم في: TransactionList
@@ -24,9 +69,10 @@ export const getWalletBalance = async () => {
 export const getTransactions = async (params = {}) => {
   try {
     const response = await axiosInstance.get("/api/v1/wallet/transactions", {
-      params,
+      params: toApiFilters(params),
     });
-    return response.data;
+    const body = response.data;
+    return Array.isArray(body?.data) ? { ...body, data: body.data.map(normalizeTransaction) } : body;
   } catch (error) {
     handleError(error);
   }
@@ -40,7 +86,8 @@ export const getTransactionById = async (transactionId) => {
     const response = await axiosInstance.get(
       `/api/v1/wallet/transactions/${transactionId}`
     );
-    return response.data;
+    const body = response.data;
+    return body?.data ? { ...body, data: normalizeTransaction(body.data) } : body;
   } catch (error) {
     handleError(error);
   }
@@ -55,7 +102,7 @@ export const exportTransactions = async (params = {}) => {
     const response = await axiosInstance.get(
       "/api/v1/wallet/transactions/export",
       {
-        params,
+        params: toApiFilters(params),
         responseType: "blob",
       }
     );

@@ -260,6 +260,18 @@ const STATUS_CONFIG = {
     border: "rgba(255,184,0,0.2)",
     defaultLabel: "قيد المعالجة",
   },
+  failed: {
+    color: "#F87171",
+    bg: "rgba(248,113,113,0.1)",
+    border: "rgba(248,113,113,0.2)",
+    defaultLabel: "فشلت العملية",
+  },
+  cancelled: {
+    color: "#9A9A9A",
+    bg: "rgba(154,154,154,0.1)",
+    border: "rgba(154,154,154,0.2)",
+    defaultLabel: "أُلغيت العملية",
+  },
 };
 
 const TYPE_FILTERS = ["all", "deposit", "adSpend", "refund", "audit"];
@@ -296,6 +308,7 @@ export default function TransactionList({
   onViewDetail,
   onExport,
   onCharge,
+  onFilterChange,
 }) {
   const calendarBtnRef = useRef(null);
   const typeBtnRef = useRef(null);
@@ -396,6 +409,8 @@ export default function TransactionList({
   }, []);
 
   useEffect(() => {
+    // Reset pagination after a user changes the visible transaction filters.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
   }, [search, selectedType, startDate, endDate]);
 
@@ -474,6 +489,7 @@ export default function TransactionList({
     if (!startDate || (startDate && endDate)) {
       setStartDate(clickedDateStr);
       setEndDate("");
+      onFilterChange?.({ dateFrom: clickedDateStr, dateTo: "" });
     }
     // 2. إذا كنا حددنا تاريخ بداية فقط وننتظر تاريخ النهاية
     else if (startDate && !endDate) {
@@ -481,12 +497,14 @@ export default function TransactionList({
         // إذا ضغط تاريخ أقدم من البداية -> نجعله هو تاريخ البداية الجديد
         setStartDate(clickedDateStr);
         setEndDate("");
+        onFilterChange?.({ dateFrom: clickedDateStr, dateTo: "" });
       } else if (clickedDateStr === startDate) {
         // إذا ضغط نفس التاريخ مرتين -> يبقى يوم واحد ويغلق التقويم
         setShowCalendar(false);
       } else {
         // إذا ضغط تاريخ بعد البداية -> نحدد تاريخ النهاية ونغلق التقويم
         setEndDate(clickedDateStr);
+        onFilterChange?.({ dateFrom: startDate, dateTo: clickedDateStr });
         setShowCalendar(false);
       }
     }
@@ -588,7 +606,7 @@ export default function TransactionList({
               <input
                 type="text"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => { setSearch(e.target.value); onFilterChange?.({ search: e.target.value }); }}
                 placeholder={t("transactions.searchPlaceholder")}
                 className="text-xs bg-transparent outline-none w-full"
                 style={{ direction: isRtl ? "rtl" : "ltr" }}
@@ -643,6 +661,7 @@ export default function TransactionList({
                           key={item}
                           onClick={() => {
                             setSelectedType(item);
+                            onFilterChange?.({ type: item === "all" ? "" : item });
                             setShowTypeDropdown(false);
                           }}
                           className={`text-xs px-3 py-2 rounded-lg w-full transition-colors ${isRtl ? "text-right" : "text-left"
@@ -783,6 +802,7 @@ export default function TransactionList({
                         onClick={() => {
                           setStartDate("");
                           setEndDate("");
+                          onFilterChange?.({ dateFrom: "", dateTo: "" });
                         }}
                         disabled={!startDate}
                         className={`font-medium transition-colors px-2 py-1 rounded-lg ${startDate

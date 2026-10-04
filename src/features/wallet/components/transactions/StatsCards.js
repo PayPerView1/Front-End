@@ -18,13 +18,15 @@ import {
 } from "react-icons/md";
 import { FiTrendingUp, FiTrendingDown } from "react-icons/fi";
 
-export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = true }) {
+export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = true, walletBalance }) {
+  const balanceValue = Number(walletBalance?.balance ?? walletBalance);
+  const displayBalance = Number.isFinite(balanceValue) ? `$${balanceValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—";
   // 1. بيانات الحالة الفارغة
   const emptyStats = [
     {
       key: "balance",
       label: t("stats.balance"),
-      value: "$0.00",
+      value: displayBalance,
       currency: "USD",
       sub: t("stats.balanceSub"),
       subColor: "#888888",
@@ -37,7 +39,7 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
     {
       key: "prevDeposits",
       label: t("stats.prevDeposits"),
-      value: "$0.00",
+      value: "—",
       currency: "USD",
       sub: t("stats.prevDepositsSub"),
       subColor: "#888888",
@@ -50,7 +52,7 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
     {
       key: "adSpend",
       label: t("stats.adSpend"),
-      value: "$0.00",
+      value: "—",
       currency: "USD",
       sub: t("stats.adSpendSub"),
       subColor: "#888888",
@@ -63,7 +65,7 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
     {
       key: "cashback",
       label: t("stats.cashback"),
-      value: "$0.00",
+      value: "—",
       currency: "USD",
       sub: t("stats.cashbackSub"),
       subColor: "#888888",
@@ -80,7 +82,7 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
     {
       key: "balance",
       label: t("stats.balance"),
-      value: "$24,500.00",
+      value: displayBalance,
       currency: "USD",
       sub: t("stats.balanceSubPop"),
       subColor: "#EAB308",
@@ -93,39 +95,36 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
     {
       key: "prevDeposits",
       label: t("stats.prevDeposits"),
-      value: "+$15,450.00",
+      value: "—",
       currency: "USD",
-      sub: t("stats.prevDepositsSubPop"),
+      sub: "",
       subColor: dark ? "#888888" : "#666666",
       valueColor: "#94D3C1",
       icon: MdOutlinePayments,
-      trend: "14.8%",
-      trendLabel: t("stats.trendLabel"),
-      trendUp: true,
     },
     {
       key: "adSpend",
       label: t("stats.adSpend"),
-      value: "+$15,450.00",
+      value: "—",
       currency: "USD",
-      sub: t("stats.adSpendSubPop", "31,200.00 ر.س"),
+      sub: "",
       subColor: dark ? "#888888" : "#666666",
       valueColor: "#94D3C1",
       icon: MdOutlineCreditCard,
-      bottomText: t("stats.adSpendBottomPop", "12 حملة نشطة تحت النشر والمتابعة"),
+      bottomText: "",
       bottomIcon: MdOutlineCreditCard,
       bottomColor: "#94D3C1",
     },
     {
       key: "cashback",
       label: t("stats.cashback"),
-      value: "+$1,450.00",
+      value: "—",
       currency: "USD",
-      sub: t("stats.cashbackSubPop", "5,437.50 ر.س"),
+      sub: "",
       subColor: dark ? "#888888" : "#666666",
       valueColor: "#94D3C1",
       icon: MdOutlineSavings,
-      bottomText: t("stats.cashbackBottomPop"),
+      bottomText: "",
       bottomIcon: MdOutlineShield,
       bottomColor: "#94D3C1",
     },

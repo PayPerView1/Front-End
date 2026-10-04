@@ -7,7 +7,25 @@
     "language": "言語",
     "logout": "ログアウト"
   },
-  "sidebar": { "home": "ホーム", "search": "検索", "discover": "見つける", "startProject": "プロジェクトを始める", "resources": "リソース", "members": "メンバー", "partners": "パートナー", "new": "新着", "help": "ヘルプ", "blog": "ブログ" },
+  "sidebar": {
+    "home": "ホーム",
+    "search": "検索",
+    "discover": "見つける",
+    "startProject": "プロジェクトを始める",
+    "resources": "リソース",
+    "members": "メンバー",
+    "partners": "パートナー",
+    "new": "新着",
+    "help": "ヘルプ",
+    "blog": "ブログ",
+    "dashboard": "ダッシュボード",
+    "analytics": "分析とレポート",
+    "clips": "クリップを管理",
+    "newCampaign": "新しいキャンペーンを作成",
+    "drafts": "下書き",
+    "manageCampaigns": "キャンペーンを管理",
+    "billing": "予算と支払い"
+  },
   "profile": {
     "edit": "プロフィールを編集",
     "manageOrders": "注文を管理",
@@ -21,7 +39,11 @@
     "user": {
       "joined": "2026年7月入社",
       "followers": "フォロワー",
-      "following": "続く"
+      "following": "続く",
+      "name": "Shatha Al-Banna",
+      "email": "@gmail.com",
+      "location": "ガザ、パレスチナ",
+      "profile": "プロフィール"
     },
     "buttons": {
       "editProfile": "プロフィールの編集",
@@ -134,6 +156,423 @@
     "services": "接続されたサービス",
     "security": "アカウントセキュリティ",
     "subscriptions": "サブスクリプション",
-    "disputes": "紛争センター"
+    "disputes": "紛争センター",
+    "email": "メールアドレス",
+    "cancel": "キャンセル"
+  },
+  "landing": {
+    "language": "言語",
+    "theme": "テーマを切り替え",
+    "dark": "ダーク",
+    "light": "ライト",
+    "nav": [
+      "仕組み",
+      "ブランド向け",
+      "クリエイター向け",
+      "始める",
+      "ログイン"
+    ],
+    "heroEyebrow": "PAYPERVIEW · 開発中",
+    "heroTitle": "視聴を\n[[価値に。]]",
+    "heroText": "PayPerViewはブランドとクリエイターをつなぎ、短尺コンテンツと検証済みの視聴を測定可能な成果に変えます。",
+    "explore": "仕組みを見る",
+    "proof": "ひとつのプラットフォーム。共有できる機会。",
+    "flowEyebrow": "より良いリーチ",
+    "flowTitle": "すべての視聴に\n[[価値を。]]",
+    "flowIntro": "最初のブリーフから視聴の検証まで、コンテンツから成果への流れを明確につなぎます。",
+    "steps": [
+      "ブランド",
+      "キャンペーン",
+      "クリップ",
+      "視聴",
+      "検証",
+      "報酬"
+    ],
+    "stepDetails": [
+      "要件を決める",
+      "アイデアを支援",
+      "自分らしく制作",
+      "視聴者が見る",
+      "真正性を確認",
+      "成果に応じて報酬"
+    ],
+    "flowLabel": "キャンペーンの流れ",
+    "loopEyebrow": "PAYPERVIEWの循環",
+    "loopTitle": "作る。\n切り取る。見る。\n[[得る。]]",
+    "loopText": "良質なコンテンツが視聴者に届き、成果が関わる人に新たな機会を生みます。",
+    "loop": [
+      "制作",
+      "企画",
+      "クリップ",
+      "視聴",
+      "検証",
+      "報酬"
+    ],
+    "brandsEyebrow": "ブランド向け",
+    "brandsTitle": "あなたのコンテンツ。\n広がる[[リーチ。]]",
+    "brandsText": "キャンペーンを始め、クリエイターとブランドの物語を作り、成長中のプラットフォームを体験しましょう。",
+    "brandsLink": "プラットフォームを見る",
+    "workspace": "キャンペーンワークスペース",
+    "campaign": "あなたのキャンペーン",
+    "preview": "プレビュー",
+    "inDevelopment": "開発中",
+    "tabs": [
+      "概要",
+      "クリエイター",
+      "コンテンツ",
+      "検証"
+    ],
+    "workspaceEyebrow": "次のストーリーはここから",
+    "workspaceTitle": "アイデアをもとにキャンペーンを作成。",
+    "workspaceText": "ブリーフやクリエイター候補、キャンペーンの動きをここにまとめます。",
+    "workflow": [
+      "キャンペーンブリーフ",
+      "クリエイターのストーリー",
+      "視聴の検証"
+    ],
+    "workspaceFoot": "透明性のあるキャンペーン管理",
+    "workspaceLabel": "ワークスペースのプレビュー",
+    "clippersEyebrow": "クリエイター向け",
+    "clipperTitle": "あなたのリーチ。\nあなたの[[報酬。]]",
+    "clipperText": "自分に合うキャンペーンを見つけ、視聴者が楽しめるコンテンツを作り、検証済みの成果に応じて報酬を得ましょう。",
+    "clipperLink": "クリエイター向け機能を見る",
+    "creatorWorkspace": "クリエイターワークスペース",
+    "readyCreate": "制作を始めましょう",
+    "rewardsHere": "キャンペーン報酬がここに表示されます",
+    "nextClip": "次のクリップ",
+    "campaignDetails": "キャンペーンの詳細がここに表示されます",
+    "verifiedEyebrow": "プラットフォームの中核",
+    "verifiedTitle": "視聴だけではない。\n[[検証済みの視聴。]]",
+    "verifiedText": "検証によりキャンペーンの動き、コンテンツ、成果を明確につなぎます。",
+    "checks": [
+      "真正性の確認",
+      "追跡可能な動き",
+      "キャンペーンとの連携"
+    ],
+    "verification": "視聴の検証",
+    "status": "開発中",
+    "statusTitle": "検証ステータス",
+    "readyActivity": "キャンペーンの開始を待っています",
+    "verifySteps": [
+      "コンテンツを送信",
+      "動きを確認",
+      "視聴を検証"
+    ],
+    "verifyFoot": "キャンペーン開始後に検証の詳細が表示されます",
+    "whyEyebrow": "PAYPERVIEWを選ぶ理由",
+    "whyTitle": "目的のある\n[[パフォーマンス。]]",
+    "whyText": "関わるすべての人に大切なことを考えて設計。",
+    "why": [
+      [
+        "ブランド",
+        "開始・追跡・測定",
+        "ブリーフをクリエイター発のリーチに変えます。"
+      ],
+      [
+        "クリエイター",
+        "発見・制作・獲得",
+        "キャンペーンを見つけ、成果を共有しましょう。"
+      ],
+      [
+        "エコシステム",
+        "透明性を設計に",
+        "コンテンツ、成果、報酬をひとつにつなぎます。"
+      ]
+    ],
+    "wallEyebrow": "動き出すコンテンツ",
+    "wallTitle": "コンテンツは[[価値。]]",
+    "wallText": "最適な人が形にすることで、アイデアはさらに広がります。",
+    "wallTitles": [
+      "街を見渡すコーヒーブレイク",
+      "屋外で過ごすひととき",
+      "ゴールデンアワー",
+      "夕日を撮影"
+    ],
+    "wallNote": "ひとつのアイデア。\n広がる視点。",
+    "mediaCredit": "動画：Michelle Leman（提供元）",
+    "photosCredit": "写真のライセンス：",
+    "ctaEyebrow": "次の視聴はここから",
+    "ctaTitle": "視聴を\n[[成果につなげませんか？]]",
+    "ctaText": "キャンペーンを企画する場合もコンテンツを作る場合も、PayPerViewが成果と機会をつなぎます。",
+    "forBrands": "ブランド向け",
+    "forCreators": "クリエイター向け",
+    "ctaLoop": "ブランド → コンテンツ → 検証済み視聴 → 価値",
+    "footerText": "良質なコンテンツを\nもっと遠くへ。",
+    "exploreLabel": "メニュー",
+    "accountLabel": "アカウント",
+    "platformLabel": "プラットフォーム",
+    "backTop": "トップへ ↑",
+    "verifiedViews": "検証済みの視聴",
+    "footerTag": "視聴エコノミーのために"
+  },
+  "assistant": {
+    "close": "アシスタントを閉じる",
+    "title": "本日はどのようなお手伝いができますか？",
+    "description": "コンテンツの作成、アカウントの管理、ご質問への回答をお手伝いします。",
+    "preview": "プレビュー",
+    "placeholder": "ここにメッセージを入力…",
+    "disclaimer": "回答に誤りが含まれる場合があります。重要な情報はご確認ください。",
+    "viewConversations": "会話を見る",
+    "conversations": "会話",
+    "newConversation": "新しい会話",
+    "loading": "読み込み中",
+    "errors": {
+      "loadMessages": "メッセージを読み込めませんでした",
+      "createThread": "会話を作成できませんでした",
+      "sendMessage": "メッセージを送信できませんでした",
+      "deleteThread": "会話を削除できませんでした"
+    },
+    "actions": {
+      "messageMembers": {
+        "title": "最近のメンバーに連絡",
+        "desc": "新しい登録者への歓迎メッセージを作成"
+      },
+      "createAd": {
+        "title": "クリエイティブな広告を作成",
+        "desc": "次のキャンペーン向けに魅力的な広告文を作成"
+      },
+      "startLive": {
+        "title": "ライブ配信を開始",
+        "desc": "視聴者とつながるライブを設定"
+      },
+      "sendInvoice": {
+        "title": "顧客に請求書を送信",
+        "desc": "プロ仕様の請求書をすばやく作成して送信"
+      }
+    }
+  },
+  "messages": {
+    "title": "メッセージ",
+    "minimizePanel": "メッセージパネルを縮小",
+    "maximizePanel": "メッセージパネルを拡大",
+    "close": "閉じる",
+    "searchPlaceholder": "メッセージを検索…",
+    "filters": {
+      "all": "すべて",
+      "unread": "未読",
+      "orders": "注文"
+    },
+    "newMessage": "新しいメッセージ",
+    "noConversations": "検索に一致する会話はありません"
+  },
+  "emptyState": {
+    "title": "メッセージを選択して開始",
+    "description": "サイドバーから会話を選択し、登録者またはサポートチームに連絡してください",
+    "encrypted": "メッセージは暗号化され、安全に保護されています。"
+  },
+  "campaigns": {
+    "title": "キャンペーン管理",
+    "subtitle": "パフォーマンス、予算、実施中キャンペーンの状況を確認",
+    "dateFilter": "期間：過去30日間",
+    "statusLabel": "ステータス",
+    "search": "キャンペーンを検索…",
+    "all": "すべて",
+    "active": "実施中",
+    "draft": "下書き",
+    "completed": "完了",
+    "paused": "一時停止",
+    "campaignName": "キャンペーン名",
+    "status": "ステータス",
+    "budget": "予算",
+    "startDate": "開始日",
+    "action": "操作",
+    "view": "詳細",
+    "modify": "編集",
+    "stop": "一時停止",
+    "delete": "削除",
+    "prev": "前へ",
+    "next": "次へ",
+    "noCampaigns": "一致するキャンペーンはありません",
+    "totalCampaigns": "キャンペーン総数",
+    "activeCampaigns": "実施中のキャンペーン",
+    "totalBudget": "総予算（第3四半期）",
+    "stable": "安定",
+    "export": "データをエクスポート",
+    "back": "戻る",
+    "copy": "コピー",
+    "campaignNumber": "キャンペーンID",
+    "client": "クライアント",
+    "kpi": "主要業績評価指標",
+    "budgetUsed": "使用予算",
+    "impressions": "インプレッション",
+    "clicks": "クリック",
+    "conversionRate": "コンバージョン率",
+    "viewDetails": "キャンペーン詳細",
+    "startDateLabel": "開始日",
+    "endDate": "終了日",
+    "targetType": "ターゲット種別",
+    "platforms": "プラットフォーム",
+    "campaignStatus": "キャンペーン状況",
+    "created": "作成済み",
+    "underReview": "審査中",
+    "approved": "承認済み",
+    "activeStatus": "実施中",
+    "completedStatus": "完了",
+    "copyTitle": "キャンペーンをコピー",
+    "newCampaignName": "新しいキャンペーン名",
+    "copyOptions": "コピー設定",
+    "copyMedia": "メディアとクリップをコピー",
+    "copyMediaDesc": "キャンペーンに関連する動画、有効な機能、ブランド素材もコピー",
+    "copyTargeting": "ターゲティング設定をコピー",
+    "copyTargetingDesc": "ターゲット、オーディエンス、地域、属性の設定を維持",
+    "startCopy": "コピーを開始",
+    "copying": "コピー中…",
+    "cancel": "キャンセル",
+    "showing": "全{total}件中{from}～{to}件を表示",
+    "from": "件",
+    "statusActive": "実施中",
+    "statusDraft": "下書き",
+    "statusCompleted": "完了",
+    "statusPendingReview": "審査待ち",
+    "statusRejected": "却下",
+    "statusManualReview": "手動審査",
+    "statusCancelled": "キャンセル済み",
+    "statusArchived": "アーカイブ済み",
+    "statusExpired": "期限切れ",
+    "campaignStats": "キャンペーン統計",
+    "emptyTitle": "キャンペーンはまだありません",
+    "emptyDesc": "広告スペースの準備ができました。最初のキャンペーンを作成してターゲットに届けましょう。",
+    "createNew": "最初のキャンペーンを開始",
+    "statsTitle": "カテゴリ別キャンペーン統計",
+    "overviewLabel": "パフォーマンス概要",
+    "last30days": "過去30日間",
+    "distribution": "内訳",
+    "totalCampaignsLabel": "キャンペーン総数",
+    "reach": "リーチ",
+    "roi": "ROI",
+    "ctr": "CTR",
+    "spentLabel": "消化額",
+    "categoryUGC": "ユーザー生成コンテンツ（UGC）",
+    "categoryClipping": "クリップ編集",
+    "categorySlideshow": "スライドショー",
+    "categoryAudio": "音声コンテンツ",
+    "categoryLogo": "ロゴ",
+    "categoryMixed": "混合",
+    "legendUGC": "ユーザーコンテンツ（UGC）",
+    "legendClipping": "クリップ編集",
+    "legendSponsorship": "スポンサーシップ",
+    "legendOther": "その他",
+    "ugcSubtitle": "昨日：収益 - 実施中キャンペーン56件",
+    "clippingSubtitle": "進行中 - 現在の効率：{progress}"
+  },
+  "newCampaign": {
+    "steps": {
+      "s1": "基本情報",
+      "s2": "コンプライアンス",
+      "s3": "コンテンツ",
+      "s4": "確認"
+    },
+    "titles": {
+      "t1": "新しいキャンペーンを作成",
+      "t2": "ハラール準拠証明",
+      "t3": "メディアをアップロード",
+      "t4": "確認して送信"
+    },
+    "subtitles": {
+      "s1": "広告キャンペーンの基本情報を入力してください。",
+      "s2": "キャンペーンの内容が以下のイスラム指針に準拠していることを確認してください。",
+      "s3": "キャンペーン用のクリエイティブ素材を用意してください。",
+      "s4": "送信前にキャンペーンの詳細を確認してください。"
+    },
+    "step1": {
+      "name": "キャンペーン名",
+      "namePlaceholder": "例：2024年第1四半期キャンペーン",
+      "budget": "予算（USD）",
+      "cpm": "インプレッション単価（CPM）",
+      "period": "キャンペーン期間",
+      "startDate": "開始日",
+      "endDate": "終了日",
+      "contentType": "コンテンツ形式",
+      "contentTypes": {
+        "VIDEO": "動画リール",
+        "IMAGE": "静止画像",
+        "TEXT": "テキスト",
+        "MIXED": "複合コンテンツ",
+        "LOGO": "ロゴ",
+        "AUDIO": "音声",
+        "SLIDESHOW": "スライドショー",
+        "UGC": "ユーザー作成コンテンツ",
+        "CLIPPING": "クリップ"
+      },
+      "audience": "ターゲット層",
+      "audiencePlaceholder": "ターゲット設定用の簡単な説明またはキーワード...",
+      "required": "必須項目です"
+    },
+    "compliance": {
+      "intro": "キャンペーンの内容が以下のイスラム指針に準拠していることを確認してください。PayPerView上のすべてのキャンペーンで必須です。",
+      "items": {
+        "noHaram": {
+          "title": "禁止コンテンツなし",
+          "desc": "アルコール、ギャンブル、成人向けコンテンツ、その他禁止されている商品やサービスを宣伝しません。"
+        },
+        "islamicValues": {
+          "title": "イスラムの価値観を尊重",
+          "desc": "画像、メッセージ、全体の雰囲気が敬意を示し、イスラムの原則を揶揄したり否定したりしません。"
+        },
+        "honestRep": {
+          "title": "誠実な表現",
+          "desc": "誤解を招くマーケティングや虚偽の主張を避け、オファーを明確に伝えます。"
+        },
+        "noGambling": {
+          "title": "ギャンブルなし",
+          "desc": "ギャンブルや賭けを宣伝する内容は含まれません。"
+        },
+        "noSexualContent": {
+          "title": "性的な内容なし",
+          "desc": "性的な内容や露骨なほのめかしは含まれません。"
+        },
+        "noExplicitMusic": {
+          "title": "不適切な音楽なし",
+          "desc": "不適切な音楽や歌詞は含まれません。"
+        },
+        "noAlcohol": {
+          "title": "アルコールの宣伝なし",
+          "desc": "アルコール飲料の宣伝は含まれません。"
+        },
+        "noSuspiciousCurrencies": {
+          "title": "不審な金融取引なし",
+          "desc": "不審または信頼性の低い通貨や金融取引を宣伝しません。"
+        },
+        "noUnrealisticProfit": {
+          "title": "非現実的な利益の約束なし",
+          "desc": "非現実的または誤解を招く利益を約束しません。"
+        }
+      },
+      "descTitle": "キャンペーンの説明",
+      "descSub": "詳細な説明",
+      "descPlaceholder": "キャンペーンの目的、ターゲット層、主要なメッセージを詳しく入力してください...",
+      "error": "利用規約を読み、同意していないようです。キャンペーンを承認するにはすべての条件を満たす必要があります。"
+    },
+    "step3": {
+      "intro": "キャンペーン用のクリエイティブ素材をアップロードしてください。各ファイルが指定のガイドラインを満たしていることを確認してください。",
+      "dropTitle": "ここにファイルをドラッグ＆ドロップ",
+      "dropSub": "またはクリックしてパソコンから選択してください。ファイルは安全に処理・分析されます。",
+      "maxSize": "ファイルごとの上限は20MBです",
+      "choose": "ファイルを選択",
+      "sizeError": "アップロード失敗：ファイルサイズが上限（20MB）を超えています",
+      "sizeErrorToast": "{name} は20MBの上限を超えているためアップロードできませんでした。",
+      "complete": "完了",
+      "required": "ファイルを1つ以上アップロードしてください"
+    },
+    "step4": {
+      "identity": "キャンペーン情報",
+      "campaignName": "キャンペーン名",
+      "goal": "目標",
+      "startDate": "開始日",
+      "endDate": "終了日",
+      "budget": "予算配分",
+      "budgetTotal": "キャンペーン総予算",
+      "reach": "予想リーチ",
+      "assets": "クリエイティブ素材",
+      "uploaded": "{count}件の素材をアップロード済み",
+      "targeting": "ターゲティング",
+      "notSpecified": "未指定"
+    },
+    "nav": {
+      "back": "戻る",
+      "saveDraft": "下書きとして保存",
+      "next": "次へ →",
+      "submit": "審査に提出 →"
+    }
   }
 }

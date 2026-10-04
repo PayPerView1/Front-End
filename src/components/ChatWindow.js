@@ -18,6 +18,7 @@ import {
 import { HiOutlineEmojiHappy } from "react-icons/hi";
 import { useMessages } from "@/context/MessagesContext";
 import { useTheme } from "@/context/ThemeContext";
+import { toast } from "@/components/ui/Toast";
 
 // تحميل Emoji Picker فقط على Client
 const EmojiPicker = dynamic(
@@ -607,7 +608,7 @@ export default function ChatWindow({
 
                 if (file) {
                   if (file.size > 20 * 1024 * 1024) {
-                    alert(
+                    toast.warning(
                       isArabic
                         ? `عذراً، حجم الملف يتجاوز الحد الأقصى المسموح به وهو 20 ميجابايت.`
                         : `File size exceeds the maximum limit of 20MB.`
