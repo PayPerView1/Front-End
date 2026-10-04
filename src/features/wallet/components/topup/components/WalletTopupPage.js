@@ -158,11 +158,19 @@ export default function WalletTopupPage({
     }
     setIsProcessing(true);
     try {
-      const paymentMethod = selectedMethod === "bank_transfer" ? "BANK_TRANSFER" : "PAYPAL";
+      const paymentMethod = selectedMethod === "bank_transfer" ? "BANK_TRANSFER" : selectedMethod === "moyasar" ? "MOYASAR" : "PAYPAL";
       const response = await fundWallet({ amount, paymentMethod });
       if (response?.success === false) throw new Error(response.message || "تعذّر بدء عملية الشحن.");
       const data = response?.data ?? response;
-      if (data.redirectUrl) {
+      if (data.invoiceUrl) {
+        if (data.transactionId) {
+          try { localStorage.setItem("pendingTransactionId", data.transactionId); } catch {}
+        }
+        window.location.assign(data.invoiceUrl);
+      } else if (data.redirectUrl) {
+        if (data.transactionId) {
+          try { localStorage.setItem("pendingTransactionId", data.transactionId); } catch {}
+        }
         window.location.assign(data.redirectUrl);
       } else if (paymentMethod === "BANK_TRANSFER") {
         try { sessionStorage.setItem("wallet:bank-transfer", JSON.stringify({ ...data, amount })); } catch {}

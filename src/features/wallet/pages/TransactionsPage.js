@@ -52,8 +52,9 @@ export default function AnalyticsPage() {
     setTransactionsError("");
     try {
       const res = await getTransactions({ ...filters, ...params });
-      if (res?.success) {
-        setTransactions(Array.isArray(res.data) ? res.data : []);
+      if (res && res.success !== false) {
+        const list = Array.isArray(res.data) ? res.data : Array.isArray(res) ? res : [];
+        setTransactions(list);
         if (res.pagination) setPagination(res.pagination);
       } else {
         throw new Error(res?.message || "Unable to load transactions.");
@@ -77,14 +78,19 @@ export default function AnalyticsPage() {
     if (tx?.id) {
       setIsLoadingDetail(true);
       setView("detail");
-      const res = await getTransactionById(tx.id);
-      if (res?.success) {
-        setSelectedTx(res.data);
-      } else {
-        // في حال الفشل نعرض البيانات الموجودة مسبقاً
+      try {
+        const res = await getTransactionById(tx.id);
+        const detail = res?.data ?? res;
+        if (detail && typeof detail === "object") {
+          setSelectedTx(detail);
+        } else {
+          setSelectedTx(tx);
+        }
+      } catch {
         setSelectedTx(tx);
+      } finally {
+        setIsLoadingDetail(false);
       }
-      setIsLoadingDetail(false);
     } else {
       setSelectedTx(tx);
       setView("detail");
