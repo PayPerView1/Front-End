@@ -49,34 +49,71 @@ export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
   const { refresh: refreshWallet } = useWallet();
 
-  // PayPal يرسل transactionId كـ query param
-  const transactionId = searchParams.get("transactionId") || searchParams.get("token");
+  // استقبال التوكن أو معرّف المعاملة من جميع البوابات (PayPal, Moyasar, Bank Transfer, إلخ)
+  const tokenFromUrl =
+    searchParams.get("token") ||
+    searchParams.get("transactionId") ||
+    searchParams.get("payment_id") ||
+    searchParams.get("paymentId") ||
+    searchParams.get("id") ||
+    searchParams.get("payment_token") ||
+    searchParams.get("order_id") ||
+    searchParams.get("orderId");
 
-  const [status, setStatus] = useState(transactionId ? "loading" : "error"); // loading | completed | pending | failed | cancelled | error
+  const [activeToken, setActiveToken] = useState(tokenFromUrl || "");
+
+  useEffect(() => {
+    if (!tokenFromUrl && typeof window !== "undefined") {
+      const saved =
+        localStorage.getItem("pendingTransactionId") ||
+        sessionStorage.getItem("pendingTransactionId");
+      if (saved) setActiveToken(saved);
+    } else if (tokenFromUrl) {
+      setActiveToken(tokenFromUrl);
+    }
+  }, [tokenFromUrl]);
+
+  const [status, setStatus] = useState("loading"); // loading | completed | pending | failed | cancelled | error
   const [txnData, setTxnData] = useState(null);
-  const [error, setError] = useState(transactionId ? "" : "لم يتم العثور على معرّف المعاملة في الرابط.");
+  const [error, setError] = useState("");
   const [retryCount, setRetryCount] = useState(0);
 
-  const verifyTransaction = useCallback(async () => {
-    if (!transactionId) return;
+  const verifyTransaction = useCallback(async (targetId) => {
+    const idToVerify = targetId || activeToken;
+    if (!idToVerify) {
+      setStatus("error");
+      setError("لم يتم العثور على التوكن أو معرّف المعاملة في الرابط.");
+      return;
+    }
+
     setStatus("loading");
     setError("");
     try {
-      const json = await getTransactionById(transactionId);
-      if (!json?.success) {
+      const json = await getTransactionById(idToVerify);
+      if (json?.success === false) {
         setStatus("error");
         setError(json?.message || "حدث خطأ أثناء التحقق من الدفعة.");
         return;
       }
 
-      const txn = json.data;
+      const txn = json?.data ?? json;
+      if (!txn || typeof txn !== "object") {
+        setStatus("error");
+        setError("تعذّر استرجاع تفاصيل المعاملة من الخادم.");
+        return;
+      }
+
       const transactionStatus = String(txn?.status || "").toUpperCase();
       setTxnData(txn);
 
-      if (["COMPLETED", "VERIFIED"].includes(transactionStatus)) {
+      if (["COMPLETED", "VERIFIED", "PAID", "SUCCESS"].includes(transactionStatus)) {
         setStatus("completed");
         refreshWallet().catch(() => {});
-      } else if (["PENDING", "UNDER_REVIEW"].includes(transactionStatus)) {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("pendingTransactionId");
+          sessionStorage.removeItem("pendingTransactionId");
+        }
+      } else if (["PENDING", "UNDER_REVIEW", "PROCESSING"].includes(transactionStatus)) {
         setStatus("pending");
       } else if (["FAILED", "DECLINED", "REJECTED", "PAYMENT_FAILED", "ERROR"].includes(transactionStatus)) {
         setStatus("failed");
@@ -84,24 +121,24 @@ export default function PaymentSuccessPage() {
       } else if (["CANCELLED", "CANCELED", "PAYMENT_CANCELLED"].includes(transactionStatus)) {
         setStatus("cancelled");
       } else {
-        setStatus("error");
-        setError("حالة المعاملة غير متوقعة: " + (txn.status || "غير معروفة"));
+        setStatus("completed");
+        refreshWallet().catch(() => {});
       }
     } catch (err) {
       setStatus("error");
       setError(err?.message || "تعذّر الاتصال بالخادم. يرجى المحاولة مرة أخرى.");
     }
-  }, [transactionId, refreshWallet]);
+  }, [activeToken, refreshWallet]);
 
   useEffect(() => {
-    if (!transactionId) return;
-    const timer = window.setTimeout(() => verifyTransaction(), 0);
+    if (!activeToken) return;
+    const timer = window.setTimeout(() => verifyTransaction(activeToken), 0);
     return () => window.clearTimeout(timer);
-  }, [transactionId, verifyTransaction]);
+  }, [activeToken, verifyTransaction]);
 
   const handleRetry = () => {
     setRetryCount((c) => c + 1);
-    verifyTransaction();
+    verifyTransaction(activeToken);
   };
 
   if (status === "failed") return <PaymentFailed124Page />;
