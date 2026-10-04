@@ -42,7 +42,7 @@ export default function CopyModal({ campaign }) {
   return (
     <div
       dir={locale === "ar" ? "rtl" : "ltr"}
-      className="w-full max-w-md mx-auto rounded-2xl p-6 flex flex-col gap-5"
+      className="w-full max-w-md mx-auto rounded-2xl p-4 sm:p-6 flex flex-col gap-5 max-h-[calc(100dvh-2rem)] overflow-y-auto"
       style={{
         background: isDark ? "rgba(25, 28, 29, 0.85)" : "rgba(255,255,255,0.95)",
         border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.08)",

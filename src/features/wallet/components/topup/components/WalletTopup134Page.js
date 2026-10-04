@@ -44,7 +44,10 @@ const T = {
   muted: "#8A9490",
 };
 
-export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }) {
+export default function WalletTopup134Page({
+  onRetry,
+  initialAmount = "50,000",
+}) {
   const router = useRouter();
   const locale = useLocale();
 
@@ -72,7 +75,8 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
   const isExceeded = cleanNumber > 10000;
   const isOutOfRange = cleanNumber < 10 || isExceeded;
   const hasInvalidChars = /[^0-9.,]/.test(inputValue.trim());
-  const isErrorState = isExceeded || isOutOfRange || hasInvalidChars || inputValue.trim() === "";
+  const isErrorState =
+    isExceeded || isOutOfRange || hasInvalidChars || inputValue.trim() === "";
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -126,13 +130,12 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
         </div>
       )}
 
-      <div className="max-w-[1480px] mx-auto px-4 sm:px-6">
-
+      <div className="max-w-[1480px] mx-auto w-full min-w-0 px-4 sm:px-6">
         {/* ── Top Bar: Reset & Navigation ── */}
         <div className="flex items-center justify-between mb-4">
           <button
             type="button"
-            onClick={() => onRetry ? onRetry(inputValue) : router.back()}
+            onClick={() => (onRetry ? onRetry(inputValue) : router.back())}
             className="inline-flex items-center gap-2 text-xs text-gray-400 hover:text-white transition-colors"
           >
             <span className="w-7 h-7 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:border-white/30">
@@ -140,12 +143,10 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
             </span>
             <span>العودة للمحفظة</span>
           </button>
-
         </div>
 
         {/* ── Page Header & Balance Card ── */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
-          
           {/* Main Title & Subtitle */}
           <div className="flex-1">
             {/* Top Badge */}
@@ -169,9 +170,14 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
             {/* Description */}
             <p className="text-xs sm:text-sm text-gray-400 leading-relaxed max-w-3xl">
               حدود المعاملة الواحدة تبدأ من{" "}
-              <span className="text-white font-medium" dir="ltr">$10.00</span>{" "}
-              <span className="text-gray-400">(37.50 ر.س)</span> وتصل كحد أقصى إلى{" "}
-              <span className="text-[#E9C349] font-bold" dir="ltr">$10,000.00</span>{" "}
+              <span className="text-white font-medium" dir="ltr">
+                $10.00
+              </span>{" "}
+              <span className="text-gray-400">(37.50 ر.س)</span> وتصل كحد أقصى
+              إلى{" "}
+              <span className="text-[#E9C349] font-bold" dir="ltr">
+                $10,000.00
+              </span>{" "}
               <span className="text-[#E9C349] font-bold">(37,500.00 ر.س)</span>{" "}
               وفقاً لتشريعات الدفع الإلكتروني المصرفي المعتمدة.
             </p>
@@ -190,10 +196,16 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                 الرصيد المتاح للإنفاق
               </span>
               <div className="flex items-baseline gap-2">
-                <span className="text-xl sm:text-2xl font-bold text-white font-mono" dir="ltr">
+                <span
+                  className="text-xl sm:text-2xl font-bold text-white font-mono"
+                  dir="ltr"
+                >
                   $24,500.00
                 </span>
-                <span className="text-xs text-[#E9C349] font-semibold" dir="ltr">
+                <span
+                  className="text-xs text-[#E9C349] font-semibold"
+                  dir="ltr"
+                >
                   91,875 ر.س
                 </span>
               </div>
@@ -206,7 +218,10 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                 border: "1px solid rgba(255, 255, 255, 0.08)",
               }}
             >
-              <MdOutlineAccountBalanceWallet size={20} className="text-[#94D3C1]" />
+              <MdOutlineAccountBalanceWallet
+                size={20}
+                className="text-[#94D3C1]"
+              />
             </div>
           </div>
         </div>
@@ -217,10 +232,8 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
             Left Column  (lg:col-span-4): فحص ومعايير المعاملة + محتسب الرصيد
         ══════════════════════════════════════════════════════════════ */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
           {/* ══════════ RIGHT COLUMN (First in DOM in RTL) ══════════ */}
           <div className="lg:col-span-8 flex flex-col gap-6">
-
             {/* ── CARD 1: تحديد قيمة الشحن ── */}
             <div
               className="rounded-[18px] border p-5 sm:p-7"
@@ -243,7 +256,9 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                     <FiCreditCard size={18} className="text-gray-300" />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-white">تحديد قيمة الشحن</h2>
+                    <h2 className="text-base font-bold text-white">
+                      تحديد قيمة الشحن
+                    </h2>
                     <p className="text-xs text-gray-500 mt-0.5">
                       العملة الأساسية للحساب: الدولار الأمريكي (USD)
                     </p>
@@ -253,7 +268,10 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                 {/* Red Error Badge: تجاوز الحد الأقصى ($10,000) */}
                 {isErrorState && (
                   <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#DC2626] text-white text-xs font-bold shadow-md">
-                    <FiAlertTriangle size={14} className="text-white shrink-0" />
+                    <FiAlertTriangle
+                      size={14}
+                      className="text-white shrink-0"
+                    />
                     <span>تجاوز الحد الأقصى ($10,000)</span>
                   </div>
                 )}
@@ -266,11 +284,13 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
 
               {/* Big Input Container */}
               <div
-                className="flex items-center justify-between rounded-xl border px-4 py-3.5 mb-3 gap-3 transition-all"
+                className="flex min-w-0 items-center justify-between rounded-xl border px-4 py-3.5 mb-3 gap-3 transition-all"
                 style={{
                   backgroundColor: T.cardInner,
                   borderColor: isErrorState ? "#DC2626" : T.cardBorder,
-                  boxShadow: isErrorState ? "0 0 16px rgba(220, 38, 38, 0.25)" : "none",
+                  boxShadow: isErrorState
+                    ? "0 0 16px rgba(220, 38, 38, 0.25)"
+                    : "none",
                 }}
               >
                 {/* Text / Input Display on the RIGHT in RTL */}
@@ -278,7 +298,7 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                   type="text"
                   value={inputValue}
                   onChange={handleInputChange}
-                  className="flex-1 bg-transparent text-2xl sm:text-3xl font-bold text-white outline-none font-mono tracking-wider text-right"
+                  className="min-w-0 w-full flex-1 bg-transparent text-xl sm:text-3xl font-bold text-white outline-none font-mono tracking-normal sm:tracking-wider text-right"
                   dir="ltr"
                   placeholder="0"
                 />
@@ -286,7 +306,10 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                 {/* Left side in RTL: Warning Triangle + Currency Badge */}
                 <div dir="ltr" className="flex items-center gap-2.5 shrink-0">
                   {isErrorState && (
-                    <FiAlertTriangle size={20} className="text-[#F59E0B] shrink-0" />
+                    <FiAlertTriangle
+                      size={20}
+                      className="text-[#F59E0B] shrink-0"
+                    />
                   )}
                   <div
                     className="px-2.5 py-1 rounded-md text-xs font-mono font-medium text-gray-400 shrink-0"
@@ -308,10 +331,16 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-sm font-bold leading-snug">
-                      الحد الأقصى للشحن في المعاملة الواحدة هو 10,000.00$ (ما يعادل 37,500.00 ر.س)
+                      الحد الأقصى للشحن في المعاملة الواحدة هو 10,000.00$ (ما
+                      يعادل 37,500.00 ر.س)
                     </h3>
                     <p className="text-xs text-white/90 leading-relaxed font-normal">
-                      المبلغ المدخل ({cleanNumber.toLocaleString("en-US", { minimumFractionDigits: 2 })}$) يتجاوز الحد المسموح به لكل معاملة عبر بوابات الدفع الإلكترونية السريعة. يرجى تقليل المبلغ للمتابعة.
+                      المبلغ المدخل (
+                      {cleanNumber.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })}
+                      $) يتجاوز الحد المسموح به لكل معاملة عبر بوابات الدفع
+                      الإلكترونية السريعة. يرجى تقليل المبلغ للمتابعة.
                     </p>
                   </div>
                 </div>
@@ -348,7 +377,9 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                     <MdOutlineCallSplit size={16} className="text-[#E9C349]" />
                     <span>
                       تجزئة: دفعتين{" "}
-                      <span className="text-[#E9C349] font-mono font-bold">(2 × 7,500$)</span>
+                      <span className="text-[#E9C349] font-mono font-bold">
+                        (2 × 7,500$)
+                      </span>
                     </span>
                   </button>
 
@@ -358,7 +389,10 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                     onClick={handleBankTransfer}
                     className="flex items-center justify-center gap-2.5 py-3 px-3 rounded-xl border border-white/10 hover:border-white/30 bg-[#101213] hover:bg-white/5 text-xs font-semibold text-gray-200 hover:text-white transition-all cursor-pointer"
                   >
-                    <MdOutlineAccountBalance size={15} className="text-gray-400" />
+                    <MdOutlineAccountBalance
+                      size={15}
+                      className="text-gray-400"
+                    />
                     <span>حوالة بنكية للمؤسسات (IBAN)</span>
                   </button>
                 </div>
@@ -391,7 +425,9 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                           borderColor: isActive
                             ? "rgba(42, 157, 143, 0.7)"
                             : T.cardBorder,
-                          boxShadow: isActive ? "0 0 14px rgba(42, 157, 143, 0.2)" : "none",
+                          boxShadow: isActive
+                            ? "0 0 14px rgba(42, 157, 143, 0.2)"
+                            : "none",
                         }}
                       >
                         <span
@@ -473,10 +509,14 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                       </span>
                       <span
                         className={`text-sm sm:text-base font-bold ${
-                          isErrorState ? "text-[#FFAAA6]" : "text-white font-mono"
+                          isErrorState
+                            ? "text-[#FFAAA6]"
+                            : "text-white font-mono"
                         }`}
                         style={{
-                          fontFamily: isErrorState ? "var(--font-tajawal), 'Tajawal', sans-serif" : undefined,
+                          fontFamily: isErrorState
+                            ? "var(--font-tajawal), 'Tajawal', sans-serif"
+                            : undefined,
                         }}
                       >
                         {isErrorState
@@ -489,7 +529,6 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                   </div>
                 </div>
               </div>
-
             </div>
 
             {/* ── CARD 2: وسيلة الدفع المفضلة ── */}
@@ -514,7 +553,9 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                     <FiCreditCard size={18} className="text-gray-400" />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-white">وسيلة الدفع المفضلة</h2>
+                    <h2 className="text-base font-bold text-white">
+                      وسيلة الدفع المفضلة
+                    </h2>
                     <p className="text-xs text-gray-500 mt-0.5">
                       يتم تفعيل قنوات الدفع بعد استيفاء الحد الأدنى للعملية
                     </p>
@@ -546,7 +587,9 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                     <FiCheck size={11} className="text-gray-400" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-xs font-bold text-gray-300 block">مدى (Mada)</span>
+                    <span className="text-xs font-bold text-gray-300 block">
+                      مدى (Mada)
+                    </span>
                     <span className="text-[10px] text-gray-500 block truncate">
                       البطاقات المصرفية السعودية
                     </span>
@@ -565,7 +608,9 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                     <FiLock size={11} className="text-gray-400" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-xs font-bold text-gray-300 block">Apple Pay / STC</span>
+                    <span className="text-xs font-bold text-gray-300 block">
+                      Apple Pay / STC
+                    </span>
                     <span className="text-[10px] text-gray-500 block truncate">
                       محافظ الجوال السريعة
                     </span>
@@ -584,7 +629,9 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                     <FiCreditCard size={11} className="text-gray-400" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-xs font-bold text-gray-300 block">Visa /Mastercard</span>
+                    <span className="text-xs font-bold text-gray-300 block">
+                      Visa /Mastercard
+                    </span>
                     <span className="text-[10px] text-gray-500 block truncate">
                       الائتمان الدولي المعتمد
                     </span>
@@ -600,10 +647,15 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                   }}
                 >
                   <div className="w-5 h-5 rounded-full border border-white/20 flex items-center justify-center shrink-0">
-                    <MdOutlineAccountBalance size={12} className="text-gray-400" />
+                    <MdOutlineAccountBalance
+                      size={12}
+                      className="text-gray-400"
+                    />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-xs font-bold text-gray-300 block">تحويل بنكي IBAN</span>
+                    <span className="text-xs font-bold text-gray-300 block">
+                      تحويل بنكي IBAN
+                    </span>
                     <span className="text-[10px] text-gray-500 block truncate">
                       للمبالغ فوق $1,000
                     </span>
@@ -623,7 +675,7 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
               {/* Button: إلغاء وعودة للمحفظة (Left side in RTL) */}
               <button
                 type="button"
-                onClick={() => onRetry ? onRetry(inputValue) : router.back()}
+                onClick={() => (onRetry ? onRetry(inputValue) : router.back())}
                 className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 text-xs font-bold text-gray-300 hover:text-white hover:border-white/25 transition-all text-center"
                 style={{
                   backgroundColor: "#181B1C",
@@ -639,7 +691,8 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                     زر المتابعة موقوف:
                   </div>
                   <div className="text-[11px] text-gray-400 mt-0.5">
-                    يلزم تعديل المبلغ إلى 10,000$ أو أقل للاستمرار عبر بوابات الدفع.
+                    يلزم تعديل المبلغ إلى 10,000$ أو أقل للاستمرار عبر بوابات
+                    الدفع.
                   </div>
                 </div>
 
@@ -648,12 +701,10 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                 </div>
               </div>
             </div>
-
           </div>
 
           {/* ══════════ LEFT COLUMN (Second in DOM = Left in RTL) ══════════ */}
           <div className="lg:col-span-4 flex flex-col gap-6">
-
             {/* ── CARD A: فحص ومعايير المعاملة ── */}
             <div
               className="rounded-[18px] border p-5 sm:p-6"
@@ -673,9 +724,14 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                       border: `1px solid ${T.accentBorder}`,
                     }}
                   >
-                    <MdOutlineAccountBalance size={18} className="text-[#94D3C1]" />
+                    <MdOutlineAccountBalance
+                      size={18}
+                      className="text-[#94D3C1]"
+                    />
                   </div>
-                  <h2 className="text-sm font-bold text-white">فحص ومعايير المعاملة</h2>
+                  <h2 className="text-sm font-bold text-white">
+                    فحص ومعايير المعاملة
+                  </h2>
                 </div>
 
                 {/* Status Pill Badge */}
@@ -686,7 +742,6 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
 
               {/* Rows */}
               <div className="space-y-3">
-
                 {/* Row 1: فحص نوع البيانات (Numeric) - Shows normal dark state with checkmark in 134 */}
                 <div className="py-2.5 px-2 border-b border-white/[0.06] flex items-center justify-between">
                   <div>
@@ -719,7 +774,10 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono text-white font-medium" dir="ltr">
+                    <span
+                      className="text-xs font-mono text-white font-medium"
+                      dir="ltr"
+                    >
                       $10.00 USD
                     </span>
                     <div className="w-4 h-4 rounded-full flex items-center justify-center bg-white/10 border border-white/20 shrink-0">
@@ -733,7 +791,9 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                   className="rounded-xl border p-3.5 flex items-center justify-between"
                   style={{
                     backgroundColor: isExceeded ? T.dangerBg : "transparent",
-                    borderColor: isExceeded ? T.dangerBorder : "rgba(255,255,255,0.06)",
+                    borderColor: isExceeded
+                      ? T.dangerBorder
+                      : "rgba(255,255,255,0.06)",
                   }}
                 >
                   <div>
@@ -749,11 +809,17 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono text-white font-medium" dir="ltr">
+                    <span
+                      className="text-xs font-mono text-white font-medium"
+                      dir="ltr"
+                    >
                       $10,000.00 USD
                     </span>
                     {isExceeded ? (
-                      <FiXCircle size={18} className="text-[#DC2626] shrink-0" />
+                      <FiXCircle
+                        size={18}
+                        className="text-[#DC2626] shrink-0"
+                      />
                     ) : (
                       <div className="w-4 h-4 rounded-full flex items-center justify-center bg-[#94D3C1]/20 border border-[#94D3C1]/40 shrink-0">
                         <FiCheck size={10} className="text-[#94D3C1]" />
@@ -773,7 +839,10 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono text-white font-medium" dir="ltr">
+                    <span
+                      className="text-xs font-mono text-white font-medium"
+                      dir="ltr"
+                    >
                       USD (3.75 SAR)
                     </span>
                     <div className="w-4 h-4 rounded-full flex items-center justify-center bg-white/10 border border-white/20 shrink-0">
@@ -781,7 +850,6 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
 
@@ -806,7 +874,9 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                   >
                     <MdOutlineCalculate size={18} className="text-[#94D3C1]" />
                   </div>
-                  <h2 className="text-sm font-bold text-white">محتسب الرصيد التقديري</h2>
+                  <h2 className="text-sm font-bold text-white">
+                    محتسب الرصيد التقديري
+                  </h2>
                 </div>
               </div>
 
@@ -816,7 +886,8 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                 <div className="flex items-center justify-between">
                   <span className="text-gray-400">الرصيد المتاح حالياً:</span>
                   <span className="font-bold text-white font-mono" dir="ltr">
-                    ${currentAvailableBalance.toLocaleString("en-US", {
+                    $
+                    {currentAvailableBalance.toLocaleString("en-US", {
                       minimumFractionDigits: 2,
                     })}{" "}
                     USD
@@ -843,17 +914,23 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                 {/* Divider */}
                 <div className="border-t border-white/10 pt-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-400">الرصيد المتوقع بعد الإيداع:</span>
+                    <span className="text-gray-400">
+                      الرصيد المتوقع بعد الإيداع:
+                    </span>
                     <div className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
                       <span
                         className={`font-medium ${
-                          isErrorState ? "text-gray-400" : "text-[#94D3C1] font-mono font-bold"
+                          isErrorState
+                            ? "text-gray-400"
+                            : "text-[#94D3C1] font-mono font-bold"
                         }`}
                       >
                         {isErrorState
                           ? "(بانتظار تصحيح المبلغ)"
-                          : `$${(currentAvailableBalance + cleanNumber).toLocaleString("en-US", {
+                          : `$${(
+                              currentAvailableBalance + cleanNumber
+                            ).toLocaleString("en-US", {
                               minimumFractionDigits: 2,
                             })} USD`}
                       </span>
@@ -862,11 +939,8 @@ export default function WalletTopup134Page({ onRetry, initialAmount = "50,000" }
                 </div>
               </div>
             </div>
-
           </div>
-
         </div>
-
       </div>
     </div>
   );
