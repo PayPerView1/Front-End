@@ -169,7 +169,6 @@ function RowActions({ locale, isDark, t, tc, onView, onStats }) {
     </div>
   );
 }
->>>>>>> origin/feat/campaign-management
 
 export default function CampaignsDashboard() {
   const router = useRouter();
