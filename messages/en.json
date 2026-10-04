@@ -291,9 +291,7 @@
   "auditLog": "Financial Audit Log"
 }
 }
-  
-  
-},
+  },
   "profile": {
     "edit": "Edit Profile",
     "manageOrders": "Manage Orders",
@@ -431,7 +429,8 @@
   "campaigns": {
     "title": "Campaign Management",
     "subtitle": "Monitor performance, budgets, and active campaign status",
-    "dateFilter": "Date: Last 30 days",
+    "dateFilter": "All dates",
+    "dateClear": "Clear dates",
     "statusLabel": "Status",
     "search": "Search campaigns...",
     "all": "All",
@@ -526,7 +525,7 @@
   "assistant": {
     "close": "Close assistant",
     "title": "How can I help you today?",
-    "description": "I’m your smart assistant. I can help you create content, manage your account, or answer any questions.",
+    "description": "I'm your smart assistant. I can help you create content, manage your account, or answer any questions.",
     "preview": "Preview",
     "placeholder": "Write your message here...",
     "disclaimer": "The assistant may occasionally make mistakes. Please verify important information.",
@@ -546,15 +545,15 @@
         "desc": "Draft a welcome message for new subscribers"
       },
       "createAd": {
-        "title": "Create a creative ad",
-        "desc": "Generate engaging ad copy for your upcoming campaign"
+        "title": "Create creative ad",
+        "desc": "Generate engaging ad copies for your next campaign"
       },
       "startLive": {
         "title": "Start a live stream",
-        "desc": "Set up a live session to connect with your audience"
+        "desc": "Set up a live stream session to connect with your audience"
       },
       "sendInvoice": {
-        "title": "Send an invoice to a client",
+        "title": "Send client invoice",
         "desc": "Create and send a professional invoice quickly"
       }
     }
@@ -1068,5 +1067,4 @@
     "footerTag": "Built for the view economy"
 
   }
-
 }
