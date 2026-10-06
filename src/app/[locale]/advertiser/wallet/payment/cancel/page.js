@@ -1,4 +1,5 @@
-import PaymentCancelled125Page from "@/features/wallet/components/topup/components/PaymentCancelled125Page";
+import { Suspense } from "react";
+import PaymentCancelPage from "@/features/wallet/components/payment/cancel/PaymentCancelPage";
 
 export const metadata = {
   title: "تم إلغاء عملية الدفع | Pay Per View",
@@ -6,5 +7,9 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <PaymentCancelled125Page />;
+  return (
+    <Suspense fallback={null}>
+      <PaymentCancelPage />
+    </Suspense>
+  );
 }

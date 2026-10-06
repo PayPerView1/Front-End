@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import PageLoader from "@/components/PageLoader";
 import { useTheme } from "@/context/ThemeContext";
 import { Discovery, TickSquare } from "react-iconly";
 import {
@@ -462,12 +463,7 @@ export default function CampaignsDashboard() {
     return () => clearTimeout(delay);
   }, [currentPage, statusFilter, search, startDate, endDate]);
 
-  if (initialLoad)
-    return (
-      <div className={`flex items-center justify-center min-h-screen ${t.bg}`}>
-        <div className="w-8 h-8 border-2 border-[#94D3C1] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+  if (initialLoad) return <PageLoader />;
 
   if (
     !initialLoad &&

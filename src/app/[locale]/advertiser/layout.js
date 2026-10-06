@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import axiosInstance, { getSavedUser, getToken, saveAuthData } from "@/lib/axiosInstance";
 import { WalletProvider } from "@/features/wallet/WalletProvider";
+import PageLoader from "@/components/PageLoader";
 
 /**
  * Advertiser layout - only allows users with role BRAND.
@@ -63,7 +64,7 @@ export default function AdvertiserLayout({ children }) {
     };
   }, [router, locale]);
 
-  if (!allowed) return null;
+  if (!allowed) return <PageLoader />;
   return <WalletProvider>{children}</WalletProvider>;
 }
 

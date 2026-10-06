@@ -3,6 +3,7 @@
 
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import {
@@ -40,6 +41,14 @@ const T = {
 export default function PaymentCancelPage() {
   const router = useRouter();
   const locale = useLocale();
+
+  // مسح معرّف المعاملة المعلّقة عند الإلغاء
+  useEffect(() => {
+    try {
+      localStorage.removeItem("pendingTransactionId");
+      sessionStorage.removeItem("pendingTransactionId");
+    } catch {}
+  }, []);
 
   return (
     <div
@@ -155,7 +164,7 @@ export default function PaymentCancelPage() {
             <div>
               <p className="text-xs text-[#E9C349] font-semibold mb-1">لماذا تمّ الإلغاء؟</p>
               <ul className="text-xs text-[#E9C349]/80 leading-relaxed space-y-1 list-disc list-inside">
-                <li>اخترت الضغط على «إلغاء» أو العودة في صفحة PayPal</li>
+                <li>اخترت الضغط على «إلغاء» أو العودة في صفحة PayPal أو Moyasar</li>
                 <li>انتهت مهلة الجلسة (session timeout)</li>
                 <li>انقطع الاتصال أثناء إتمام الدفع</li>
               </ul>

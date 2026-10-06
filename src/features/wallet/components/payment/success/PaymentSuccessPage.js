@@ -262,7 +262,7 @@ export default function PaymentSuccessPage() {
                   { label: "المبلغ المدفوع", value: `$${txnData.grossAmount?.toLocaleString("en-US", { minimumFractionDigits: 2 }) ?? "—"}` },
                   { label: "صافي الشحن", value: `$${txnData.netAmount?.toLocaleString("en-US", { minimumFractionDigits: 2 }) ?? "—"}` },
                   { label: "العمولة", value: `$${txnData.commission?.toLocaleString("en-US", { minimumFractionDigits: 2 }) ?? "0.00"}` },
-                  { label: "وسيلة الدفع", value: txnData.paymentMethod === "PAYPAL" ? "PayPal" : txnData.paymentMethod ?? "—" },
+                  { label: "وسيلة الدفع", value: txnData.paymentMethod === "PAYPAL" ? "PayPal" : txnData.paymentMethod === "MOYASAR" ? "Moyasar" : txnData.paymentMethod === "BANK_TRANSFER" ? "تحويل بنكي" : txnData.paymentMethod ?? "—" },
                   { label: "الرقم المرجعي", value: txnData.referenceId ?? txnData.id?.slice(0, 12) + "..." ?? "—" },
                   { label: "حالة المعاملة", value: "مكتملة ✓", isGreen: true },
                 ].map(({ label, value, isGreen }) => (
@@ -357,7 +357,7 @@ export default function PaymentSuccessPage() {
               >
                 {[
                   { label: "المبلغ المرسل", value: `$${txnData.grossAmount?.toLocaleString("en-US", { minimumFractionDigits: 2 }) ?? "—"}` },
-                  { label: "وسيلة الدفع", value: txnData.paymentMethod === "PAYPAL" ? "PayPal" : txnData.paymentMethod ?? "—" },
+                  { label: "وسيلة الدفع", value: txnData.paymentMethod === "PAYPAL" ? "PayPal" : txnData.paymentMethod === "MOYASAR" ? "Moyasar" : txnData.paymentMethod === "BANK_TRANSFER" ? "تحويل بنكي" : txnData.paymentMethod ?? "—" },
                   { label: "الرقم المرجعي", value: txnData.referenceId ?? txnData.id?.slice(0, 14) + "..." ?? "—" },
                   { label: "الحالة", value: "قيد المعالجة", isWarning: true },
                 ].map(({ label, value, isWarning }) => (

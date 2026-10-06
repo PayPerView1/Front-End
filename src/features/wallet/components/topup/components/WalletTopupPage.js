@@ -502,6 +502,21 @@ export default function WalletTopupPage({
                   subtitle="بوابة الدفع الإلكترونية"
                 />
                 <PaymentCard
+                  id="moyasar"
+                  selected={selectedMethod}
+                  onSelect={setSelectedMethod}
+                  icon={
+                    <span
+                      className="text-[10px] font-extrabold tracking-tight"
+                      style={{ color: selectedMethod === 'moyasar' ? T.accent : '#8A9490' }}
+                    >
+                      M
+                    </span>
+                  }
+                  title="Moyasar"
+                  subtitle="بطاقات ومدى وApple Pay"
+                />
+                <PaymentCard
                   id="apple_pay"
                   selected={selectedMethod}
                   onSelect={setSelectedMethod}
