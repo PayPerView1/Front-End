@@ -147,7 +147,7 @@ export default function PaymentSuccessPage() {
   return (
     <div
       dir="rtl"
-      className="min-h-screen text-white pb-16 pt-4"
+      className="wallet-theme-page min-h-screen text-white pb-16 pt-4"
       style={{
         backgroundColor: T.bg,
         fontFamily: "var(--font-tajawal), 'Tajawal', sans-serif",
@@ -449,4 +449,3 @@ export default function PaymentSuccessPage() {
     </div>
   );
 }
-

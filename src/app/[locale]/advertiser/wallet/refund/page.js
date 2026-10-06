@@ -102,7 +102,7 @@ export default function RefundPage() {
   return (
     <div
       dir="rtl"
-      className="min-h-screen bg-[#0B0D0E] text-white p-6 md:p-8"
+      className="wallet-theme-page min-h-screen bg-[#0B0D0E] text-white p-6 md:p-8"
       style={{ fontFamily: "var(--font-tajawal), 'Tajawal', sans-serif" }}
     >
       {state !== 'cancelled' && state !== 'rejected' && (

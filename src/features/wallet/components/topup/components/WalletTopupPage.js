@@ -192,7 +192,7 @@ export default function WalletTopupPage({
   return (
     <div
       dir="rtl"
-      className="min-h-screen text-white pb-12"
+      className="wallet-theme-page min-h-screen text-white pb-12"
       style={{
         backgroundColor: T.bg,
         fontFamily: "var(--font-tajawal), 'Tajawal', sans-serif",
@@ -214,7 +214,7 @@ export default function WalletTopupPage({
             <button
               type="button"
               onClick={() => router.back()}
-              className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center text-white/70 hover:text-white hover:border-white/30 transition-all shrink-0 mt-0.5"
+              className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center text-white/70 transition-all shrink-0 mt-0.5"
             >
               <FiChevronRight size={18} />
             </button>
@@ -361,7 +361,9 @@ export default function WalletTopupPage({
                         key={q}
                         type="button"
                         onClick={() => handleQuickAmount(q)}
-                        className="flex flex-col items-center py-3 px-2 rounded-xl border transition-all cursor-pointer hover:brightness-110"
+                        className={`flex flex-col items-center py-3 px-2 rounded-xl border transition-all cursor-pointer ${
+                          isActive && !isTop ? "wallet-quick-amount-selected" : ""
+                        }`}
                         style={{
                           backgroundColor: isActive
                             ? isTop
@@ -552,7 +554,8 @@ export default function WalletTopupPage({
                 type="button"
                 onClick={handleProceed}
                 disabled={isProcessing}
-                className="px-6 py-3 rounded-xl bg-[#94D3C1] text-sm font-bold text-[#0B0D0E] hover:brightness-110 transition-all cursor-pointer w-full sm:w-auto disabled:cursor-wait disabled:opacity-60"
+                className="px-6 py-3 rounded-xl text-sm font-bold text-white transition-all cursor-pointer w-full sm:w-auto disabled:cursor-wait disabled:opacity-60"
+                style={{ background: "linear-gradient(90deg, #FDA100 0%, #FE5403 100%)" }}
               >
                 {isProcessing ? "جاري بدء عملية الشحن..." : "متابعة إلى الدفع"}
               </button>

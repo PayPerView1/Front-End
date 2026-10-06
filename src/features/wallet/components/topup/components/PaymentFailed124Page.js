@@ -91,7 +91,7 @@ export default function PaymentFailed124Page() {
   return (
     <div
       dir="rtl"
-      className="min-h-screen text-white pb-16 pt-2 sm:pt-4"
+      className="wallet-theme-page min-h-screen text-white pb-16 pt-2 sm:pt-4"
       style={{
         backgroundColor: T.bg,
         fontFamily: "var(--font-tajawal), 'Tajawal', sans-serif",

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   MdOutlineClose,
@@ -24,17 +24,54 @@ export default function ExportModal({ dark = true, isRtl = true, onClose, onExpo
   const [attachHash, setAttachHash] = useState(false);
   const [sendEmailCopy, setSendEmailCopy] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+
+  const completionPercent =
+    (!selectedFormat ? 0 : 45) +
+    (includeBankRef ? 18 : 0) +
+    (attachHash ? 18 : 0) +
+    (sendEmailCopy ? 19 : 0);
+
+  const displayProgress = Math.round(
+    isExporting ? exportProgress : Math.min(completionPercent, 100),
+  );
+
+  useEffect(() => {
+    if (!selectedFormat) {
+      setExportProgress(0);
+      return;
+    }
+
+    if (!isExporting) {
+      setExportProgress(Math.min(completionPercent, 100));
+    }
+  }, [selectedFormat, isExporting, completionPercent]);
 
   const handleDownload = async () => {
     if (!selectedFormat || isExporting) return;
+
     setIsExporting(true);
+    setExportProgress(Math.max(12, completionPercent));
+
+    const timer = setInterval(() => {
+      setExportProgress((prev) => {
+        if (prev >= 96) return prev;
+        return Math.min(prev + 18, 96);
+      });
+    }, 220);
+
     try {
       if (onExport) {
         await onExport({ format: selectedFormat, includeBankRef, attachHash, sendEmailCopy });
       }
+
+      setExportProgress(100);
+      setTimeout(() => {
+        onClose?.();
+      }, 250);
     } finally {
+      clearInterval(timer);
       setIsExporting(false);
-      onClose();
     }
   };
 
@@ -284,7 +321,7 @@ export default function ExportModal({ dark = true, isRtl = true, onClose, onExpo
           <div className="flex items-center justify-between text-[0.62rem] sm:text-[0.65rem]">
             <div className="flex items-center gap-1 font-semibold bg-gradient-to-r from-[#94D3C1] to-[#E9C349] bg-clip-text text-transparent">
               <HiCheckCircle size={14} className="text-[#94D3C1] shrink-0" />
-              <span>{t("dataSuccess")}</span>
+              <span>{t("dataSuccess", { percent: displayProgress })}</span>
             </div>
 
             <span className={`text-[0.58rem] sm:text-[0.6rem] shrink-0 ${
@@ -299,7 +336,10 @@ export default function ExportModal({ dark = true, isRtl = true, onClose, onExpo
           <div className={`w-full h-1 rounded-full overflow-hidden ${
             dark ? "bg-gray-800" : "bg-gray-200"
           }`}>
-            <div className="h-full bg-gradient-to-r from-[#94D3C1] to-[#E9C349] w-full" />
+            <div
+              className="h-full bg-gradient-to-r from-[#94D3C1] to-[#E9C349] transition-all duration-300 ease-out"
+              style={{ width: `${isExporting ? exportProgress : Math.min(completionPercent, 100)}%` }}
+            />
           </div>
 
           <div className="flex items-center justify-between gap-1 text-[0.58rem] sm:text-[0.6rem] pt-0.5">
@@ -312,7 +352,7 @@ export default function ExportModal({ dark = true, isRtl = true, onClose, onExpo
             </span>
 
             <span className="text-amber-400 font-semibold shrink-0">
-              {t("readyForDownload")}
+              {displayProgress}%
             </span>
           </div>
         </div>

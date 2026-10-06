@@ -1009,7 +1009,7 @@
     "includeBankRef": "تضمين المرجع البنكي والبيان الضريبي",
     "attachHash": "إرفاق البصمة (Ledger Hash)",
     "sendEmailCopy": "إرسال نسخة مشفرة للبريد (finance@company.com)",
-    "dataSuccess": "تم تجميع البيانات بنجاح (100%)",
+    "dataSuccess": "تم تجميع البيانات بنجاح ({percent}%)",
     "fileSize": "الحجم:",
     "selectFormatFirst": "اختر صيغة الملف أولاً",
     "readyForDownload": "جاهز للتنزيل",
