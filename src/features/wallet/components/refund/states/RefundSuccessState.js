@@ -126,7 +126,7 @@ export default function RefundSuccessState({ onSwitchState, onCancel, refund, ca
           <button onClick={() => router.push(`/${locale}/advertiser/wallet`)} className="flex-1 bg-[rgba(148,211,193,0.1)] hover:bg-[rgba(148,211,193,0.2)] text-[#94D3C1] text-sm font-medium py-3 rounded-xl transition-colors border border-[rgba(148,211,193,0.2)]">
             العودة إلى لوحة المحفظة
           </button>
-          {!approved && <button onClick={onCancel} disabled={cancelling || !refund?.refundRequestId} className="flex items-center justify-center gap-2 flex-1 bg-[#E9C349] hover:bg-[#E67E00] text-white text-sm font-medium py-3 rounded-xl transition-colors shadow-lg shadow-[#E9C349]/20 disabled:cursor-not-allowed disabled:opacity-50">
+          {!approved && <button onClick={onCancel} disabled={cancelling || !refund?.refundRequestId} className="flex items-center justify-center gap-2 flex-1 text-white text-sm font-medium py-3 rounded-xl disabled:cursor-not-allowed disabled:opacity-50" style={{ background: "linear-gradient(90deg, #FDA100 0%, #FE5403 100%)" }}>
             <FileText className="w-4 h-4" />
             {cancelling ? 'جارٍ إلغاء الطلب…' : 'إلغاء طلب الاسترداد'}
           </button>}

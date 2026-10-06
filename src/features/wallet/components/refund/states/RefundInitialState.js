@@ -206,7 +206,8 @@ export default function RefundInitialState({ onSwitchState, onSubmit, submitting
             <button 
               onClick={handleSubmit}
               disabled={submitting}
-              className="w-full bg-[#E9C349] hover:bg-[#E67E00] text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-[#E9C349]/20"
+              className="w-full text-[#1D1D1D] font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg"
+              style={{ background: "linear-gradient(90deg, #FDA100 0%, #FE5403 100%)" }}
             >
               {submitting ? 'جارٍ إرسال الطلب…' : `تأكيد وإرسال طلب الاسترداد (Net $${(Number(amount || 0) * 0.98).toFixed(2)})`}
               <ArrowRight className="w-5 h-5 -rotate-135" />

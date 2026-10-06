@@ -625,7 +625,9 @@ export default function TransactionList({
                   setShowCalendar(false);
                 }}
                 className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border cursor-pointer transition-colors whitespace-nowrap ${selectedType !== "all"
-                  ? "border-[#94D3C1] text-[#94D3C1] bg-[#94D3C1]/10"
+                  ? dark
+                    ? "border-[#94D3C1] text-[#94D3C1] bg-[#94D3C1]/10"
+                    : "border-[#1C6B58] text-[#1C6B58] bg-[#94D3C1]/20"
                   : btnCls
                   }`}
               >
@@ -666,10 +668,12 @@ export default function TransactionList({
                           }}
                           className={`text-xs px-3 py-2 rounded-lg w-full transition-colors ${isRtl ? "text-right" : "text-left"
                             } ${active
-                              ? "bg-[#94D3C1]/15 text-[#94D3C1] font-bold"
+                              ? dark
+                                ? "bg-[#94D3C1]/15 text-[#94D3C1] font-bold"
+                                : "bg-[#94D3C1]/20 text-[#1C6B58] font-bold"
                               : dark
                                 ? "hover:bg-[#252525]"
-                                : "hover:bg-gray-100"
+                                : "text-[#404945] hover:bg-gray-100"
                             }`}
                         >
                           {labels[item]}
@@ -900,7 +904,7 @@ export default function TransactionList({
                     {/* رقم المعاملة */}
                     <td className="px-4 py-3.5 whitespace-nowrap">
                       <div
-                        className={`flex items-center gap-1.5 px-2 py-1 rounded-md w-fit border ${dark
+                        className={`flex flex-row-reverse items-center gap-1.5 px-2 py-1 rounded-md w-fit border ${dark
                           ? "bg-[#171717] border-[#262626]"
                           : "bg-[#F3F4F6] border-[#E5E5E5]"
                           }`}
@@ -940,7 +944,7 @@ export default function TransactionList({
                         className="inline-flex items-center gap-1 text-[0.65rem] px-2.5 py-1 rounded-full font-medium"
                         style={{
                           background: typeCfg.bg,
-                          color: typeCfg.text,
+                          color: !dark && tx.type === "deposit" ? "#1C6B58" : typeCfg.text,
                           border: `1px solid ${typeCfg.border}`,
                         }}
                       >
@@ -984,7 +988,7 @@ export default function TransactionList({
 
                     {/* المبلغ */}
                     <td className="px-4 py-3.5 whitespace-nowrap font-mono">
-                      <div className="font-bold text-sm text-[#FFB800]">
+                      <div className={`font-bold text-sm ${dark ? "text-[#FFB800]" : "text-[#8A6100]"}`}>
                         {tx.amount}
                       </div>
                       <div className="text-[0.6rem] text-[#666] mt-0.5">

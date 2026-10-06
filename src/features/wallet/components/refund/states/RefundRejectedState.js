@@ -185,7 +185,7 @@ export default function RefundRejectedState({ onSwitchState, refund, walletBalan
 
         {/* Action Buttons */}
         <div className="bg-[#151819] rounded-2xl border border-white/[.08] p-6 space-y-3">
-          <button onClick={() => onSwitchState('initial')} className="w-full bg-[#E9C349] hover:bg-[#E67E00] text-white font-bold py-3.5 rounded-xl transition-colors shadow-lg shadow-[#E9C349]/20">
+          <button onClick={() => onSwitchState('initial')} className="w-full text-white font-bold py-3.5 rounded-xl" style={{ background: "linear-gradient(90deg, #FDA100 0%, #FE5403 100%)" }}>
             إيقاف الحملات وتعديل البيانات لإعادة التقديم
           </button>
           <button className="w-full bg-[#101213] hover:bg-white/[.08] border border-white/[.08] text-white text-sm font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2">

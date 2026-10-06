@@ -1435,7 +1435,7 @@ function BudgetContent({ campaigns, onRefresh }) {
         {/* ── 1) Header + banners + geo ───────────────────────────────── */}
         <div className="flex flex-col gap-2">
           <Card t={t} className="px-4 py-3 sm:px-5">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                   <h1
@@ -1464,11 +1464,12 @@ function BudgetContent({ campaigns, onRefresh }) {
                 t={t}
                 icon={MdOutlineAddCard}
                 onClick={() => setShowBulk(true)}
+                className="w-full lg:w-auto"
               >
                 شحن جماعي
               </GhostBtn>
               <div
-                className="flex shrink-0 items-center gap-3 self-start rounded-xl px-3 py-2 md:self-center"
+                className="flex w-full shrink-0 items-center gap-3 self-stretch rounded-xl px-3 py-2 sm:w-fit sm:self-start lg:self-center"
                 style={{ background: t.inner, border: `1px solid ${t.border}` }}
               >
                 <div
@@ -1568,9 +1569,9 @@ function BudgetContent({ campaigns, onRefresh }) {
         </div>
 
         {/* ── 2) Main grid ────────────────────────────────────────────── */}
-        <div className="mt-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="mt-6 grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
           {/* Right column (in RTL): summary + daily limit + security */}
-          <div className="flex min-w-0 flex-col gap-4">
+          <div className="order-2 flex min-w-0 flex-col gap-4 xl:order-none">
             {/* Summary */}
             <Card t={t} className="flex flex-col gap-4 p-4 sm:p-5">
               <SectionHead
@@ -1598,14 +1599,14 @@ function BudgetContent({ campaigns, onRefresh }) {
                   }}
                   className="inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold transition-all hover:opacity-80"
                   style={{
-                    background: isUpdating ? "#0C0F10" : t.inner,
-                    color: isUpdating ? "#FFFFFF" : t.soft,
-                    border: `1px solid ${isUpdating ? "#0C0F10" : t.border}`,
+                    background: isUpdating ? t.innerStrong : t.inner,
+                    color: isUpdating ? t.heading : t.soft,
+                    border: `1px solid ${isUpdating ? t.innerStrong : t.border}`,
                   }}
                 >
                   <MdOutlineRefresh
                     size={15}
-                    color={isUpdating ? "#FFFFFF" : undefined}
+                    color={isUpdating ? t.heading : undefined}
                   />
                   <span className="hidden sm:inline">
                     {tr("summary.refresh")}
@@ -2167,7 +2168,7 @@ function BudgetContent({ campaigns, onRefresh }) {
           </div>
 
           {/* Left column (in RTL): recharge + notifications */}
-          <div className="flex min-w-0 flex-col gap-4">
+          <div className="order-1 flex min-w-0 flex-col gap-4 xl:order-none">
             <Card t={t} className="flex min-w-0 flex-col gap-4 p-4 sm:p-5">
               <SectionHead
                 t={t}

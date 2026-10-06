@@ -21,6 +21,9 @@ import { FiTrendingUp, FiTrendingDown } from "react-icons/fi";
 export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = true, walletBalance }) {
   const balanceValue = Number(walletBalance?.balance ?? walletBalance);
   const displayBalance = Number.isFinite(balanceValue) ? `$${balanceValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—";
+  const accentColor = dark ? "#94D3C1" : "#1C6B58";
+  const mutedColor = dark ? "#888888" : "#5F6A66";
+  const goldColor = dark ? "#EAB308" : "#806000";
   // 1. بيانات الحالة الفارغة
   const emptyStats = [
     {
@@ -29,11 +32,11 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
       value: displayBalance,
       currency: "USD",
       sub: t("stats.balanceSub"),
-      subColor: "#888888",
-      valueColor: "#94D3C1",
+      subColor: mutedColor,
+      valueColor: accentColor,
       icon: MdOutlineAccountBalanceWallet,
       bottomText: t("stats.balanceBottom"),
-      bottomColor: "#EAB308",
+      bottomColor: goldColor,
       hasDot: true,
     },
     {
@@ -42,12 +45,12 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
       value: "—",
       currency: "USD",
       sub: t("stats.prevDepositsSub"),
-      subColor: "#888888",
-      valueColor: "#94D3C1",
+      subColor: mutedColor,
+      valueColor: accentColor,
       icon: MdOutlinePayments,
       bottomText: t("stats.prevDepositsBottom"),
       bottomIcon: MdOutlineCreditCardOff,
-      bottomColor: "#888888",
+      bottomColor: mutedColor,
     },
     {
       key: "adSpend",
@@ -55,12 +58,12 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
       value: "—",
       currency: "USD",
       sub: t("stats.adSpendSub"),
-      subColor: "#888888",
-      valueColor: "#94D3C1",
+      subColor: mutedColor,
+      valueColor: accentColor,
       icon: MdOutlineCreditCard,
       bottomText: t("stats.adSpendBottom"),
       bottomIcon: MdOutlineShield,
-      bottomColor: "#94D3C1",
+      bottomColor: accentColor,
     },
     {
       key: "cashback",
@@ -68,12 +71,12 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
       value: "—",
       currency: "USD",
       sub: t("stats.cashbackSub"),
-      subColor: "#888888",
-      valueColor: "#94D3C1",
+      subColor: mutedColor,
+      valueColor: accentColor,
       icon: MdOutlineSavings,
       bottomText: t("stats.cashbackBottom"),
       bottomIcon: MdOutlineFactCheck,
-      bottomColor: "#888888",
+      bottomColor: mutedColor,
     },
   ];
 
@@ -85,12 +88,12 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
       value: displayBalance,
       currency: "USD",
       sub: t("stats.balanceSubPop"),
-      subColor: "#EAB308",
-      valueColor: "#94D3C1",
+      subColor: goldColor,
+      valueColor: accentColor,
       icon: MdOutlineAccountBalanceWallet,
       bottomText: t("stats.balanceBottomPop", t("stats.balanceBottom")),
       bottomIcon: MdOutlineFactCheck,
-      bottomColor: "#94D3C1",
+      bottomColor: accentColor,
     },
     {
       key: "prevDeposits",
@@ -98,8 +101,8 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
       value: "—",
       currency: "USD",
       sub: "",
-      subColor: dark ? "#888888" : "#666666",
-      valueColor: "#94D3C1",
+      subColor: mutedColor,
+      valueColor: accentColor,
       icon: MdOutlinePayments,
     },
     {
@@ -108,12 +111,12 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
       value: "—",
       currency: "USD",
       sub: "",
-      subColor: dark ? "#888888" : "#666666",
-      valueColor: "#94D3C1",
+      subColor: mutedColor,
+      valueColor: accentColor,
       icon: MdOutlineCreditCard,
       bottomText: "",
       bottomIcon: MdOutlineCreditCard,
-      bottomColor: "#94D3C1",
+      bottomColor: accentColor,
     },
     {
       key: "cashback",
@@ -121,12 +124,12 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
       value: "—",
       currency: "USD",
       sub: "",
-      subColor: dark ? "#888888" : "#666666",
-      valueColor: "#94D3C1",
+      subColor: mutedColor,
+      valueColor: accentColor,
       icon: MdOutlineSavings,
       bottomText: "",
       bottomIcon: MdOutlineShield,
-      bottomColor: "#94D3C1",
+      bottomColor: accentColor,
     },
   ];
 
@@ -151,7 +154,7 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
                 {s.label}
               </span>
               <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${dark ? "bg-[#1E2328]" : "bg-[#F3F4F6]"}`}>
-                <Icon size={18} color="#94D3C1" />
+                <Icon size={18} color={accentColor} />
               </div>
             </div>
 
@@ -159,7 +162,7 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
             <div className="flex flex-col gap-0.5 text-start">
               <div className="flex items-baseline gap-1.5 flex-wrap">
                 {s.currency && (
-                  <span className="text-xs font-medium text-[#94D3C1]">
+                  <span className="text-xs font-medium" style={{ color: accentColor }}>
                     {s.currency}
                   </span>
                 )}
@@ -190,7 +193,7 @@ export default function StatsCards({ t, dark = true, isEmpty = false, isRtl = tr
                     {s.trend}
                   </span>
                   {s.trendLabel && (
-                    <span className={`text-xs ${dark ? "text-[#777777]" : "text-[#888888]"}`}>
+                    <span className={`text-xs ${dark ? "text-[#777777]" : "text-[#5F6A66]"}`}>
                       {s.trendLabel}
                     </span>
                   )}

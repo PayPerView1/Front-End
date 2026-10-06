@@ -120,7 +120,7 @@ export default function AnalyticsPage() {
   return (
     <div
       dir={isRtl ? "rtl" : "ltr"}
-      className={`min-h-screen p-6 ${dark ? "bg-[#0A0A0A]" : "bg-[#F4F5F7]"}`}
+      className={`min-h-screen p-3 sm:p-4 md:p-6 ${dark ? "bg-[#0A0A0A]" : "bg-[#F1F4F3]"}`}
       style={{ fontFamily: "var(--font-tajawal,inherit)" }}
     >
 

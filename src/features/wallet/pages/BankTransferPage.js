@@ -85,7 +85,7 @@ export default function BankTransferPage() {
   const bankDetails = transfer?.bankDetails;
 
   return (
-    <>
+    <main className="wallet-theme-page min-h-screen px-4 sm:px-6">
       <section dir="rtl" className="mx-auto mt-6 max-w-4xl rounded-2xl border border-white/10 bg-[#151819] p-5 text-white sm:p-7">
         <h1 className="mb-2 text-xl font-bold">بيانات التحويل البنكي</h1>
         <p className="mb-5 text-sm text-gray-400">
@@ -175,6 +175,6 @@ export default function BankTransferPage() {
       </section>
 
       <PaymentSuccessPage />
-    </>
+    </main>
   );
 }

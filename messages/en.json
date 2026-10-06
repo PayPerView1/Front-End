@@ -913,7 +913,7 @@
     "includeBankRef": "Include bank reference and detailed tax statement",
     "attachHash": "Attach digital fingerprint (Ledger Hash)",
     "sendEmailCopy": "Send an encrypted copy to email (finance@company.com)",
-    "dataSuccess": "Data compiled successfully (100%)",
+    "dataSuccess": "Data compiled successfully ({percent}%)",
     "fileSize": "Size:",
     "selectFormatFirst": "Select file format first",
     "readyForDownload": "Ready for download",
