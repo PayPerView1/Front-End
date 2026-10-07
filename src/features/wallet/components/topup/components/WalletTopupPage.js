@@ -176,7 +176,8 @@ export default function WalletTopupPage({
         try { sessionStorage.setItem("wallet:bank-transfer", JSON.stringify({ ...data, amount })); } catch {}
         router.push(`/${locale}/advertiser/wallet/bank-transfer?transactionId=${encodeURIComponent(data.transactionId || "")}`);
       } else if (data.transactionId) {
-        router.push(`/${locale}/advertiser/wallet/payment/success?transactionId=${encodeURIComponent(data.transactionId)}`);
+        try { localStorage.setItem("pendingTransactionId", data.transactionId); } catch {}
+        router.push(`/${locale}/advertiser/wallet/payment/success`);
       } else {
         throw new Error("لم يُرجع الخادم معرّفاً لعملية الشحن.");
       }
