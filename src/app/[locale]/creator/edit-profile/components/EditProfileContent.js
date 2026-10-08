@@ -475,7 +475,7 @@ export default function EditProfileContent() {
           user.profilePicture &&
           user.profilePicture !== "default-avatar.png"
         ) {
-          const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://payperview-platform.onrender.com";
+          const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://platform.apps.taqat.academy";
           const imageUrl = user.profilePicture.startsWith("http")
             ? user.profilePicture
             : `${baseUrl.replace(/\/$/, "")}/${user.profilePicture.replace(/^\//, "")}`;

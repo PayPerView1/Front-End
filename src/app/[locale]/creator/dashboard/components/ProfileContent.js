@@ -50,7 +50,7 @@ function getUserName(user) {
 function getProfileImageUrl(profilePicture) {
   if (!profilePicture) return null;
   if (profilePicture.startsWith("http")) return profilePicture;
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://payperview-platform.onrender.com";
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://platform.apps.taqat.academy";
   return `${baseUrl.replace(/\/$/, "")}/${profilePicture.replace(/^\//, "")}`;
 }
 
