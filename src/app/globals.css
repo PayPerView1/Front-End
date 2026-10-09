@@ -4,6 +4,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  scrollbar-gutter: stable;
 }
 
 .dark {
@@ -230,4 +231,27 @@ html:not(.dark) .wallet-theme-page input::placeholder {
 .lang-scroll {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.orders-filter-scroll-light {
+  scrollbar-color: #b5c0bb #e8eeeb;
+  scrollbar-width: thin;
+}
+
+.orders-filter-scroll-light::-webkit-scrollbar {
+  height: 6px;
+}
+
+.orders-filter-scroll-light::-webkit-scrollbar-track {
+  background: #e8eeeb;
+  border-radius: 9999px;
+}
+
+.orders-filter-scroll-light::-webkit-scrollbar-thumb {
+  background: #b5c0bb;
+  border-radius: 9999px;
+}
+
+.orders-filter-scroll-light::-webkit-scrollbar-thumb:hover {
+  background: #ea580c;
 }
