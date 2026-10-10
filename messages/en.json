@@ -326,6 +326,73 @@
       "noCreatedWorks": "No created works yet",
       "noJoinedCampaigns": "No joined campaigns yet"
     },
+    "favorites": {
+      "title": "Favorite Campaigns & Bulk Management",
+      "description": "Track and apply to Sharia-compliant campaigns you have saved. Manage applications individually or in bulk and export records with ease.",
+      "searchPlaceholder": "Search by name or advertiser...",
+      "selectAll": "Select all ({count})",
+      "removeSelected": "Remove selected",
+      "noResults": "No matching results",
+      "changeFilters": "Try changing your search or category.",
+      "removeFromFavorites": "Remove from favorites",
+      "materials": "Materials:",
+      "platforms": "Platforms:",
+      "rateLabel": "Earnings per thousand impressions:",
+      "remaining": "Remaining:",
+      "total": "Total:",
+      "applyNow": "Apply now",
+      "campaignDetails": "Campaign details",
+      "rawClips": "{count} raw 4K clips",
+      "halalAudio": "Halal audio",
+      "sort": {
+        "newest": "Recently added",
+        "cpmHigh": "Highest CPM",
+        "endingSoon": "Ending soon",
+        "aiRecommended": "Best match (AI recommendation)"
+      },
+      "categories": {
+        "all": "All categories",
+        "lifestyle": "Lifestyle",
+        "technology": "Technology",
+        "education": "Education",
+        "entertainment": "Entertainment",
+        "finance": "Finance",
+        "health": "Health"
+      },
+      "countries": {
+        "label": "Countries:",
+        "sa": "Saudi Arabia",
+        "ae": "United Arab Emirates",
+        "eg": "Egypt",
+        "kw": "Kuwait",
+        "qa": "Qatar"
+      },
+      "campaigns": {
+        "emerald": {
+          "title": "Edit and publish educational clips about halal investing",
+          "description": "Create engaging clips from a safe-investing podcast, adding interactive captions and clear, compliant audio effects."
+        },
+        "modestFashion": {
+          "title": "Reviews and Eid outfit styling videos",
+          "description": "Showcase and style elegant abayas and dresses while highlighting the quality of their premium fabrics."
+        },
+        "wafer": {
+          "title": "Design and edit promotional app videos",
+          "description": "Edit app screen recordings and highlight automatic gold and silver savings features in a modern, fast-paced style."
+        }
+      },
+      "alerts": {
+        "title": "Smart favorites monitoring and alerts",
+        "description": "Get instant notifications and emails when a campaign's status changes, its end date approaches, or its budget is updated.",
+        "customize": "Customize alerts"
+      },
+      "empty": {
+        "title": "Your favorites list is currently empty",
+        "description": "You haven't saved any Sharia-compliant ad campaigns yet. Explore the available opportunities and save promising campaigns to revisit or apply with one click.",
+        "explore": "Explore available campaigns",
+        "recommendations": "View suggested smart recommendations"
+      }
+    },
     "campaigns": {
       "arabClips": "Arabic Clips Community",
       "creators": "Creators Platform",
@@ -424,7 +491,31 @@
     "services": "Connected services",
     "security": "Account security",
     "subscriptions": "Subscriptions",
-    "disputes": "Dispute center"
+    "disputes": "Dispute center",
+    "interests": "Interests",
+    "favorites": "Favorites",
+    "linkedAccounts": "Linked accounts",
+    "notifications": "Notifications",
+    "paymentMethods": "Payment methods",
+    "phone": "Phone number",
+    "choose": "Choose",
+    "phonePlaceholder": "Enter your phone number",
+    "country": "Country",
+    "countryPlaceholder": "Choose a country",
+    "city": "City",
+    "cityPlaceholder": "e.g. Dubai",
+    "interestsTitle": "Interests",
+    "interestOptions": {
+      "lifestyle": "Lifestyle",
+      "technology": "Technology",
+      "education": "Education",
+      "entertainment": "Entertainment",
+      "finance": "Finance",
+      "health": "Health"
+    },
+    "phoneCodeRequired": "Select a country calling code and enter a phone number",
+    "removeProfilePicture": "Remove profile picture",
+    "profilePictureValidation": "Image must be JPEG, JPG, PNG, or WebP and no larger than 5 MB"
   },
   "campaigns": {
     "title": "Campaign Management",
