@@ -31,6 +31,7 @@ import { useUser } from "@/context/UserContext";
 // ─── قائمة صانع المحتوى (CLIPPER) ────────────────────────────
 const creatorNavItems = [
   { label: "home", href: "/creator/dashboard", icon: Home },
+  { label: "orders", href: "/creator/orders", icon: Bag },
   { label: "search", href: "/search", icon: Search },
   { label: "discover", href: "/discover", icon: Discovery },
   { label: "startProject", href: "/new", icon: Plus },
@@ -90,6 +91,7 @@ const advertiserResourceItems = [];
 // ─── Fallbacks حسب اللغة ──────────────────────────────────────
 const sidebarFallbacksEn = {
   home: "Home",
+  orders: "Orders",
   search: "Search",
   discover: "Discover",
   startProject: "Start a project",
@@ -112,6 +114,7 @@ const sidebarFallbacksEn = {
 
 const sidebarFallbacksAr = {
   home: "الرئيسية",
+  orders: "طلباتي",
   search: "البحث",
   discover: "استكشاف",
   startProject: "بدء مشروع",
@@ -158,12 +161,16 @@ export default function Sidebar() {
   }, []);
 
   const fallbacks = locale === "ar" ? sidebarFallbacksAr : sidebarFallbacksEn;
-  const sidebar = (key) => messages?.sidebar?.[key] || fallbacks[key] || key;
+  const sidebar = (key) =>
+    messages?.sidebar?.[key] ||
+    (key === "orders" ? messages?.nav?.orders : null) ||
+    fallbacks[key] ||
+    key;
 
   const { isDark } = useTheme();
 
   const t = {
-    bg: isDark ? "bg-[#0D0D0D] border-[#2D2D2D]" : "bg-white border-[#E5E5E5]",
+    bg: isDark ? "bg-[#0D0D0D]" : "bg-white",
     text: isDark ? "text-white" : "text-[#1A1A1A]",
     subText: isDark ? "text-[#9A9A9A]" : "text-[#666666]",
     activeLink: isDark ? "bg-white/10 text-white" : "bg-[#F0F0F0] text-black",
@@ -324,7 +331,7 @@ export default function Sidebar() {
         className={`
           min-[1280px]:hidden fixed top-4
           ${locale === "ar" ? "right-4" : "left-4"}
-          z-[999999999999] w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
+          z-[80] w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
           ${
             isDark
               ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
@@ -348,8 +355,8 @@ export default function Sidebar() {
       <aside
         dir={locale === "ar" ? "rtl" : "ltr"}
         className={`
-          fixed ${locale === "ar" ? "right-0 border-l" : "left-0 border-r"}
-          top-0 h-screen w-[260px] flex flex-col z-[9999999999]
+          fixed ${locale === "ar" ? "right-0" : "left-0"}
+          top-0 h-screen w-[260px] flex flex-col z-[90]
           ${t.bg}
           transition-transform duration-300 ease-in-out
           min-[1280px]:translate-x-0

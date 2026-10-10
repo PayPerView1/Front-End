@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import { mockConversations } from "@/components/ConversationList";
 
 const MessagesContext = createContext(null);
@@ -11,6 +11,52 @@ export function MessagesProvider({ children }) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [readIds, setReadIds] = useState([]);
   const [conversations, setConversations] = useState(mockConversations);
+
+  const addSystemNotification = useCallback(
+    ({ title, text, orderId, status }) => {
+      const notificationKey = orderId
+        ? `${orderId}-${status || "update"}`
+        : Date.now();
+      const id = `system-${notificationKey}`;
+      const message = {
+        id: `${id}-message`,
+        sender: title,
+        text,
+        isMe: false,
+        time: new Date().toLocaleTimeString("ar-EG", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+
+      setConversations((prev) => {
+        if (
+          orderId &&
+          prev.some(
+            (conversation) =>
+              conversation.systemNotificationId === notificationKey
+          )
+        ) {
+          return prev;
+        }
+
+        return [
+          {
+            id,
+            name: title,
+            lastMessage: text,
+            unread: true,
+            isOrder: true,
+            color: "#ef4444",
+            systemNotificationId: notificationKey,
+            messages: [message],
+          },
+          ...prev,
+        ];
+      });
+    },
+    []
+  );
 
   const toggleMessages = () => setIsMessagesOpen((prev) => !prev);
   const toggleMaximize = () => setIsMaximized((prev) => !prev);
@@ -41,6 +87,7 @@ export function MessagesProvider({ children }) {
         toggleMaximize,
         conversations,
         setConversations,
+        addSystemNotification,
         readIds,
         markAsRead,
         unreadCount,

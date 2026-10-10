@@ -1066,5 +1066,106 @@
     "verifiedViews": "Verified views",
     "footerTag": "Built for the view economy"
 
+  },
+  "creatorOrders": {
+    "title": "My Orders",
+    "description": "Manage and track your campaign applications, advertiser approvals, video submissions, and active withdrawals with confidence and transparency.",
+    "exploreCampaigns": "Explore New Campaigns",
+    "stats": {
+      "total": "Total Applications",
+      "registered": "Applications submitted",
+      "pending": "Under Review",
+      "awaitingAdvertiser": "Awaiting advertiser response",
+      "accepted": "Accepted Applications",
+      "acceptanceRate": "75% acceptance rate",
+      "closed": "Completed / Closed",
+      "archived": "Completed or archived"
+    },
+    "notice": {
+      "title": "Withdrawal Guidelines:",
+      "description": "You can withdraw your application at any time while it is still under review and has not been approved by the advertiser, without affecting your creator rating or platform record."
+    },
+    "filters": {
+      "all": "All",
+      "pending": "Under Review",
+      "accepted": "Accepted & Active",
+      "rejected": "Rejected or Withdrawn"
+    },
+    "searchPlaceholder": "Search by campaign name or code...",
+    "sort": {
+      "label": "Sort orders",
+      "newest": "Newest",
+      "highestCost": "Highest Cost",
+      "endingSoon": "Ending Soon"
+    },
+    "order": {
+      "submitted": "Submitted: {date} - {time}",
+      "approved": "Approved: {date}",
+      "closed": "Closed: {date}",
+      "cpm": "View Rate (CPM)",
+      "targetPlatforms": "Target Platforms",
+      "trackingCode": "Tracking code:",
+      "withdraw": "Withdraw Application",
+      "campaignDetails": "View Campaign Details",
+      "contactAdvertiser": "Contact Advertiser",
+      "uploadVideo": "Upload Video",
+      "withdrawReason": "Withdrawal reason:",
+      "rejectionReason": "Advertiser's rejection reason:"
+    },
+    "sampleOrders": {
+      "perfumeTitle": "Al Asalah Luxury Perfume Launch Campaign - Sidra Co.",
+      "sidraCompany": "Sidra Co.",
+      "pendingStatus": "Under Review",
+      "campaignBudget": "Campaign Budget",
+      "pendingNote": "Estimated response time: under 12 hours (you may withdraw while the application is unapproved)",
+      "goldAppTitle": "Smart Gold and Islamic Investment App",
+      "fintechCompany": "Namaa Fintech",
+      "acceptedStatus": "Accepted - Awaiting Video Clip",
+      "maxEarnings": "Maximum Earnings",
+      "acceptedNote": "Your application has been officially approved by the advertiser. You can now produce your video and submit the approved clip link to start tracking views and earnings automatically.",
+      "fashionTitle": "Elegant Arabic Clothing and Fashion",
+      "fashionStore": "Arabic Fashion Store",
+      "rejectedStatus": "Rejected - Creator Capacity Reached",
+      "totalBudget": "Total Budget",
+      "rejectionReason": "The full allocation for fashion creators in this campaign was filled within the first few hours. No additional spots are available; we invite you to apply for the next release in September."
+    },
+    "notifications": {
+      "acceptedTitle": "Application Accepted",
+      "rejectedTitle": "Application Rejected",
+      "acceptedText": "Your application to join the \"{title}\" campaign was accepted.",
+      "rejectedText": "Your application for the \"{title}\" campaign was rejected.",
+      "rejectedWithReason": "Your application for the \"{title}\" campaign was rejected. Reason: {reason}",
+      "withdrawnTitle": "Application Withdrawn",
+      "withdrawnText": "Your application for the \"{title}\" campaign was successfully withdrawn."
+    },
+    "withdrawn": {
+      "status": "Withdrawn by Creator",
+      "busyReason": "Current scheduling constraints",
+      "personalReason": "Personal reasons",
+      "reasonText": "You withdrew this application for the following reason: {reason}."
+    },
+    "withdrawModal": {
+      "title": "Are you sure you want to withdraw your application?",
+      "description": "You can withdraw your application safely and free of charge, with no penalties, as long as it is still under review and has not been officially approved by the campaign team.",
+      "close": "Close",
+      "applicationId": "Application ID:",
+      "pending": "Under Review",
+      "submittedAt": "Submitted At",
+      "cpm": "Cost per 1,000 Impressions (CPM)",
+      "perThousandViews": "per 1,000 views",
+      "fairPolicyTitle": "Our Fair Policy for Creators",
+      "policyBeforeApproval": "Withdrawing before approval",
+      "policyNoImpact": "will not affect",
+      "policyAfterNoImpact": "your account rating, credit score, or ranking in future advertising campaigns. The slot will immediately be returned to other creators.",
+      "reasonTitle": "Reason for Withdrawal",
+      "reasonOptional": "(Optional, helps us improve your experience)",
+      "reasonGroupLabel": "Reason for withdrawing the application",
+      "reasons": {
+        "timeBusy": "I am currently unavailable",
+        "personalReasons": "Personal circumstances or reasons"
+      },
+      "cancel": "Go Back and Keep Application",
+      "confirm": "Confirm Final Withdrawal"
+    }
   }
 }
