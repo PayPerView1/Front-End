@@ -35,14 +35,13 @@
     "compliant": "Compliant & Approved",
     "active": "Active & Running",
     "loading": "Loading campaigns...",
-"loadError": "Could not load campaigns. Please try again later.",
-"noCampaigns": "No active or paused campaigns to manage.",
+    "loadError": "Could not load campaigns. Please try again later.",
+    "noCampaigns": "No active or paused campaigns to manage.",
     "geoRegion": {
       "title": "Detected Geographic Region: Saudi Arabia (SA)",
       "badge": "Local IP Verified",
       "description": "According to the approved financial system and Sharia-compliant standards on the Pay Per View platform, only authorized and regionally stable payment channels are displayed. Non-compliant methods appear restricted and cannot be used for current transactions.",
       "changeCountry": "Change Country or Request Business Exception"
-      
     },
     "summary": {
       "title": "Overall Budget Summary",
@@ -74,8 +73,8 @@
       "label": "Target Daily Limit (USD)",
       "quickSelect": "Quick selection for preset values",
       "applied": "New daily limit (${amount}/day) saved and applied instantly!",
-     "reached": "Daily spending limit reached (${amount})",
-"details": "Details",
+      "reached": "Daily spending limit reached (${amount})",
+      "details": "Details",
       "ai": {
         "title": "Smart AI Recommendation",
         "badge": "EMERALD-AI Algorithm",
@@ -109,35 +108,35 @@
       "confirm": "Confirm Instant Recharge Now (${amount})",
       "cancel": "Cancel & Undo",
       "success": {
-  "title": "Campaign recharged successfully",
-  "added": "Added",
-  "newBudget": "to campaign budget | Updated budget:",
-  "walletLeft": "Remaining wallet balance:",
-  "id": "ID:"
-},
-"insufficient": {
-  "title": "Recharge failed – insufficient wallet balance",
-  "message": "The requested amount <req>${required} ({requiredSar} SAR)</req> exceeds the net available balance in your central wallet of <avail>${available} ({availableSar} SAR)</avail>. You can cover the shortfall now to complete the recharge, or reduce the amount to the maximum available.",
-  "action": "Top up wallet & cover shortfall"
-},
-"fault": {
-  "title": "Recharge failed – sudden technical fault",
-  "message": "The platform experienced an unexpected delay in the response of the banking sync servers connected to your ads wallet. For absolute financial safety, an instant rollback was triggered successfully and any withdrawal from your wallet was halted.",
-  "retry": "Try again"
-}
+        "title": "Campaign recharged successfully",
+        "added": "Added",
+        "newBudget": "to campaign budget | Updated budget:",
+        "walletLeft": "Remaining wallet balance:",
+        "id": "ID:"
+      },
+      "insufficient": {
+        "title": "Recharge failed – insufficient wallet balance",
+        "message": "The requested amount <req>${required} ({requiredSar} SAR)</req> exceeds the net available balance in your central wallet of <avail>${available} ({availableSar} SAR)</avail>. You can cover the shortfall now to complete the recharge, or reduce the amount to the maximum available.",
+        "action": "Top up wallet & cover shortfall"
+      },
+      "fault": {
+        "title": "Recharge failed – sudden technical fault",
+        "message": "The platform experienced an unexpected delay in the response of the banking sync servers connected to your ads wallet. For absolute financial safety, an instant rollback was triggered successfully and any withdrawal from your wallet was halted.",
+        "retry": "Try again"
+      }
     },
     "notifications": {
-  "title": "Sent alert channels log",
-  "badge": "100% delivered",
-  "instant": {
-    "title": "Instant in-platform notification",
-    "message": "Broadcast of campaign {campaignId} was stopped automatically after the budget reached zero."
-  },
-  "email": {
-    "title": "Official email message",
-    "message": "The report was sent to <mail>{address}</mail> including the spending statement and renewal link."
-  }
-},
+      "title": "Sent alert channels log",
+      "badge": "100% delivered",
+      "instant": {
+        "title": "Instant in-platform notification",
+        "message": "Broadcast of campaign {campaignId} was stopped automatically after the budget reached zero."
+      },
+      "email": {
+        "title": "Official email message",
+        "message": "The report was sent to <mail>{address}</mail> including the spending statement and renewal link."
+      }
+    },
     "security": {
       "title": "Encrypted Financial Protection & Authentication",
       "badge": "SSL 256-Bit SHA",
@@ -157,9 +156,9 @@
         "actions": "Actions"
       },
       "menu": {
-  "details": "Details",
-  "manageBudget": "Manage & allocate budget"
-},
+        "details": "Details",
+        "manageBudget": "Manage & allocate budget"
+      },
       "statusActive": "Active",
       "statusPaused": "Paused"
     },
@@ -169,128 +168,209 @@
       "remaining": "Remaining in Campaign"
     },
     "presets": {
-      "recharge": [
-        250,
-        500,
-        1000
-      ],
-      "daily": [
-        250,
-        300,
-        350
-      ]
+      "recharge": [250, 500, 1000],
+      "daily": [250, 300, 350]
     },
     "paused": {
-  "title": "Campaign paused successfully – remaining budget is saved and fully frozen",
-  "message": "Ad delivery and all deduction and publishing tasks have been suspended immediately. Your remaining balance (<b>${amount}</b>) is safe and preserved with no deductions or hidden fees. You can resume delivery with one click at any time.",
-  "resume": "Resume campaign",
-  "spentLabel": "Spent ({pct}% - ${amount})",
-  "frozenLabel": "Frozen and fully preserved ({pct}% - ${amount})",
-  "startedAt": "Started on: {date}",
-  "frozenAt": "Frozen at: today {time}",
-  "validity": "Validity period: does not expire"
-},
-"quickResume": {
-  "title": "Quick resume options and settings",
-  "subtitle": "Set the conditions for resuming campaign ads without creating a new campaign",
-  "badge": "Ready for instant activation",
-  "rate": {
-    "title": "Resume with a custom spend rate",
-    "desc": "Resume delivery at the previous daily limit, or lower it to stretch the remaining budget over a longer period.",
-    "label": "New daily limit ($/day):",
-    "coverage": "≈ {days} days of coverage",
-    "action": "Apply and resume now"
+      "title": "Campaign paused successfully – remaining budget is saved and fully frozen",
+      "message": "Ad delivery and all deduction and publishing tasks have been suspended immediately. Your remaining balance (<b>${amount}</b>) is safe and preserved with no deductions or hidden fees. You can resume delivery with one click at any time.",
+      "resume": "Resume campaign",
+      "spentLabel": "Spent ({pct}% - ${amount})",
+      "frozenLabel": "Frozen and fully preserved ({pct}% - ${amount})",
+      "startedAt": "Started on: {date}",
+      "frozenAt": "Frozen at: today {time}",
+      "validity": "Validity period: does not expire"
+    },
+    "quickResume": {
+      "title": "Quick resume options and settings",
+      "subtitle": "Set the conditions for resuming campaign ads without creating a new campaign",
+      "badge": "Ready for instant activation",
+      "rate": {
+        "title": "Resume with a custom spend rate",
+        "desc": "Resume delivery at the previous daily limit, or lower it to stretch the remaining budget over a longer period.",
+        "label": "New daily limit ($/day):",
+        "coverage": "≈ {days} days of coverage",
+        "action": "Apply and resume now"
+      },
+      "schedule": {
+        "title": "Schedule automatic resume",
+        "desc": "Automatically reactivate the campaign at a specific future time (for example, with a new product launch or at the start of the month).",
+        "label": "Preferred automatic resume date:",
+        "action": "Save schedule"
+      }
+    },
+    "bulkRecharge": {
+      "title": "Campaigns selected for bulk recharge",
+      "subtitle": "Split the total amount equally across the list, or set a specific budget for each campaign.",
+      "submitting": "Processing recharge...",
+      "partial": {
+        "title": "Partial Recharge Completed",
+        "message": "{ok} campaign(s) were successfully recharged, {failed} failed, and {skipped} were not processed."
+      },
+      "result": {
+        "ok": "Recharge Successful",
+        "failed": "Recharge Failed",
+        "skipped": "Not Processed"
+      },
+      "mode": {
+        "manual": "Set each campaign manually",
+        "equal": "Split amount equally"
+      },
+      "equal": {
+        "label": "Total amount to distribute",
+        "hint": "Will be split across {count} campaigns, ${share} each",
+        "fieldLabel": "Total"
+      },
+      "quickAdd": {
+        "label": "Quick add per campaign",
+        "default": "default"
+      },
+      "filter": {
+        "label": "Filter",
+        "active": "Active campaigns only",
+        "all": "All campaigns"
+      },
+      "empty": "No campaigns match the filter.",
+      "row": {
+        "previous": "Previous balance:",
+        "dailyLimit": "Daily limit:",
+        "day": "day",
+        "creators": "{count} content creators",
+        "amount": "Recharge amount",
+        "paused": "Paused"
+      },
+      "check": {
+        "title": "Balance check",
+        "ok": "Sufficient balance",
+        "fail": "Insufficient balance",
+        "before": "Wallet balance before recharge",
+        "total": "Total recharge for ({count} campaigns)",
+        "remaining": "Remaining wallet balance",
+        "available": "Available for other operations or withdrawal",
+        "sar": "≈ {amount} SAR",
+        "deficit": "You need ${amount} more to complete this",
+        "ratio": "Share deducted from wallet"
+      },
+      "distribution": {
+        "title": "Amount per campaign (detailed)",
+        "empty": "Select at least one campaign.",
+        "total": "Final recharge total:"
+      },
+      "actions": {
+        "confirm": "Confirm recharge and update budgets now",
+        "back": "Back to ad campaigns list"
+      },
+      "audit": {
+        "title": "Transparency log for bulk budget updates",
+        "time": "Transaction time",
+        "today": "Today, {time}",
+        "pending": "Awaiting confirmation",
+        "method": "Verification method",
+        "methodOk": "Automatic available-balance check (100% passed)",
+        "methodFail": "Automatic available-balance check (failed)",
+        "effect": "Effect on wallet",
+        "effectValue": "Instant deduction of ${amount} for campaigns"
+      },
+      "success": {
+        "title": "Bulk recharge completed",
+        "message": "{count} campaigns recharged, ${total} total | Transaction {id}",
+        "close": "Close"
+      },
+      "verified": {
+        "title": "Balance verified and budgets distributed successfully!",
+        "message": "A total of <gold>${total} (SAR {sar})</gold> was allocated from the wallet and distributed across <mint>{count, plural, one {# active campaign} other {# active campaigns}}</mint>. Remaining budgets were updated instantly.",
+        "auditLog": "Financial Audit Log"
+      }
+    }
   },
-  "schedule": {
-    "title": "Schedule automatic resume",
-    "desc": "Automatically reactivate the campaign at a specific future time (for example, with a new product launch or at the start of the month).",
-    "label": "Preferred automatic resume date:",
-    "action": "Save schedule"
-  }
-},
-"bulkRecharge": {
-  "title": "Campaigns selected for bulk recharge",
-  "subtitle": "Split the total amount equally across the list, or set a specific budget for each campaign.",
-  "submitting": "Processing recharge...",
-"partial": {
-  "title": "Partial Recharge Completed",
-  "message": "{ok} campaign(s) were successfully recharged, {failed} failed, and {skipped} were not processed."
-},
-"result": {
-  "ok": "Recharge Successful",
-  "failed": "Recharge Failed",
-  "skipped": "Not Processed"
-},
-  "mode": {
-    "manual": "Set each campaign manually",
-    "equal": "Split amount equally"
-  },
-  "equal": {
-    "label": "Total amount to distribute",
-    "hint": "Will be split across {count} campaigns, ${share} each",
-    "fieldLabel": "Total"
-  },
-  "quickAdd": {
-    "label": "Quick add per campaign",
-    "default": "default"
-  },
-  "filter": {
-    "label": "Filter",
-    "active": "Active campaigns only",
-    "all": "All campaigns"
-  },
-  "empty": "No campaigns match the filter.",
-  "row": {
-    "previous": "Previous balance:",
-    "dailyLimit": "Daily limit:",
-    "day": "day",
-    "creators": "{count} content creators",
-    "amount": "Recharge amount",
-    "paused": "Paused"
-  },
-  "check": {
-    "title": "Balance check",
-    "ok": "Sufficient balance",
-    "fail": "Insufficient balance",
-    "before": "Wallet balance before recharge",
-    "total": "Total recharge for ({count} campaigns)",
-    "remaining": "Remaining wallet balance",
-    "available": "Available for other operations or withdrawal",
-    "sar": "≈ {amount} SAR",
-    "deficit": "You need ${amount} more to complete this",
-    "ratio": "Share deducted from wallet"
-  },
-  "distribution": {
-    "title": "Amount per campaign (detailed)",
-    "empty": "Select at least one campaign.",
-    "total": "Final recharge total:"
-  },
-  "actions": {
-    "confirm": "Confirm recharge and update budgets now",
-    "back": "Back to ad campaigns list"
-  },
-  "audit": {
-    "title": "Transparency log for bulk budget updates",
-    "time": "Transaction time",
-    "today": "Today, {time}",
-    "pending": "Awaiting confirmation",
-    "method": "Verification method",
-    "methodOk": "Automatic available-balance check (100% passed)",
-    "methodFail": "Automatic available-balance check (failed)",
-    "effect": "Effect on wallet",
-    "effectValue": "Instant deduction of ${amount} for campaigns"
-  },
-  "success": {
-    "title": "Bulk recharge completed",
-    "message": "{count} campaigns recharged, ${total} total | Transaction {id}",
-    "close": "Close"
-  },
-  "verified": {
-  "title": "Balance verified and budgets distributed successfully!",
-  "message": "A total of <gold>${total} (SAR {sar})</gold> was allocated from the wallet and distributed across <mint>{count, plural, one {# active campaign} other {# active campaigns}}</mint>. Remaining budgets were updated instantly.",
-  "auditLog": "Financial Audit Log"
-}
-}
+  "dailyLimitDetails": {
+    "back": "Back",
+    "banner": {
+      "title": "Daily spending limit reached (${amount})",
+      "message": "Ad delivery was stopped automatically to protect the total budget from rapid burn. Your total campaign budget and wallet are completely safe, and delivery will resume automatically tomorrow at 12:00 AM Mecca/Riyadh time (GMT+3).",
+      "notice": "An instant notification and email alert were sent to the account manager: the ${amount} limit was reached and the budget is protected."
+    },
+    "cards": {
+      "todaySpend": {
+        "title": "Today's spend vs daily limit",
+        "reached": "Allowed limit {percent}% used"
+      },
+      "balance": {
+        "title": "Total remaining campaign balance",
+        "of": "remaining of ${total}",
+        "spent": "Total spent to date: ${spent} ({percent}%)"
+      },
+      "reach": {
+        "title": "Today's Halal Reach",
+        "views": "clean views",
+        "cpm": "Cost per 1K (CPM):"
+      }
+    },
+    "chart": {
+      "title": "Hourly spend distribution and ceiling (${limit})",
+      "subtitle": "The set ceiling was held precisely at {time} with no financial overrun at all",
+      "capped": "(Capped)",
+      "tooltip": "{time}: protective stop activated",
+      "legend": {
+        "actual": "Actual spend",
+        "cap": "Limit ceiling (${limit})"
+      }
+    },
+    "stats": {
+      "clicks": {
+        "title": "Valid clicks achieved today",
+        "value": "{count} clicks",
+        "note": "Click-through rate: {ctr}%"
+      },
+      "hours": {
+        "title": "Running hours before the limit",
+        "value": "{hours} hours",
+        "note": "Rate ${rate} / hour"
+      },
+      "saved": {
+        "title": "Protected surplus amounts",
+        "value": "exceeded",
+        "note": "Reservation accuracy {percent}%"
+      }
+    },
+    "publishers": {
+      "title": "Certified clip publishers active in this campaign",
+      "desc": "{count} content creators verified under the digital media Shariah compliance document {docId}",
+      "action": "View compliance and content log"
+    },
+    "resume": {
+      "title": "Resume options and instant control",
+      "subtitle": "Skip today's temporary pause",
+      "description": "If you want to keep the momentum and bring in more views, you can raise today's ceiling by an extra amount from the campaign balance (${balance})",
+      "newLimit": "New limit for today only (USD):",
+      "current": "(current)",
+      "action": "Apply extension and resume campaign now",
+      "note": "It will be deducted from the campaign's approved general balance without requiring an additional top-up"
+    },
+    "wallet": {
+      "title": "Central wallet status",
+      "available": "Total balance available to the advertiser",
+      "sar": "{amount} Saudi riyals",
+      "otherCampaigns": "Other active campaigns:",
+      "campaignsCount": "{count} campaigns",
+      "platformSpend": "Platform total daily spend:",
+      "autoReset": "Automatic limit renewal:",
+      "enabled": "Enabled ({time})",
+      "auditLog": "Financial audit and transactions log"
+    },
+    "ads": {
+      "title": "Campaign ads covered by recharge",
+      "subtitle": "{count} active ads in this campaign",
+      "statusResumed": "Resumed",
+      "columns": {
+        "ad": "Ad",
+        "status": "Current status",
+        "clicks": "Clicks",
+        "cr": "Conversion rate (CR)",
+        "cost": "Actual cost",
+        "actions": "Actions"
+      }
+    }
   },
   "profile": {
     "edit": "Edit Profile",
@@ -633,19 +713,23 @@
     "actions": {
       "messageMembers": {
         "title": "Message recent members",
-        "desc": "Draft a welcome message for new subscribers"
+        "desc": "Draft a welcome message for new subscribers",
+        "prompt": "How can I message my members and send them a welcome message?"
       },
       "createAd": {
-        "title": "Create creative ad",
-        "desc": "Generate engaging ad copies for your next campaign"
+        "title": "Create a creative ad",
+        "desc": "Generate engaging ad copy for your upcoming campaign",
+        "prompt": "Help me write and craft creative ad copy for my upcoming campaign."
       },
       "startLive": {
         "title": "Start a live stream",
-        "desc": "Set up a live stream session to connect with your audience"
+        "desc": "Set up a live session to connect with your audience",
+        "prompt": "What are the steps to start a live stream session?"
       },
       "sendInvoice": {
-        "title": "Send client invoice",
-        "desc": "Create and send a professional invoice quickly"
+        "title": "Send an invoice to a client",
+        "desc": "Create and send a professional invoice quickly",
+        "prompt": "How can I create and send a new invoice to a client?"
       }
     }
   },
@@ -795,52 +879,46 @@
       "balanceSubPop": "91,875.00 SAR",
       "balanceBottom": "Ready for deposit and activation",
       "balanceBottomPop": "Approved & ready for campaigns",
-
       "prevDeposits": "Total Past Deposits",
       "prevDepositsSub": "No previous transactions",
       "prevDepositsSubPop": "57,937.50 SAR",
       "prevDepositsBottom": "No top-up recorded",
       "trendLabel": "vs previous period",
-
       "adSpend": "Total Ad Spend",
       "adSpendSub": "0 active campaigns",
       "adSpendSubPop": "31,200.00 SAR",
       "adSpendBottom": "Full capital protection",
       "adSpendBottomPop": "12 active campaigns under publishing and tracking",
-
       "cashback": "Refunds & Budget Surplus",
       "cashbackSub": "Guaranteed automatic refunds",
       "cashbackSubPop": "5,437.50 SAR",
       "cashbackBottom": "No pending claims",
       "cashbackBottomPop": "Refunded & Sharia Verified"
     },
-
     "emptyTag": "Accounting & Financial Audit Log",
     "emptyTitle": "Transaction log is empty so far",
     "emptyDesc": "No deposit, deduction, or refund transactions have been recorded in your wallet yet. Start by topping up your balance to activate your ad campaigns and track your financial flows immediately in accordance with the highest standards of transparency and Sharia compliance.",
     "chargeNow": "Top Up Digital Wallet Now",
     "exploreMethods": "Explore Approved Payment Methods",
     "manageGuide": "Budget & Payment Management Guide",
-
     "trust100": "100% Segregated Escrow Account",
     "trustSharia": "Certified by Sharia Supervisory Board",
     "trustPCI": "Financial Encryption Compliant with PCI-DSS",
-
     "transparencyTitle": "100% Security & Accounting Transparency",
     "transparencyDesc": "Real-time recording of every single cent invested in your campaigns, with zero hidden fees or unannounced clauses in the transaction log.",
     "transparencyFoot": "Instant & Direct Audit Trail",
-
     "taxTitle": "Instant Certified Tax Invoices",
     "taxDesc": "Automatic generation of all tax invoices in PDF format upon every top-up or spend. Fully compliant with ZATCA e-invoicing requirements.",
     "taxFoot": "QR Code Encrypted Certified Invoices",
-
     "refundTitle": "Automatic & Instant Balance Refund",
     "refundDesc": "When any campaign stops or ends with an unspent financial surplus, the amount automatically and immediately returns to your available wallet balance.",
     "refundFoot": "Right to refund is guaranteed by regulation",
-
     "supportTitle": "Need consultation on managing your ad campaign budgets?",
     "supportDesc": "The financial and Sharia auditing team at Pay Per View platform is ready to help you plan your budgets with extreme precision.",
     "supportBtn": "Contact Financial Accountant & Support",
+    "common": {
+      "close": "Close"
+    },
     "transactions": {
       "title": "Financial Transaction History",
       "searchPlaceholder": "Search by transaction number or financial reference...",
@@ -859,6 +937,7 @@
         "last7Days": "Last 7 days",
         "thisMonth": "This month",
         "apply": "Apply date range",
+        "clear": "Clear date range",
         "previousMonth": "Previous month",
         "nextMonth": "Next month",
         "selectStart": "Select a start date",
@@ -976,7 +1055,6 @@
       "termsLink": "Accounting Terms & Conditions"
     }
   },
-  
   "stats": {
     "balance": "Available Balance",
     "balanceBottom": "Approved & ready for campaigns",
@@ -1156,8 +1234,214 @@
     "backTop": "Back to top ↑",
     "verifiedViews": "Verified views",
     "footerTag": "Built for the view economy"
-
   },
+  "discover": {
+    "title": "Discover Approved Campaigns & Ad Opportunities",
+    "subtitle": "Browse the latest Shariah-compliant campaigns, join instantly, and earn solid returns per thousand views (CPM) with trusted brands.",
+    "searchPlaceholder": "Search by brand, product, or campaign type...",
+    "clear": "Clear search",
+    "allCountries": "All countries",
+    "applied": "Request sent",
+    "sort": {
+      "cpm": "Highest cost per 1K views (CPM)",
+      "newest": "Newest first",
+      "endingSoon": "Ending soon",
+      "relevance": "Most relevant (AI recommended)"
+    },
+    "sortTitle": "Available sort options",
+    "sortCount": "{n} criteria",
+    "countryTitle": "Available countries",
+    "countryCount": "{n} countries",
+    "countrySearch": "Search a country...",
+    "types": {
+      "ALL": "All",
+      "CLIPPING": "Clipping",
+      "UGC": "Original UGC",
+      "SLIDESHOW": "Slideshow",
+      "AUDIO": "Voice-over"
+    },
+    "countries": "Countries:",
+    "materials": "Materials:",
+    "platforms": "Platforms:",
+    "cpmLabel": "Earnings per 1K views:",
+    "remaining": "Remaining:",
+    "total": "Total:",
+    "apply": "Apply now",
+    "details": "Campaign details",
+    "favorite": "Add to favorites",
+    "showing": "Showing {shown} of {total} active campaigns",
+    "prev": "Previous",
+    "next": "Next",
+    "pagination": "Campaign pagination",
+    "empty": "No campaigns match your search",
+    "emptyTitle": "No ad campaigns available right now",
+    "emptyDesc": "There are no campaigns available in this section at the moment. Shariah-compliant opportunities are added continuously, please check back later!",
+    "emptyNotify": "Enable new campaign notifications",
+    "emptyChecked": "Approved campaigns database checked moments ago",
+    "charterTitle": "Emerald Halal Charter commitment",
+    "charterDesc": "All ad campaigns and clip materials are free of music, immodesty, and interest-based products, and comply with Islamic Shariah rulings.",
+    "charterBtn": "Read the Shariah charter"
+  },
+  "campaignDetails": {
+    "back": "Back to list",
+    "filesAvailable": "{n} raw files available to download",
+    "packSize": "Pack size",
+    "apply": "Apply now and join the campaign",
+    "applied": "Request sent (under review)",
+    "save": "Save to favorites",
+    "saved": "Saved",
+    "report": "Report",
+    "reported": "Reported",
+    "descTitle": "Campaign description",
+    "descSub": "Publishing goals and the core message for the audience",
+    "platformsTitle": "Platforms & required content types",
+    "platformsSub": "Technical specs and eligible publishing channels",
+    "supported": "Supported platforms",
+    "contentTypes": "Required content types",
+    "summaryTitle": "Campaign summary",
+    "summarySub": "Financial terms and timeline",
+    "advertiser": "Advertiser / partner",
+    "earnings": "Earnings per 1,000 views",
+    "budget": "Remaining & total budget",
+    "remainingWord": "remaining",
+    "ofTotal": "of {total} total",
+    "period": "Official campaign period",
+    "to": "to",
+    "acceptance": "Instant acceptance rate",
+    "acceptanceValue": "{n}% fast approval",
+    "filesTitle": "Campaign files (PDF & Assets)",
+    "filesDesc": "The file includes the full approach texts, technical guidelines, tone of voice, acceptance criteria and Shariah rules, plus download links for the raw 4K source files.",
+    "preview": "Preview & open files",
+    "download": "Download PDF",
+    "notFound": "Campaign not found"
+  },
+  "campaignOnHold": {
+    "close": "Close",
+    "title": "This campaign is currently unavailable",
+    "desc": "Applications for this campaign are temporarily suspended while it undergoes a regulatory and Shariah re-audit following a report under review.",
+    "target": "Targeted campaign",
+    "reasonLabel": "Immediate reason for suspension",
+    "reasonValue": "Precautionary hold to verify content against Shariah rules",
+    "actionLabel": "Action taken",
+    "actionValue": "Creator applications are blocked until the hold is lifted",
+    "errorCode": "Restriction code:",
+    "status": "Status: under urgent review and audit",
+    "tipsTitle": "What can you do now?",
+    "tipNotify": "Turn on a resume alert to get an instant message when applications reopen.",
+    "tipBrowse": "Browse the list of active, trusted campaigns in investment and digital finance.",
+    "explore": "Explore available alternative campaigns",
+    "notify": "Notify me when it resumes",
+    "notifying": "Enabling...",
+    "notified": "Alert enabled",
+    "back": "Back to the campaign and general details",
+    "error": "Couldn't enable the alert, please try again.",
+    "notifyUnavailable": "Notifications are not available right now."
+  },
+  "reportAlready": {
+    "close": "Close",
+    "title": "You have already reported this campaign",
+    "subtitle": "Your report was recorded and matched to your digital record on the platform",
+    "descBefore": "Your previous report is on file and linked to this campaign. It is currently being reviewed by the",
+    "descBold": "Shariah Audit & Integrity Committee",
+    "descAfter": "to ensure ad credibility and prevent duplicate requests.",
+    "cta": "Continue browsing campaigns"
+  },
+  "reportSuccess": {
+    "close": "Close",
+    "title": "Your report was received",
+    "subtitle": "Your report was received. The campaign will be reviewed.",
+    "desc": "Thank you for helping us uphold the Shariah standards of our platform and protect the Muslim creator community.",
+    "refLabel": "Report reference number",
+    "dateChip": "Submitted: today · instant",
+    "campaignLabel": "Reported campaign",
+    "statusLabel": "Campaign's immediate status",
+    "statusValue": "Precautionarily suspended and hidden",
+    "etaLabel": "Expected review time",
+    "etaValue": "Under 24 business hours",
+    "noticeTitle": "Transparent precaution:",
+    "noticeBody": "The campaign has been temporarily hidden from all creators until the Shariah review is complete, to ensure integrity.",
+    "cta": "Continue browsing campaigns",
+    "reasons": {
+      "INDECENT_CONTENT": "Suspected indecent content",
+      "GAMBLING": "Suspected gambling",
+      "FORBIDDEN_MUSIC": "Suspected forbidden music",
+      "SUSPICIOUS_CURRENCY": "Suspicious currency",
+      "FALSE_PROFIT_CLAIMS": "False profit claims",
+      "OTHER": "Other violation"
+    }
+  },
+  "applyConfirm": {
+    "close": "Close",
+    "title": "Are you sure you want to apply to this campaign?",
+    "desc": "Your request will be officially registered and the advertiser notified immediately. The campaign will appear in “My requests & campaigns” with the status “Under review”.",
+    "campaignName": "Approved campaign",
+    "advertiser": "Verified advertiser",
+    "cpmLabel": "Earnings (CPM)",
+    "cpmValue": "${v} per 1,000 qualified views",
+    "contentType": "Content type",
+    "noticeTitle": "Instant guarantee:",
+    "noticeBody": "Your earnings are safe in your Shariah wallet as soon as views are approved.",
+    "confirm": "Confirm and send request now",
+    "sending": "Sending...",
+    "cancel": "Cancel and go back",
+    "error": "Couldn't send your request, please try again."
+  },
+  "applyAlready": {
+    "close": "Close",
+    "title": "You have already applied to this campaign",
+    "desc": "Your request to join this campaign is on file and currently in your requests list. You can't apply to the same campaign more than once.",
+    "activeRequest": "Active request details",
+    "campaignName": "Registered campaign",
+    "submittedAt": "Submission date & time",
+    "expectedCpm": "Expected earnings per view",
+    "currentStatus": "Current request status:",
+    "status": "Under review and audit",
+    "viewOrders": "Go to my request in “My orders”",
+    "explore": "Explore other available campaigns",
+    "back": "Back to campaign page"
+  },
+  "reportViolation": {
+    "title": "Report content or a campaign that violates Shariah guidelines",
+    "subtitle": "Choosing the violation type precisely helps keep the digital content environment compliant, and triggers an immediate precautionary suspension of the campaign.",
+    "autoSelected": "Auto-selected from the current page",
+    "chooseType": "Choose the type of Shariah or regulatory violation",
+    "reasons": {
+      "indecent": {
+        "title": "Indecent or offensive content",
+        "desc": "Vulgar images, loose explanations, or language offensive to modesty"
+      },
+      "gambling": {
+        "title": "Disguised betting or gambling",
+        "desc": "Games of chance, online maysir, binary options trading"
+      },
+      "music": {
+        "title": "Loud or forbidden music",
+        "desc": "Forcing the creator to use soundtracks and instruments that contradict the guidelines"
+      },
+      "crypto": {
+        "title": "Suspicious currencies or unlicensed trading",
+        "desc": "Fake tokens, pyramid Ponzi schemes, and trading without a license"
+      },
+      "fraud": {
+        "title": "False profit claims and financial deception (explicit gharar)",
+        "desc": "Promoting guaranteed fantasy profits (40% daily), hiding risks entirely, and luring the public into contracts containing gharar and hidden riba."
+      },
+      "other": {
+        "title": "Other Shariah or procedural reasons",
+        "desc": "Violating intellectual property rights, or breaching fair contracting terms and Shariah regulation"
+      }
+    },
+    "detailsLabel": "Additional details backed by evidence (optional)",
+    "detailsHint": "Clip link, scene timestamps, or proof documents",
+    "detailsPlaceholder": "Write an additional explanation of the violation... e.g. The ad promises guaranteed fantasy profits of 40% daily with no risk, which contradicts the Shariah guidelines prohibiting gharar and riba.",
+    "attachLinks": "External links supported",
+    "send": "Submit report",
+    "sending": "Submitting...",
+    "cancel": "Cancel and go back",
+    "close": "Close",
+    "error": "Couldn't submit the report. Please try again."
+  },
+
   "creatorOrders": {
     "title": "My Orders",
     "description": "Manage and track your campaign applications, advertiser approvals, video submissions, and active withdrawals with confidence and transparency.",
