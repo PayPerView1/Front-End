@@ -1,9 +1,9 @@
-import ProfileContent from "@/app/[locale]/creator/dashboard/components/ProfileContent";
+import DashboardSwitcher from "@/app/[locale]/creator/dashboard/components/DashboardSwitcher";
 
 export const metadata = {
-  title: "الملف الشخصي | Pay Per View",
+  title: "الرئيسية | Pay Per View",
 };
 
 export default function DashboardPage() {
-  return <ProfileContent />;
-}
+  return <DashboardSwitcher />;
+}

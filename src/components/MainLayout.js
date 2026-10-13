@@ -25,6 +25,10 @@ export default function MainLayout({ children, locale }) {
     "/reset-password",
     "/done",
     "/logout",
+    "/creator-home",
+    "/account-settings",
+    "/interests-recommendations",
+    "/macbook-190",
   ];
 
   // Check if current path matches or starts with any of the excluded paths
