@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import {
@@ -16,7 +16,7 @@ import {
 import { MdOutlineAccountBalanceWallet } from "react-icons/md";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { useWallet } from "@/features/wallet/WalletProvider";
-import { getTransactionById } from "@/features/wallet/services/walletService";
+import { capturePayPalOrder, getTransactionById } from "@/features/wallet/services/walletService";
 import PaymentFailed124Page from "@/features/wallet/components/topup/components/PaymentFailed124Page";
 import PaymentCancelled125Page from "@/features/wallet/components/topup/components/PaymentCancelled125Page";
 
@@ -43,65 +43,213 @@ const T = {
   muted: "#8A9490",
 };
 
+function clearPendingTransaction() {
+  try {
+    localStorage.removeItem("pendingTransactionId");
+    sessionStorage.removeItem("pendingTransactionId");
+  } catch {}
+}
+
 export default function PaymentSuccessPage() {
   const router = useRouter();
   const locale = useLocale();
   const searchParams = useSearchParams();
   const { refresh: refreshWallet } = useWallet();
+  const paypalOrderId = searchParams.get("token");
 
-  // PayPal يرسل transactionId كـ query param
-  const transactionId = searchParams.get("transactionId") || searchParams.get("token");
-
-  const [status, setStatus] = useState(transactionId ? "loading" : "error"); // loading | completed | pending | failed | cancelled | error
+  const [status, setStatus] = useState("loading"); // loading | completed | pending | failed | cancelled | error
   const [txnData, setTxnData] = useState(null);
-  const [error, setError] = useState(transactionId ? "" : "لم يتم العثور على معرّف المعاملة في الرابط.");
+  const [error, setError] = useState("");
   const [retryCount, setRetryCount] = useState(0);
+  const [activeTransactionId, setActiveTransactionId] = useState("");
+  const [isPolling, setIsPolling] = useState(false);
+  const captureRequestRef = useRef(null);
+  const isMountedRef = useRef(false);
 
-  const verifyTransaction = useCallback(async () => {
-    if (!transactionId) return;
-    setStatus("loading");
-    setError("");
-    try {
-      const json = await getTransactionById(transactionId);
-      if (!json?.success) {
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const requestPayPalCapture = useCallback((orderId) => {
+    if (captureRequestRef.current?.orderId === orderId) {
+      return captureRequestRef.current.promise;
+    }
+
+    let promise;
+    promise = capturePayPalOrder(orderId).catch((cause) => {
+      if (captureRequestRef.current?.promise === promise) {
+        captureRequestRef.current = null;
+      }
+      throw cause;
+    });
+    captureRequestRef.current = { orderId, promise };
+    return promise;
+  }, []);
+
+  const applyTransactionStatus = useCallback((txn) => {
+    const transactionStatus = String(txn?.status || "").toUpperCase();
+    setTxnData(txn);
+
+    if (["COMPLETED", "VERIFIED", "PAID", "SUCCESS"].includes(transactionStatus)) {
+      setStatus("completed");
+      clearPendingTransaction();
+      refreshWallet().catch(() => {});
+      return "completed";
+    }
+
+    if (["FAILED", "DECLINED", "REJECTED", "PAYMENT_FAILED", "ERROR"].includes(transactionStatus)) {
+      setStatus("failed");
+      setError(txn.failureReason || txn.message || "لم تنجح عملية الدفع. تحقق من وسيلة الدفع وحاول مرة أخرى.");
+      clearPendingTransaction();
+      return "failed";
+    }
+
+    if (["CANCELLED", "CANCELED", "PAYMENT_CANCELLED"].includes(transactionStatus)) {
+      setStatus("cancelled");
+      clearPendingTransaction();
+      return "cancelled";
+    }
+
+    // PENDING و UNDER_REVIEW وأي حالة غير نهائية تظل قيد المعالجة.
+    setStatus("pending");
+    return "pending";
+  }, [refreshWallet]);
+
+  const verifyTransaction = useCallback(async (transactionId, isActive = () => isMountedRef.current) => {
+    if (!transactionId) {
+      if (isActive()) {
         setStatus("error");
-        setError(json?.message || "حدث خطأ أثناء التحقق من الدفعة.");
+        setError("لم يتم العثور على معرّف المعاملة.");
+      }
+      return;
+    }
+
+    setError("");
+    setIsPolling(true);
+    let lastTransaction = null;
+
+    try {
+      for (let attempt = 0; attempt < 20; attempt += 1) {
+        if (!isActive()) return;
+
+        const response = await getTransactionById(transactionId);
+        if (!isActive()) return;
+        if (response?.success === false) {
+          throw new Error(response.message || "حدث خطأ أثناء التحقق من الدفعة.");
+        }
+
+        const transaction = response?.data ?? response;
+        if (!transaction || typeof transaction !== "object") {
+          throw new Error("تعذّر استرجاع تفاصيل المعاملة من الخادم.");
+        }
+
+        lastTransaction = transaction;
+        if (applyTransactionStatus(transaction) !== "pending") return;
+
+        if (attempt < 19) {
+          await new Promise((resolve) => window.setTimeout(resolve, 3000));
+        }
+      }
+
+      if (isActive() && lastTransaction) {
+        setTxnData(lastTransaction);
+        setStatus("pending");
+      }
+    } catch (cause) {
+      if (isActive()) {
+        setStatus("error");
+        setError(cause?.message || "تعذّر الاتصال بالخادم. يرجى المحاولة مرة أخرى.");
+      }
+    } finally {
+      if (isActive()) setIsPolling(false);
+    }
+  }, [applyTransactionStatus]);
+
+  const runPayPalCapture = useCallback(async (orderId, isActive = () => isMountedRef.current) => {
+    if (!orderId) return;
+    setError("");
+
+    try {
+      const response = await requestPayPalCapture(orderId);
+      if (!isActive()) return;
+      if (response?.success === false) {
+        throw new Error(response.message || "تعذّر تأكيد دفعة PayPal.");
+      }
+
+      const capture = response?.data ?? response;
+      if (!capture || typeof capture !== "object") {
+        throw new Error("تعذّر استرجاع نتيجة تأكيد دفعة PayPal.");
+      }
+
+      const transactionId = capture.transactionId ? String(capture.transactionId) : "";
+      if (transactionId) setActiveTransactionId(transactionId);
+      const transaction = {
+        ...capture,
+        id: transactionId,
+        paymentMethod: capture.paymentMethod || "PAYPAL",
+      };
+      const captureStatus = String(capture.status || "").toUpperCase();
+
+      if (["COMPLETED", "VERIFIED", "PAID", "SUCCESS"].includes(captureStatus)) {
+        applyTransactionStatus(transaction);
         return;
       }
 
-      const txn = json.data;
-      const transactionStatus = String(txn?.status || "").toUpperCase();
-      setTxnData(txn);
-
-      if (["COMPLETED", "VERIFIED"].includes(transactionStatus)) {
-        setStatus("completed");
-        refreshWallet().catch(() => {});
-      } else if (["PENDING", "UNDER_REVIEW"].includes(transactionStatus)) {
-        setStatus("pending");
-      } else if (["FAILED", "DECLINED", "REJECTED", "PAYMENT_FAILED", "ERROR"].includes(transactionStatus)) {
-        setStatus("failed");
-        setError(txn.failureReason || txn.message || "لم تنجح عملية الدفع. تحقق من وسيلة الدفع وحاول مرة أخرى.");
-      } else if (["CANCELLED", "CANCELED", "PAYMENT_CANCELLED"].includes(transactionStatus)) {
-        setStatus("cancelled");
-      } else {
-        setStatus("error");
-        setError("حالة المعاملة غير متوقعة: " + (txn.status || "غير معروفة"));
+      if (["FAILED", "DECLINED", "REJECTED", "PAYMENT_FAILED", "ERROR", "CANCELLED", "CANCELED"].includes(captureStatus)) {
+        applyTransactionStatus(transaction);
+        return;
       }
-    } catch (err) {
-      setStatus("error");
-      setError(err?.message || "تعذّر الاتصال بالخادم. يرجى المحاولة مرة أخرى.");
+
+      setTxnData(transaction);
+      setStatus("pending");
+      if (transactionId) await verifyTransaction(transactionId, isActive);
+    } catch (cause) {
+      if (isActive()) {
+        setStatus("error");
+        setError(cause?.message || "تعذّر تأكيد دفعة PayPal. يرجى المحاولة مرة أخرى.");
+      }
     }
-  }, [transactionId, refreshWallet]);
+  }, [applyTransactionStatus, requestPayPalCapture, verifyTransaction]);
 
   useEffect(() => {
-    if (!transactionId) return;
-    const timer = window.setTimeout(() => verifyTransaction(), 0);
-    return () => window.clearTimeout(timer);
-  }, [transactionId, verifyTransaction]);
+    let isActive = true;
+
+    if (paypalOrderId) {
+      runPayPalCapture(paypalOrderId, () => isActive);
+    } else {
+      let transactionId = "";
+      try {
+        transactionId =
+          localStorage.getItem("pendingTransactionId") ||
+          sessionStorage.getItem("pendingTransactionId") ||
+          "";
+      } catch {}
+
+      if (transactionId) {
+        setActiveTransactionId(transactionId);
+        verifyTransaction(transactionId, () => isActive);
+      } else {
+        setStatus("error");
+        setError("لم يتم العثور على معرّف المعاملة المحفوظ للتحقق من الدفعة.");
+      }
+    }
+
+    return () => {
+      isActive = false;
+    };
+  }, [paypalOrderId, runPayPalCapture, verifyTransaction]);
 
   const handleRetry = () => {
     setRetryCount((c) => c + 1);
-    verifyTransaction();
+    if (activeTransactionId) {
+      verifyTransaction(activeTransactionId);
+    } else if (paypalOrderId) {
+      setStatus("loading");
+      runPayPalCapture(paypalOrderId);
+    }
   };
 
   if (status === "failed") return <PaymentFailed124Page />;
@@ -110,7 +258,7 @@ export default function PaymentSuccessPage() {
   return (
     <div
       dir="rtl"
-      className="min-h-screen text-white pb-16 pt-4"
+      className="wallet-theme-page min-h-screen text-white pb-16 pt-4"
       style={{
         backgroundColor: T.bg,
         fontFamily: "var(--font-tajawal), 'Tajawal', sans-serif",
@@ -225,7 +373,7 @@ export default function PaymentSuccessPage() {
                   { label: "المبلغ المدفوع", value: `$${txnData.grossAmount?.toLocaleString("en-US", { minimumFractionDigits: 2 }) ?? "—"}` },
                   { label: "صافي الشحن", value: `$${txnData.netAmount?.toLocaleString("en-US", { minimumFractionDigits: 2 }) ?? "—"}` },
                   { label: "العمولة", value: `$${txnData.commission?.toLocaleString("en-US", { minimumFractionDigits: 2 }) ?? "0.00"}` },
-                  { label: "وسيلة الدفع", value: txnData.paymentMethod === "PAYPAL" ? "PayPal" : txnData.paymentMethod ?? "—" },
+                  { label: "وسيلة الدفع", value: txnData.paymentMethod === "PAYPAL" ? "PayPal" : txnData.paymentMethod === "MOYASAR" ? "Moyasar" : txnData.paymentMethod === "BANK_TRANSFER" ? "تحويل بنكي" : txnData.paymentMethod ?? "—" },
                   { label: "الرقم المرجعي", value: txnData.referenceId ?? txnData.id?.slice(0, 12) + "..." ?? "—" },
                   { label: "حالة المعاملة", value: "مكتملة ✓", isGreen: true },
                 ].map(({ label, value, isGreen }) => (
@@ -308,7 +456,9 @@ export default function PaymentSuccessPage() {
                     جاري معالجة الدفعة ⏳
                   </h1>
                   <p className="text-sm text-[#8A9490] leading-relaxed">
-                    دفعتك قيد المراجعة والمعالجة. سنعلمك بالنتيجة فور اكتمال التحقق عبر البريد الإلكتروني.
+                    {isPolling
+                      ? "نتحقق تلقائيًا من حالة الدفعة كل 3 ثوانٍ. قد يستغرق وصول تأكيد بوابة الدفع بضع لحظات."
+                      : "ما زالت الدفعة قيد المعالجة. سيتحدث رصيدك فور تأكيدها، ويمكنك متابعة الحالة من سجل المعاملات."}
                   </p>
                 </div>
               </div>
@@ -320,7 +470,7 @@ export default function PaymentSuccessPage() {
               >
                 {[
                   { label: "المبلغ المرسل", value: `$${txnData.grossAmount?.toLocaleString("en-US", { minimumFractionDigits: 2 }) ?? "—"}` },
-                  { label: "وسيلة الدفع", value: txnData.paymentMethod === "PAYPAL" ? "PayPal" : txnData.paymentMethod ?? "—" },
+                  { label: "وسيلة الدفع", value: txnData.paymentMethod === "PAYPAL" ? "PayPal" : txnData.paymentMethod === "MOYASAR" ? "Moyasar" : txnData.paymentMethod === "BANK_TRANSFER" ? "تحويل بنكي" : txnData.paymentMethod ?? "—" },
                   { label: "الرقم المرجعي", value: txnData.referenceId ?? txnData.id?.slice(0, 14) + "..." ?? "—" },
                   { label: "الحالة", value: "قيد المعالجة", isWarning: true },
                 ].map(({ label, value, isWarning }) => (
@@ -336,10 +486,11 @@ export default function PaymentSuccessPage() {
                 <button
                   type="button"
                   onClick={handleRetry}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-xl font-bold text-sm text-white bg-white/8 border border-white/15 hover:bg-white/12 transition-all cursor-pointer"
+                  disabled={isPolling}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-xl font-bold text-sm text-white bg-white/8 border border-white/15 hover:bg-white/12 transition-all cursor-pointer disabled:cursor-wait disabled:opacity-60"
                 >
                   <FiRefreshCw size={16} />
-                  <span>إعادة التحقق ({retryCount} مرة)</span>
+                  <span>{isPolling ? "جاري التحقق..." : `إعادة التحقق (${retryCount} مرة)`}</span>
                 </button>
                 <button
                   type="button"
@@ -348,6 +499,14 @@ export default function PaymentSuccessPage() {
                 >
                   <FiArrowRight size={16} />
                   <span>العودة للمحفظة</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push(`/${locale}/advertiser/wallet/transactions`)}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium text-gray-200 bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
+                >
+                  <FiCreditCard size={16} />
+                  <span>سجل المعاملات</span>
                 </button>
               </div>
             </div>
@@ -359,7 +518,7 @@ export default function PaymentSuccessPage() {
             >
               <FiClock size={14} className="text-[#E9C349] mt-0.5 shrink-0" />
               <p className="text-xs text-[#E9C349] leading-relaxed">
-                تستغرق عمليات المراجعة عادةً من دقائق إلى 24 ساعة. ستتلقى إشعارًا فور تحديث حالة دفعتك.
+                إذا لم يتحدث الرصيد خلال دقيقة، راجع سجل المعاملات. قد تبقى العملية معلّقة إذا لم يكتمل الدفع.
               </p>
             </div>
           </div>
@@ -412,4 +571,3 @@ export default function PaymentSuccessPage() {
     </div>
   );
 }
-

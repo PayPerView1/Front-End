@@ -56,6 +56,17 @@ const api = {
   getDrafts: drafts.getDrafts,
   deleteDraft: drafts.deleteDraft,
 
+  // Wallet & Transfers shortcuts
+  getWalletBalance: wallet.getWalletBalance,
+  getPlatformBankDetails: wallet.getPlatformBankDetails,
+  fundWallet: wallet.fundWallet,
+  uploadBankTransferReceipt: wallet.uploadBankTransferReceipt,
+  getTransactions: wallet.getTransactions,
+  getTransactionById: wallet.getTransactionById,
+  exportTransactions: wallet.exportTransactions,
+  exportTransactionsPdf: wallet.exportTransactionsPdf,
+  requestRefund: wallet.requestRefund,
+
   // Campaign Budget shortcuts
   allocateCampaignBudget: campaign.allocateCampaignBudget,
   setDailyBudgetLimit: campaign.setDailyBudgetLimit,

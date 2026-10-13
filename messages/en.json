@@ -406,6 +406,73 @@
       "noCreatedWorks": "No created works yet",
       "noJoinedCampaigns": "No joined campaigns yet"
     },
+    "favorites": {
+      "title": "Favorite Campaigns & Bulk Management",
+      "description": "Track and apply to Sharia-compliant campaigns you have saved. Manage applications individually or in bulk and export records with ease.",
+      "searchPlaceholder": "Search by name or advertiser...",
+      "selectAll": "Select all ({count})",
+      "removeSelected": "Remove selected",
+      "noResults": "No matching results",
+      "changeFilters": "Try changing your search or category.",
+      "removeFromFavorites": "Remove from favorites",
+      "materials": "Materials:",
+      "platforms": "Platforms:",
+      "rateLabel": "Earnings per thousand impressions:",
+      "remaining": "Remaining:",
+      "total": "Total:",
+      "applyNow": "Apply now",
+      "campaignDetails": "Campaign details",
+      "rawClips": "{count} raw 4K clips",
+      "halalAudio": "Halal audio",
+      "sort": {
+        "newest": "Recently added",
+        "cpmHigh": "Highest CPM",
+        "endingSoon": "Ending soon",
+        "aiRecommended": "Best match (AI recommendation)"
+      },
+      "categories": {
+        "all": "All categories",
+        "lifestyle": "Lifestyle",
+        "technology": "Technology",
+        "education": "Education",
+        "entertainment": "Entertainment",
+        "finance": "Finance",
+        "health": "Health"
+      },
+      "countries": {
+        "label": "Countries:",
+        "sa": "Saudi Arabia",
+        "ae": "United Arab Emirates",
+        "eg": "Egypt",
+        "kw": "Kuwait",
+        "qa": "Qatar"
+      },
+      "campaigns": {
+        "emerald": {
+          "title": "Edit and publish educational clips about halal investing",
+          "description": "Create engaging clips from a safe-investing podcast, adding interactive captions and clear, compliant audio effects."
+        },
+        "modestFashion": {
+          "title": "Reviews and Eid outfit styling videos",
+          "description": "Showcase and style elegant abayas and dresses while highlighting the quality of their premium fabrics."
+        },
+        "wafer": {
+          "title": "Design and edit promotional app videos",
+          "description": "Edit app screen recordings and highlight automatic gold and silver savings features in a modern, fast-paced style."
+        }
+      },
+      "alerts": {
+        "title": "Smart favorites monitoring and alerts",
+        "description": "Get instant notifications and emails when a campaign's status changes, its end date approaches, or its budget is updated.",
+        "customize": "Customize alerts"
+      },
+      "empty": {
+        "title": "Your favorites list is currently empty",
+        "description": "You haven't saved any Sharia-compliant ad campaigns yet. Explore the available opportunities and save promising campaigns to revisit or apply with one click.",
+        "explore": "Explore available campaigns",
+        "recommendations": "View suggested smart recommendations"
+      }
+    },
     "campaigns": {
       "arabClips": "Arabic Clips Community",
       "creators": "Creators Platform",
@@ -504,12 +571,37 @@
     "services": "Connected services",
     "security": "Account security",
     "subscriptions": "Subscriptions",
-    "disputes": "Dispute center"
+    "disputes": "Dispute center",
+    "interests": "Interests",
+    "favorites": "Favorites",
+    "linkedAccounts": "Linked accounts",
+    "notifications": "Notifications",
+    "paymentMethods": "Payment methods",
+    "phone": "Phone number",
+    "choose": "Choose",
+    "phonePlaceholder": "Enter your phone number",
+    "country": "Country",
+    "countryPlaceholder": "Choose a country",
+    "city": "City",
+    "cityPlaceholder": "e.g. Dubai",
+    "interestsTitle": "Interests",
+    "interestOptions": {
+      "lifestyle": "Lifestyle",
+      "technology": "Technology",
+      "education": "Education",
+      "entertainment": "Entertainment",
+      "finance": "Finance",
+      "health": "Health"
+    },
+    "phoneCodeRequired": "Select a country calling code and enter a phone number",
+    "removeProfilePicture": "Remove profile picture",
+    "profilePictureValidation": "Image must be JPEG, JPG, PNG, or WebP and no larger than 5 MB"
   },
   "campaigns": {
     "title": "Campaign Management",
     "subtitle": "Monitor performance, budgets, and active campaign status",
-    "dateFilter": "Date: Last 30 days",
+    "dateFilter": "All dates",
+    "dateClear": "Clear dates",
     "statusLabel": "Status",
     "search": "Search campaigns...",
     "all": "All",
@@ -604,7 +696,7 @@
   "assistant": {
     "close": "Close assistant",
     "title": "How can I help you today?",
-    "description": "I’m your smart assistant. I can help you create content, manage your account, or answer any questions.",
+    "description": "I'm your smart assistant. I can help you create content, manage your account, or answer any questions.",
     "preview": "Preview",
     "placeholder": "Write your message here...",
     "disclaimer": "The assistant may occasionally make mistakes. Please verify important information.",
@@ -990,7 +1082,7 @@
     "includeBankRef": "Include bank reference and detailed tax statement",
     "attachHash": "Attach digital fingerprint (Ledger Hash)",
     "sendEmailCopy": "Send an encrypted copy to email (finance@company.com)",
-    "dataSuccess": "Data compiled successfully (100%)",
+    "dataSuccess": "Data compiled successfully ({percent}%)",
     "fileSize": "Size:",
     "selectFormatFirst": "Select file format first",
     "readyForDownload": "Ready for download",
@@ -1348,5 +1440,107 @@
     "cancel": "Cancel and go back",
     "close": "Close",
     "error": "Couldn't submit the report. Please try again."
+  },
+
+  "creatorOrders": {
+    "title": "My Orders",
+    "description": "Manage and track your campaign applications, advertiser approvals, video submissions, and active withdrawals with confidence and transparency.",
+    "exploreCampaigns": "Explore New Campaigns",
+    "stats": {
+      "total": "Total Applications",
+      "registered": "Applications submitted",
+      "pending": "Under Review",
+      "awaitingAdvertiser": "Awaiting advertiser response",
+      "accepted": "Accepted Applications",
+      "acceptanceRate": "75% acceptance rate",
+      "closed": "Completed / Closed",
+      "archived": "Completed or archived"
+    },
+    "notice": {
+      "title": "Withdrawal Guidelines:",
+      "description": "You can withdraw your application at any time while it is still under review and has not been approved by the advertiser, without affecting your creator rating or platform record."
+    },
+    "filters": {
+      "all": "All",
+      "pending": "Under Review",
+      "accepted": "Accepted & Active",
+      "rejected": "Rejected or Withdrawn"
+    },
+    "searchPlaceholder": "Search by campaign name or code...",
+    "sort": {
+      "label": "Sort orders",
+      "newest": "Newest",
+      "highestCost": "Highest Cost",
+      "endingSoon": "Ending Soon"
+    },
+    "order": {
+      "submitted": "Submitted: {date} - {time}",
+      "approved": "Approved: {date}",
+      "closed": "Closed: {date}",
+      "cpm": "View Rate (CPM)",
+      "targetPlatforms": "Target Platforms",
+      "trackingCode": "Tracking code:",
+      "withdraw": "Withdraw Application",
+      "campaignDetails": "View Campaign Details",
+      "contactAdvertiser": "Contact Advertiser",
+      "uploadVideo": "Upload Video",
+      "withdrawReason": "Withdrawal reason:",
+      "rejectionReason": "Advertiser's rejection reason:"
+    },
+    "sampleOrders": {
+      "perfumeTitle": "Al Asalah Luxury Perfume Launch Campaign - Sidra Co.",
+      "sidraCompany": "Sidra Co.",
+      "pendingStatus": "Under Review",
+      "campaignBudget": "Campaign Budget",
+      "pendingNote": "Estimated response time: under 12 hours (you may withdraw while the application is unapproved)",
+      "goldAppTitle": "Smart Gold and Islamic Investment App",
+      "fintechCompany": "Namaa Fintech",
+      "acceptedStatus": "Accepted - Awaiting Video Clip",
+      "maxEarnings": "Maximum Earnings",
+      "acceptedNote": "Your application has been officially approved by the advertiser. You can now produce your video and submit the approved clip link to start tracking views and earnings automatically.",
+      "fashionTitle": "Elegant Arabic Clothing and Fashion",
+      "fashionStore": "Arabic Fashion Store",
+      "rejectedStatus": "Rejected - Creator Capacity Reached",
+      "totalBudget": "Total Budget",
+      "rejectionReason": "The full allocation for fashion creators in this campaign was filled within the first few hours. No additional spots are available; we invite you to apply for the next release in September."
+    },
+    "notifications": {
+      "acceptedTitle": "Application Accepted",
+      "rejectedTitle": "Application Rejected",
+      "acceptedText": "Your application to join the \"{title}\" campaign was accepted.",
+      "rejectedText": "Your application for the \"{title}\" campaign was rejected.",
+      "rejectedWithReason": "Your application for the \"{title}\" campaign was rejected. Reason: {reason}",
+      "withdrawnTitle": "Application Withdrawn",
+      "withdrawnText": "Your application for the \"{title}\" campaign was successfully withdrawn."
+    },
+    "withdrawn": {
+      "status": "Withdrawn by Creator",
+      "busyReason": "Current scheduling constraints",
+      "personalReason": "Personal reasons",
+      "reasonText": "You withdrew this application for the following reason: {reason}."
+    },
+    "withdrawModal": {
+      "title": "Are you sure you want to withdraw your application?",
+      "description": "You can withdraw your application safely and free of charge, with no penalties, as long as it is still under review and has not been officially approved by the campaign team.",
+      "close": "Close",
+      "applicationId": "Application ID:",
+      "pending": "Under Review",
+      "submittedAt": "Submitted At",
+      "cpm": "Cost per 1,000 Impressions (CPM)",
+      "perThousandViews": "per 1,000 views",
+      "fairPolicyTitle": "Our Fair Policy for Creators",
+      "policyBeforeApproval": "Withdrawing before approval",
+      "policyNoImpact": "will not affect",
+      "policyAfterNoImpact": "your account rating, credit score, or ranking in future advertising campaigns. The slot will immediately be returned to other creators.",
+      "reasonTitle": "Reason for Withdrawal",
+      "reasonOptional": "(Optional, helps us improve your experience)",
+      "reasonGroupLabel": "Reason for withdrawing the application",
+      "reasons": {
+        "timeBusy": "I am currently unavailable",
+        "personalReasons": "Personal circumstances or reasons"
+      },
+      "cancel": "Go Back and Keep Application",
+      "confirm": "Confirm Final Withdrawal"
+    }
   }
 }

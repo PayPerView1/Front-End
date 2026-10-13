@@ -158,17 +158,26 @@ export default function WalletTopupPage({
     }
     setIsProcessing(true);
     try {
-      const paymentMethod = selectedMethod === "bank_transfer" ? "BANK_TRANSFER" : "PAYPAL";
+      const paymentMethod = selectedMethod === "bank_transfer" ? "BANK_TRANSFER" : selectedMethod === "moyasar" ? "MOYASAR" : "PAYPAL";
       const response = await fundWallet({ amount, paymentMethod });
       if (response?.success === false) throw new Error(response.message || "تعذّر بدء عملية الشحن.");
       const data = response?.data ?? response;
-      if (data.redirectUrl) {
+      if (data.invoiceUrl) {
+        if (data.transactionId) {
+          try { localStorage.setItem("pendingTransactionId", data.transactionId); } catch {}
+        }
+        window.location.assign(data.invoiceUrl);
+      } else if (data.redirectUrl) {
+        if (data.transactionId) {
+          try { localStorage.setItem("pendingTransactionId", data.transactionId); } catch {}
+        }
         window.location.assign(data.redirectUrl);
       } else if (paymentMethod === "BANK_TRANSFER") {
         try { sessionStorage.setItem("wallet:bank-transfer", JSON.stringify({ ...data, amount })); } catch {}
         router.push(`/${locale}/advertiser/wallet/bank-transfer?transactionId=${encodeURIComponent(data.transactionId || "")}`);
       } else if (data.transactionId) {
-        router.push(`/${locale}/advertiser/wallet/payment/success?transactionId=${encodeURIComponent(data.transactionId)}`);
+        try { localStorage.setItem("pendingTransactionId", data.transactionId); } catch {}
+        router.push(`/${locale}/advertiser/wallet/payment/success`);
       } else {
         throw new Error("لم يُرجع الخادم معرّفاً لعملية الشحن.");
       }
@@ -184,7 +193,7 @@ export default function WalletTopupPage({
   return (
     <div
       dir="rtl"
-      className="min-h-screen text-white pb-12"
+      className="wallet-theme-page min-h-screen text-white pb-12"
       style={{
         backgroundColor: T.bg,
         fontFamily: "var(--font-tajawal), 'Tajawal', sans-serif",
@@ -206,7 +215,7 @@ export default function WalletTopupPage({
             <button
               type="button"
               onClick={() => router.back()}
-              className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center text-white/70 hover:text-white hover:border-white/30 transition-all shrink-0 mt-0.5"
+              className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center text-white/70 transition-all shrink-0 mt-0.5"
             >
               <FiChevronRight size={18} />
             </button>
@@ -353,7 +362,9 @@ export default function WalletTopupPage({
                         key={q}
                         type="button"
                         onClick={() => handleQuickAmount(q)}
-                        className="flex flex-col items-center py-3 px-2 rounded-xl border transition-all cursor-pointer hover:brightness-110"
+                        className={`flex flex-col items-center py-3 px-2 rounded-xl border transition-all cursor-pointer ${
+                          isActive && !isTop ? "wallet-quick-amount-selected" : ""
+                        }`}
                         style={{
                           backgroundColor: isActive
                             ? isTop
@@ -494,6 +505,21 @@ export default function WalletTopupPage({
                   subtitle="بوابة الدفع الإلكترونية"
                 />
                 <PaymentCard
+                  id="moyasar"
+                  selected={selectedMethod}
+                  onSelect={setSelectedMethod}
+                  icon={
+                    <span
+                      className="text-[10px] font-extrabold tracking-tight"
+                      style={{ color: selectedMethod === 'moyasar' ? T.accent : '#8A9490' }}
+                    >
+                      M
+                    </span>
+                  }
+                  title="Moyasar"
+                  subtitle="بطاقات ومدى وApple Pay"
+                />
+                <PaymentCard
                   id="apple_pay"
                   selected={selectedMethod}
                   onSelect={setSelectedMethod}
@@ -529,7 +555,8 @@ export default function WalletTopupPage({
                 type="button"
                 onClick={handleProceed}
                 disabled={isProcessing}
-                className="px-6 py-3 rounded-xl bg-[#94D3C1] text-sm font-bold text-[#0B0D0E] hover:brightness-110 transition-all cursor-pointer w-full sm:w-auto disabled:cursor-wait disabled:opacity-60"
+                className="px-6 py-3 rounded-xl text-sm font-bold text-white transition-all cursor-pointer w-full sm:w-auto disabled:cursor-wait disabled:opacity-60"
+                style={{ background: "linear-gradient(90deg, #FDA100 0%, #FE5403 100%)" }}
               >
                 {isProcessing ? "جاري بدء عملية الشحن..." : "متابعة إلى الدفع"}
               </button>

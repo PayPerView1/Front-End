@@ -190,7 +190,7 @@ ${locale === "ar" ? "pr-14 sm:pr-6" : "pl-14 sm:pl-6"}
 py-2.5
 sticky
 top-0
-z-[9999999]
+z-50
 border-b
 ${t.navBg}
 ${t.navBorder}
