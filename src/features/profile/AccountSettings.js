@@ -422,11 +422,11 @@ export default function AccountSettings({
                 type="button"
                 className="h-8 px-2 rounded-full bg-[#11141A] border border-[#202531] text-white text-xs font-medium flex items-center gap-1.5 cursor-pointer"
               >
+                <FiChevronDown size={12} className="text-[#94A3B8]" />
+                <span>salloma</span>
                 <div className="w-5 h-5 rounded-full bg-[#202531] flex items-center justify-center text-[10px] text-[#94A3B8]">
                   <FiUser size={12} />
                 </div>
-                <span>salloma</span>
-                <FiChevronDown size={12} className="text-[#94A3B8]" />
               </button>
             </div>
           </header>
@@ -787,7 +787,7 @@ export default function AccountSettings({
                         className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#FF6B00] to-[#FFA800] text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-[#FF6B00]/20 hover:shadow-[#FF6B00]/35 transition-all cursor-pointer whitespace-nowrap"
                       >
                         <TbRefresh size={15} />
-                        <span>حفظ ومزامنة التوصيات</span>
+                        <span>إضافة وإدارة التوصيات</span>
                       </button>
                       <button
                         type="button"
@@ -955,7 +955,7 @@ export default function AccountSettings({
                       </div>
                       <div>
                         <h4 className="text-sm font-bold text-white">
-                          ركائز التوصيات الذكية الدقيقة
+                          2. ركائز التوصيات الذكية الدقيقة
                         </h4>
                         <p className="text-[11px] text-[#64748B]">
                           ضبط حساسية الفلترة العالية، الحجم التعاقدي، وشروط التوافق الشرعي
@@ -1083,7 +1083,7 @@ export default function AccountSettings({
                       </div>
                       <div>
                         <h4 className="text-sm font-bold text-white">
-                          التوزيع الجغرافي والجمهور المستهدف
+                          3. التوزيع الجغرافي والجمهور المستهدف
                         </h4>
                         <p className="text-[11px] text-[#64748B]">
                           التركيز الجغرافي لقوة وصول المقاطع والمتابعين
@@ -1236,7 +1236,7 @@ export default function AccountSettings({
                         </div>
                         <div>
                           <h4 className="text-sm font-bold text-white">
-                            4. منصات النشر وصيغ الكليبينج
+                            4. منصات النشر وضع الكليبيتنك
                           </h4>
                           <p className="text-[11px] text-[#64748B]">
                             القنوات المعتمدة التي تنشر مقاطعك من خلالها
