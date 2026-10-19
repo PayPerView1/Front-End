@@ -1342,7 +1342,9 @@
       },
       "cancel": "Go Back and Keep Application",
       "confirm": "Confirm Final Withdrawal"
-    }
+    },
+    "emptyState": "No orders yet. Explore available campaigns and start applying!",
+    "retry": "Retry"
   },
   "startProject": {
     "title": "Produced your clip? Pick the campaign to submit it and claim your reward",

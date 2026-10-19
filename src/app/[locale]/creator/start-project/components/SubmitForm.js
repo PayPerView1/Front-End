@@ -169,7 +169,7 @@ const placeholders = {
   };
 
   return (
-    <div className={`${theme.surface} border rounded-2xl p-4 sm:p-5 space-y-5`}>
+    <div className={`${theme.surface} min-w-0 border rounded-2xl p-3 sm:p-5 space-y-5`}>
       <div>
         <h2 className={`text-lg font-bold ${theme.primaryText}`}>{t("formTitle")}</h2>
         <p className={`text-xs ${theme.secondaryText}`}>{t("formSubtitle")}</p>
@@ -178,7 +178,7 @@ const placeholders = {
             {/* 1) Platform */}
       <section className="space-y-2">
         <Label n="1" text={t("choosePlatform")} theme={theme} />
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 min-[360px]:grid-cols-3 gap-2">
           {platforms.map(({ key, Icon, color }) => {
             const active = platform === key;
             const iconColor = active
@@ -192,7 +192,7 @@ const placeholders = {
                   setPlatform(key);
                   clearErrors();
                 }}
-                className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-xs font-bold transition-all ${
+                className={`flex min-w-0 items-center justify-center gap-2 px-1 py-3 rounded-xl border text-xs font-bold transition-all ${
                   active
                     ? "text-white border-transparent"
                     : platformError
@@ -320,7 +320,7 @@ const placeholders = {
             return (
               <div
                 key={tag}
-                className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-lg border text-xs font-bold ${
+                className={`flex min-w-0 flex-col items-center justify-center gap-1.5 break-all px-2 py-3 rounded-lg border text-xs font-bold ${
                   isMissing ? missingChip : theme.chip
                 } ${theme.primaryText}`}
               >

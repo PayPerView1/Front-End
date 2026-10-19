@@ -44,7 +44,7 @@ export default function ResultShell({
     <>
       {/* الهيدر */}
       <div
-        className={`${surface} border rounded-2xl p-5 mb-5 flex items-center justify-between gap-4`}
+        className={`${surface} border rounded-2xl p-4 sm:p-5 mb-5 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center sm:gap-4`}
       >
         <div className="flex items-center gap-4 min-w-0">
           <span
@@ -53,7 +53,7 @@ export default function ResultShell({
             <Icon size={24} />
           </span>
           <div className="min-w-0">
-            <h1 className={`text-xl md:text-2xl font-black mb-1 ${primary}`}>{title}</h1>
+            <h1 className={`break-words text-xl md:text-2xl font-black mb-1 ${primary}`}>{title}</h1>
             <p className={`text-xs leading-relaxed ${secondary}`}>{description}</p>
           </div>
         </div>
@@ -64,10 +64,10 @@ export default function ResultShell({
       <ProgressSteps statuses={steps} />
 
       {/* المحتوى */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5 items-start">
-        <div className="space-y-5">{children}</div>
+      <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-5 2xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0 space-y-4 sm:space-y-5">{children}</div>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <VideoPreview link={link} image={image} platformLabel={platformLabel} />
           <DeadlineTimer hours={23} minutes={14} />
           {sideExtra}

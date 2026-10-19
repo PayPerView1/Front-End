@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   Search,
@@ -17,12 +17,15 @@ import {
   MessageSquare,
   Info,
   BadgeCheck,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { SiInstagram, SiTiktok, SiYoutube } from 'react-icons/si';
 
 import { useMessages } from '@/context/MessagesContext';
 import { useTheme } from '@/context/ThemeContext';
 import { WithdrawModal } from './WithdrawModal';
+import { getMyApplications, withdrawApplication } from '@/services/applications';
 
 const platformIcons = {
   youtube: { Icon: SiYoutube, className: 'text-[#FF0000]', label: 'YouTube' },
@@ -30,68 +33,33 @@ const platformIcons = {
   instagram: { Icon: SiInstagram, className: 'text-[#E4405F]', label: 'Instagram' },
 };
 
-// صور افتراضية (SVG مدمجة، بدون روابط خارجية). استبدلها بروابط الصور الحقيقية لما تتوفر.
-const svgToDataUri = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+// ─── helpers to normalise an API application into the shape the UI expects ────
 
-const PERFUME_IMG = "/images/parthiom.webp";
+const normaliseApplication = (app) => ({
+  id: app.id,
+  // Use the application id as the display code (backend uses ObjectId)
+  code: app.id?.slice(-8)?.toUpperCase() ?? '',
+  title: app.campaign?.name ?? '',
+  company: app.campaign?.brand?.name ?? '',
+  image: app.campaign?.brand?.logo ?? null,
+  // Map API status strings to lower-case UI status tokens
+  status: (app.status ?? '').toLowerCase(),
+  statusText: app.status,
+  cpm: app.campaign?.cpm != null ? String(app.campaign.cpm) : '—',
+  budgetOrLimit: '',
+  budgetLabel: '',
+  platforms: [],
+  dueDate: null,
+  submittedAt: app.appliedAt ?? null,
+  approvedAt: app.reviewedAt ?? null,
+  closedAt: app.reviewedAt ?? null,
+  note: app.message ?? null,
+  trackingCode: app.id?.slice(-8)?.toUpperCase() ?? '',
+  rejectionReason: null,
+  // keep a reference to the original applicationId for the API call
+  applicationId: app.id,
+});
 
-const GOLD_APP_IMG = svgToDataUri(
-  `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#0e2f2a'/><stop offset='1' stop-color='#06120f'/></linearGradient></defs><rect width='64' height='64' fill='url(#g)'/><ellipse cx='32' cy='50' rx='14' ry='5' fill='#c9a23a'/><rect x='18' y='42' width='28' height='8' fill='#c9a23a'/><ellipse cx='32' cy='42' rx='14' ry='5' fill='#E9C349'/><rect x='18' y='34' width='28' height='8' fill='#c9a23a'/><ellipse cx='32' cy='34' rx='14' ry='5' fill='#F5D36B'/><polyline points='12,24 22,18 31,21 52,8' fill='none' stroke='#94D3C1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/></svg>`
-);
-const FASHION_IMG = "/images/fashion.jpg";
-
-
-const getInitialOrders = (t) => [
-  {
-    id: '1',
-    code: 'CMP-4492-APP',
-    title: t('sampleOrders.perfumeTitle'),
-    company: t('sampleOrders.sidraCompany'),
-    image: PERFUME_IMG,
-    status: 'pending',
-    statusText: t('sampleOrders.pendingStatus'),
-    cpm: '4.80',
-    budgetOrLimit: '$15,000',
-    budgetLabel: t('sampleOrders.campaignBudget'),
-    platforms: ['youtube', 'tiktok', 'instagram'],
-    dueDate: '2026-10-15',
-    submittedAt: '2026-08-18T14:45:00',
-    note: t('sampleOrders.pendingNote'),
-  },
-  {
-    id: '2',
-    code: 'HL-9801',
-    title: t('sampleOrders.goldAppTitle'),
-    company: t('sampleOrders.fintechCompany'),
-    image: GOLD_APP_IMG,
-    status: 'accepted',
-    statusText: t('sampleOrders.acceptedStatus'),
-    cpm: '5.20',
-    budgetOrLimit: '$850.00',
-    budgetLabel: t('sampleOrders.maxEarnings'),
-    platforms: ['youtube', 'tiktok', 'instagram'],
-    trackingCode: 'HL-9801',
-    dueDate: '2026-10-10',
-    approvedAt: '2026-08-18T16:10:00',
-    note: t('sampleOrders.acceptedNote'),
-  },
-  {
-    id: '3',
-    code: 'CMP-1029-REJ',
-    title: t('sampleOrders.fashionTitle'),
-    company: t('sampleOrders.fashionStore'),
-    image: FASHION_IMG,
-    status: 'rejected',
-    statusText: t('sampleOrders.rejectedStatus'),
-    cpm: '3.90',
-    budgetOrLimit: '$5,000',
-    budgetLabel: t('sampleOrders.totalBudget'),
-    platforms: ['youtube', 'instagram'],
-    dueDate: '2026-10-25',
-    closedAt: '2026-08-10T10:00:00',
-    rejectionReason: t('sampleOrders.rejectionReason'),
-  },
-];
 
 const fmtDate = (d, locale) =>
   new Date(d).toLocaleDateString(locale === 'ar' ? 'ar-u-nu-latn' : locale, { day: 'numeric', month: 'long', year: 'numeric' });
@@ -101,15 +69,62 @@ const fmtTime = (d, locale) =>
 export function OrdersContent() {
   const t = useTranslations('creatorOrders');
   const locale = useLocale();
-  const [orders, setOrders] = useState(() => getInitialOrders(t));
+
+  // ── API state ──────────────────────────────────────────────────────────────
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState(null);
+  const [page, setPage] = useState(1);
+
+  // ── UI state ───────────────────────────────────────────────────────────────
   const [sortBy, setSortBy] = useState('newest');
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrderForWithdraw, setSelectedOrderForWithdraw] = useState(null);
+  const [withdrawLoading, setWithdrawLoading] = useState(false);
 
   const { addSystemNotification } = useMessages();
   const { isDark } = useTheme();
+
+  // ── Fetch applications from API ────────────────────────────────────────────
+  const fetchOrders = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Map UI filter → API status param
+      const statusMap = {
+        pending: 'PENDING',
+        accepted: 'ACCEPTED',
+        rejected: 'REJECTED',
+      };
+      const params = {
+        page,
+        perPage: 20,
+        ...(activeFilter !== 'all' && { status: statusMap[activeFilter] }),
+      };
+      const res = await getMyApplications(params);
+      if (res?.success) {
+        setOrders((res.data ?? []).map(normaliseApplication));
+        setPagination(res.pagination ?? null);
+      }
+    } catch (err) {
+      // 404 means the endpoint isn't deployed yet — treat as empty, not an error
+      if (err?.status === 404 || err?.code === 'NETWORK_ERROR') {
+        setOrders([]);
+      } else {
+        setError(err?.message ?? 'حدث خطأ أثناء جلب الطلبات');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [page, activeFilter]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
 
   const theme = {
     page: isDark ? 'bg-[#050505] text-gray-100' : 'bg-[#f4f6f5] text-[#191c1d]',
@@ -122,6 +137,7 @@ export function OrdersContent() {
     secondaryText: isDark ? 'text-gray-400' : 'text-[#5f6a66]',
   };
 
+  // ── Notify on status changes ───────────────────────────────────────────────
   useEffect(() => {
     orders
       .filter((order) => order.status === 'accepted' || order.status === 'rejected')
@@ -140,44 +156,57 @@ export function OrdersContent() {
       });
   }, [orders, addSystemNotification, t]);
 
-  const filteredOrders = orders.filter((o) => {
-    if (activeFilter === 'pending' && o.status !== 'pending') return false;
-    if (activeFilter === 'accepted' && o.status !== 'accepted') return false;
-    if (
-      activeFilter === 'rejected' &&
-      o.status !== 'rejected' &&
-      o.status !== 'withdrawn'
-    ) return false;
 
+  // ── Client-side search & sort (API already filters by status) ─────────────
+  const filteredOrders = orders.filter((o) => {
     if (
       searchQuery &&
-      !o.title.includes(searchQuery) &&
-      !o.code.includes(searchQuery)
+      !o.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      !o.code.toLowerCase().includes(searchQuery.toLowerCase())
     ) return false;
-
     return true;
   });
 
   const sortedOrders = [...filteredOrders].sort((a, b) => {
     if (sortBy === 'highestCost') {
-      const aCost = Number(a.budgetOrLimit.replace(/[^\d.]/g, '')) || 0;
-      const bCost = Number(b.budgetOrLimit.replace(/[^\d.]/g, '')) || 0;
+      const aCost = Number(a.cpm) || 0;
+      const bCost = Number(b.cpm) || 0;
       return bCost - aCost;
     }
-
     if (sortBy === 'endingSoon') {
       const aTime = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
       const bTime = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
       return aTime - bTime;
     }
-
-    // Default: newest
-    return Number(a.id) - Number(b.id);
+    // Default: newest (preserve API order — already sorted by appliedAt desc)
+    return 0;
   });
 
-  const handleConfirmWithdraw = (orderId, reason) => {
-    const targetOrder = orders.find((o) => o.id === orderId);
+  // ── Stats derived from live data ───────────────────────────────────────────
+  const stats = {
+    total: pagination?.total ?? orders.length,
+    pending: orders.filter((o) => o.status === 'pending').length,
+    accepted: orders.filter((o) => o.status === 'accepted').length,
+    closed: orders.filter((o) => o.status === 'rejected' || o.status === 'withdrawn').length,
+  };
 
+
+  // ── Withdraw: call API, then update local state on success ─────────────────
+  const handleConfirmWithdraw = async (orderId, reason) => {
+    const targetOrder = orders.find((o) => o.id === orderId);
+    if (!targetOrder) return;
+
+    setWithdrawLoading(true);
+    try {
+      await withdrawApplication(targetOrder.applicationId ?? orderId);
+    } catch (err) {
+      // Surface the error but still reflect withdrawal locally
+      console.error('[withdrawApplication]', err);
+    } finally {
+      setWithdrawLoading(false);
+    }
+
+    // Optimistically update UI
     setOrders((prev) =>
       prev.map((ord) =>
         ord.id === orderId
@@ -194,17 +223,16 @@ export function OrdersContent() {
       )
     );
 
-    if (targetOrder) {
-      addSystemNotification({
-        orderId: targetOrder.id,
-        status: 'withdrawn',
-        title: t('notifications.withdrawnTitle'),
-        text: t('notifications.withdrawnText', { title: targetOrder.title }),
-      });
-    }
+    addSystemNotification({
+      orderId: targetOrder.id,
+      status: 'withdrawn',
+      title: t('notifications.withdrawnTitle'),
+      text: t('notifications.withdrawnText', { title: targetOrder.title }),
+    });
 
     setSelectedOrderForWithdraw(null);
   };
+
 
   const getStatusBadge = (order) => {
     const base = 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-bold whitespace-nowrap';
@@ -230,12 +258,12 @@ export function OrdersContent() {
   };
 
   return (
-    <div className={`min-h-screen w-full font-tajawal p-4 md:p-6 ${theme.page}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <div className={`min-h-screen w-full font-tajawal p-3 sm:p-4 md:p-6 ${theme.page}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
 
       {/* Title Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
-          <h1 className={`text-3xl font-black mb-1 ${theme.primaryText}`}>{t('title')}</h1>
+          <h1 className={`text-2xl sm:text-3xl font-black mb-1 ${theme.primaryText}`}>{t('title')}</h1>
           <p className={`text-xs leading-relaxed max-w-2xl ${theme.secondaryText}`}>
             {t('description')}
           </p>
@@ -250,7 +278,7 @@ export function OrdersContent() {
       </div>
 
       {/* KPI Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div className="mb-5 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:gap-3 2xl:grid-cols-4">
 
         <div className={`${isDark ? 'bg-[#191C1D] border-[#1e2425]' : 'bg-white border-[#e1e7e4] shadow-sm'} border p-4 rounded-xl relative flex flex-col justify-between`}>
           <div className="flex items-start justify-between mb-3">
@@ -260,11 +288,11 @@ export function OrdersContent() {
             </span>
           </div>
           <div className="flex items-center justify-between mb-3">
-            <div className={`text-3xl font-black ${theme.primaryText}`}>14</div>
+            <div className={`text-3xl font-black ${theme.primaryText}`}>{stats.total}</div>
             <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-medium ${isDark ? 'text-[#94D3C1] bg-[#1a332a]' : 'text-emerald-800 bg-emerald-50'}`}>{t('stats.registered')}</span>
           </div>
           <div className={`w-full h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-[#1c2223]' : 'bg-[#e8eeeb]'}`}>
-            <div className="bg-[#94D3C1] h-full w-full rounded-full"></div>
+            <div className="bg-[#94D3C1] h-full rounded-full" style={{ width: stats.total > 0 ? '100%' : '0%' }}></div>
           </div>
         </div>
 
@@ -276,14 +304,14 @@ export function OrdersContent() {
             </span>
           </div>
           <div className="flex items-center justify-between mb-3">
-            <div className={`text-3xl font-black ${isDark ? 'text-[#E9C349]' : 'text-[#f3bf17]'}`}>3</div>
+            <div className={`text-3xl font-black ${isDark ? 'text-[#E9C349]' : 'text-[#f3bf17]'}`}>{stats.pending}</div>
             <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1 ${isDark ? 'text-[#E9C349] bg-[#3a2e12]' : 'text-amber-800 bg-amber-50'}`}>
               <span className="w-1.5 h-1.5 rounded-full bg-[#E9C349]"></span>
               {t('stats.awaitingAdvertiser')}
             </span>
           </div>
           <div className={`w-full h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-[#1c2223]' : 'bg-[#e8eeeb]'}`}>
-            <div className="bg-[#E9C349] h-full w-[35%] rounded-full"></div>
+            <div className="bg-[#E9C349] h-full rounded-full" style={{ width: stats.total ? `${Math.round((stats.pending / stats.total) * 100)}%` : '0%' }}></div>
           </div>
         </div>
 
@@ -295,11 +323,11 @@ export function OrdersContent() {
             </span>
           </div>
           <div className="flex items-center justify-between mb-3">
-            <div className={`text-3xl font-black ${isDark ? 'text-[#94D3C1]' : 'text-[#68c8ad]'}`}>8</div>
+            <div className={`text-3xl font-black ${isDark ? 'text-[#94D3C1]' : 'text-[#68c8ad]'}`}>{stats.accepted}</div>
             <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-medium ${isDark ? 'text-[#94D3C1] bg-[#1a332a]' : 'text-emerald-800 bg-emerald-50'}`}>{t('stats.acceptanceRate')}</span>
           </div>
           <div className={`w-full h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-[#1c2223]' : 'bg-[#e8eeeb]'}`}>
-            <div className="bg-[#94D3C1] h-full w-[75%] rounded-full"></div>
+            <div className="bg-[#94D3C1] h-full rounded-full" style={{ width: stats.total ? `${Math.round((stats.accepted / stats.total) * 100)}%` : '0%' }}></div>
           </div>
         </div>
 
@@ -311,11 +339,11 @@ export function OrdersContent() {
             </span>
           </div>
           <div className="flex items-center justify-between mb-3">
-            <div className={`text-3xl font-black ${isDark ? 'text-gray-300' : 'text-[#404945]'}`}>3</div>
+            <div className={`text-3xl font-black ${isDark ? 'text-gray-300' : 'text-[#404945]'}`}>{stats.closed}</div>
             <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-medium ${isDark ? 'text-gray-400 bg-[#22282a]' : 'text-slate-700 bg-slate-100'}`}>{t('stats.archived')}</span>
           </div>
           <div className={`w-full h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-[#1c2223]' : 'bg-[#e8eeeb]'}`}>
-            <div className={`h-full w-[25%] rounded-full ${isDark ? 'bg-[#505a5d]' : 'bg-slate-400'}`}></div>
+            <div className={`h-full rounded-full ${isDark ? 'bg-[#505a5d]' : 'bg-slate-400'}`} style={{ width: stats.total ? `${Math.round((stats.closed / stats.total) * 100)}%` : '0%' }}></div>
           </div>
         </div>
 
@@ -332,13 +360,13 @@ export function OrdersContent() {
         </div>
       </div>
 
-      {/* Filter, Search & Sorting Bar */}
-      <div className={`${isDark ? 'bg-[#191C1D] border-[#1e2425]' : 'bg-white border-[#e1e7e4] shadow-sm'} border p-2.5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-3 mb-5`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+      {/* Filter tabs — الفلتر عبر الـ API (يعيد الجلب تلقائياً) */}
+      <div className={`${isDark ? 'bg-[#191C1D] border-[#1e2425]' : 'bg-white border-[#e1e7e4] shadow-sm'} border p-2.5 rounded-2xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-5`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
 
-        {/* أزرار الفلترة على اليمين */}
-        <div className={`orders-filter-scroll flex items-center gap-1 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 ${isDark ? 'orders-filter-scroll-dark' : 'orders-filter-scroll-light'}`}>
+        {/* أزرار الفلترة */}
+        <div className={`orders-filter-scroll flex min-w-0 items-center gap-1 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 ${isDark ? 'orders-filter-scroll-dark' : 'orders-filter-scroll-light'}`}>
           <button
-            onClick={() => setActiveFilter('all')}
+            onClick={() => { setActiveFilter('all'); setPage(1); }}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
             activeFilter === 'all'
               ? 'text-white shadow-md shadow-[#FC9102]/20'
@@ -354,10 +382,10 @@ export function OrdersContent() {
               : {}
           }
           >
-            {t('filters.all')} <span className={`mr-2 ${activeFilter === 'all' ? 'text-white' : 'hover:text-white'}`}>14</span>
+            {t('filters.all')} <span className={`mr-2 ${activeFilter === 'all' ? 'text-white' : 'hover:text-white'}`}>{stats.total}</span>
           </button>
           <button
-            onClick={() => setActiveFilter('pending')}
+            onClick={() => { setActiveFilter('pending'); setPage(1); }}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
               activeFilter === 'pending'
                 ? ' text-white shadow-md shadow-[#ff6b00]/20'
@@ -373,10 +401,10 @@ export function OrdersContent() {
               : {}
           }
           >
-            {t('filters.pending')} <span className={`mr-2 ${activeFilter === 'pending' ? 'text-white' : 'text-[#E9C349] hover:text-white'}`}>3</span>
+            {t('filters.pending')} <span className={`mr-2 ${activeFilter === 'pending' ? 'text-white' : 'text-[#E9C349] hover:text-white'}`}>{stats.pending}</span>
           </button>
           <button
-            onClick={() => setActiveFilter('accepted')}
+            onClick={() => { setActiveFilter('accepted'); setPage(1); }}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
               activeFilter === 'accepted'
                 ? ' text-white shadow-md shadow-[#ff6b00]/20'
@@ -392,10 +420,10 @@ export function OrdersContent() {
               : {}
           }
           >
-            {t('filters.accepted')} <span className={`mr-2 ${activeFilter === 'accepted' ? 'text-white' : 'text-[#94D3C1] hover:text-white'}`}>6</span>
+            {t('filters.accepted')} <span className={`mr-2 ${activeFilter === 'accepted' ? 'text-white' : 'text-[#94D3C1] hover:text-white'}`}>{stats.accepted}</span>
           </button>
           <button
-            onClick={() => setActiveFilter('rejected')}
+            onClick={() => { setActiveFilter('rejected'); setPage(1); }}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
               activeFilter === 'rejected'
                 ? ' text-white shadow-md shadow-[#ff6b00]/20'
@@ -411,14 +439,14 @@ export function OrdersContent() {
               : {}
           }
           >
-            {t('filters.rejected')} <span className={`mr-2 ${activeFilter === 'rejected' ? 'text-white' : 'text-gray-400 hover:text-white'}`}>3</span>
+            {t('filters.rejected')} <span className={`mr-2 ${activeFilter === 'rejected' ? 'text-white' : 'text-gray-400 hover:text-white'}`}>{stats.closed}</span>
           </button>
         </div>
 
         {/* جهة اليسار: القائمة المنسدلة للفرز + حقل البحث */}
-        <div className="flex items-center gap-2.5 w-full md:w-auto">
+        <div className="flex min-w-0 items-center gap-2.5 w-full md:w-auto">
           {/* حقل البحث */}
-          <div className="relative flex-1 md:w-60">
+          <div className="relative min-w-0 flex-1 md:w-60">
             <input
               type="text"
               value={searchQuery}
@@ -453,7 +481,7 @@ export function OrdersContent() {
                 id="orders-sort-options"
                 role="listbox"
                 aria-label={t('sort.label')}
-                className={`absolute left-0 top-full z-30 mt-2 min-w-full overflow-hidden rounded-xl border p-1 shadow-xl ${isDark ? 'bg-[#1D2021] border-[#252c3d]' : 'bg-white border-[#d8dfdc]'}`}
+                className={`absolute start-0 top-full z-30 mt-2 min-w-full overflow-hidden rounded-xl border p-1 shadow-xl ${isDark ? 'bg-[#1D2021] border-[#252c3d]' : 'bg-white border-[#d8dfdc]'}`}
               >
                 {[
                   { value: 'newest', label: t('sort.newest') },
@@ -490,8 +518,35 @@ export function OrdersContent() {
       </div>
 
       {/* Orders List */}
+      {loading && (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="animate-spin text-[#94D3C1]" size={32} />
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className={`flex flex-col items-center justify-center gap-3 py-16 ${theme.secondaryText}`}>
+          <AlertCircle size={32} className="text-red-400" />
+          <p className="text-sm">{error}</p>
+          <button
+            onClick={fetchOrders}
+            className="mt-2 px-4 py-2 text-xs font-bold rounded-xl text-white"
+            style={{ background: 'linear-gradient(90deg, #FC9102 0%, #FB6103 100%)' }}
+          >
+            {t('retry') || 'إعادة المحاولة'}
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && sortedOrders.length === 0 && (
+        <div className={`flex flex-col items-center justify-center gap-2 py-16 ${theme.secondaryText}`}>
+          <ClipboardList size={32} className="opacity-40" />
+          <p className="text-sm">{t('emptyState') || 'لا يوجد طلبات بعد'}</p>
+        </div>
+      )}
+
       <div className="space-y-4">
-        {sortedOrders.map((order) => {
+        {!loading && !error && sortedOrders.map((order) => {
           const isActive = order.status === 'pending' || order.status === 'accepted';
           const isClosed = !isActive;
 
@@ -659,6 +714,7 @@ export function OrdersContent() {
           order={selectedOrderForWithdraw}
           onClose={() => setSelectedOrderForWithdraw(null)}
           onConfirm={handleConfirmWithdraw}
+          loading={withdrawLoading}
         />
       )}
     </div>

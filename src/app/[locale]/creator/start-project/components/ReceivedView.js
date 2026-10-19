@@ -72,13 +72,13 @@ export default function ReceivedView({ submission, campaign }) {
         <div className="space-y-1.5">
   <p className={`text-[10px] ${theme.secondaryText}`}>{t("creatorLink")}</p>
   <div
-    className={`flex items-center justify-between gap-3 rounded-xl border p-3 ${theme.inset}`}
+    className={`flex flex-col items-stretch gap-2 rounded-xl border p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3 ${theme.inset}`}
   >
-    <span dir="ltr" className={`text-xs font-mono truncate ${theme.primaryText}`}>
+    <span dir="ltr" className={`min-w-0 text-xs font-mono truncate ${theme.primaryText}`}>
       {link || "—"}
     </span>
     <span
-      className={`flex items-center gap-1.5 text-[10px] font-bold rounded-lg border px-3 py-1.5 shrink-0 ${
+      className={`flex items-center justify-center gap-1.5 text-center text-[10px] font-bold rounded-lg border px-3 py-1.5 sm:shrink-0 ${
         isDark
           ? "border-[#94D3C1]/30 bg-[#94D3C1]/10 text-[#94D3C1]"
           : "border-emerald-200 bg-emerald-50 text-emerald-700"

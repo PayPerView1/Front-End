@@ -12,6 +12,8 @@ export default function MessagesPanel({
   onConversationChange,
   side,
   currentUser,
+  stacked = false,
+  topOffset = 0,
 }) {
   const locale = useLocale();
   const { isDark } = useTheme();
@@ -70,8 +72,6 @@ export default function MessagesPanel({
       className={`
         messages-panel 
         fixed 
-        top-14 
-        h-[calc(100vh-56px)] 
         z-40 
         flex 
         transition-all 
@@ -86,6 +86,8 @@ export default function MessagesPanel({
       data-side={panelSide}
       dir={isRtl ? "rtl" : "ltr"}
       style={{
+        top: `${56 + (stacked ? topOffset : 0)}px`,
+        height: "calc(100vh - 56px)",
         backgroundColor: isDark
           ? "rgba(12, 15, 16, 1)"
           : "#ffffff",

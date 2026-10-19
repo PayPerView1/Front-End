@@ -13,33 +13,28 @@ export default function DashboardShell({ children, locale }) {
   const { isNotificationsOpen } = useNotifications();
 
   const isRtl = locale === "ar";
-  const messagesMargin =
-    isMessagesOpen && !isMaximized
-      ? isRtl
-        ? "sm:ml-[380px]"
-        : "sm:mr-[380px]"
-      : "";
-
-  const notificationsMargin = isNotificationsOpen
-    ? isRtl
-      ? "sm:ml-[380px]"
-      : "sm:mr-[380px]"
-    : "";
+  const sidePanelsOpen = [
+    isAssistantOpen,
+    isNotificationsOpen,
+    isMessagesOpen && !isMaximized,
+  ].filter(Boolean).length;
 
   const mainMargin = isRtl
-    ? `xl:mr-[260px] ${isAssistantOpen ? "xl:ml-[380px]" : ""} ${messagesMargin} ${notificationsMargin}`
-    : `xl:ml-[260px] ${isAssistantOpen ? "xl:mr-[380px]" : ""} ${messagesMargin} ${notificationsMargin}`;
+    ? `xl:mr-[260px] ${sidePanelsOpen ? "xl:ml-[380px]" : ""}`
+    : `xl:ml-[260px] ${sidePanelsOpen ? "xl:mr-[380px]" : ""}`;
+
+  const stackedPanels = sidePanelsOpen > 1;
 
   return (
     <>
       {/* بانل المساعد */}
-      <AIAssistantPanel side={isRtl ? "left" : "right"} />
+      <AIAssistantPanel side={isRtl ? "left" : "right"} stacked={stackedPanels} topOffset={0} />
 
       {/* بانل الإشعارات */}
-      <NotificationsPanel side={isRtl ? "left" : "right"} />
+      <NotificationsPanel side={isRtl ? "left" : "right"} stacked={stackedPanels} topOffset={88} />
 
       {/* بانل الرسائل */}
-      <MessagesPanel side={isRtl ? "left" : "right"} />
+      <MessagesPanel side={isRtl ? "left" : "right"} stacked={stackedPanels} topOffset={176} />
 
       <main className={`min-w-0 transition-all duration-300 ${mainMargin}`}>
         {children}

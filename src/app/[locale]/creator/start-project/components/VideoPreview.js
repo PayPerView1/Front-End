@@ -30,7 +30,6 @@ export default function VideoPreview({
   const withdrawBtn = `${btnBase} ${isDark ? "text-[#FFB4AB]" : "text-red-600"}`;
 
   const hasLink = Boolean(link.trim()) && !error;
-  const boxHeight = "h-[340px]";
   return (
     <div className={`${surface} border rounded-2xl p-4 space-y-3`}>
       {/* العنوان والشارة */}
@@ -95,7 +94,7 @@ export default function VideoPreview({
       ) : (
         // معاينة الفيديو (أو حالة فاضية قبل إدخال الرابط)
         <div
-          className={`relative w-full h-[340px] min-h-[340px] rounded-2xl overflow-hidden border flex items-center justify-center ${
+          className={`relative w-full h-[260px] sm:h-[340px] min-h-[260px] sm:min-h-[340px] rounded-2xl overflow-hidden border flex items-center justify-center ${
             isDark ? "bg-[#0b0e0f] border-[#252c2d]" : "bg-[#eef2f0] border-[#e1e7e4]"
           }`}
         >

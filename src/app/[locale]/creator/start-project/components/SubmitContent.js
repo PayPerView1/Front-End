@@ -41,11 +41,11 @@ const [draft, setDraft] = useState({ link: "", platform: null });
 
   return (
     <div
-      className={`min-h-screen w-full font-tajawal p-4 md:p-6 ${theme.page}`}
+      className={`min-h-screen w-full font-tajawal p-3 sm:p-4 md:p-6 ${theme.page}`}
       dir={locale === "ar" ? "rtl" : "ltr"}
     >
       {/* Header */}
-      <div className={`${theme.surface} border rounded-2xl p-5 mb-5`}>
+      <div className={`${theme.surface} border rounded-2xl p-4 sm:p-5 mb-5`}>
         <h1 className={`text-2xl md:text-3xl font-black mb-1 ${theme.primaryText}`}>
           {t("title")}
         </h1>
@@ -55,10 +55,12 @@ const [draft, setDraft] = useState({ link: "", platform: null });
       <ProgressSteps statuses={["done", formError ? "error" : "pending", "pending"]} />
 
       <ErrorBanner reason={formError} />
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5 items-start">
-        <SubmitForm campaign={campaign} campaignId={campaignId} onChange={setDraft} onError={setFormError}/>
+      <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-5 2xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0">
+          <SubmitForm campaign={campaign} campaignId={campaignId} onChange={setDraft} onError={setFormError}/>
+        </div>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <VideoPreview
             link={draft.link}
             image={campaign?.image}
