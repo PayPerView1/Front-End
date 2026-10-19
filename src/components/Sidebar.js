@@ -31,7 +31,7 @@ const creatorNavItems = [
   { label: "home", href: "/creator/dashboard", icon: Home },
   { label: "orders", href: "/creator/orders", icon: Bag }, // عدّل الرابط حسب مشروعك
   { label: "discover", href: "/creator/discover", icon: Discovery },
-  { label: "startProject", href: "/new", icon: Plus },
+  { label: "startProject", href: "/start-project", icon: Plus },
 ];
 
 const creatorResourceItems = [
