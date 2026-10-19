@@ -189,6 +189,7 @@ export default function Sidebar() {
   const renderLink = (item) => {
     const isActive =
       pathname === item.href ||
+      (item.label === "startProject" && pathname?.startsWith(`${item.href}/`)) ||
       (item.label === "billing" && pathname?.startsWith("/advertiser/wallet"));
     const Icon = item.icon;
 

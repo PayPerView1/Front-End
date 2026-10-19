@@ -143,7 +143,7 @@ export default function ReviewView({ submission, campaign }) {
             href={submission.link}
             target="_blank"
             rel="noopener noreferrer"
-            className={`flex items-center gap-1.5 px-3 py-2 border rounded-lg text-[10px] font-bold ${theme.inset} ${theme.secondaryText}`}
+            className={`flex w-full items-center justify-center gap-1.5 px-3 py-2 border rounded-lg text-center text-[10px] font-bold sm:w-auto ${theme.inset} ${theme.secondaryText}`}
           >
             <ExternalLink size={12} />
             {t("openInPlatform", { platform: platformLabel })}

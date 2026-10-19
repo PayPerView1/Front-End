@@ -9,6 +9,7 @@ import * as profile from "@/services/profile";
 import * as drafts from "@/services/drafts";
 import * as wallet from "@/services/wallet";
 import * as campaign from "@/services/campaign";
+import * as applications from "@/services/applications";
 import {
   getToken,
   getSavedUser,
@@ -38,6 +39,7 @@ const api = {
   drafts,
   wallet,
   campaign,
+  applications,
 
   // Auth shortcuts
   register: auth.register,
@@ -74,6 +76,42 @@ const api = {
   pauseCampaign: campaign.pauseCampaign,
   resumeCampaign: campaign.resumeCampaign,
   configureAutoResume: campaign.configureAutoResume,
+
+  // Applications (Sprint 4)
+  applyToCampaign: applications.applyToCampaign,
+  withdrawApplication: applications.withdrawApplication,
+  getMyApplications: applications.getMyApplications,
+  getApplicationMaterials: applications.getApplicationMaterials,
+  getCampaignApplicants: applications.getCampaignApplicants,
+  reviewApplication: applications.reviewApplication,
+
+  // Discover / Creator (Sprint 4)
+  discoverCampaigns: applications.discoverCampaigns,
+  getCampaignSuggestions: applications.getCampaignSuggestions,
+  getCampaignDetails: applications.getCampaignDetails,
+  getRecommendedCampaigns: applications.getRecommendedCampaigns,
+  getCreatorPreferences: applications.getCreatorPreferences,
+  updateCreatorPreferences: applications.updateCreatorPreferences,
+
+  // Favorites (Sprint 4)
+  addFavorite: applications.addFavorite,
+  getFavorites: applications.getFavorites,
+  removeFavorite: applications.removeFavorite,
+  bulkRemoveFavorites: applications.bulkRemoveFavorites,
+
+  // Reports (Sprint 4)
+  reportCampaign: applications.reportCampaign,
+  confirmVisitorReport: applications.confirmVisitorReport,
+  getReports: applications.getReports,
+  getReportStatistics: applications.getReportStatistics,
+  getReportById: applications.getReportById,
+  reviewReport: applications.reviewReport,
+
+  // Notifications (Sprint 4)
+  getNotifications: applications.getNotifications,
+  getUnreadNotificationCount: applications.getUnreadNotificationCount,
+  markNotificationRead: applications.markNotificationRead,
+  markAllNotificationsRead: applications.markAllNotificationsRead,
 
   // Helpers
   getToken,

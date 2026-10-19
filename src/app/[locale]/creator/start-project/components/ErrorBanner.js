@@ -13,7 +13,7 @@ export default function ErrorBanner({ reason, values = {} }) {
   return (
     <div
       role="alert"
-      className={`flex items-start justify-between gap-4 rounded-2xl border p-5 mb-5 ${
+      className={`flex items-start justify-between gap-3 rounded-2xl border p-4 sm:gap-4 sm:p-5 mb-5 ${
         isDark ? "bg-[#5a1c1c]/70 border-red-500/30" : "bg-red-50 border-red-200"
       }`}
     >

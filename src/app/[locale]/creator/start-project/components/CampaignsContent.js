@@ -68,7 +68,7 @@ export default function CampaignsContent() {
 
   return (
     <div
-      className={`min-h-screen w-full font-tajawal p-4 md:p-6 ${theme.page}`}
+      className={`min-h-screen w-full font-tajawal p-3 sm:p-4 md:p-6 ${theme.page}`}
       dir={locale === "ar" ? "rtl" : "ltr"}
     >
       {/* Title */}
@@ -83,9 +83,9 @@ export default function CampaignsContent() {
 
       {/* Filters + Search */}
       <div
-        className={`${theme.surface} border p-2.5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-3 mb-5`}
+        className={`${theme.surface} border p-2.5 rounded-2xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-5`}
       >
-        <div className="flex items-center gap-0.3 overflow-x-auto w-full md:w-auto">
+        <div className="flex min-w-0 items-center gap-1 overflow-x-auto w-full md:w-auto">
           {filters.map((f) => {
             const active = activeFilter === f.key;
             return (
@@ -157,16 +157,16 @@ export default function CampaignsContent() {
                     {formatRemaining(c.remaining)}
                   </span>
                 </div>
-                <span className={`text-[10px] font-mono ${theme.secondaryText}`}>
+                <span className={`max-w-full break-all text-[10px] font-mono ${theme.secondaryText}`}>
                   {t("card.campaignNumber")}: {c.code}
                 </span>
               </div>
 
               {/* Body */}
-              <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+              <div className="campaign-card-body flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
               {/* Thumbnail */}
                 <div
-                  className={`relative w-full lg:w-[310px] h-[170px] shrink-0 rounded-xl overflow-hidden border ${
+                  className={`campaign-card-image relative h-[170px] w-full shrink-0 overflow-hidden rounded-xl border lg:w-[310px] ${
                     isDark ? "border-[#233532]" : "border-[#d3e6de]"
                   }`}
                 >
@@ -179,9 +179,9 @@ export default function CampaignsContent() {
                     {c.duration} {t("card.seconds")}
                   </span>
                 </div>
-                <div className="flex-1 min-w-0 space-y-3">
+                <div className="campaign-card-details flex-1 min-w-0 space-y-3">
                   <div>
-                    <h3 className={`text-base sm:text-lg font-bold ${theme.primaryText}`}>
+                    <h3 className={`break-words text-base sm:text-lg font-bold ${theme.primaryText}`}>
                       {t(`campaigns.${c.title}`)}
                     </h3>
                     <p className={`text-[11px] mt-1 ${theme.secondaryText}`}>
@@ -189,7 +189,7 @@ export default function CampaignsContent() {
                     </p>
                   </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="campaign-info-grid grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-3">
                 {/* 1. الهاشتاق */}
                 <InfoBox
                   theme={theme}
@@ -215,10 +215,10 @@ export default function CampaignsContent() {
                 />
               </div>
 
-                  <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="campaign-actions flex flex-col gap-2 sm:flex-row">
                     <Link
                       href={`/creator/start-project/${c.id}`}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white text-xs font-bold shadow-[0_4px_20px_rgba(251,96,1,0.5)]"
+                      className="flex-1 flex min-w-0 items-center justify-center gap-2 px-3 sm:px-4 py-3 rounded-xl text-center text-xs font-bold text-white shadow-[0_4px_20px_rgba(251,96,1,0.5)]"
                       style={gradient}
                     >
                       <Upload size={15} />
@@ -226,7 +226,7 @@ export default function CampaignsContent() {
                     </Link>
                     <button
                       type="button"
-                      className={`px-7 py-1 border text-xs font-bold  rounded-xl flex items-center justify-center gap-1.5 ${
+                      className={`px-4 sm:px-7 py-2 border text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 ${
                         isDark
                           ? "bg-[#22282a] border-[#2d3436] text-gray-200"
                           : "bg-[#f3f6f5] border-[#d8dfdc] text-[#404945]"
@@ -304,7 +304,7 @@ export default function CampaignsContent() {
 
 function InfoBox({ theme, icon, label, value }) {
   return (
-    <div className={`rounded-xl border p-3 flex items-center justify-center gap-3 ${theme.inset}`}>
+    <div className={`min-w-0 rounded-xl border p-3 flex items-center justify-center gap-3 ${theme.inset}`}>
      {/* الأيقونة التركوازية الجانبية */}
       {icon && (
         <div className="text-[#94D3C1] shrink-0">
@@ -312,11 +312,11 @@ function InfoBox({ theme, icon, label, value }) {
         </div>
       )}
       {/* النصين المترتبين فوق بعض */}
-      <div className="flex flex-col items-center">
+      <div className="flex min-w-0 flex-col items-center text-center">
         <span className={`text-[10px] mb-0.5 ${theme.secondaryText}`}>
           {label}
         </span>
-        <strong className={`text-xs ${theme.primaryText}`}>
+        <strong className={`max-w-full break-words text-xs ${theme.primaryText}`}>
           {value}
         </strong>
       </div>

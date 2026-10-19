@@ -102,7 +102,7 @@ export function WithdrawModal({ isOpen, order, onClose, onConfirm, anchorRef }) 
         onClick={onClose}
       />
       <div
-        className="pointer-events-none absolute flex items-center justify-center overflow-hidden p-4 sm:p-8"
+        className="pointer-events-none absolute flex items-center justify-center overflow-y-auto overscroll-contain p-3 sm:p-8"
         style={area ?? { left: 0, top: 0, width: '100%', height: '100%' }}
       >
       <div
@@ -110,7 +110,7 @@ export function WithdrawModal({ isOpen, order, onClose, onConfirm, anchorRef }) 
         aria-modal="true"
         dir={locale === 'ar' ? 'rtl' : 'ltr'}
         onClick={(e) => e.stopPropagation()}
-        className={`pointer-events-auto relative w-full max-w-[500px] rounded-xl border px-3 pt-8 pb-6 sm:px-5 sm:pt-10 sm:pb-7 ${locale === 'ar' ? 'text-right' : 'text-left'} shadow-2xl ${themeText.modal}`}
+        className={`pointer-events-auto relative max-h-full w-full max-w-[500px] overflow-y-auto overscroll-contain rounded-xl border px-3 pt-6 pb-4 sm:px-5 sm:pt-8 sm:pb-6 ${locale === 'ar' ? 'text-right' : 'text-left'} shadow-2xl ${themeText.modal}`}
       >
         {/* Header */}
         <div className="flex items-start gap-3 mb-6">

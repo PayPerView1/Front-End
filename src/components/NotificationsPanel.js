@@ -5,7 +5,7 @@ import { useNotifications } from "@/context/NotificationsContext";
 import { useLocale } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 
-export default function NotificationsPanel({ side = "left" }) {
+export default function NotificationsPanel({ side = "left", stacked = false, topOffset = 0 }) {
   const {
     isNotificationsOpen,
     notifications,
@@ -91,9 +91,11 @@ export default function NotificationsPanel({ side = "left" }) {
       />
 
       <aside
-        className={`notifications-panel fixed top-14 h-[calc(100vh-56px)] w-full max-w-full xl:w-[380px] xl:max-w-[380px] z-40 flex flex-col overflow-y-auto border transition-all duration-300 ${sideClass} ${t.border}`}
+        className={`notifications-panel fixed w-full max-w-full xl:w-[380px] xl:max-w-[380px] z-40 flex flex-col overflow-y-auto border transition-all duration-300 ${sideClass} ${t.border}`}
         data-side={side}
         style={{
+          top: `${56 + (stacked ? topOffset : 0)}px`,
+          height: "calc(100vh - 56px)",
           backgroundColor: isDark ? "#0C0F10" : "#FFFFFF",
           boxShadow: "0px 25px 50px -12px rgba(0, 0, 0, 0.25)",
         }}
