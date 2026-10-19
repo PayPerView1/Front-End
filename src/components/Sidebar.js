@@ -34,7 +34,7 @@ const creatorNavItems = [
   { label: "orders", href: "/creator/orders", icon: Bag },
   { label: "search", href: "/search", icon: Search },
   { label: "discover", href: "/discover", icon: Discovery },
-  { label: "startProject", href: "/new", icon: Plus },
+  { label: "startProject", href: "/creator/start-project", icon: Plus },
 ];
 
 const creatorResourceItems = [
