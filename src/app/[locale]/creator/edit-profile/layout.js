@@ -37,12 +37,16 @@ export default function Sidebar({ children }) {
   // يشتغل لـ creator و advertiser: /ar/creator/edit-profile أو /ar/advertiser/edit-profile
   const marker = "/edit-profile";
   const markerIndex = pathname.indexOf(marker);
+  const isAdvertiser = pathname.includes("/advertiser/edit-profile");
   const base =
     markerIndex === -1
       ? `/${locale}/creator${marker}`
       : pathname.slice(0, markerIndex) + marker;
 
   const currentPath = pathname.replace(/\/$/, "");
+  const visibleMenuItems = isAdvertiser
+    ? menuItems.filter((item) => item.key === "profile")
+    : menuItems;
 
   const t = {
     sidebarBg: isDark ? "bg-[#111]" : "bg-white",
@@ -71,7 +75,7 @@ export default function Sidebar({ children }) {
         </div>
 
         <nav className="flex min-w-0 flex-1 flex-row gap-0.5 overflow-x-auto lang-scroll md:flex-initial md:flex-col md:overflow-x-visible">
-          {menuItems.map((item) => {
+          {visibleMenuItems.map((item) => {
             const Icon = item.icon;
             const href = item.path ? `${base}/${item.path}` : base;
             const isActive = currentPath === href;

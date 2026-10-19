@@ -222,7 +222,7 @@ export default function FavoritesContent() {
     text: isDark ? "text-white" : "text-[#171717]",
     subText: isDark ? "text-[#B0B0B0]" : "text-[#555555]",
     muted: isDark ? "text-[#A0A0A0]" : "text-[#595959]",
-    cardBg: isDark ? "bg-[#141414]" : "bg-white",
+    cardBg: isDark ? "bg-[#191C1D]" : "bg-white",
     cardBorder: isDark ? "border-[#333333]" : "border-[#D6D6D6]",
     innerBg: isDark ? "bg-[#1C1C1C]" : "bg-[#F5F5F5]",
     toolbarBg: isDark ? "bg-[#111]" : "bg-white",

@@ -104,6 +104,70 @@ export const getCampaigns = async (params = {}) => {
   }
 };
 
+// Recommended campaigns and creator preference settings (Sprint 4)
+export const getCreatorRecommendations = async (limit = 10) => {
+  try {
+    const response = await axiosInstance.get("/api/v1/campaigns/recommendations", {
+      params: { limit },
+      _suppressInterceptorErrorLog: true,
+    });
+    return response.data;
+  } catch (error) {
+    const errorData = (() => {
+      if (typeof error.response?.data !== "string") return error.response?.data || {};
+      try {
+        return JSON.parse(error.response.data);
+      } catch {
+        return {};
+      }
+    })();
+
+    if (error.response?.status === 403 && /only brand accounts/i.test(errorData.message || "")) {
+      try {
+        const response = await axiosInstance.get("/api/v1/campaigns/discover", {
+          params: { sort: "bestMatch", page: 1, perPage: Math.min(Math.max(Number(limit) || 10, 1), 20) },
+        });
+        return {
+          ...response.data,
+          meta: { ...response.data?.meta, hasPreferences: null },
+          recommendationSource: "discover",
+        };
+      } catch (fallbackError) {
+        handleError(fallbackError);
+      }
+    }
+
+    handleError(error);
+  }
+};
+
+export const getCreatorPreferences = async () => {
+  try {
+    const response = await axiosInstance.get("/api/v1/creator/preferences");
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const updateCreatorPreferences = async (preferences) => {
+  try {
+    const response = await axiosInstance.put("/api/v1/creator/preferences", preferences);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getMyCampaignApplications = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/api/v1/applications/my", { params });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 // 10. جلب تفاصيل حملة محددة
 export const getCampaignById = async (campaignId) => {
   try {

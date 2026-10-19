@@ -5,7 +5,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { Wallet, Location, People, Category } from "react-iconly";
 import { RiUserLine } from "react-icons/ri";
 import { useRouter, usePathname } from "next/navigation";
-import api, { getSavedUser } from "@/lib/axiosInstance";
+import api from "@/services";
 import { useLocale, useTranslations } from "next-intl";
 import worldCountries from "world-countries";
 import Select from "react-select";
@@ -342,6 +342,10 @@ export default function EditProfileContent() {
         return;
       }
 
+      const savedUser = api.getSavedUser() || {};
+      const isBrand = pathname?.includes("/advertiser") || String(savedUser.role || "").toUpperCase() === "BRAND";
+      const hasCompanyName = Object.prototype.hasOwnProperty.call(savedUser, "companyName");
+
       const payload = {
         fullName: form.name || undefined,
         username: form.username.trim(),
@@ -351,6 +355,8 @@ export default function EditProfileContent() {
         city: city || undefined,
         interests: selectedInterests,
       };
+
+      if (isBrand && hasCompanyName) payload.companyName = form.name.trim();
 
       if (phone.trim()) {
         payload.phoneNumber = phone.trim();
@@ -364,10 +370,10 @@ export default function EditProfileContent() {
         payload.profilePicture = "";
       }
 
-      const result = await api.updateProfile(payload);
+      let result = await api.updateProfile(payload);
 
       if (hasNewImage) {
-        await api.updateProfile(api.createFormData({ profilePicture: profileImage }));
+        result = await api.updateProfile(api.createFormData({ profilePicture: profileImage }));
       }
 
       setSaveMsg(copy("saved") + " ✅");
@@ -375,24 +381,24 @@ export default function EditProfileContent() {
       const updatedUser = getUserFromResponse(result);
 
       if (updatedUser && typeof updatedUser === "object") {
-        const savedUser = api.getSavedUser() || {};
         api.saveAuthData(api.getToken(), {
           ...savedUser,
           ...updatedUser,
           fullName: form.name,
+          ...(isBrand && hasCompanyName ? { companyName: form.name.trim() } : {}),
           username: form.username.trim(),
           bio: form.bio.trim(),
         });
       }
 
       setTimeout(() => {
-        const savedUser = getSavedUser();
-        if (pathname?.includes("/advertiser") || savedUser?.role === "BRAND") {
-          router.push(`/${locale}/advertiser/dashboard`);
+        const savedUser = api.getSavedUser();
+        if (pathname?.includes("/advertiser") || String(savedUser?.role || "").toUpperCase() === "BRAND") {
+          router.replace(`/${locale}/advertiser/profile`);
         } else {
-          router.push(`/${locale}/creator/dashboard`);
+          router.replace(`/${locale}/creator/dashboard`);
         }
-      }, 1000);
+      }, 700);
     } catch (error) {
       const responseErrors = error.response?.data?.errors;
       if (responseErrors && Array.isArray(responseErrors)) {
@@ -414,8 +420,9 @@ export default function EditProfileContent() {
         const result = await api.getProfile();
         const user = getUserFromResponse(result);
 
+        const isBrandUser = pathname?.includes("/advertiser") || String(user?.role || "").toUpperCase() === "BRAND";
         setForm({
-          name: user?.fullName || "",
+          name: (isBrandUser && user?.companyName) || user?.fullName || "",
           username: user?.username || "",
           email: user?.email || "",
           bio: user?.bio || "",
@@ -444,6 +451,10 @@ export default function EditProfileContent() {
         setDialCode(user?.phoneCountryCode || "");
         setCountry(user?.country || "");
         setCity(user?.city || "");
+
+        if (user && typeof user === "object" && api.getToken()) {
+          api.saveAuthData(api.getToken(), { ...(api.getSavedUser() || {}), ...user });
+        }
 
         if (
           user.profilePicture &&
@@ -1102,9 +1113,9 @@ export default function EditProfileContent() {
           <button
             type="button"
             onClick={() => {
-              const savedUser = getSavedUser();
-              if (pathname?.includes("/advertiser") || savedUser?.role === "BRAND") {
-                router.push(`/${locale}/advertiser/dashboard`);
+              const savedUser = api.getSavedUser();
+              if (pathname?.includes("/advertiser") || String(savedUser?.role || "").toUpperCase() === "BRAND") {
+                router.push(`/${locale}/advertiser/profile`);
               } else {
                 router.push(`/${locale}/creator/dashboard`);
               }
