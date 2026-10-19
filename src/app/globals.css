@@ -37,6 +37,18 @@ body {
 }
 
 @media (min-width: 1280px) and (max-width: 1399px) {
+  main[data-side-panels-open="true"] .creator-responsive-page .grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  main[data-side-panels-open="true"] .creator-responsive-page [class~="sm:flex-row"],
+  main[data-side-panels-open="true"] .creator-responsive-page [class~="md:flex-row"],
+  main[data-side-panels-open="true"] .creator-responsive-page [class~="lg:flex-row"] {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 1280px) and (max-width: 1399px) {
   main[data-side-panels-open="true"] .campaign-card-body {
     flex-direction: column;
   }

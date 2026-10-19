@@ -258,7 +258,7 @@ export function OrdersContent() {
   };
 
   return (
-    <div className={`min-h-screen w-full font-tajawal p-3 sm:p-4 md:p-6 ${theme.page}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <div className={`creator-responsive-page min-h-screen w-full font-tajawal p-3 sm:p-4 md:p-6 ${theme.page}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
 
       {/* Title Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">

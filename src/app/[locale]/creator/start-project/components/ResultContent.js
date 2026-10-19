@@ -49,7 +49,7 @@ export default function ResultContent() {
   
   return (
     <div
-      className={`min-h-screen w-full font-tajawal p-3 sm:p-4 md:p-6 ${page}`}
+      className={`creator-responsive-page min-h-screen w-full font-tajawal p-3 sm:p-4 md:p-6 ${page}`}
       dir={locale === "ar" ? "rtl" : "ltr"}
     >
       <View submission={submission} campaign={campaign} />
