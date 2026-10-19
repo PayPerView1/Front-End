@@ -361,12 +361,12 @@ const placeholders = {
       {submitError && <p className="text-[11px] text-red-400">{submitError}</p>}
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex w-full flex-col items-stretch gap-2 sm:flex-row">
         <button
           type="button"
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="flex-1 flex items-center justify-center h-11 rounded-xl text-white text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_0_20px_rgba(252,145,2,0.25)]"
+          className="flex h-11 min-h-11 w-full flex-none items-center justify-center rounded-xl px-4 text-center text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(252,145,2,0.25)] sm:flex-1"
           style={gradient}
         >
           {submitting
@@ -377,7 +377,7 @@ const placeholders = {
         </button>
         <button
           type="button"
-          className={`flex items-center justify-center gap-2 h-11 px-5 border rounded-xl text-xs font-bold ${theme.inset} ${theme.secondaryText}`}
+          className={`flex h-11 min-h-11 w-full flex-none items-center justify-center gap-2 rounded-xl border px-5 text-xs font-bold sm:w-auto ${theme.inset} ${theme.secondaryText}`}
         >
           <Bookmark size={14} />
           {t("saveLater")}

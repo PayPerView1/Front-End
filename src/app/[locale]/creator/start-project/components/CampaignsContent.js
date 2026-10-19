@@ -68,7 +68,7 @@ export default function CampaignsContent() {
 
   return (
     <div
-      className={`min-h-screen w-full font-tajawal p-3 sm:p-4 md:p-6 ${theme.page}`}
+      className={`creator-responsive-page min-h-screen w-full font-tajawal p-3 sm:p-4 md:p-6 ${theme.page}`}
       dir={locale === "ar" ? "rtl" : "ltr"}
     >
       {/* Title */}
