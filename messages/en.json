@@ -1542,5 +1542,416 @@
       "cancel": "Go Back and Keep Application",
       "confirm": "Confirm Final Withdrawal"
     }
+  },
+  "startProject": {
+    "title": "Produced your clip? Pick the campaign to submit it and claim your reward",
+    "description": "Choose the campaign you produced your clip for. Once you submit the link, AI will check the requirements and confirm the deposit to your wallet within seconds.",
+    "searchPlaceholder": "Search by campaign or advertiser name...",
+    "empty": "No matching campaigns",
+    "filters": {
+      "all": "All",
+      "ready": "Ready to submit now",
+      "endingSoon": "Ending soon"
+    },
+    "status": {
+      "instant": "Approved for instant submission",
+      "production": "Approved for production & submission"
+    },
+    "card": {
+      "campaignNumber": "Campaign No.",
+      "verifiedCompany": "Sharia-verified account",
+      "requiredHashtag": "Required hashtag",
+      "requiredMention": "Account mention",
+      "shariaRule": "Sharia requirement",
+      "noMusic": "Completely free of music",
+      "submitNow": "Submit this campaign's clip now",
+      "terms": "Campaign terms",
+      "assets": "Campaign assets",
+      "seconds": "sec",
+      "remainingHours": "Only {count} hours left",
+      "remainingDays": "{count} days left"
+    },
+    "paymentTerms": {
+      "bankTransfer": "Bank transfer",
+      "viewsBased": "Based on views",
+      "stepsBased": "Based on steps"
+    },
+    "campaigns": {
+      "wafiTitle": "Wafi Islamic Finance Platform - Smart Murabaha Feature",
+      "wafiCompany": "Wafi Financial Company",
+      "muskTitle": "Musk Luxury Perfume App - Heritage Authenticity Scent",
+      "muskCompany": "Musk International House",
+      "goldTitle": "Gulf Digital Gold Platform - Saving in Pure Gold",
+      "goldCompany": "Gulf Investment Company"
+    },
+    "escrow": {
+      "title": "Your financial rights are 100% protected",
+      "description": "The funds of all these campaigns are pre-frozen in the bank escrow account. As soon as you submit the post link and AI confirms it, the reward is transferred directly to your wallet with no waiting or lengthy reviews."
+    },
+    "support": {
+      "title": "Live support team",
+      "subtitle": "Ready to help you during submission",
+      "chat": "Instant chat with an advisor"
+    },
+    "tips": {
+      "title": "Quick tips to get your clip accepted",
+      "subtitle": "Make sure of these things before submitting your clip",
+      "public": {
+        "title": "Public account",
+        "desc": "Make sure your account is public, not private, so we can verify the post."
+      },
+      "hashtags": {
+        "title": "Add the required hashtags",
+        "desc": "Make sure you add all the campaign's required hashtags before publishing the clip."
+      },
+      "noMusic": {
+        "title": "Clip free of music",
+        "desc": "Make sure the clip has no music or instruments and follows the campaign terms."
+      }
+    },
+    "submit": {
+      "title": "Submit your published clip for review",
+      "description": "Enter your clip link after publishing it on your verified account so it can be checked and your earnings approved right away, quickly and easily.",
+      "formTitle": "Clip submission form",
+      "formSubtitle": "Follow these simple steps to submit your clip without any trouble.",
+      "choosePlatform": "Choose where you published the clip:",
+      "platforms": {
+        "tiktok": "TikTok",
+        "instagram": "Instagram",
+        "youtube": "YouTube"
+      },
+      "pasteLink": "Paste the video link here:",
+      "publicNote": "Make sure your account is public, not private, so the post can be read instantly.",
+      "requiredHashtags": "Required hashtags in the post ({count} hashtags only):",
+      "copyAll": "Copy in one click",
+      "copied": "Copied",
+      "pledgeLabel": "Sharia pledge:",
+      "pledge": "I pledge that the clip is free of music and instruments and complies with the terms and Sharia rules of the Wafi platform.",
+      "submit": "Submit clip for review and approval",
+      "submitting": "Submitting...",
+      "saveLater": "Save for later",
+      "verifiedLink": "Verified account link",
+      "checkLink": "Check link",
+      "linkOk": "The link is valid and can be submitted",
+      "recheck": "Re-check the post",
+      "duplicateNote": "This submission was rejected to prevent duplication and keep independent payment records.",
+      "errors": {
+        "empty": "Please enter the video link",
+        "invalidUrl": "The link is invalid. Make sure you copied it in full from the app",
+        "unsupportedPlatform": "This platform is not supported. Use TikTok, Instagram or YouTube",
+        "platformMismatch": "The link does not match the platform you selected",
+        "noPlatform": "Please choose the platform you published the clip on first"
+      },
+      "badges": {
+        "invalidUrl": "Invalid link",
+        "unsupportedPlatform": "Facebook is not supported",
+        "platformMismatch": "Link does not match platform",
+        "duplicate": "Duplicate link, already registered",
+        "missingHashtags": "Missing hashtags"
+      },
+      "formats": {
+        "title": "Accepted and supported {platform} link formats:",
+        "notes": {
+          "tiktok": "Make sure the clip link is from your public account and includes the post number.",
+          "instagram": "Make sure the Reel link is from your public account and includes the Reel ID.",
+          "youtube": "Make sure the Shorts link is from your public channel and includes the video ID."
+        },
+        "supportedOnly": "Sorry! The automatic checker only recognizes links from:"
+      }
+    },
+    "steps": {
+      "submitted": {
+        "title": "Clip submitted",
+        "done": "Ready, with the required quality",
+        "active": "Submitting",
+        "error": "Submission failed",
+        "pending": "Waiting for submission"
+      },
+      "aiCheck": {
+        "title": "AI check",
+        "done": "Passed and meets the requirements",
+        "active": "Checking now",
+        "passed": "Passed 100% and fully compliant",
+        "review": "Audio track needs an expert review",
+        "error": "Clip does not meet the requirements",
+        "pending": "Starts after submission"
+      },
+      "reward": {
+        "title": "Reward deposit",
+        "done": "Deposited into your wallet",
+        "active": "Awaiting final approval",
+        "error": "Deposit failed",
+        "pending": "Within 24 hours"
+      }
+    },
+    "preview": {
+      "title": "Published clip preview",
+      "empty": "The clip preview will appear here after you enter the link",
+      "openOriginal": "Open original link",
+      "withdraw": "Withdraw to edit",
+      "verified": "{platform} verified",
+      "detectedTitle": "Detected post preview",
+      "failedBadge": "Clip unreachable",
+      "failedTitle": "Couldn't fetch the post",
+      "failedDesc": "The video can't be previewed and views can't be verified until a valid link is entered.",
+      "httpError": "HTTP 404 • Not Found"
+    },
+    "deadline": {
+      "label": "Deadline for your reward's final approval",
+      "value": "Within {hours} hours and {minutes} minutes"
+    },
+    "result": {
+      "title": "Your clip was received successfully!",
+      "description": "Your clip is in the smart check queue, and the reward will reach your wallet as soon as it is approved.",
+      "campaignLabel": "Ad campaign",
+      "hashtagsRequired": "Required hashtags in the post ({count} hashtags)",
+      "hashtagsDone": "{done} of {total} completed",
+      "noteTitle": "Important notes",
+      "noteText": "Please make sure all campaign requirements are met before submitting your clip.",
+      "creatorLink": "Submitted and verified clip link",
+      "hashtagsLabel": "Required hashtags in the post ({count} hashtags)",
+      "compatibility": "Your clip is more than 44 seconds at the start. The model evaluates from second 44, taking the smart opening into account.",
+      "backToList": "Back to campaigns list",
+      "linkConfirmed": "Link confirmed",
+      "campaigns": {
+        "wafiTitle": "Wafi Islamic Finance Platform - Smart Murabaha Feature",
+        "muskTitle": "Musk Luxury Perfume App - Heritage Authenticity Scent",
+        "goldTitle": "Gulf Digital Gold Platform - Saving in Pure Gold"
+      },
+      "ai": {
+        "label": "AI check result",
+        "subtitle": "The clip was analyzed and verified against the requirements",
+        "excellent": "Excellent",
+        "items": {
+          "sharia": {
+            "title": "Sharia compliance",
+            "desc": "The content complies with the campaign terms."
+          },
+          "logo": {
+            "title": "Logo visibility",
+            "desc": "The required logo was verified as visible."
+          },
+          "quality": {
+            "title": "Video quality",
+            "desc": "The video quality is suitable for publishing."
+          },
+          "audio": {
+            "title": "Audio",
+            "desc": "The audio was verified as compliant with the requirements."
+          }
+        }
+      }
+    },
+    "approved": {
+      "title": "The clip was checked and automatically approved by AI!",
+      "description": "All campaign criteria and the specified Sharia rules were verified at 100%. Current submission status: awaiting the advertiser's final approval for payout. The amount is protected by escrow and secured for transfer.",
+      "scoreLabel": "Overall match score",
+      "reportTitle": "Full AI check results report",
+      "reportSubtitle": "{passed} of {total} requirements verified successfully",
+      "instant": "Instant check",
+      "checks": {
+        "videoSpecs": {
+          "title": "Video dimensions and resolution",
+          "desc": "Vertical 9:16 clip at 1080p, 42 seconds long",
+          "badge": "100% match"
+        },
+        "audio": {
+          "title": "Sharia audio audit",
+          "desc": "Completely free of music, instruments and unauthorized sound effects",
+          "badge": "100% Sharia compliant"
+        },
+        "mainHashtag": {
+          "title": "Mandatory main hashtag",
+          "desc": "{tag} is present and active in the main caption",
+          "badge": "Present and active"
+        },
+        "secondHashtag": {
+          "title": "Contractual hashtag",
+          "desc": "{tag2} matches the campaign terms",
+          "badge": "Present and active"
+        },
+        "mention": {
+          "title": "Official account mention",
+          "desc": "{account} is a valid mention with a direct account link",
+          "badge": "Included and matching"
+        }
+      }
+    },
+    "review": {
+      "title": "Your clip is under manual audit team review",
+      "description": "Don't worry! You don't need to take any action now. The automatic check referred your clip to the manual audit team to make sure it is reviewed fairly and not wrongly rejected. Your reward is held in full in the escrow vault until the clip is cleared.",
+      "dataTitle": "Submitted clip data and criteria check",
+      "dataSubtitle": "Summary of the mandatory requirements checked automatically",
+      "openInPlatform": "Preview the clip on {platform}",
+      "checks": {
+        "videoSpecs": {
+          "title": "Video dimensions and resolution",
+          "desc": "Vertical 9:16 clip (1080×1920) at 60 fps",
+          "badge": "Matches"
+        },
+        "hashtags": {
+          "title": "Mandatory hashtags",
+          "desc": "{tags} detected in the caption",
+          "badge": "Complete"
+        },
+        "mention": {
+          "title": "Official account mention",
+          "desc": "The mention of the verified account {account} was confirmed",
+          "badge": "Complete"
+        }
+      },
+      "audio": {
+        "title": "Audio",
+        "desc": "The audio track was sent for manual review because of possible sound effects close to music. The expert will confirm it meets the Sharia rules.",
+        "badge": "Manual check"
+      },
+      "whatNowTitle": "What happens now, step by step?",
+      "whatNowSubtitle": "Clear, guaranteed steps so your rights reach you without any extra action from you",
+      "flow": {
+        "received": {
+          "title": "Clip received and given review priority",
+          "desc": "The clip was recorded successfully and added to the check list",
+          "badge": "Done"
+        },
+        "expert": {
+          "title": "Expert listens to the audio track and approves it",
+          "desc": "A specialist reviewer listens to the audio track and confirms it meets the Sharia rules.",
+          "badge": "In progress"
+        },
+        "reward": {
+          "title": "Reward transfer ({amount} USD) to your wallet right away",
+          "desc": "Once the expert approves the clip, the amount is transferred immediately and you are notified.",
+          "badge": "Next step"
+        }
+      },
+      "timelineTitle": "Timeline and rights guarantee",
+      "timelineSubtitle": "Expected time to finish the manual audit",
+      "etaLabel": "Expected time to complete the check",
+      "etaValue": "{min} – {max} hours",
+      "guarantee": "Your reward amount is held in full in the escrow account and won't be touched unless the clip is rejected for a clear violation.",
+      "faqTitle": "Quick questions you may have",
+      "faq": {
+        "edit": {
+          "q": "Do I need to delete or edit the clip on TikTok?",
+          "a": "No, leave the clip published as it is and don't change anything until you receive the review decision."
+        },
+        "reward": {
+          "q": "Is the {amount} USD amount really guaranteed?",
+          "a": "Yes, the amount is held in escrow and transferred to your wallet as soon as the clip is approved."
+        }
+      }
+    },
+    "rejected": {
+      "title": "AI check complete: the clip does not meet the requirements",
+      "description": "Review the reasons for rejection below, fix the clip on your platform, then re-check with one click.",
+      "reportTitle": "Full AI check results report",
+      "reportSubtitle": "{passed} of {total} requirements verified successfully",
+      "instant": "Instant check",
+      "fixesTitle": "Only this needs fixing ({count} required)",
+      "fixesBadge": "{count} need correction",
+      "fixes": {
+        "audio": {
+          "title": "Change the audio track (remove music)",
+          "desc": "Background music effects were detected. Required: replace the audio with a clean track or natural human sounds, or use the approved campaign voiceover."
+        },
+        "hashtag": {
+          "title": "Add the mandatory campaign hashtag to the caption",
+          "desc": "The hashtag {tag} was not found in the video text or pinned comment. Add it to enable the payout."
+        }
+      },
+      "passedTitle": "Accepted and matched successfully ({count} requirements met)",
+      "passedBadge": "{count} requirements met",
+      "passed": {
+        "videoSpecs": {
+          "title": "Clip dimensions and resolution",
+          "tag": "Matches specs",
+          "desc": "Vertical 9:16 clip in high quality at 1080p."
+        },
+        "mainHashtag": {
+          "title": "Main hashtag",
+          "tag": "Present",
+          "desc": "The hashtag {tag} was verified in the caption successfully."
+        },
+        "mention": {
+          "title": "Official account mention",
+          "tag": "Verified",
+          "desc": "The mention of {account} and the link were verified."
+        }
+      }
+    },
+    "errorBanner": {
+      "invalidUrl": {
+        "title": "Invalid link • Don't worry, you can fix it easily now",
+        "desc": "The link you entered looks incomplete or isn't a direct link to a TikTok post. Follow the three simple steps below to copy the right link and the system will recognize it right away."
+      },
+      "unsupportedPlatform": {
+        "title": "Link from an unsupported platform (Facebook) • Don't worry, you can fix this in seconds!",
+        "desc": "This campaign only accepts vertical videos on TikTok, Instagram Reels or YouTube Shorts. All you need to do is publish the same video on one of the supported platforms and paste the link here!"
+      },
+      "platformMismatch": {
+        "title": "The link does not match the platform you selected",
+        "desc": "You selected a different platform from the link's platform. Change the platform above to match the link, or paste a link from the selected platform."
+      },
+      "missingHashtags": {
+        "title": "Your post is missing the campaign's required hashtags!",
+        "desc": "The smart checker verified the video quality and that it is free of music, but it didn't find the contractual hashtags in the post caption. All you need to do is copy the hashtags below and paste them into the video caption in the TikTok app."
+      },
+      "duplicateLink": {
+        "title": "This link has already been submitted in the system!",
+        "desc": "The smart checker matched the link and noticed it is already tied to a previous approved submission. The same video link can't be submitted twice to earn double profits for the same post. If you published a new clip for the campaign, please copy its unique link and paste it here."
+      }
+    },
+    "linkGuide": {
+      "title": "How to copy the right link in 3 simple steps",
+      "steps": {
+        "open": {
+          "title": "Open the TikTok app",
+          "desc": "Go to your profile and open the published Wafi ad clip."
+        },
+        "share": {
+          "title": "Tap the Share button",
+          "desc": "You'll find it at the bottom left of the video (the curved arrow icon)."
+        },
+        "copy": {
+          "title": "Choose \"Copy Link\"",
+          "desc": "Paste the link in the field above and tap \"Re-check\"."
+        }
+      }
+    },
+    "editGuide": {
+      "title": "Edit your post in one minute",
+      "steps": {
+        "open": {
+          "title": "Open the TikTok app",
+          "desc": "Go to your profile and open this video."
+        },
+        "share": {
+          "title": "Tap the three dots (⋯) then choose Edit post",
+          "desc": "Choose \"Edit post / caption\"."
+        },
+        "copy": {
+          "title": "Paste the hashtags and save",
+          "desc": "Paste the copied hashtags into the caption, save the post, then tap \"Re-check the post\"."
+        }
+      }
+    },
+    "duplicateTips": {
+      "title": "How to make sure you copied a different clip's link?",
+      "id": "Check the last 13 digits of the TikTok link. This number is a unique ID for each separate clip.",
+      "wait": "If you just published the video, wait one minute until TikTok finishes processing it, then copy the direct link.",
+      "noShort": "Make sure you aren't using promotional shortened links."
+    },
+    "previousSubmission": {
+      "title": "Data of the clip previously submitted with this link",
+      "subtitle": "Archived system record to protect your rights",
+      "badge": "Approved and paid to wallet",
+      "reference": "Previous reference number",
+      "reward": "Previously paid reward",
+      "paid": "Deposited",
+      "campaign": "Campaign it was registered under",
+      "firstDate": "Date and time of first submission",
+      "whyTitle": "Why does the system block link reuse?",
+      "whyDesc": "Because the platform calculates earnings based on the unique views of each new clip published independently. A video that has already been rewarded can't be submitted again."
+    }
   }
 }

@@ -9,23 +9,27 @@ import MessagesPanel from "@/components/MessagesPanel";
 
 export default function DashboardShell({ children, locale }) {
   const { isAssistantOpen } = useAssistant();
-const { isMessagesOpen, isMaximized, selectedConversation } = useMessages();
-const { isNotificationsOpen } = useNotifications();
+  const { isMessagesOpen, isMaximized } = useMessages();
+  const { isNotificationsOpen } = useNotifications();
 
-const isRtl = locale === "ar";
-const messagesMargin =
-  isMessagesOpen && !isMaximized
-    ? isRtl ? "sm:ml-[380px]" : "sm:mr-[380px]"   
+  const isRtl = locale === "ar";
+  const messagesMargin =
+    isMessagesOpen && !isMaximized
+      ? isRtl
+        ? "sm:ml-[380px]"
+        : "sm:mr-[380px]"
+      : "";
+
+  const notificationsMargin = isNotificationsOpen
+    ? isRtl
+      ? "sm:ml-[380px]"
+      : "sm:mr-[380px]"
     : "";
 
-const notificationsMargin =
-  isNotificationsOpen
-    ? isRtl ? "sm:ml-[380px]" : "sm:mr-[380px]"   
-    : "";
+  const mainMargin = isRtl
+    ? `xl:mr-[260px] ${isAssistantOpen ? "xl:ml-[380px]" : ""} ${messagesMargin} ${notificationsMargin}`
+    : `xl:ml-[260px] ${isAssistantOpen ? "xl:mr-[380px]" : ""} ${messagesMargin} ${notificationsMargin}`;
 
-const mainMargin = isRtl
-  ? `xl:mr-[260px] ${isAssistantOpen ? "xl:ml-[380px]" : ""} ${messagesMargin} ${notificationsMargin}`
-  : `xl:ml-[260px] ${isAssistantOpen ? "xl:mr-[380px]" : ""} ${messagesMargin} ${notificationsMargin}`;
   return (
     <>
       {/* بانل المساعد */}
@@ -37,7 +41,7 @@ const mainMargin = isRtl
       {/* بانل الرسائل */}
       <MessagesPanel side={isRtl ? "left" : "right"} />
 
-      <main className={`transition-all duration-300 ${mainMargin}`}>
+      <main className={`min-w-0 transition-all duration-300 ${mainMargin}`}>
         {children}
       </main>
     </>

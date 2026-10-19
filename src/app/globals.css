@@ -32,6 +32,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.font-tajawal {
+  font-family: var(--font-tajawal), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 @keyframes messages-panel-from-left {
   from {
     transform: translateX(-100%);
