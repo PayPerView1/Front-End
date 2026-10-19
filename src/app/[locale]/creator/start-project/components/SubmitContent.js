@@ -55,7 +55,7 @@ const [draft, setDraft] = useState({ link: "", platform: null });
       <ProgressSteps statuses={["done", formError ? "error" : "pending", "pending"]} />
 
       <ErrorBanner reason={formError} />
-      <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-5 2xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0">
           <SubmitForm campaign={campaign} campaignId={campaignId} onChange={setDraft} onError={setFormError}/>
         </div>

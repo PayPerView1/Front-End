@@ -36,7 +36,10 @@ export default function DashboardShell({ children, locale }) {
       {/* بانل الرسائل */}
       <MessagesPanel side={isRtl ? "left" : "right"} stacked={stackedPanels} topOffset={176} />
 
-      <main className={`min-w-0 transition-all duration-300 ${mainMargin}`}>
+      <main
+        data-side-panels-open={sidePanelsOpen > 0 ? "true" : "false"}
+        className={`min-w-0 transition-all duration-300 ${mainMargin}`}
+      >
         {children}
       </main>
     </>

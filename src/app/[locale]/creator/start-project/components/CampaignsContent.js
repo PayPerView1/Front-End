@@ -163,10 +163,10 @@ export default function CampaignsContent() {
               </div>
 
               {/* Body */}
-              <div className="flex flex-col justify-between gap-4 2xl:flex-row 2xl:items-start">
+              <div className="campaign-card-body flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
               {/* Thumbnail */}
                 <div
-                  className={`relative h-[170px] w-full shrink-0 overflow-hidden rounded-xl border 2xl:w-[310px] ${
+                  className={`campaign-card-image relative h-[170px] w-full shrink-0 overflow-hidden rounded-xl border lg:w-[310px] ${
                     isDark ? "border-[#233532]" : "border-[#d3e6de]"
                   }`}
                 >
@@ -179,7 +179,7 @@ export default function CampaignsContent() {
                     {c.duration} {t("card.seconds")}
                   </span>
                 </div>
-                <div className="flex-1 min-w-0 space-y-3">
+                <div className="campaign-card-details flex-1 min-w-0 space-y-3">
                   <div>
                     <h3 className={`break-words text-base sm:text-lg font-bold ${theme.primaryText}`}>
                       {t(`campaigns.${c.title}`)}
@@ -189,7 +189,7 @@ export default function CampaignsContent() {
                     </p>
                   </div>
 
-                <div className="grid min-w-0 grid-cols-1 gap-2 2xl:grid-cols-3">
+                <div className="campaign-info-grid grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-3">
                 {/* 1. الهاشتاق */}
                 <InfoBox
                   theme={theme}
@@ -215,7 +215,7 @@ export default function CampaignsContent() {
                 />
               </div>
 
-                  <div className="flex flex-col gap-2 2xl:flex-row">
+                  <div className="campaign-actions flex flex-col gap-2 sm:flex-row">
                     <Link
                       href={`/creator/start-project/${c.id}`}
                       className="flex-1 flex min-w-0 items-center justify-center gap-2 px-3 sm:px-4 py-3 rounded-xl text-center text-xs font-bold text-white shadow-[0_4px_20px_rgba(251,96,1,0.5)]"

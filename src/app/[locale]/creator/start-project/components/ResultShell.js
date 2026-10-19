@@ -64,7 +64,7 @@ export default function ResultShell({
       <ProgressSteps statuses={steps} />
 
       {/* المحتوى */}
-      <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-5 2xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-4 sm:space-y-5">{children}</div>
 
         <div className="min-w-0 space-y-4">

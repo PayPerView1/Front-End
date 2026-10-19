@@ -278,7 +278,7 @@ export function OrdersContent() {
       </div>
 
       {/* KPI Stat Cards */}
-      <div className="mb-5 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:gap-3 2xl:grid-cols-4">
+      <div className="mb-5 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:gap-3 lg:grid-cols-4">
 
         <div className={`${isDark ? 'bg-[#191C1D] border-[#1e2425]' : 'bg-white border-[#e1e7e4] shadow-sm'} border p-4 rounded-xl relative flex flex-col justify-between`}>
           <div className="flex items-start justify-between mb-3">
