@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import { useWallet } from "@/features/wallet/WalletProvider";
+import PageLoader from "@/components/PageLoader";
 
 // Services
 import {
@@ -38,6 +39,7 @@ export default function AnalyticsPage() {
   const [pagination, setPagination] = useState({ page: 1, perPage: 20, total: 0, totalPages: 1 });
   const [filters, setFilters] = useState({ type: "", status: "", page: 1, perPage: 20 });
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [transactionsError, setTransactionsError] = useState("");
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
@@ -63,6 +65,7 @@ export default function AnalyticsPage() {
       setTransactionsError(cause?.message || "Unable to load transactions.");
     } finally {
       setIsLoading(false);
+      setIsInitialLoad(false);
     }
   }, [filters]);
 
@@ -116,6 +119,8 @@ export default function AnalyticsPage() {
   const handleExport = useCallback(async (params = {}) => {
     await exportTransactions({ ...exportFilters, ...params });
   }, [exportFilters]);
+
+  if (isInitialLoad) return <PageLoader />;
 
   return (
     <div

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://payperview-platform.onrender.com";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://platform.apps.taqat.academy";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -110,7 +110,7 @@ axiosInstance.interceptors.response.use(
       typeof error.response?.data === "string" &&
       error.response.data.includes("<html");
 
-    if (error.response?.data && !isHtmlResponse) {
+    if (!error.config?._suppressInterceptorErrorLog && error.response?.data && !isHtmlResponse) {
       console.error("[Axios Response Error]:", error.config?.url, error.response.status, error.response.data);
     } else if (isHtmlResponse) {
       console.warn(`[Axios Response Warning]: ${error.config?.url} returned ${error.response.status} HTML response`);
@@ -140,30 +140,43 @@ axiosInstance.interceptors.response.use(
 
 // ─── Error Handler ────────────────────────────────────────────────────────────
 
+function parseErrorResponseData(data) {
+  if (data && typeof data === "object") return data;
+  if (typeof data !== "string") return {};
+
+  try {
+    const parsed = JSON.parse(data);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return { message: data };
+  }
+}
+
 export function handleError(error) {
   const isHtml =
     typeof error.response?.data === "string" &&
     error.response.data.includes("<html");
+  const responseData = isHtml ? {} : parseErrorResponseData(error.response?.data);
 
   if (error.response?.data && !isHtml) {
     console.error(
       "API Error Response Data:",
-      typeof error.response.data === "string"
-        ? error.response.data
-        : JSON.stringify(error.response.data, null, 2)
+      JSON.stringify(responseData, null, 2)
     );
   }
-  const validationMessages = Array.isArray(error.response?.data?.errors)
-    ? error.response.data.errors.map((item) => item?.message).filter(Boolean)
+  const validationMessages = Array.isArray(responseData.errors)
+    ? responseData.errors.map((item) => item?.message).filter(Boolean)
     : [];
 
-    let message =
+  let message =
     validationMessages.join("\n") ||
-    (typeof error.response?.data?.message === "string" ? error.response.data.message : null);
+    (typeof responseData.message === "string" ? responseData.message : null);
 
   if (!message) {
     if (error.response?.status === 404) {
       message = "الخدمة المطلوبة غير متوفرة حالياً على الخادم (404 Not Found)";
+    } else if (error.response?.status === 403) {
+      message = "لا يملك هذا الحساب الصلاحية اللازمة لتنفيذ هذا الإجراء.";
     } else if (typeof error.response?.data === "string" && error.response.data.includes("<html")) {
       message = "حدث خطأ غير متوقع في الخادم";
     } else {
@@ -173,7 +186,8 @@ export function handleError(error) {
 
   const err = new Error(message);
   err.code =
-    error.response?.data?.code ||
+    responseData.code ||
+    (error.response?.status === 403 ? "FORBIDDEN" : undefined) ||
     (error.response ? undefined : "NETWORK_ERROR");
   err.status = error.response?.status;
   throw err;

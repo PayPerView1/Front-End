@@ -168,16 +168,8 @@
       "remaining": "Remaining in Campaign"
     },
     "presets": {
-      "recharge": [
-        250,
-        500,
-        1000
-      ],
-      "daily": [
-        250,
-        300,
-        350
-      ]
+      "recharge": [250, 500, 1000],
+      "daily": [250, 300, 350]
     },
     "paused": {
       "title": "Campaign paused successfully – remaining budget is saved and fully frozen",
@@ -295,13 +287,13 @@
     "back": "Back",
     "banner": {
       "title": "Daily spending limit reached (${amount})",
-      "message": "Ad delivery was stopped automatically to protect the total budget from rapid burn-through. Your total campaign budget and wallet are fully safe, and delivery will resume automatically tomorrow at 12:00 midnight Makkah/Riyadh time (GMT+3).",
-      "notice": "An instant notification and an email alert were sent to the account manager: the ${amount} limit was reached successfully and the budget is protected."
+      "message": "Ad delivery was stopped automatically to protect the total budget from rapid burn. Your total campaign budget and wallet are completely safe, and delivery will resume automatically tomorrow at 12:00 AM Mecca/Riyadh time (GMT+3).",
+      "notice": "An instant notification and email alert were sent to the account manager: the ${amount} limit was reached and the budget is protected."
     },
     "cards": {
       "todaySpend": {
         "title": "Today's spend vs daily limit",
-        "reached": "Allowed limit {percent}% complete"
+        "reached": "Allowed limit {percent}% used"
       },
       "balance": {
         "title": "Total remaining campaign balance",
@@ -309,51 +301,51 @@
         "spent": "Total spent to date: ${spent} ({percent}%)"
       },
       "reach": {
-        "title": "Today's Halal Reach achievement",
-        "views": "pure views",
-        "cpm": "Cost per thousand (CPM):"
+        "title": "Today's Halal Reach",
+        "views": "clean views",
+        "cpm": "Cost per 1K (CPM):"
       }
     },
     "chart": {
-      "title": "Hourly spend distribution and maximum cap (${limit})",
-      "subtitle": "The set cap was held precisely at {time} PM with no financial overrun at all",
+      "title": "Hourly spend distribution and ceiling (${limit})",
+      "subtitle": "The set ceiling was held precisely at {time} with no financial overrun at all",
       "capped": "(Capped)",
       "tooltip": "{time}: protective stop activated",
       "legend": {
         "actual": "Actual spend",
-        "cap": "Limit cap (${limit})"
+        "cap": "Limit ceiling (${limit})"
       }
     },
     "stats": {
       "clicks": {
-        "title": "Legitimate clicks achieved today",
+        "title": "Valid clicks achieved today",
         "value": "{count} clicks",
         "note": "Click-through rate: {ctr}%"
       },
       "hours": {
-        "title": "Working hours before the limit",
+        "title": "Running hours before the limit",
         "value": "{hours} hours",
         "note": "Rate ${rate} / hour"
       },
       "saved": {
         "title": "Protected surplus amounts",
-        "value": "Overrun",
-        "note": "Reservation system accuracy {percent}%"
+        "value": "exceeded",
+        "note": "Reservation accuracy {percent}%"
       }
     },
     "publishers": {
-      "title": "Approved clip publishers active in this campaign",
-      "desc": "{count} verified creators under the digital media Sharia compliance document {docId}",
-      "action": "View compliance and content record"
+      "title": "Certified clip publishers active in this campaign",
+      "desc": "{count} content creators verified under the digital media Shariah compliance document {docId}",
+      "action": "View compliance and content log"
     },
     "resume": {
       "title": "Resume options and instant control",
       "subtitle": "Skip today's temporary pause",
-      "description": "If you want to keep the momentum and get more views, you can raise today's cap by an extra amount from the campaign balance (${balance})",
+      "description": "If you want to keep the momentum and bring in more views, you can raise today's ceiling by an extra amount from the campaign balance (${balance})",
       "newLimit": "New limit for today only (USD):",
       "current": "(current)",
       "action": "Apply extension and resume campaign now",
-      "note": "The amount will be deducted from the campaign's approved overall balance without requiring an extra top-up"
+      "note": "It will be deducted from the campaign's approved general balance without requiring an additional top-up"
     },
     "wallet": {
       "title": "Central wallet status",
@@ -367,7 +359,7 @@
       "auditLog": "Financial audit and transactions log"
     },
     "ads": {
-      "title": "Campaign ads covered by the top-up",
+      "title": "Campaign ads covered by recharge",
       "subtitle": "{count} active ads in this campaign",
       "statusResumed": "Resumed",
       "columns": {
@@ -722,20 +714,20 @@
       "messageMembers": {
         "title": "Message recent members",
         "desc": "Draft a welcome message for new subscribers",
-        "prompt": "How can I message members and send them a welcome message?"
+        "prompt": "How can I message my members and send them a welcome message?"
       },
       "createAd": {
-        "title": "Create creative ad",
-        "desc": "Generate engaging ad copies for your next campaign",
-        "prompt": "Help me write and craft a creative ad copy for my next campaign."
+        "title": "Create a creative ad",
+        "desc": "Generate engaging ad copy for your upcoming campaign",
+        "prompt": "Help me write and craft creative ad copy for my upcoming campaign."
       },
       "startLive": {
         "title": "Start a live stream",
-        "desc": "Set up a live stream session to connect with your audience",
+        "desc": "Set up a live session to connect with your audience",
         "prompt": "What are the steps to start a live stream session?"
       },
       "sendInvoice": {
-        "title": "Send client invoice",
+        "title": "Send an invoice to a client",
         "desc": "Create and send a professional invoice quickly",
         "prompt": "How can I create and send a new invoice to a client?"
       }
@@ -1243,6 +1235,213 @@
     "verifiedViews": "Verified views",
     "footerTag": "Built for the view economy"
   },
+  "discover": {
+    "title": "Discover Approved Campaigns & Ad Opportunities",
+    "subtitle": "Browse the latest Shariah-compliant campaigns, join instantly, and earn solid returns per thousand views (CPM) with trusted brands.",
+    "searchPlaceholder": "Search by brand, product, or campaign type...",
+    "clear": "Clear search",
+    "allCountries": "All countries",
+    "applied": "Request sent",
+    "sort": {
+      "cpm": "Highest cost per 1K views (CPM)",
+      "newest": "Newest first",
+      "endingSoon": "Ending soon",
+      "relevance": "Most relevant (AI recommended)"
+    },
+    "sortTitle": "Available sort options",
+    "sortCount": "{n} criteria",
+    "countryTitle": "Available countries",
+    "countryCount": "{n} countries",
+    "countrySearch": "Search a country...",
+    "types": {
+      "ALL": "All",
+      "CLIPPING": "Clipping",
+      "UGC": "Original UGC",
+      "SLIDESHOW": "Slideshow",
+      "AUDIO": "Voice-over"
+    },
+    "countries": "Countries:",
+    "materials": "Materials:",
+    "platforms": "Platforms:",
+    "cpmLabel": "Earnings per 1K views:",
+    "remaining": "Remaining:",
+    "total": "Total:",
+    "apply": "Apply now",
+    "details": "Campaign details",
+    "favorite": "Add to favorites",
+    "showing": "Showing {shown} of {total} active campaigns",
+    "prev": "Previous",
+    "next": "Next",
+    "pagination": "Campaign pagination",
+    "empty": "No campaigns match your search",
+    "emptyTitle": "No ad campaigns available right now",
+    "emptyDesc": "There are no campaigns available in this section at the moment. Shariah-compliant opportunities are added continuously, please check back later!",
+    "emptyNotify": "Enable new campaign notifications",
+    "emptyChecked": "Approved campaigns database checked moments ago",
+    "charterTitle": "Emerald Halal Charter commitment",
+    "charterDesc": "All ad campaigns and clip materials are free of music, immodesty, and interest-based products, and comply with Islamic Shariah rulings.",
+    "charterBtn": "Read the Shariah charter"
+  },
+  "campaignDetails": {
+    "back": "Back to list",
+    "filesAvailable": "{n} raw files available to download",
+    "packSize": "Pack size",
+    "apply": "Apply now and join the campaign",
+    "applied": "Request sent (under review)",
+    "save": "Save to favorites",
+    "saved": "Saved",
+    "report": "Report",
+    "reported": "Reported",
+    "descTitle": "Campaign description",
+    "descSub": "Publishing goals and the core message for the audience",
+    "platformsTitle": "Platforms & required content types",
+    "platformsSub": "Technical specs and eligible publishing channels",
+    "supported": "Supported platforms",
+    "contentTypes": "Required content types",
+    "summaryTitle": "Campaign summary",
+    "summarySub": "Financial terms and timeline",
+    "advertiser": "Advertiser / partner",
+    "earnings": "Earnings per 1,000 views",
+    "budget": "Remaining & total budget",
+    "remainingWord": "remaining",
+    "ofTotal": "of {total} total",
+    "period": "Official campaign period",
+    "to": "to",
+    "acceptance": "Instant acceptance rate",
+    "acceptanceValue": "{n}% fast approval",
+    "filesTitle": "Campaign files (PDF & Assets)",
+    "filesDesc": "The file includes the full approach texts, technical guidelines, tone of voice, acceptance criteria and Shariah rules, plus download links for the raw 4K source files.",
+    "preview": "Preview & open files",
+    "download": "Download PDF",
+    "notFound": "Campaign not found"
+  },
+  "campaignOnHold": {
+    "close": "Close",
+    "title": "This campaign is currently unavailable",
+    "desc": "Applications for this campaign are temporarily suspended while it undergoes a regulatory and Shariah re-audit following a report under review.",
+    "target": "Targeted campaign",
+    "reasonLabel": "Immediate reason for suspension",
+    "reasonValue": "Precautionary hold to verify content against Shariah rules",
+    "actionLabel": "Action taken",
+    "actionValue": "Creator applications are blocked until the hold is lifted",
+    "errorCode": "Restriction code:",
+    "status": "Status: under urgent review and audit",
+    "tipsTitle": "What can you do now?",
+    "tipNotify": "Turn on a resume alert to get an instant message when applications reopen.",
+    "tipBrowse": "Browse the list of active, trusted campaigns in investment and digital finance.",
+    "explore": "Explore available alternative campaigns",
+    "notify": "Notify me when it resumes",
+    "notifying": "Enabling...",
+    "notified": "Alert enabled",
+    "back": "Back to the campaign and general details",
+    "error": "Couldn't enable the alert, please try again.",
+    "notifyUnavailable": "Notifications are not available right now."
+  },
+  "reportAlready": {
+    "close": "Close",
+    "title": "You have already reported this campaign",
+    "subtitle": "Your report was recorded and matched to your digital record on the platform",
+    "descBefore": "Your previous report is on file and linked to this campaign. It is currently being reviewed by the",
+    "descBold": "Shariah Audit & Integrity Committee",
+    "descAfter": "to ensure ad credibility and prevent duplicate requests.",
+    "cta": "Continue browsing campaigns"
+  },
+  "reportSuccess": {
+    "close": "Close",
+    "title": "Your report was received",
+    "subtitle": "Your report was received. The campaign will be reviewed.",
+    "desc": "Thank you for helping us uphold the Shariah standards of our platform and protect the Muslim creator community.",
+    "refLabel": "Report reference number",
+    "dateChip": "Submitted: today · instant",
+    "campaignLabel": "Reported campaign",
+    "statusLabel": "Campaign's immediate status",
+    "statusValue": "Precautionarily suspended and hidden",
+    "etaLabel": "Expected review time",
+    "etaValue": "Under 24 business hours",
+    "noticeTitle": "Transparent precaution:",
+    "noticeBody": "The campaign has been temporarily hidden from all creators until the Shariah review is complete, to ensure integrity.",
+    "cta": "Continue browsing campaigns",
+    "reasons": {
+      "INDECENT_CONTENT": "Suspected indecent content",
+      "GAMBLING": "Suspected gambling",
+      "FORBIDDEN_MUSIC": "Suspected forbidden music",
+      "SUSPICIOUS_CURRENCY": "Suspicious currency",
+      "FALSE_PROFIT_CLAIMS": "False profit claims",
+      "OTHER": "Other violation"
+    }
+  },
+  "applyConfirm": {
+    "close": "Close",
+    "title": "Are you sure you want to apply to this campaign?",
+    "desc": "Your request will be officially registered and the advertiser notified immediately. The campaign will appear in “My requests & campaigns” with the status “Under review”.",
+    "campaignName": "Approved campaign",
+    "advertiser": "Verified advertiser",
+    "cpmLabel": "Earnings (CPM)",
+    "cpmValue": "${v} per 1,000 qualified views",
+    "contentType": "Content type",
+    "noticeTitle": "Instant guarantee:",
+    "noticeBody": "Your earnings are safe in your Shariah wallet as soon as views are approved.",
+    "confirm": "Confirm and send request now",
+    "sending": "Sending...",
+    "cancel": "Cancel and go back",
+    "error": "Couldn't send your request, please try again."
+  },
+  "applyAlready": {
+    "close": "Close",
+    "title": "You have already applied to this campaign",
+    "desc": "Your request to join this campaign is on file and currently in your requests list. You can't apply to the same campaign more than once.",
+    "activeRequest": "Active request details",
+    "campaignName": "Registered campaign",
+    "submittedAt": "Submission date & time",
+    "expectedCpm": "Expected earnings per view",
+    "currentStatus": "Current request status:",
+    "status": "Under review and audit",
+    "viewOrders": "Go to my request in “My orders”",
+    "explore": "Explore other available campaigns",
+    "back": "Back to campaign page"
+  },
+  "reportViolation": {
+    "title": "Report content or a campaign that violates Shariah guidelines",
+    "subtitle": "Choosing the violation type precisely helps keep the digital content environment compliant, and triggers an immediate precautionary suspension of the campaign.",
+    "autoSelected": "Auto-selected from the current page",
+    "chooseType": "Choose the type of Shariah or regulatory violation",
+    "reasons": {
+      "indecent": {
+        "title": "Indecent or offensive content",
+        "desc": "Vulgar images, loose explanations, or language offensive to modesty"
+      },
+      "gambling": {
+        "title": "Disguised betting or gambling",
+        "desc": "Games of chance, online maysir, binary options trading"
+      },
+      "music": {
+        "title": "Loud or forbidden music",
+        "desc": "Forcing the creator to use soundtracks and instruments that contradict the guidelines"
+      },
+      "crypto": {
+        "title": "Suspicious currencies or unlicensed trading",
+        "desc": "Fake tokens, pyramid Ponzi schemes, and trading without a license"
+      },
+      "fraud": {
+        "title": "False profit claims and financial deception (explicit gharar)",
+        "desc": "Promoting guaranteed fantasy profits (40% daily), hiding risks entirely, and luring the public into contracts containing gharar and hidden riba."
+      },
+      "other": {
+        "title": "Other Shariah or procedural reasons",
+        "desc": "Violating intellectual property rights, or breaching fair contracting terms and Shariah regulation"
+      }
+    },
+    "detailsLabel": "Additional details backed by evidence (optional)",
+    "detailsHint": "Clip link, scene timestamps, or proof documents",
+    "detailsPlaceholder": "Write an additional explanation of the violation... e.g. The ad promises guaranteed fantasy profits of 40% daily with no risk, which contradicts the Shariah guidelines prohibiting gharar and riba.",
+    "attachLinks": "External links supported",
+    "send": "Submit report",
+    "sending": "Submitting...",
+    "cancel": "Cancel and go back",
+    "close": "Close",
+    "error": "Couldn't submit the report. Please try again."
+  },
+
   "creatorOrders": {
     "title": "My Orders",
     "description": "Manage and track your campaign applications, advertiser approvals, video submissions, and active withdrawals with confidence and transparency.",

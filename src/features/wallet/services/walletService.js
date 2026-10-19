@@ -73,6 +73,20 @@ export const fundWallet = async (data) => {
 export const initiateWalletFunding = fundWallet;
 
 /**
+ * تأكيد طلب PayPal بعد عودة المستخدم من صفحة الموافقة
+ * POST /api/v1/wallet/paypal/capture
+ * @param {string} orderId قيمة token التي يعيدها PayPal
+ */
+export const capturePayPalOrder = async (orderId) => {
+  try {
+    const response = await axiosInstance.post("/api/v1/wallet/paypal/capture", { orderId });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
  * 2.2 رفع إيصال التحويل البنكي
  * POST /api/v1/wallet/bank-transfer/upload
  * @param {{ transactionId: string, receipt: File }} data

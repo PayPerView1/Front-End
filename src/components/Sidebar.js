@@ -4,15 +4,13 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import {
   Home,
-  Search,
   Discovery,
   Plus,
   Bag,
-  People,
-  Message,
+  User,
+  MoreCircle,
   Document,
 } from "react-iconly";
-import { FiFileText } from "react-icons/fi";
 import {
   MdOutlineDashboard,
   MdBarChart,
@@ -24,23 +22,21 @@ import {
 
 import { useTheme } from "@/context/ThemeContext";
 import { BsList, BsX } from "react-icons/bs";
-import { useLocale, useTranslations, useMessages } from "next-intl";
+import { useLocale, useMessages } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useUser } from "@/context/UserContext";
 
 // ─── قائمة صانع المحتوى (CLIPPER) ────────────────────────────
 const creatorNavItems = [
   { label: "home", href: "/creator/dashboard", icon: Home },
-  { label: "orders", href: "/creator/orders", icon: Bag },
-  { label: "search", href: "/search", icon: Search },
-  { label: "discover", href: "/discover", icon: Discovery },
-  { label: "startProject", href: "/creator/start-project", icon: Plus },
+  { label: "orders", href: "/creator/orders", icon: Bag }, // عدّل الرابط حسب مشروعك
+  { label: "discover", href: "/creator/discover", icon: Discovery },
+  { label: "startProject", href: "/new", icon: Plus },
 ];
 
 const creatorResourceItems = [
-  { label: "members", href: "/members", icon: Bag },
-  { label: "partners", href: "/partners", icon: People, badge: "new" },
-  { label: "help", href: "/help", icon: Message },
+  { label: "profile", href: "/creator/profile", icon: User },
+  { label: "help", href: "/help", icon: MoreCircle },
   { label: "blog", href: "/blog", icon: Document },
 ];
 
@@ -66,9 +62,7 @@ const advertiserNavItems = [
   },
   {
     label: "newCampaign",
-
     href: "/advertiser/create-campaign",
-
     icon: MdAddBox,
     useMd: true,
   },
@@ -91,15 +85,13 @@ const advertiserResourceItems = [];
 // ─── Fallbacks حسب اللغة ──────────────────────────────────────
 const sidebarFallbacksEn = {
   home: "Home",
-  orders: "Orders",
-  search: "Search",
+  orders: "My Orders",
+
   discover: "Discover",
   startProject: "Start a project",
 
   resources: "Resources",
-  members: "Members",
-  partners: "Partners",
-  new: "New",
+  profile: "Profile",
   help: "Help",
   blog: "Blog",
 
@@ -115,15 +107,14 @@ const sidebarFallbacksEn = {
 const sidebarFallbacksAr = {
   home: "الرئيسية",
   orders: "طلباتي",
-  search: "البحث",
-  discover: "استكشاف",
-  startProject: "بدء مشروع",
-  resources: "الموارد",
-  members: "الأعضاء",
-  partners: "الشركاء",
-  new: "جديد",
-  help: "المساعدة",
-  blog: "المدونة",
+  discover: "اكتشف",
+  startProject: "ابدأ مشروعًا",
+  resources: "موارد",
+  profile: "الملف الشخصي",
+  help: "يساعد",
+  blog: "مدونة",
+
+
   dashboard: "لوحة التحكم الرئيسية",
   manageCampaigns: "إدارة الحملات",
   analytics: "التقارير والتحليلات",
@@ -173,10 +164,8 @@ export default function Sidebar() {
     bg: isDark ? "bg-[#0D0D0D]" : "bg-white",
     text: isDark ? "text-white" : "text-[#1A1A1A]",
     subText: isDark ? "text-[#9A9A9A]" : "text-[#666666]",
-    activeLink: isDark ? "bg-white/10 text-white" : "bg-[#F0F0F0] text-black",
-    hoverLink: isDark
-      ? "hover:text-white hover:bg-white/5"
-      : "hover:text-black hover:bg-[#F5F5F5]",
+    activeLink: isDark ? "bg-[#151A1A]" : "bg-[#F0F0F0]",
+    hoverLink: isDark ? "hover:bg-white/5" : "hover:bg-[#F5F5F5]",
     logoText: isDark ? "text-white" : "text-black",
   };
 
@@ -190,6 +179,12 @@ export default function Sidebar() {
         ? "#9A9A9A"
         : "#666666";
 
+  // ─── كلاس الرابط (مشترك بين القائمتين) ────────────────────
+  const linkClass = (isActive) => `
+    flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-base
+    ${isActive ? t.activeLink : `bg-transparent ${t.hoverLink}`}
+  `;
+
   // ─── رندر رابط واحد ───────────────────────────────────────
   const renderLink = (item) => {
     const isActive =
@@ -202,10 +197,7 @@ export default function Sidebar() {
         key={item.href}
         href={item.href}
         onClick={() => setSidebarOpen(false)}
-        className={`
-          flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm
-          ${isActive ? "bg-[#94D3C142]" : "bg-transparent hover:bg-[#94D3C142]"}
-        `}
+        className={linkClass(isActive)}
       >
         {/* أيقونة react-icons/md */}
         {item.useMd ? (
@@ -258,10 +250,9 @@ export default function Sidebar() {
             min-[1280px]:hidden absolute top-1/2 -translate-y-1/2
             ${locale === "ar" ? "left-4" : "right-4"}
             w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
-            ${
-              isDark
-                ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-                : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+            ${isDark
+              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
             }
           `}
         >
@@ -276,8 +267,8 @@ export default function Sidebar() {
 
       {/* الموارد — تُعرض فقط إذا كانت القائمة غير فارغة */}
       {resourceItems.length > 0 && (
-        <div className="px-4 mt-6">
-          <p className={`text-xs px-3 mb-2 ${t.subText}`}>
+        <div className="px-4 mt-2">
+          <p className={`text-xs font-bold px-3 mb-1 ${t.subText}`}>
             {sidebar("resources")}
           </p>
           <nav className="flex flex-col gap-1">
@@ -290,12 +281,9 @@ export default function Sidebar() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={`
-                    flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg transition-all text-sm
-                    ${isActive ? "bg-[#94D3C142]" : "bg-transparent hover:bg-[#94D3C142]"}
-                  `}
+                  className={`${linkClass(isActive)} justify-between w-full`}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <Icon
                       set="light"
                       size={20}
@@ -332,12 +320,10 @@ export default function Sidebar() {
           min-[1280px]:hidden fixed top-4
           ${locale === "ar" ? "right-4" : "left-4"}
           z-[80] w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
-          ${
-            isDark
-              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+          ${isDark
+            ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+            : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
           }
-
         `}
       >
         <BsList size={18} />
@@ -360,14 +346,12 @@ export default function Sidebar() {
           ${t.bg}
           transition-transform duration-300 ease-in-out
           min-[1280px]:translate-x-0
-          ${
-            sidebarOpen
-              ? "translate-x-0"
-              : locale === "ar"
-                ? "translate-x-full"
-                : "-translate-x-full"
+          ${sidebarOpen
+            ? "translate-x-0"
+            : locale === "ar"
+              ? "translate-x-full"
+              : "-translate-x-full"
           }
-
         `}
       >
         {sidebarContent}
