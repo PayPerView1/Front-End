@@ -387,9 +387,9 @@ ${t.navBorder}
                   onClick={() => {
                     setMenuOpen(false);
                     if (isAdvertiser) {
-                      router.push(`/${locale}/advertiser/edit-profile`);
+                      router.push(`/${locale}/advertiser/profile`);
                     } else {
-                      router.push(`/${locale}/creator/edit-profile`);
+                      router.push(`/${locale}/creator/profile`);
                     }
                   }}
                   className={`

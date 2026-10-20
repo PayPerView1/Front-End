@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import {
   Link2,
@@ -41,6 +41,7 @@ export default function SubmitForm({ campaign, campaignId, onChange, onError }) 
   const tc = useTranslations("startProject");
   const { isDark } = useTheme();
   const router = useRouter();
+  const locale = useLocale();
 
   const hashtags = campaign?.hashtags || (campaign ? [campaign.hashtag] : []);
 
@@ -48,6 +49,7 @@ export default function SubmitForm({ campaign, campaignId, onChange, onError }) 
   const [platformError, setPlatformError] = useState(false);
   const [link, setLink] = useState("");
   const [linkState, setLinkState] = useState(null); // null | "ok" | سبب الخطأ
+  const [detectedPlatform, setDetectedPlatform] = useState("");
   const [serverError, setServerError] = useState(null); // { reason, details }
   const [checked, setChecked] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -113,30 +115,35 @@ const errorKey = isDuplicate
     }
   };
 
-  const reportError = (reason) =>
-    onError?.(reason && reason !== "empty" ? reason : null);
+  const reportError = (reason, details = {}) =>
+    onError?.(reason && reason !== "empty" ? reason : null, details);
 
- const clearErrors = () => {
-  setLinkState(null);
-  setServerError(null);
-  setPlatformError(false);
-  reportError(null);
-};
-const placeholders = {
-  tiktok: "https://www.tiktok.com/@your_account/video/73918234...",
-  instagram: "https://www.instagram.com/reel/...",
-  youtube: "https://www.youtube.com/shorts/...",
-};
+  const clearErrors = () => {
+    setLinkState(null);
+    setServerError(null);
+    setPlatformError(false);
+    setDetectedPlatform("");
+    reportError(null);
+  };
+  const placeholders = {
+    tiktok: "https://www.tiktok.com/@your_account/video/73918234...",
+    instagram: "https://www.instagram.com/reel/...",
+    youtube: "https://www.youtube.com/shorts/...",
+  };
   const checkLink = () => {
-  if (!platform) {
-    setPlatformError(true);
-    return false;
-  }
-  const result = validateLink(link, platform);
-  setLinkState(result.valid ? "ok" : result.reason);
-  reportError(result.valid ? null : result.reason);
-  return result.valid;
-};
+    if (!platform) {
+      setPlatformError(true);
+      return false;
+    }
+    const result = validateLink(link, platform, locale);
+    setLinkState(result.valid ? "ok" : result.reason);
+    setDetectedPlatform(result.platformName || "");
+    reportError(
+      result.valid ? null : result.reason,
+      result.platformName ? { platformName: ` (${result.platformName})` } : { platformName: "" }
+    );
+    return result.valid;
+  };
 
   const handleSubmit = async () => {
     if (!checkLink()) return;
@@ -218,7 +225,11 @@ const placeholders = {
           <Label n="2" text={t("pasteLink")} theme={theme} />
           {errorKey ? (
             <span className="inline-flex items-center gap-1 text-[10px] font-bold rounded-md border border-red-500/40 bg-red-500/10 text-red-300 px-2.5 py-1">
-              {t(`badges.${errorKey}`)}
+              {errorKey === "unsupportedPlatform" && detectedPlatform
+                ? (locale === "ar"
+                    ? `منصة ${detectedPlatform} غير مدعومة`
+                    : `${detectedPlatform} is not supported`)
+                : t(`badges.${errorKey}`)}
             </span>
           ) : (
             <span className={`flex items-center gap-1 text-[10px] ${theme.secondaryText}`}>
@@ -260,6 +271,12 @@ const placeholders = {
           <p className="text-[11px] text-red-400">{t("duplicateNote")}</p>
         ) : linkState === "ok" ? (
           <p className="text-[11px] text-[#94D3C1]">{t("linkOk")}</p>
+        ) : linkState === "unsupportedPlatform" && detectedPlatform ? (
+          <p className="text-[11px] text-red-400">
+            {locale === "ar"
+              ? `منصة ${detectedPlatform} غير مدعومة، استخدم تيك توك أو إنستغرام أو يوتيوب`
+              : `${detectedPlatform} is not supported. Use TikTok, Instagram or YouTube`}
+          </p>
         ) : linkState ? (
           <p className="text-[11px] text-red-400">{t(`errors.${linkState}`)}</p>
         ) : (

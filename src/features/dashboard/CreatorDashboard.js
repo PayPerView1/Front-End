@@ -506,10 +506,10 @@ export default function CreatorDashboard({
 
             {/* زر الملف الشخصي */}
             <Link
-              href={`/${locale}/creator/edit-profile`}
+              href={`/${locale}/creator/profile`}
               className="px-4 py-2.5 bg-[#121617] hover:bg-[#1E2425] border border-[#1E2425] text-white font-medium text-xs md:text-sm rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
-              <FiSliders size={16} className="text-[#9CA3AF]" />
+              <FiUser size={16} className="text-[#9CA3AF]" />
               <span>الملف الشخصي</span>
             </Link>
           </div>

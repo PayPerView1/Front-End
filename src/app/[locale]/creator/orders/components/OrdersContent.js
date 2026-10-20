@@ -24,6 +24,7 @@ import { SiInstagram, SiTiktok, SiYoutube } from 'react-icons/si';
 
 import { useMessages } from '@/context/MessagesContext';
 import { useTheme } from '@/context/ThemeContext';
+import { Link } from '@/i18n/navigation';
 import { WithdrawModal } from './WithdrawModal';
 import { getMyApplications, withdrawApplication } from '@/services/applications';
 
@@ -269,12 +270,13 @@ export function OrdersContent() {
           </p>
         </div>
 
-        <button
+        <Link
+          href="/creator/discover"
           className="px-5 py-2.5 text-white font-bold text-xs rounded-xl shadow-[0_0_20px_rgba(252,145,2,0.25)] flex items-center justify-center gap-2 transition-all self-start md:self-auto shrink-0"
           style={{ background: 'linear-gradient(90deg, #FC9102 0%, #FB6103 100%)' }}
         >
           <Compass size={16} /> {t('exploreCampaigns')}
-        </button>
+        </Link>
       </div>
 
       {/* KPI Stat Cards */}

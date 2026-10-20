@@ -128,7 +128,7 @@ export default function VideoPreview({
             rel="noopener noreferrer"
             className={`flex items-center justify-center gap-1.5 px-2.5 py-3 border rounded-xl text-[11px] font-bold whitespace-nowrap ${openBtn}`}
           >
-            <ExternalLink size={14} className="shrink-0" />
+            <ExternalLink size={14} className="shrink-0 text-[#94D3C1]" />
             {t("openOriginal")}
           </a>
           <button

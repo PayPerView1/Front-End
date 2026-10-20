@@ -1646,7 +1646,7 @@
       },
       "badges": {
         "invalidUrl": "Invalid link",
-        "unsupportedPlatform": "Facebook is not supported",
+        "unsupportedPlatform": "Unsupported platform",
         "platformMismatch": "Link does not match platform",
         "duplicate": "Duplicate link, already registered",
         "missingHashtags": "Missing hashtags"
@@ -1887,7 +1887,7 @@
         "desc": "The link you entered looks incomplete or isn't a direct link to a TikTok post. Follow the three simple steps below to copy the right link and the system will recognize it right away."
       },
       "unsupportedPlatform": {
-        "title": "Link from an unsupported platform (Facebook) • Don't worry, you can fix this in seconds!",
+        "title": "Link from an unsupported platform{platformName} • Don't worry, you can fix this in seconds!",
         "desc": "This campaign only accepts vertical videos on TikTok, Instagram Reels or YouTube Shorts. All you need to do is publish the same video on one of the supported platforms and paste the link here!"
       },
       "platformMismatch": {

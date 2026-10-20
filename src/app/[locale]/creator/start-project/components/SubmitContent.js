@@ -25,8 +25,14 @@ export default function SubmitContent() {
   const campaign = mockCampaigns.find((c) => c.id === campaignId);
 
   // الرابط والمنصة بتجي من النموذج لمعاينة الفيديو
-const [draft, setDraft] = useState({ link: "", platform: null });
-   const [formError, setFormError] = useState(null);
+  const [draft, setDraft] = useState({ link: "", platform: null });
+  const [formError, setFormError] = useState(null);
+  const [errorDetails, setErrorDetails] = useState({});
+
+  const handleFormError = (reason, details = {}) => {
+    setFormError(reason);
+    setErrorDetails(details || {});
+  };
   // أخطاء الرابط فقط بتخلي المعاينة فاضية (الأخطاء الثانية بتضل تعرض الفيديو)
   const linkErrors = ["invalidUrl", "unsupportedPlatform", "platformMismatch"];
   const previewFailed = linkErrors.includes(formError);
@@ -54,10 +60,10 @@ const [draft, setDraft] = useState({ link: "", platform: null });
 
       <ProgressSteps statuses={["done", formError ? "error" : "pending", "pending"]} />
 
-      <ErrorBanner reason={formError} />
+      <ErrorBanner reason={formError} values={errorDetails} />
       <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0">
-          <SubmitForm campaign={campaign} campaignId={campaignId} onChange={setDraft} onError={setFormError}/>
+          <SubmitForm campaign={campaign} campaignId={campaignId} onChange={setDraft} onError={handleFormError}/>
         </div>
 
         <div className="min-w-0 space-y-4">

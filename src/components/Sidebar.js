@@ -164,8 +164,6 @@ export default function Sidebar() {
     bg: isDark ? "bg-[#0D0D0D]" : "bg-white",
     text: isDark ? "text-white" : "text-[#1A1A1A]",
     subText: isDark ? "text-[#9A9A9A]" : "text-[#666666]",
-    activeLink: isDark ? "bg-[#151A1A]" : "bg-[#F0F0F0]",
-    hoverLink: isDark ? "hover:bg-white/5" : "hover:bg-[#F5F5F5]",
     logoText: isDark ? "text-white" : "text-black",
   };
 
@@ -178,12 +176,6 @@ export default function Sidebar() {
       : isDark
         ? "#9A9A9A"
         : "#666666";
-
-  // ─── كلاس الرابط (مشترك بين القائمتين) ────────────────────
-  const linkClass = (isActive) => `
-    flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-base
-    ${isActive ? t.activeLink : `bg-transparent ${t.hoverLink}`}
-  `;
 
   // ─── رندر رابط واحد ───────────────────────────────────────
   const renderLink = (item) => {
@@ -198,7 +190,10 @@ export default function Sidebar() {
         key={item.href}
         href={item.href}
         onClick={() => setSidebarOpen(false)}
-        className={linkClass(isActive)}
+        className={`
+          flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm
+          ${isActive ? "bg-[#94D3C142]" : "bg-transparent hover:bg-[#94D3C142]"}
+        `}
       >
         {/* أيقونة react-icons/md */}
         {item.useMd ? (
@@ -268,8 +263,8 @@ export default function Sidebar() {
 
       {/* الموارد — تُعرض فقط إذا كانت القائمة غير فارغة */}
       {resourceItems.length > 0 && (
-        <div className="px-4 mt-2">
-          <p className={`text-xs font-bold px-3 mb-1 ${t.subText}`}>
+        <div className="px-4 mt-6">
+          <p className={`text-xs px-3 mb-2 ${t.subText}`}>
             {sidebar("resources")}
           </p>
           <nav className="flex flex-col gap-1">
@@ -282,7 +277,10 @@ export default function Sidebar() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={`${linkClass(isActive)} justify-between w-full`}
+                  className={`
+                    flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg transition-all text-sm
+                    ${isActive ? "bg-[#94D3C142]" : "bg-transparent hover:bg-[#94D3C142]"}
+                  `}
                 >
                   <div className="flex items-center gap-3">
                     <Icon
@@ -343,7 +341,7 @@ export default function Sidebar() {
         dir={locale === "ar" ? "rtl" : "ltr"}
         className={`
           fixed ${locale === "ar" ? "right-0" : "left-0"}
-          top-0 h-screen w-[260px] flex flex-col z-[90]
+          top-0 h-screen w-[260px] flex flex-col z-[90] font-tajawal
           ${t.bg}
           transition-transform duration-300 ease-in-out
           min-[1280px]:translate-x-0
