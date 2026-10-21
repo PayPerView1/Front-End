@@ -205,6 +205,41 @@ html:not(.dark) .creator-dashboard-page [class~="hover:border-[#94D3C1]"]:hover 
   main[data-side-panels-open="true"] .creator-responsive-page [class~="lg:flex-row"] {
     flex-direction: column;
   }
+
+  main[data-side-panels-open="true"] .creator-edit-profile-layout:has(.creator-responsive-page) {
+    flex-direction: column;
+  }
+
+  main[data-side-panels-open="true"] .creator-edit-profile-layout:has(.creator-responsive-page) .creator-edit-profile-sidebar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-left: 0;
+    border-bottom-width: 1px;
+  }
+
+  main[data-side-panels-open="true"] .creator-edit-profile-layout:has(.creator-responsive-page) .creator-edit-profile-title {
+    display: none;
+  }
+
+  main[data-side-panels-open="true"] .creator-edit-profile-layout:has(.creator-responsive-page) .creator-edit-profile-nav {
+    flex: 1 1 auto;
+    flex-direction: row;
+    gap: 0.25rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  main[data-side-panels-open="true"] .creator-edit-profile-layout:has(.creator-responsive-page) .creator-edit-profile-logout {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  main[data-side-panels-open="true"] .creator-edit-profile-layout:has(.creator-responsive-page) .creator-edit-profile-logout button {
+    width: auto;
+  }
 }
 
 @media (min-width: 1280px) and (max-width: 1399px) {

@@ -251,7 +251,7 @@ export default function InterestsContent() {
   return (
     <main
       dir={locale === "ar" ? "rtl" : "ltr"}
-      className="min-h-full w-full bg-[#EFF4F2] px-3 py-6 font-tajawal text-gray-900 transition-colors duration-200 dark:bg-[#0D0F10] dark:text-white sm:px-5 sm:py-8 lg:px-8"
+      className="creator-responsive-page min-h-full w-full bg-[#EFF4F2] px-3 py-6 font-tajawal text-gray-900 transition-colors duration-200 dark:bg-[#0D0F10] dark:text-white sm:px-5 sm:py-8 lg:px-8"
     >
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
         {/* Header */}

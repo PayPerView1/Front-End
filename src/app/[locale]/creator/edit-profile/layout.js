@@ -61,20 +61,20 @@ export default function Sidebar({ children }) {
   };
 
   return (
-    <div className="flex min-h-screen w-full min-w-0 flex-col md:flex-row items-stretch">
+    <div className="creator-edit-profile-layout flex min-h-screen w-full min-w-0 flex-col md:flex-row items-stretch">
       <div
-        className={`w-full md:w-[240px] flex-shrink-0 self-stretch border-b md:border-b-0 md:border-l flex flex-row md:flex-col items-center md:items-stretch justify-between md:justify-start gap-0.5 py-1.5 md:py-3 px-4 sm:px-6 md:px-3 ${t.sidebarBg} ${t.sidebarBorder}`}
+        className={`creator-edit-profile-sidebar w-full md:w-[240px] flex-shrink-0 self-stretch border-b md:border-b-0 md:border-l flex flex-row md:flex-col items-center md:items-stretch justify-between md:justify-start gap-0.5 py-1.5 md:py-3 px-4 sm:px-6 md:px-3 ${t.sidebarBg} ${t.sidebarBorder}`}
       >
         {/* العنوان */}
         <div
-          className={`hidden md:block pb-2 mb-1 border-b px-2 ${t.sidebarBorder}`}
+          className={`creator-edit-profile-title hidden md:block pb-2 mb-1 border-b px-2 ${t.sidebarBorder}`}
         >
           <p className={`text-lg font-bold ${t.text}`}>
             {translate("editProfile.accountSettings")}
           </p>
         </div>
 
-        <nav className="flex min-w-0 flex-1 flex-row gap-0.5 overflow-x-auto lang-scroll md:flex-initial md:flex-col md:overflow-x-visible">
+        <nav className="creator-edit-profile-nav flex min-w-0 flex-1 flex-row gap-0.5 overflow-x-auto lang-scroll md:flex-initial md:flex-col md:overflow-x-visible">
           {visibleMenuItems.map((item) => {
             const Icon = item.icon;
             const href = item.path ? `${base}/${item.path}` : base;
@@ -107,7 +107,7 @@ export default function Sidebar({ children }) {
 
         {/* Logout */}
         <div
-          className={`md:border-t md:pt-4 flex-shrink-0 ${t.sidebarBorder}`}
+          className={`creator-edit-profile-logout md:border-t md:pt-4 flex-shrink-0 ${t.sidebarBorder}`}
         >
           <button
             type="button"

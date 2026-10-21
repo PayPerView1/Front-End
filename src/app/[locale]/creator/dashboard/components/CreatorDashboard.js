@@ -267,11 +267,23 @@ export default function CreatorDashboard({ locale: localeOverride }) {
   }, [t]);
 
   useEffect(() => {
-    loadRecommendations();
+    let isCurrent = true;
+    Promise.resolve().then(() => {
+      if (isCurrent) loadRecommendations();
+    });
+    return () => {
+      isCurrent = false;
+    };
   }, [loadRecommendations]);
 
   useEffect(() => {
-    loadHomeData();
+    let isCurrent = true;
+    Promise.resolve().then(() => {
+      if (isCurrent) loadHomeData();
+    });
+    return () => {
+      isCurrent = false;
+    };
   }, [loadHomeData]);
 
   const handleRefresh = async () => {
@@ -329,7 +341,7 @@ export default function CreatorDashboard({ locale: localeOverride }) {
   return (
     <div
       dir={locale === "ar" ? "rtl" : "ltr"}
-      className="creator-dashboard-page min-h-screen w-full bg-[#F4F7F6] p-4 font-tajawal text-gray-900 antialiased selection:bg-[#94D3C1] selection:text-[#101513] transition-colors duration-200 dark:bg-[#050505] dark:text-white md:p-6 lg:p-7"
+      className="creator-dashboard-page creator-responsive-page min-h-screen w-full bg-[#F4F7F6] p-4 font-tajawal text-gray-900 antialiased selection:bg-[#94D3C1] selection:text-[#101513] transition-colors duration-200 dark:bg-[#050505] dark:text-white md:p-6 lg:p-7"
     >
       <div className="mx-auto w-full max-w-[1440px]">
         {/* ─── بطاقة الترحيب ─────────────────────────── */}
