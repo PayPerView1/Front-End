@@ -19,8 +19,7 @@ import {
   FiInfo,
   FiUpload,
   FiZap,
-  FiShare
-  ,
+  FiShare2,
   FiTrendingUp,
   FiArrowLeft,
   FiFileText,
