@@ -4,6 +4,15 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
+import { useNotifications } from "@/context/NotificationsContext";
+import worldCountries from "world-countries";
+import {
+  addCampaignFavorite,
+  applyToCampaign,
+  getCreatorFavorites,
+  getDiscoveredCampaigns,
+  removeCampaignFavorite,
+} from "@/lib/creatorCampaignApi";
 import {
   MdSearch,
   MdClose,
@@ -53,6 +62,16 @@ const PLATFORM_ICONS = {
 
 const ORANGE = "linear-gradient(90deg, #FFA600, #FF4B04)";
 const PAGE_SIZE = 3;
+const COUNTRIES_BY_ALPHA3 = new Map(
+  worldCountries.map((country) => [country.cca3, country]),
+);
+const COUNTRY_OPTIONS = worldCountries
+  .filter((country) => country.cca2 && country.cca3)
+  .map((country) => ({
+    value: country.cca3,
+    code: country.cca2,
+    name: country.name.common,
+  }));
 
 // ── الدول: أكواد ISO + أسماء من Intl + أعلام صور (إيموجي الأعلام ما بتظهر بويندوز) ──
 const COUNTRY_CODES =
@@ -65,14 +84,19 @@ const makeCountryName = (locale) => {
   try {
     dn = new Intl.DisplayNames([locale], { type: "region" });
   } catch {}
-  return (code) => dn?.of(code) || code;
+  return (code) => {
+    const country = COUNTRIES_BY_ALPHA3.get(code);
+    return (country && dn?.of(country.cca2)) || country?.name.common || code;
+  };
 };
 
 function Flag({ code }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`https://flagcdn.com/w40/${String(code).toLowerCase()}.png`}
+      src={`https://flagcdn.com/w40/${String(
+        COUNTRIES_BY_ALPHA3.get(code)?.cca2 ?? code,
+      ).toLowerCase()}.png`}
       alt=""
       width={18}
       height={13}
@@ -196,6 +220,25 @@ const MOCK_CAMPAIGNS = [
 
 // ── أدوات صغيرة ─────────────────────────────────────────────────────────────
 const money = (n) => `$${Number(n).toLocaleString("en-US")}`;
+const mapDiscoverCampaign = (campaign) => ({
+  ...campaign,
+  title: campaign.name ?? "",
+  brand: campaign.brand?.name ?? "",
+  desc: campaign.brief?.mainIdea ?? "",
+  type: campaign.contentType ?? "MIXED",
+  cover: campaign.coverImage ?? campaign.brand?.logo ?? null,
+  countries: campaign.targetCountries ?? [],
+  materials: [],
+  platforms: Array.isArray(campaign.platforms)
+    ? campaign.platforms.map((platform) =>
+        typeof platform === "string" ? platform.toLowerCase() : platform.key,
+      )
+    : [],
+  remaining: Number(campaign.remainingBudget ?? 0),
+  total: Number(campaign.totalBudget ?? campaign.remainingBudget ?? 0),
+  endsAt: campaign.endDate,
+  applied: Boolean(campaign.applicationStatus),
+});
 
 function pageList(current, totalPages) {
   if (totalPages <= 5)
@@ -367,7 +410,16 @@ function Dropdown({
 }
 
 function CampaignCard({
-  t, s, c, isDark, countryName, favorite, onToggleFav, onApply, onDetails, applied,
+  t,
+  s,
+  c,
+  isDark,
+  countryName,
+  favorite,
+  onToggleFav,
+  onApply,
+  onDetails,
+  applied,
 }) {
   const pct = c.total > 0 ? Math.round((c.remaining / c.total) * 100) : 0;
 
@@ -523,21 +575,22 @@ function CampaignCard({
           <button
             type="button"
             onClick={() => onApply(c)}
+            disabled={c.availability === "UNAVAILABLE"}
             className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-opacity hover:opacity-90"
-  style={{ background: ORANGE }}
->
-  {applied ? s("applied") : s("apply")}
-  {!applied && <MdSend size={15} className="rtl:-scale-x-100" />}
-</button>
-<button
-  type="button"
-  aria-label={s("details")}
-  title={s("details")}
-  onClick={() => onDetails(c)}
-  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-all hover:border-[#94D3C1] ${t.field} ${t.subText}`}
->
-  <MdOutlineInfo size={18} />
-</button>
+            style={{ background: ORANGE }}
+          >
+            {applied ? s("applied") : s("apply")}
+            {!applied && <MdSend size={15} className="rtl:-scale-x-100" />}
+          </button>
+          <button
+            type="button"
+            aria-label={s("details")}
+            title={s("details")}
+            onClick={() => onDetails(c)}
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-all hover:border-[#94D3C1] ${t.field} ${t.subText}`}
+          >
+            <MdOutlineInfo size={18} />
+          </button>
         </div>
       </div>
     </article>
@@ -545,8 +598,9 @@ function CampaignCard({
 }
 
 // ── الصفحة ──────────────────────────────────────────────────────────────────
-export default function DiscoverCampaigns({ campaigns = MOCK_CAMPAIGNS }) {
+export default function DiscoverCampaigns() {
   const { isDark } = useTheme();
+  const { addNotification } = useNotifications();
   const locale = useLocale();
   const s = useTranslations("discover");
   const router = useRouter();
@@ -559,31 +613,84 @@ export default function DiscoverCampaigns({ campaigns = MOCK_CAMPAIGNS }) {
   const [country, setCountry] = useState("ALL");
   const [type, setType] = useState("ALL");
   const [page, setPage] = useState(1);
+  const [campaigns, setCampaigns] = useState([]);
+  const [pagination, setPagination] = useState({ total: 0, totalPages: 0 });
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [favorites, setFavorites] = useState(() => new Set());
+  const [favoriteIds, setFavoriteIds] = useState({});
   const [applyTarget, setApplyTarget] = useState(null);
   const [appliedIds, setAppliedIds] = useState(() => new Set());
   const [alreadyTarget, setAlreadyTarget] = useState(null);
 
   useEffect(() => {
-    const savedIds = new Set();
-    campaigns.forEach((campaign) => {
+    let active = true;
+    const timer = window.setTimeout(async () => {
+      setLoading(true);
+      setLoadError("");
       try {
-        if (
-          window.localStorage.getItem(
-            `ppv:applied-campaign:${campaign.id}`,
-          )
-        ) {
-          savedIds.add(campaign.id);
-        }
-      } catch (error) {
-        console.error(
-          `Could not read application status for campaign ${campaign.id}:`,
-          error,
+        const response = await getDiscoveredCampaigns({
+          ...(search.trim() ? { search: search.trim() } : {}),
+          ...(country !== "ALL" ? { countries: country } : {}),
+          ...(type !== "ALL" ? { contentType: type } : {}),
+          sort:
+            sort === "cpm"
+              ? "highestCpm"
+              : sort === "relevance"
+                ? "bestMatch"
+                : sort,
+          page,
+          perPage: PAGE_SIZE,
+        });
+        if (!active) return;
+        const rows = Array.isArray(response?.data) ? response.data : [];
+        setCampaigns(rows.map(mapDiscoverCampaign));
+        setPagination(
+          response.pagination ?? {
+            total: rows.length,
+            totalPages: rows.length ? 1 : 0,
+          },
         );
+        setAppliedIds(
+          new Set(
+            rows
+              .filter((campaign) => campaign.applicationStatus)
+              .map((campaign) => campaign.id),
+          ),
+        );
+      } catch (error) {
+        if (active) setLoadError(error.message);
+      } finally {
+        if (active) setLoading(false);
       }
-    });
-    setAppliedIds(savedIds);
-  }, [campaigns]);
+    }, search.trim() ? 300 : 0);
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [search, country, type, sort, page]);
+
+  useEffect(() => {
+    let active = true;
+    getCreatorFavorites({ page: 1, perPage: 50 })
+      .then((response) => {
+        if (!active) return;
+        const rows = Array.isArray(response?.data) ? response.data : [];
+        const records = Object.fromEntries(
+          rows
+            .filter((favorite) => favorite.campaign?.id)
+            .map((favorite) => [favorite.campaign.id, favorite.id]),
+        );
+        setFavoriteIds(records);
+        setFavorites(new Set(Object.keys(records)));
+      })
+      .catch((error) => {
+        if (active) console.error("Could not load campaign favorites:", error);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const t = {
     bg: isDark ? "bg-[#0D0D0D]" : "bg-[#F0F2F5]",
@@ -596,44 +703,14 @@ export default function DiscoverCampaigns({ campaigns = MOCK_CAMPAIGNS }) {
     subText: isDark ? "text-[#9A9A9A]" : "text-[#64748B]",
   };
 
-  // ── تصفية وترتيب ──
-  const q = search.trim().toLowerCase();
-  const matches = (c, ignoreType) =>
-    (ignoreType || type === "ALL" || c.type === type) &&
-    (country === "ALL" || c.countries.includes(country)) &&
-    (!q ||
-      c.brand.toLowerCase().includes(q) ||
-      c.title.toLowerCase().includes(q) ||
-      c.desc.toLowerCase().includes(q));
-
-  const filtered = campaigns
-    .filter((c) => matches(c, false))
-    .sort((a, b) => {
-      if (sort === "cpm") return b.cpm - a.cpm;
-      if (sort === "endingSoon") {
-        return (
-          new Date(a.endsAt ?? "9999-12-31") -
-          new Date(b.endsAt ?? "9999-12-31")
-        );
-      }
-      if (sort === "relevance") return (b.relevance ?? 0) - (a.relevance ?? 0);
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    });
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const filtered = campaigns;
+  const visible = campaigns;
+  const totalPages = pagination.totalPages || 1;
   const safePage = Math.min(page, totalPages);
-  const visible = filtered.slice(
-    (safePage - 1) * PAGE_SIZE,
-    safePage * PAGE_SIZE,
-  );
-
-  // عدّادات التبويبات تتبع البحث والدولة
-  const counts = { ALL: campaigns.filter((c) => matches(c, true)).length };
+  const counts = { ALL: pagination.total ?? campaigns.length };
   Object.keys(types).forEach((k) => {
     if (k !== "ALL") {
-      counts[k] = campaigns.filter(
-        (c) => c.type === k && matches(c, true),
-      ).length;
+      counts[k] = campaigns.filter((c) => c.type === k).length;
     }
   });
 
@@ -641,10 +718,10 @@ export default function DiscoverCampaigns({ campaigns = MOCK_CAMPAIGNS }) {
   const countryOptions = useMemo(
     () => [
       { value: "ALL", label: s("allCountries") },
-      ...COUNTRY_CODES.map((code) => ({
-        value: code,
+      ...COUNTRY_OPTIONS.map(({ value, code }) => ({
+        value,
         code,
-        label: countryName(code),
+        label: countryName(value),
       })).sort((a, b) => a.label.localeCompare(b.label, locale)),
     ],
     [s, countryName, locale],
@@ -666,28 +743,42 @@ export default function DiscoverCampaigns({ campaigns = MOCK_CAMPAIGNS }) {
 
   // ── handlers ──
   const resetPage = () => setPage(1);
-  const toggleFav = (id) =>
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  const handleApply = (c) => {
+  const toggleFav = async (id) => {
+    const wasFavorite = favorites.has(id);
     try {
-      const savedApplication = window.localStorage.getItem(
-        `ppv:applied-campaign:${c.id}`,
-      );
-      if (savedApplication) {
-        setAlreadyTarget({
-          ...c,
-          application: JSON.parse(savedApplication),
-        });
-        setAppliedIds((prev) => new Set(prev).add(c.id));
-        return;
-      }
+      const result = wasFavorite
+        ? await removeCampaignFavorite(favoriteIds[id])
+        : await addCampaignFavorite(id);
+      setFavorites((previous) => {
+        const next = new Set(previous);
+        if (wasFavorite) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+      setFavoriteIds((previous) => {
+        const next = { ...previous };
+        if (wasFavorite) delete next[id];
+        else next[id] = result.id;
+        return next;
+      });
     } catch (error) {
-      console.error(`Could not read application for campaign ${c.id}:`, error);
+      console.error(`Could not update favorite for campaign ${id}:`, error);
+      setLoadError(error.message);
+    }
+  };
+  const handleApply = (c) => {
+    if (appliedIds.has(c.id)) {
+      setAlreadyTarget({
+        ...c,
+        application: {
+          campaignName: c.title,
+          campaignCode: c.id,
+          cpm: c.cpm,
+          submittedAt: c.createdAt,
+          status: c.applicationStatus,
+        },
+      });
+      return;
     }
     setApplyTarget(c);
   };
@@ -768,7 +859,7 @@ export default function DiscoverCampaigns({ campaigns = MOCK_CAMPAIGNS }) {
               label={countryLabel}
               options={countryOptions}
               title={s("countryTitle")}
-              meta={s("countryCount", { n: COUNTRY_CODES.length })}
+              meta={s("countryCount", { n: COUNTRY_OPTIONS.length })}
               searchable
               searchPlaceholder={s("countrySearch")}
               emptyLabel={s("empty")}
@@ -811,7 +902,15 @@ export default function DiscoverCampaigns({ campaigns = MOCK_CAMPAIGNS }) {
       </section>
 
       {/* الكاردات أو الحالة الفارغة */}
-      {visible.length === 0 ? (
+      {loading ? (
+        <div className={`rounded-2xl border p-10 text-center text-sm ${t.border} ${t.subText}`}>
+          {s("loading")}
+        </div>
+      ) : loadError ? (
+        <div role="alert" className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center text-sm text-red-500">
+          {loadError}
+        </div>
+      ) : visible.length === 0 ? (
         <div
           className={`flex flex-col items-center gap-5 rounded-2xl border px-6 py-14 text-center ${t.border}`}
           style={{ background: isDark ? "#191C1D" : "#FFFFFF" }}
@@ -873,7 +972,10 @@ export default function DiscoverCampaigns({ campaigns = MOCK_CAMPAIGNS }) {
           className={`flex flex-col gap-3 rounded-2xl border px-4 py-3 sm:flex-row sm:items-center sm:justify-between ${t.card} ${t.border}`}
         >
           <p className={`text-xs ${t.subText}`}>
-            {s("showing", { shown: visible.length, total: filtered.length })}
+            {s("showing", {
+              shown: visible.length,
+              total: pagination.total ?? filtered.length,
+            })}
           </p>
 
           <div
@@ -970,33 +1072,53 @@ export default function DiscoverCampaigns({ campaigns = MOCK_CAMPAIGNS }) {
         </button>
       </section>
       <ApplyConfirmModal
-  open={!!applyTarget}
-  campaign={
-    applyTarget && {
-      id: applyTarget.id,
-      name: applyTarget.title,
-      brand: applyTarget.brand,
-      cpm: applyTarget.cpm,
-      platforms: applyTarget.platforms,
-    }
-  }
-  onClose={() => setApplyTarget(null)}
-  onConfirm={async () => {
-    // TODO: ابعت طلب التقديم للـ API
-    const application = {
-      ref: `APP-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-      campaignName: applyTarget.title,
-      campaignCode: applyTarget.id,
-      submittedAt: new Date().toISOString(),
-      cpm: applyTarget.cpm,
-    };
-    window.localStorage.setItem(
-      `ppv:applied-campaign:${applyTarget.id}`,
-      JSON.stringify(application),
-    );
-    setAppliedIds((prev) => new Set(prev).add(applyTarget.id));
-  }}
-/>
+        open={!!applyTarget}
+        campaign={
+          applyTarget && {
+            id: applyTarget.id,
+            name: applyTarget.title,
+            brand: applyTarget.brand,
+            cpm: applyTarget.cpm,
+            platforms: applyTarget.platforms,
+          }
+        }
+        onClose={() => setApplyTarget(null)}
+        onConfirm={async () => {
+          try {
+            const application = await applyToCampaign(applyTarget.id);
+            addNotification("APPLICATION_SUBMITTED", {
+              campaign: applyTarget.title,
+            });
+            setAppliedIds((previous) => new Set(previous).add(applyTarget.id));
+            setAlreadyTarget({
+              ...applyTarget,
+              application: {
+                ref: application.id,
+                campaignName: applyTarget.title,
+                campaignCode: applyTarget.id,
+                submittedAt: application.appliedAt,
+                cpm: applyTarget.cpm,
+                status: application.status,
+              },
+            });
+          } catch (error) {
+            if (error.code === "ALREADY_APPLIED") {
+              setAppliedIds((previous) => new Set(previous).add(applyTarget.id));
+              setAlreadyTarget({
+                ...applyTarget,
+                application: {
+                  campaignName: applyTarget.title,
+                  campaignCode: applyTarget.id,
+                  cpm: applyTarget.cpm,
+                  status: "PENDING",
+                },
+              });
+              return;
+            }
+            throw error;
+          }
+        }}
+      />
       <ApplyAlreadyModal
         open={!!alreadyTarget}
         application={alreadyTarget?.application}

@@ -1146,6 +1146,7 @@
   "discover": {
     "title": "Discover Approved Campaigns & Ad Opportunities",
     "subtitle": "Browse the latest Shariah-compliant campaigns, join instantly, and earn solid returns per thousand views (CPM) with trusted brands.",
+    "loading": "Loading campaigns...",
     "searchPlaceholder": "Search by brand, product, or campaign type...",
     "clear": "Clear search",
     "allCountries": "All countries",
