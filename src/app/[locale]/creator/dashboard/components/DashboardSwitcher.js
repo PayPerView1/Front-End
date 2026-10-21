@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import ProfileContent from "@/app/[locale]/creator/dashboard/components/ProfileContent";
-import CreatorDashboard from "@/features/dashboard/CreatorDashboard";
+import ProfileContent from "@/app/[locale]/creator/profile/components/ProfileContent";
+import CreatorDashboard from "@/app/[locale]/creator/dashboard/components/CreatorDashboard";
 
 export default function DashboardSwitcher() {
   const [view, setView] = useState("dashboard");
