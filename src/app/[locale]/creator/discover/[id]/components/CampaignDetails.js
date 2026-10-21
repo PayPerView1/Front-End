@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
+import { useNotifications } from "@/context/NotificationsContext";
+import { toast } from "@/components/ui/Toast";
+import {
+  applyToCampaign,
+  getCampaignDetails,
+} from "@/lib/creatorCampaignApi";
 import {
   MdArrowBack,
   MdArrowForward,
@@ -70,15 +76,390 @@ const CONTENT_ICONS = {
 const ORANGE = "linear-gradient(90deg, #FFA600, #FF4B04)";
 const money = (n) => `$${Number(n).toLocaleString("en-US")}`;
 
-// ── بيانات تجريبية: استبدلها بنتيجة الـ API (GET /campaigns/:id) ───────────
+function mapCampaignDetails(data, id) {
+  const campaign = data?.campaign ?? data;
+  const localized = (value, fallback = "") =>
+    typeof value === "object" && value !== null
+      ? { ar: value.ar ?? value.en ?? fallback, en: value.en ?? value.ar ?? fallback }
+      : { ar: value ?? fallback, en: value ?? fallback };
+  const description =
+    campaign.brief?.mainIdea ??
+    campaign.brief?.description ??
+    campaign.description ??
+    "";
+  const descriptions = Array.isArray(description) ? description : [description];
+
+  return {
+    ...campaign,
+    id: campaign.id ?? campaign._id ?? id,
+    title: localized(campaign.title ?? campaign.name),
+    brand: localized(campaign.brand?.name ?? campaign.brand),
+    brandLegal: campaign.brandLegal ?? campaign.brand?.legalName ?? "",
+    category: localized(campaign.category ?? campaign.contentType),
+    description: {
+      ar: descriptions.filter(Boolean),
+      en: descriptions.filter(Boolean),
+    },
+    platforms: Array.isArray(campaign.platforms)
+      ? campaign.platforms.map((platform) =>
+          typeof platform === "string"
+            ? { key: platform.toLowerCase(), ratio: "9:16" }
+            : { ...platform, key: platform.key ?? platform.name?.toLowerCase() },
+        )
+      : [],
+    contentTypes: Array.isArray(campaign.contentTypes)
+      ? campaign.contentTypes
+      : [],
+    remaining: Number(campaign.remainingBudget ?? campaign.remaining ?? 0),
+    total: Number(campaign.totalBudget ?? campaign.total ?? 0),
+    startsAt: localized(campaign.startDate ?? campaign.startsAt),
+    endsAt: localized(campaign.endDate ?? campaign.endsAt),
+    cpm: Number(campaign.cpm ?? 0),
+    acceptance: Number(campaign.acceptanceRate ?? campaign.acceptance ?? 0),
+    filesCount: Number(campaign.filesCount ?? 0),
+    packSize: campaign.packSize ?? "0 GB",
+  };
+}
+
+function getExistingApplication(campaign) {
+  const application =
+    campaign.application ??
+    campaign.creatorApplication ??
+    campaign.myApplication ??
+    (typeof campaign.applicationStatus === "object"
+      ? campaign.applicationStatus
+      : null);
+  const status =
+    application?.status ??
+    (typeof campaign.applicationStatus === "string"
+      ? campaign.applicationStatus
+      : null);
+  const appliedStatuses = new Set([
+    "PENDING",
+    "SUBMITTED",
+    "UNDER_REVIEW",
+    "APPROVED",
+    "ACCEPTED",
+    "REJECTED",
+    "COMPLETED",
+  ]);
+  const hasApplication =
+    Boolean(application) ||
+    campaign.applicationStatus === true ||
+    appliedStatuses.has(String(status ?? "").toUpperCase());
+
+  if (!hasApplication) return null;
+
+  return {
+    ref: application?.id ?? application?._id ?? application?.applicationId,
+    campaignName:
+      campaign.title?.ar ?? campaign.name ?? campaign.title?.en ?? "",
+    campaignCode: campaign.code ?? campaign.id,
+    submittedAt:
+      application?.appliedAt ??
+      application?.submittedAt ??
+      application?.createdAt,
+    cpm: campaign.cpm,
+    status: status ?? "PENDING",
+  };
+}
+
+function isAlreadyAppliedError(error) {
+  return (
+    error?.code === "ALREADY_APPLIED" ||
+    /already applied|سبق.{0,20}التقديم|قدمت.{0,20}(?:مسبق|سابق)/i.test(
+      error?.message ?? "",
+    )
+  );
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (character) => {
+    const entities = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return entities[character];
+  });
+}
+
+function formatBriefValue(value, isRtl = false) {
+  if (value === null || value === undefined || value === "") return "";
+  if (Array.isArray(value)) {
+    return value.map((item) => formatBriefValue(item, isRtl)).filter(Boolean).join("<br />");
+  }
+  if (typeof value === "object") {
+    return Object.entries(value)
+      .filter(([, nestedValue]) => nestedValue !== null && nestedValue !== undefined && nestedValue !== "")
+      .map(
+        ([key, nestedValue]) =>
+          `<strong>${escapeHtml(getBriefFieldLabel(key, isRtl))}:</strong> ${formatBriefValue(nestedValue, isRtl)}`,
+      )
+      .join("<br />");
+  }
+  if (typeof value === "boolean") return value ? "✓" : "";
+  return escapeHtml(value).replace(/\n/g, "<br />");
+}
+
+function getBriefFieldLabel(key, isRtl) {
+  const labels = {
+    noGambling: ["خلو المحتوى من المقامرة", "No gambling content"],
+    noSexualContent: ["خلو المحتوى من المواد الجنسية", "No sexual content"],
+    noExplicitMusic: ["خلو المحتوى من الموسيقى الصريحة", "No explicit music"],
+    noAlcohol: ["خلو المحتوى من الكحول", "No alcohol"],
+    noSuspiciousCurrencies: ["تجنب العملات المشبوهة", "Avoid suspicious currencies"],
+    noUnrealisticProfit: ["تجنب وعود الأرباح غير الواقعية", "No unrealistic profit claims"],
+  };
+  if (labels[key]) return labels[key][isRtl ? 0 : 1];
+  return key.replace(/([A-Z])/g, " $1").replace(/^./, (letter) => letter.toUpperCase());
+}
+
+function getBriefPdfUrl(campaign) {
+  const url =
+    campaign.briefPdfUrl ??
+    campaign.briefPdf?.url ??
+    campaign.campaignBriefUrl ??
+    campaign.campaignBrief?.pdfUrl ??
+    campaign.pdfUrl ??
+    campaign.pdf_url ??
+    campaign.pdf?.url;
+  return typeof url === "string" && /^https?:\/\//i.test(url.trim())
+    ? url.trim()
+    : null;
+}
+
+function getCampaignAssetLinks(campaign) {
+  const links = [];
+  const addFile = (file) => {
+    if (typeof file === "string") {
+      if (/^(https?:\/\/|\/(?!\/))/i.test(file)) {
+        links.push({ url: file, name: file.split("/").pop() || file });
+      }
+      return;
+    }
+    if (!file || typeof file !== "object") return;
+
+    const url =
+      file.downloadUrl ??
+      file.download_url ??
+      file.fileUrl ??
+      file.file_url ??
+      file.url ??
+      file.path;
+    if (
+      typeof url !== "string" ||
+      !/^(https?:\/\/|\/(?!\/))/i.test(url.trim())
+    ) {
+      return;
+    }
+    links.push({
+      url,
+      name: file.name ?? file.originalName ?? file.filename ?? file.title ?? url.split("/").pop(),
+    });
+  };
+
+  for (const key of ["rawFiles", "sourceFiles", "files", "assets", "materials", "attachments", "media", "resources"]) {
+    const value = campaign[key];
+    if (Array.isArray(value)) value.forEach(addFile);
+    else if (value) addFile(value);
+  }
+
+  return links.filter(
+    (link, index, all) =>
+      all.findIndex((candidate) => candidate.url === link.url) === index,
+  );
+}
+
+function buildCampaignBriefHtml(campaign, isRtl) {
+  const lang = isRtl ? "ar" : "en";
+  const localize = (value) =>
+    value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    ("ar" in value || "en" in value)
+      ? value[lang] ?? value.en ?? value.ar
+      : value;
+  const brief = campaign.brief ?? {};
+  const sectionLabels = isRtl
+    ? {
+        overview: "نصوص المقاربة",
+        mainIdea: "الفكرة الرئيسية",
+        audience: "الجمهور المستهدف",
+        tone: "نبرة الصوت",
+        keyMessages: "الرسائل الرئيسية",
+        keywords: "الكلمات المفتاحية",
+        visualReferences: "المراجع البصرية",
+        technicalGuidelines: "التوجيهات الفنية",
+        guidelines: "التوجيهات",
+        instructions: "تعليمات الإنتاج",
+        deliverables: "المخرجات المطلوبة",
+        acceptanceCriteria: "معايير القبول",
+        halalDeclaration: "الضوابط الشرعية",
+        shariahRules: "الضوابط الشرعية",
+        assets: "الملفات المصدرية",
+        rawFiles: "الملفات المصدرية الخام",
+        noAssets: "لا توجد روابط تنزيل مرفقة بهذه الحملة.",
+        print: "طباعة / حفظ كـ PDF",
+        campaign: "موجز الحملة",
+      }
+    : {
+        overview: "Campaign brief",
+        mainIdea: "Main idea",
+        audience: "Target audience",
+        tone: "Tone of voice",
+        keyMessages: "Key messages",
+        keywords: "Keywords",
+        visualReferences: "Visual references",
+        technicalGuidelines: "Technical guidelines",
+        guidelines: "Guidelines",
+        instructions: "Production instructions",
+        deliverables: "Deliverables",
+        acceptanceCriteria: "Acceptance criteria",
+        halalDeclaration: "Shariah compliance",
+        shariahRules: "Shariah rules",
+        assets: "Source files",
+        rawFiles: "Raw source files",
+        noAssets: "No downloadable files are attached to this campaign.",
+        print: "Print / Save as PDF",
+        campaign: "Campaign brief",
+      };
+  const knownFields = new Set([
+    "mainIdea",
+    "description",
+    "audience",
+    "tone",
+    "keyMessages",
+    "keywords",
+    "visualReferences",
+  ]);
+  const sections = [
+    [sectionLabels.mainIdea, localize(brief.mainIdea ?? brief.description ?? campaign.description)],
+    [sectionLabels.audience, localize(brief.audience ?? campaign.audience)],
+    [sectionLabels.tone, localize(brief.tone ?? campaign.tone)],
+    [sectionLabels.keyMessages, localize(brief.keyMessages ?? campaign.keyMessages)],
+    [sectionLabels.keywords, localize(brief.keywords ?? campaign.keywords)],
+    [sectionLabels.visualReferences, localize(brief.visualReferences ?? campaign.visualReferences)],
+    [
+      sectionLabels.technicalGuidelines,
+      campaign.technicalGuidelines ??
+        brief.technicalGuidelines ??
+        campaign.technicalRequirements ??
+        brief.technicalRequirements,
+    ],
+    [sectionLabels.guidelines, campaign.guidelines ?? brief.guidelines],
+    [sectionLabels.instructions, campaign.instructions ?? brief.instructions],
+    [sectionLabels.deliverables, campaign.deliverables ?? brief.deliverables],
+    [
+      sectionLabels.technicalGuidelines,
+      campaign.productionGuidelines ??
+        brief.productionGuidelines ??
+        campaign.contentRequirements ??
+        brief.contentRequirements ??
+        campaign.postingRequirements,
+    ],
+    [
+      sectionLabels.acceptanceCriteria,
+      campaign.acceptanceCriteria ??
+        campaign.acceptanceCriteriaText ??
+        brief.acceptanceCriteria ??
+        campaign.reviewCriteria ??
+        brief.reviewCriteria ??
+        campaign.criteria,
+    ],
+    [
+      sectionLabels.halalDeclaration,
+      campaign.halalDeclaration ?? campaign.shariahRules ?? campaign.compliance,
+    ],
+    ...Object.entries(brief)
+      .filter(([key, value]) => !knownFields.has(key) && formatBriefValue(value, isRtl))
+      .map(([key, value]) => [getBriefFieldLabel(key, isRtl), localize(value)]),
+  ].filter(([, value]) => formatBriefValue(localize(value), isRtl));
+
+  const title =
+    (typeof campaign.title === "object"
+      ? campaign.title[lang] ?? campaign.title.en ?? campaign.title.ar
+      : campaign.title) ??
+    campaign.name ??
+    sectionLabels.campaign;
+  const assets = getCampaignAssetLinks(campaign);
+  const sectionsHtml = sections
+    .map(
+      ([label, value]) =>
+        `<section><h2>${escapeHtml(label)}</h2><p>${formatBriefValue(localize(value), isRtl)}</p></section>`,
+    )
+    .join("");
+  const assetsHtml = assets.length
+    ? `<section><h2>${escapeHtml(sectionLabels.assets)}</h2><ul>${assets
+        .map(
+          (asset) =>
+            `<li><a href="${escapeHtml(asset.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(asset.name)}</a></li>`,
+        )
+        .join("")}</ul></section>`
+    : `<section><h2>${escapeHtml(sectionLabels.assets)}</h2><p>${escapeHtml(sectionLabels.noAssets)}</p></section>`;
+
+  return `<!doctype html>
+<html lang="${isRtl ? "ar" : "en"}" dir="${isRtl ? "rtl" : "ltr"}">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(title)} — ${escapeHtml(sectionLabels.overview)}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 32px; color: #17211f; background: #f3f6f5; font: 16px/1.7 Arial, sans-serif; }
+    main { max-width: 900px; margin: auto; padding: 40px; background: white; border-radius: 16px; }
+    header { border-bottom: 2px solid #94d3c1; margin-bottom: 28px; padding-bottom: 18px; }
+    h1 { margin: 0; font-size: 28px; }
+    h2 { margin: 0 0 8px; color: #1c6b58; font-size: 18px; }
+    section { margin: 24px 0; break-inside: avoid; }
+    p { margin: 0; white-space: normal; }
+    a { color: #176b58; overflow-wrap: anywhere; }
+    li { margin: 8px 0; }
+    .actions { max-width: 900px; margin: 0 auto 16px; text-align: end; }
+    button { border: 0; border-radius: 8px; padding: 10px 16px; color: white; background: #1c6b58; font-size: 14px; cursor: pointer; }
+    @media print {
+      body { padding: 0; background: white; }
+      main { max-width: none; padding: 0; }
+      .actions { display: none; }
+      a { color: inherit; text-decoration: underline; }
+    }
+  </style>
+</head>
+<body>
+  <div class="actions"><button onclick="window.print()">${escapeHtml(sectionLabels.print)}</button></div>
+  <main><header><h1>${escapeHtml(title)}</h1></header>${sectionsHtml}${assetsHtml}</main>
+</body>
+</html>`;
+}
+
+function openCampaignBrief(campaign, isRtl, autoPrint = false) {
+  const briefWindow = window.open("", "_blank");
+  if (!briefWindow) return false;
+  if (autoPrint) {
+    briefWindow.addEventListener(
+      "load",
+      () => briefWindow.print(),
+      { once: true },
+    );
+  }
+  briefWindow.document.open();
+  briefWindow.document.write(buildCampaignBriefHtml(campaign, isRtl));
+  briefWindow.document.close();
+  return true;
+}
+
+// ── بيانات تجريبية (بدون ربط API) ───────────────────────────────────────────
 const MOCK_DETAILS = {
   c1: {
     id: "c1",
+    code: "ACAM-2026-038",
     cover: null,
     gradient: "linear-gradient(135deg,#0f2b3d,#0b1620)",
     filesCount: 14,
     packSize: "3.8 GB",
-    // status: "paused",
+    status: "active",
     title: {
       ar: "قص ونشر مقاطع توعوية عن الاستثمار الحلال والادخار بالسبائك الذهبية",
       en: "Clip and publish awareness videos on halal investing and gold-bar saving",
@@ -162,6 +543,7 @@ function CardHeader({ t, icon: Icon, title, sub, isDark }) {
 // ── الصفحة ──────────────────────────────────────────────────────────────────
 export default function CampaignDetails({ id, campaign }) {
   const { isDark } = useTheme();
+  const { addNotification } = useNotifications();
   const locale = useLocale();
   const s = useTranslations("campaignDetails");
   const router = useRouter();
@@ -175,49 +557,61 @@ export default function CampaignDetails({ id, campaign }) {
   const [applyAlreadyOpen, setApplyAlreadyOpen] = useState(false);
   const [application, setApplication] = useState(null);
   const [applied, setApplied] = useState(false);
+  const [previewNotified, setPreviewNotified] = useState(false);
+  const [campaignRequest, setCampaignRequest] = useState(null);
+  const isMockCampaign = !campaign && Boolean(MOCK_DETAILS[id]);
+  const currentRequest =
+    campaignRequest?.id === id ? campaignRequest : null;
+  const campaignLoading =
+    !campaign && !isMockCampaign && (!currentRequest || currentRequest.status === "loading");
+  const campaignError =
+    currentRequest?.status === "error" ? currentRequest.error : "";
+  const c =
+    campaign ??
+    MOCK_DETAILS[id] ??
+    (currentRequest?.status === "success" ? currentRequest.campaign : null);
+  const existingApplication = c ? getExistingApplication(c) : null;
+  const currentApplication =
+    application ??
+    (existingApplication
+      ? {
+          ...existingApplication,
+          campaignName: c.title?.[lang] ?? existingApplication.campaignName,
+        }
+      : null);
+  const hasApplied = Boolean(currentApplication || applied);
 
-  const c = campaign ?? MOCK_DETAILS[id];
+  useEffect(() => {
+    if (campaign || MOCK_DETAILS[id]) return;
+
+    let active = true;
+    getCampaignDetails(id)
+      .then((data) => {
+        if (active) {
+          setCampaignRequest({
+            id,
+            status: "success",
+            campaign: mapCampaignDetails(data, id),
+          });
+        }
+      })
+      .catch((error) => {
+        if (active) setCampaignRequest({ id, status: "error", error: error.message });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [campaign, id]);
+
   const isUnavailable =
     c &&
-    (c.available === false ||
-      c.isAvailable === false ||
-      c.isActive === false ||
-      c.acceptingApplications === false ||
-      UNAVAILABLE_STATUSES.has(
-        String(c.status ?? "")
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, "-"),
-      ));
-
-  useEffect(() => {
-    if (!c?.id) return;
-
-    try {
-      setReportSent(
-        window.localStorage.getItem(`ppv:reported-campaign:${c.id}`) === "true",
-      );
-    } catch (error) {
-      console.error("Could not read reported campaign status:", error);
-    }
-  }, [c?.id]);
-
-  useEffect(() => {
-    if (!c?.id) return;
-
-    try {
-      const savedApplication = window.localStorage.getItem(
-        `ppv:applied-campaign:${c.id}`,
-      );
-      if (savedApplication) {
-        const parsedApplication = JSON.parse(savedApplication);
-        setApplication(parsedApplication);
-        setApplied(true);
-      }
-    } catch (error) {
-      console.error("Could not read campaign application status:", error);
-    }
-  }, [c?.id]);
+    UNAVAILABLE_STATUSES.has(
+      String(c.status ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-"),
+    );
 
   const t = {
     bg: isDark ? "bg-[#0D0D0D]" : "bg-[#F0F2F5]",
@@ -229,12 +623,20 @@ export default function CampaignDetails({ id, campaign }) {
     subText: isDark ? "text-[#9A9A9A]" : "text-[#64748B]",
   };
 
+  if (!c && campaignLoading) {
+    return (
+      <div className={`flex min-h-screen items-center justify-center ${t.bg} ${t.text}`}>
+        {isRtl ? "جارٍ تحميل الحملة..." : "Loading campaign..."}
+      </div>
+    );
+  }
+
   if (!c) {
     return (
       <div
         className={`flex min-h-screen items-center justify-center ${t.bg} ${t.text}`}
       >
-        {s("notFound")}
+        {campaignError || s("notFound")}
       </div>
     );
   }
@@ -243,7 +645,16 @@ export default function CampaignDetails({ id, campaign }) {
   const pct = c.total > 0 ? Math.round((c.remaining / c.total) * 100) : 0;
 
   const handleApply = () => {
-    if (application) {
+    if (isMockCampaign) {
+      toast.info("", {
+        title: isRtl ? "التقديم التجريبي غير متاح" : "Demo application unavailable",
+        description: isRtl
+          ? "هذه حملة تجريبية ولا يمكن إرسالها إلى الخادم."
+          : "This is a demo campaign and cannot be submitted to the server.",
+      });
+      return;
+    }
+    if (currentApplication) {
       setApplyAlreadyOpen(true);
       return;
     }
@@ -255,6 +666,47 @@ export default function CampaignDetails({ id, campaign }) {
       return;
     }
     setReportOpen(true);
+  };
+
+  const handleExportPdf = () => {
+    const pdfUrl = getBriefPdfUrl(c);
+    if (pdfUrl) {
+      window.open(pdfUrl, "_blank", "noopener,noreferrer");
+      toast.success("", {
+        title: isRtl ? "بدأ تحميل ملف PDF" : "PDF download started",
+        description: isRtl
+          ? "تم فتح موجز الحملة المرفق من الخادم."
+          : "The campaign brief provided by the server was opened.",
+        duration: 6000,
+      });
+      return;
+    }
+
+    if (!openCampaignBrief(c, isRtl, true)) {
+      toast.error(isRtl ? "تعذر فتح موجز الحملة. اسمحي بالنوافذ المنبثقة ثم أعيدي المحاولة." : "Could not open the campaign brief. Allow pop-ups and try again.");
+    }
+  };
+
+  const handlePreview = () => {
+    const pdfUrl = getBriefPdfUrl(c);
+    if (pdfUrl) {
+      window.open(pdfUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // لا يوجد PDF ولا ملفات ولا موجز => المعاينة غير متاحة: إشعار في لوحة الإشعارات
+    const hasBrief = c.brief && Object.keys(c.brief).length > 0;
+    if (!hasBrief && getCampaignAssetLinks(c).length === 0) {
+      if (!previewNotified) {
+        addNotification("PREVIEW_UNAVAILABLE", { campaign: c.title[lang] });
+        setPreviewNotified(true);
+      }
+      return;
+    }
+
+    if (!openCampaignBrief(c, isRtl)) {
+      toast.error(isRtl ? "تعذر فتح موجز الحملة. اسمحي بالنوافذ المنبثقة ثم أعيدي المحاولة." : "Could not open the campaign brief. Allow pop-ups and try again.");
+    }
   };
 
   const summaryRows = [
@@ -364,10 +816,11 @@ export default function CampaignDetails({ id, campaign }) {
           <button
             type="button"
             onClick={handleApply}
+            disabled={isMockCampaign}
             className="inline-flex h-11 flex-1 items-center justify-center rounded-xl text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             style={{ background: ORANGE }}
           >
-            {applied ? s("applied") : s("apply")}
+            {hasApplied ? s("applied") : s("apply")}
           </button>
 
           <button
@@ -630,9 +1083,9 @@ export default function CampaignDetails({ id, campaign }) {
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row">
-          {/* TODO: اربط الأزرار برابط ملف الـ PDF */}
           <button
             type="button"
+            onClick={handlePreview}
             className={`inline-flex h-10 items-center justify-center gap-2 rounded-xl border px-4 text-xs font-bold transition-all hover:border-[#94D3C1] ${t.field} ${t.text}`}
           >
             <MdOutlineVisibility size={16} />
@@ -640,6 +1093,7 @@ export default function CampaignDetails({ id, campaign }) {
           </button>
           <button
             type="button"
+            onClick={handleExportPdf}
             className="inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-xs font-bold text-white transition-opacity hover:opacity-90"
             style={{ background: ORANGE }}
           >
@@ -680,25 +1134,45 @@ export default function CampaignDetails({ id, campaign }) {
         }}
         onClose={() => setApplyOpen(false)}
         onConfirm={async () => {
-          // TODO: ابعت طلب التقديم للـ API
-          const savedApplication = {
-            ref: `APP-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-            campaignName: c.title[lang],
-            campaignCode: c.code ?? c.id,
-            submittedAt: new Date().toISOString(),
-            cpm: c.cpm,
-          };
-          window.localStorage.setItem(
-            `ppv:applied-campaign:${c.id}`,
-            JSON.stringify(savedApplication),
-          );
-          setApplication(savedApplication);
-          setApplied(true);
+          try {
+            const submittedApplication = await applyToCampaign(c.id);
+            const savedApplication = {
+              ref: submittedApplication.id,
+              campaignName: c.title[lang],
+              campaignCode: c.code ?? c.id,
+              submittedAt: submittedApplication.appliedAt,
+              cpm: c.cpm,
+              status: submittedApplication.status,
+            };
+            addNotification("APPLICATION_SUBMITTED", {
+              campaign: c.title[lang],
+            });
+            window.localStorage.setItem(
+              `ppv:applied-campaign:${c.id}`,
+              JSON.stringify(savedApplication),
+            );
+            setApplication(savedApplication);
+            setApplied(true);
+          } catch (error) {
+            if (!isAlreadyAppliedError(error)) throw error;
+
+            const existing =
+              getExistingApplication(c) ?? {
+                campaignName: c.title[lang],
+                campaignCode: c.code ?? c.id,
+                cpm: c.cpm,
+                status: "PENDING",
+              };
+            setApplication(existing);
+            setApplied(true);
+            setApplyOpen(false);
+            setApplyAlreadyOpen(true);
+          }
         }}
       />
       <ApplyAlreadyModal
         open={!isUnavailable && applyAlreadyOpen}
-        application={application}
+        application={currentApplication}
         onClose={() => setApplyAlreadyOpen(false)}
         onExplore={() => {
           setApplyAlreadyOpen(false);

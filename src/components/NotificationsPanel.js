@@ -4,11 +4,15 @@ import { useState } from "react";
 import { useNotifications } from "@/context/NotificationsContext";
 import { useLocale } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
+import { KIND_META, fillText } from "./notificationKinds";
 
 export default function NotificationsPanel({ side = "left", stacked = false, topOffset = 0 }) {
   const {
     isNotificationsOpen,
     notifications,
+    isNotificationsLoading,
+    notificationsError,
+    refreshNotifications,
     closeNotifications,
     markAsRead,
   } = useNotifications();
@@ -17,6 +21,39 @@ export default function NotificationsPanel({ side = "left", stacked = false, top
   const [activeTab, setActiveTab] = useState("mentions");
   const locale = useLocale();
   const isAr = locale === "ar";
+
+  const getDateGroup = (createdAt) => {
+    const date = new Date(createdAt);
+    if (Number.isNaN(date.getTime())) return isAr ? "اليوم" : "Today";
+
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const sameDay = (left, right) =>
+      left.getFullYear() === right.getFullYear() &&
+      left.getMonth() === right.getMonth() &&
+      left.getDate() === right.getDate();
+
+    if (sameDay(date, today)) return isAr ? "اليوم" : "Today";
+    if (sameDay(date, yesterday)) return isAr ? "أمس" : "Yesterday";
+    return new Intl.DateTimeFormat(isAr ? "ar-EG-u-nu-latn" : "en-US", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    }).format(date);
+  };
+
+  const getNotificationTime = (notif) => {
+    const localizedTime = isAr ? notif.timeAr : notif.timeEn;
+    if (localizedTime) return localizedTime;
+
+    const date = new Date(notif.createdAt);
+    if (Number.isNaN(date.getTime())) return "";
+    return new Intl.DateTimeFormat(isAr ? "ar-EG-u-nu-latn" : "en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  };
 
   // Theme mapping colors
   const t = {
@@ -46,11 +83,11 @@ export default function NotificationsPanel({ side = "left", stacked = false, top
   // Filter notifications based on chosen tab
   const filteredNotifications =
     activeTab === "mentions"
-      ? notifications.filter((n) => n.type === "mention")
+      ? notifications.filter((n) => n.type === "mention" || n.kind)
       : notifications; // All Activity
 
   // Calculate unread count for mentions tab badge
-  const mentionsCount = notifications.filter((n) => n.type === "mention" && n.unread).length;
+  const mentionsCount = notifications.filter((n) => (n.type === "mention" || n.kind) && n.unread).length;
 
   // Format message text to highlight @everyone
   const formatMessage = (msg) => {
@@ -67,9 +104,58 @@ export default function NotificationsPanel({ side = "left", stacked = false, top
     });
   };
 
+  // إشعار بنوع محدد (تنزيل / إيقاف حملة / رفض / قبول)
+  const renderTyped = (notif) => {
+    const meta = KIND_META[notif.kind];
+    if (!meta) return null;
+    const { Icon, color } = meta;
+    const txt = meta[isAr ? "ar" : "en"];
+    const date = notif.createdAt
+      ? new Intl.DateTimeFormat(isAr ? "ar-EG-u-nu-latn" : "en-US", {
+          month: "numeric",
+          day: "numeric",
+        }).format(new Date(notif.createdAt))
+      : "";
+
+    return (
+      <div
+        key={notif.id}
+        onClick={() => markAsRead(notif.id)}
+        className={`w-full flex flex-row items-start p-4 gap-3 border-b ${t.itemBorder} transition-colors duration-200 cursor-pointer ${
+          notif.unread ? t.itemUnread : "opacity-60"
+        } ${t.itemHover}`}
+      >
+        {/* Unread indicator dot */}
+        <div className="w-1.5 shrink-0 flex items-center justify-center self-stretch">
+          {notif.unread && <span className={`w-1.5 h-1.5 rounded-full ${t.itemUnreadDot}`} />}
+        </div>
+
+        {/* Type icon */}
+        <div
+          className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+          style={{ background: `${color}26` }}
+        >
+          <Icon size={22} color={color} />
+        </div>
+
+        {/* Text */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex flex-row items-start justify-between gap-2 mb-1">
+            <h4 className={`text-xs font-bold leading-snug ${t.senderText}`}>{txt.title}</h4>
+            <span className="text-[10px] text-gray-500 whitespace-nowrap">{date}</span>
+          </div>
+          <p className={`text-[11px] leading-relaxed break-words ${t.msgText}`}>
+            {fillText(txt.body, notif.params)}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
   // Group notifications by date (Today / Yesterday)
   const groupedNotifications = filteredNotifications.reduce((groups, item) => {
-    const groupKey = isAr ? item.dateGroupAr : item.dateGroupEn;
+    const groupKey =
+      (isAr ? item.dateGroupAr : item.dateGroupEn) ?? getDateGroup(item.createdAt);
     if (!groups[groupKey]) {
       groups[groupKey] = [];
     }
@@ -162,7 +248,23 @@ export default function NotificationsPanel({ side = "left", stacked = false, top
 
         {/* 4. Notification Items List Area */}
         <div className={`flex-1 overflow-y-auto divide-y ${t.listDivide}`}>
-          {filteredNotifications.length === 0 ? (
+          {notificationsError && (
+            <div role="alert" className="px-5 py-4 text-sm text-red-500">
+              <p>{notificationsError}</p>
+              <button
+                type="button"
+                onClick={refreshNotifications}
+                className="mt-2 underline"
+              >
+                {isAr ? "إعادة المحاولة" : "Try again"}
+              </button>
+            </div>
+          )}
+          {isNotificationsLoading && notifications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-gray-500 text-sm">
+              <p>{isAr ? "جارٍ تحميل الإشعارات..." : "Loading notifications..."}</p>
+            </div>
+          ) : filteredNotifications.length === 0 && !notificationsError ? (
             <div className="flex flex-col items-center justify-center py-20 text-gray-500 text-sm">
               <p>{isAr ? "لا توجد إشعارات جديدة" : "No new notifications"}</p>
             </div>
@@ -180,7 +282,8 @@ export default function NotificationsPanel({ side = "left", stacked = false, top
                 </div>
 
                 {/* Notification items */}
-                {groupedNotifications[groupName].map((notif) => (
+                {groupedNotifications[groupName].map((notif) =>
+                  notif.kind && KIND_META[notif.kind] ? renderTyped(notif) : (
                   <div
                     key={notif.id}
                     onClick={() => markAsRead(notif.id)}
@@ -214,7 +317,7 @@ export default function NotificationsPanel({ side = "left", stacked = false, top
                           {notif.sender}
                         </h4>
                         <span className="text-[10px] text-gray-500 whitespace-nowrap">
-                          {isAr ? notif.timeAr : notif.timeEn}
+                          {getNotificationTime(notif)}
                         </span>
                       </div>
 

@@ -101,7 +101,7 @@ function ModalContent({ campaign, onClose, onSubmit }) {
   const isRtl = locale === "ar";
   const t = getTokens(isDark);
   const router = useRouter();
-const [result, setResult] = useState(null);
+  const [result, setResult] = useState(null);
 
   const [reason, setReason] = useState(null);
   const [details, setDetails] = useState("");
@@ -129,32 +129,32 @@ const [result, setResult] = useState(null);
   };
 
   const handleSubmit = async () => {
-  if (!reason || submitting) return;
-  setSubmitting(true);
-  setError("");
-  try {
-    const res = await onSubmit?.({
-      campaignId: campaign?.id,
-      reason,
-      details: details.trim(),
-    });
-    setResult({
-      ref:
-        res?.reference ??
-        `REP-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-      reason,
-    });
-    setSubmitting(false);
-  } catch (e) {
-    setError(e?.message || tr("error"));
-    setSubmitting(false);
-  }
-};
-if (result) {
-  return (
-    <ReportSuccessModal
+    if (!reason || submitting) return;
+    setSubmitting(true);
+    setError("");
+    try {
+      const res = await onSubmit?.({
+        campaignId: campaign?.id,
+        reason,
+        details: details.trim(),
+      });
+      setResult({
+        ref:
+          res?.reference ??
+          `REP-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+        reason,
+      });
+    } catch (e) {
+      setError(e?.message || tr("error"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (result) {
+    return (
+      <ReportSuccessModal
       open
-      lockScroll={false}
       reference={result.ref}
       reason={result.reason}
       campaignCode={
@@ -167,9 +167,10 @@ if (result) {
         onClose?.();
         router.push(`/${locale}/creator/discover`);
       }}
-    />
-  );
-}
+      />
+    );
+  }
+
   return (
     <div
       className="fixed inset-0 z-[2147483000] flex items-center justify-center overflow-y-auto p-3 sm:p-6"

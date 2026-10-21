@@ -47,12 +47,25 @@ const VARIANTS = {
 };
 
 // ─── Single Toast Item ─────────────────────────────────────────────────────────
-function ToastItem({ id, type = 'success', message, duration = 4000, onRemove }) {
+function ToastItem({
+  id,
+  type = 'success',
+  message,
+  title,
+  description,
+  duration = 4000,
+  onRemove,
+}) {
   const [visible, setVisible] = useState(false);
   const [progress, setProgress] = useState(100);
   const intervalRef = useRef(null);
   const v = VARIANTS[type] || VARIANTS.success;
   const Icon = v.icon;
+
+  const handleClose = useCallback(() => {
+    setVisible(false);
+    setTimeout(() => onRemove(id), 350);
+  }, [id, onRemove]);
 
   useEffect(() => {
     // Enter animation
@@ -76,12 +89,7 @@ function ToastItem({ id, type = 'success', message, duration = 4000, onRemove })
       clearTimeout(timer);
       clearInterval(intervalRef.current);
     };
-  }, []);
-
-  const handleClose = () => {
-    setVisible(false);
-    setTimeout(() => onRemove(id), 350);
-  };
+  }, [duration, handleClose]);
 
   return (
     <div
@@ -89,25 +97,37 @@ function ToastItem({ id, type = 'success', message, duration = 4000, onRemove })
       className={`
         relative overflow-hidden flex items-center gap-3
         bg-[#151819] border ${v.border}
-        text-white px-4 py-3.5 rounded-2xl shadow-2xl
+        text-white px-4 py-3 rounded-xl shadow-2xl
         min-w-[280px] max-w-[420px] w-full
         transition-all duration-350 ease-out
         ${visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}
       `}
       style={{ fontFamily: "var(--font-tajawal), 'Tajawal', sans-serif" }}
     >
-      {/* Icon */}
-      <div className={`shrink-0 ${v.iconColor}`}>
-        <Icon size={18} />
+      <span className="shrink-0 text-[11px] text-white/40" dir="ltr">
+        {new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}
+      </span>
+
+      <div className="min-w-0 flex-1 text-right" dir="rtl">
+        {title && <p className={`text-sm font-bold leading-snug ${v.iconColor}`}>{title}</p>}
+        {description ? (
+          <>
+            {message && <p className="mt-0.5 text-xs font-medium leading-5 text-white/90">{message}</p>}
+            <p className="text-[10px] leading-4 text-white/55">{description}</p>
+          </>
+        ) : (
+          !title && <p className="text-sm font-medium leading-snug">{message}</p>
+        )}
       </div>
 
-      {/* Message */}
-      <p className="text-sm font-medium flex-1 leading-snug">{message}</p>
-
-      {/* Close Button */}
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] ${v.iconColor}`}>
+        <Icon size={21} />
+      </div>
       <button
+        type="button"
+        aria-label="إغلاق الإشعار"
         onClick={handleClose}
-        className="shrink-0 text-white/40 hover:text-white/80 transition-colors ml-1"
+        className="shrink-0 text-white/40 hover:text-white/80 transition-colors"
       >
         <FiX size={15} />
       </button>
@@ -149,11 +169,11 @@ export function ToastProvider({ children }) {
 
       {/* Toast Container */}
       <div
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999999] flex flex-col gap-2 items-center pointer-events-none"
+        className="fixed right-3 top-20 end-10 z-[9999] flex w-[min(420px,calc(100vw-1.5rem))] flex-col gap-2 pointer-events-none sm:right-5 sm:top-5"
         aria-live="polite"
       >
         {toasts.map(t => (
-          <div key={t.id} className="pointer-events-auto">
+          <div key={t.id} className="pointer-events-auto w-full">
             <ToastItem {...t} onRemove={removeToast} />
           </div>
         ))}
