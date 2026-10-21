@@ -1,4 +1,252 @@
 {
+  "creatorDashboard": {
+    "creator": "Creator",
+    "welcome": "Welcome, {name}",
+    "loadingAccount": "Loading your account data…",
+    "activitySummary": "Your account is active and 100% Sharia-compliant.",
+    "exploreCampaigns": "Explore new campaigns",
+    "retry": "Try again",
+    "brand": "Brand",
+    "campaign": "Campaign",
+    "campaignWithoutName": "Untitled campaign",
+    "halalVerified": "Sharia-compliant",
+    "favorited": "Favorited",
+    "listSeparator": ", ",
+    "overview": {
+      "earningsTotal": "Total earnings",
+      "withdrawable": "Ready for instant withdrawal",
+      "instantWithdraw": "Withdraw now",
+      "activeCompleted": "Active & completed campaigns",
+      "activeNow": "in progress",
+      "appliedSuffix": "applications",
+      "acceptRate": "acceptance rate",
+      "avgDelivery": "Average delivery per clip",
+      "approvedViews": "Approved views",
+      "verifiedClips": "Fully verified clips",
+      "workflow": "Live workflow",
+      "workflowSub": "Regular follow-up on orders and earnings",
+      "chipPending": "applications under review",
+      "chipActive": "campaigns in progress",
+      "chipTotal": "applications submitted",
+      "viewAll": "View all",
+      "applyNow": "Apply to this campaign",
+      "budget": "Allocated budget",
+      "cpmReturn": "CPM return",
+      "seats": "Campaign status",
+      "addFav": "Add to favorites",
+      "campaignInfo": "Campaign details",
+      "myCampaigns": "My active campaigns & upcoming deadlines",
+      "myCampaignsSub": "Close follow-up on clip delivery and financial review",
+      "goOrders": "Go to my orders & campaigns",
+      "progress": "Progress",
+      "estEarnings": "Estimated earnings",
+      "uploadClip": "Upload clip",
+      "details": "Details",
+      "startedAt": "Applied on"
+    },
+    "creatorInterests": {
+      "title": "Recommendations & interests",
+      "description": "Customize your interests and target audience to find rewarding, Sharia-compliant campaigns that fit your content style and maximize your return per thousand qualified views.",
+      "save": "Save preferences",
+      "saving": "Saving…",
+      "reset": "Reset",
+      "retry": "Try again",
+      "loading": "Loading your preferences…",
+      "saveSuccess": "Your preferences and recommendation criteria have been updated.",
+      "errors": {
+        "load": "Could not load your preferences right now.",
+        "save": "Could not save your preferences. Please try again.",
+        "countryLimit": "You can select up to {count} countries."
+      },
+      "system": {
+        "title": "Interest and recommendation settings",
+        "description": "Set your matching criteria to filter for Sharia-compliant campaigns, adjust your minimum return per thousand qualified views, and reach the audience you want."
+      },
+      "categories": {
+        "title": "1. Creative content categories",
+        "description": "Choose the content priorities that best fit your channel and creative style.",
+        "enabled": "{count} categories enabled",
+        "priority": "Adjustable priority",
+        "weight": "Recommendation weight:",
+        "customTitle": "Add a custom interest",
+        "customDescription": "Add a category that is not listed above.",
+        "customPlaceholder": "Example: emerging tech apps",
+        "customTag": "Custom category",
+        "add": "Add category",
+        "clipping": "Tech and app clips",
+        "clippingHint": "Priority: technology reviews",
+        "fintech": "Fintech and investing",
+        "fintechHint": "Priority: responsible investing",
+        "ai": "AI and technology tools",
+        "aiHint": "Interest: AI tools",
+        "faith": "Faith and values",
+        "faithHint": "Interest: positive values",
+        "health": "Healthcare and specialists",
+        "healthHint": "Interest: selected products",
+        "documentaries": "Documentaries, history and culture",
+        "documentariesHint": "Interest: educational content",
+        "books": "Books and publishing",
+        "booksHint": "Priority: reviews",
+        "lifestyle": "Nutrition, wellness and lifestyle",
+        "lifestyleHint": "Suggested recommendation weight",
+        "automotive": "Automotive and mechanics",
+        "automotiveHint": "Suggested recommendation weight"
+      },
+      "pillars": {
+        "title": "Smart recommendation criteria",
+        "description": "Set your financial preferences, minimum return, and ethical requirements.",
+        "sharia": "Sharia compliance",
+        "strict": "Strict 100% filter",
+        "shariaDescription": "Automatically exclude campaigns that conflict with Sharia guidelines and community values.",
+        "filterEnabled": "Active filter: excludes prohibited content",
+        "minimumCpm": "Minimum CPM",
+        "cpmDescription": "Campaigns below this return per thousand qualified views will not be shown.",
+        "budget": "Campaign budget",
+        "budgetDescription": "Choose the budget range that suits the campaigns you want to join."
+      },
+      "budgets": {
+        "high": "High",
+        "medium": "Medium",
+        "economical": "Economical"
+      },
+      "regions": {
+        "title": "Audience location and target regions",
+        "description": "Focus on engaged audiences in Gulf and Arab markets.",
+        "active": "{percent}% active",
+        "enabled": "Enabled",
+        "enable": "Enable region",
+        "selectedCountries": "Selected countries: {selected} / {max}",
+        "SA": {
+          "name": "Saudi Arabia",
+          "note": "Riyadh, Jeddah, Eastern Province, and Qassim"
+        },
+        "AE": {
+          "name": "United Arab Emirates",
+          "note": "Dubai, Abu Dhabi, and Sharjah"
+        },
+        "GULF": {
+          "name": "Kuwait, Qatar, and Bahrain",
+          "note": "Gulf capitals and engaged communities"
+        },
+        "REST": {
+          "name": "Egypt and the rest of the Arab world",
+          "note": "A broad audience for viral content"
+        }
+      },
+      "platforms": {
+        "title": "4. Publishing platforms and clip formats",
+        "description": "Supported channels where your content can be published.",
+        "activeCount": "{count} active formats",
+        "instagram": "Strong direct engagement",
+        "tiktok": "Fast viral reach",
+        "youtube": "Long-term view stability",
+        "x": "Focused stories and updates",
+        "podcast": "Full podcast episodes with clipping",
+        "optional": "Optional"
+      }
+    },
+    "nav": {
+      "home": "Home",
+      "orders": "Orders",
+      "discover": "Discover",
+      "startProject": "Start a project",
+      "resources": "Resources",
+      "profile": "Profile",
+      "help": "Help",
+      "blog": "Blog"
+    },
+    "header": {
+      "assistant": "AI assistant",
+      "messages": "Messages",
+      "notifications": "Notifications"
+    },
+    "summary": {
+      "walletBalance": "Wallet balance",
+      "totalApplications": "Total campaign applications",
+      "pendingApplications": "Pending review",
+      "acceptedApplications": "Accepted applications"
+    },
+    "recommendations": {
+      "title": "Recommended Campaigns For You",
+      "subtitle": "Selected based on your audience demographics, your highest-performing video views, and certified ethical standards.",
+      "matchScore": "Match",
+      "refresh": "Refresh recommendations",
+      "viewAll": "View all campaigns",
+      "loading": "Loading recommended campaigns…",
+      "personalizeTitle": "Set your preferences to see suitable campaigns",
+      "emptyTitle": "No recommendations right now. Browse all campaigns",
+      "personalizeDescription": "Choose content types, countries, and a minimum CPM, and we’ll find matching campaigns.",
+      "emptyDescription": "The Halal AI engine checks and audits hundreds of campaigns daily, and there are currently no opportunities that 100% match your current filtering criteria with Sharia guidelines or your precise niche. You can explore all available public campaigns immediately or re-adjust your smart preferences.",
+      "browseCampaigns": "Browse All Available Campaigns",
+      "editPreferences": "Edit Recommendation Preferences",
+      "instantAlertsTitle": "Enable instant alerts when new recommendations are available",
+      "instantAlertsDesc": "Instant notification via your account and verified email when a suitable match is found"
+    },
+    "campaignDetails": {
+      "cpm": "CPM rate",
+      "remainingBudget": "Remaining budget",
+      "targetCountries": "Target countries",
+      "unspecified": "Not specified",
+      "view": "View campaign details"
+    },
+    "recentApplications": {
+      "title": "Recent campaign applications",
+      "subtitle": "Applications submitted from your account",
+      "viewAll": "View all applications",
+      "loading": "Loading your applications…",
+      "empty": "You haven’t applied to any campaigns yet."
+    },
+    "availability": {
+      "available": "Available",
+      "status": "Status: {status}"
+    },
+    "statuses": {
+      "pending": "Pending review",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn",
+      "unknown": "Unknown"
+    },
+    "reasons": {
+      "countryMatch": "Your audience is in {country}",
+      "contentTypeMatch": "Matches {contentType} content",
+      "cpmMatch": "Meets your minimum CPM",
+      "previousParticipation": "Similar to campaigns you’ve joined",
+      "previousParticipationWithType": "Similar to campaigns you’ve joined ({contentType})",
+      "recommended": "Recommended for you"
+    },
+    "contentTypes": {
+      "clipping": "Short clips",
+      "ugc": "User-generated content",
+      "slideshow": "Slideshow",
+      "audio": "Audio content",
+      "logo": "Logo design",
+      "mixed": "Mixed content"
+    },
+    "countries": {
+      "saudiArabia": "Saudi Arabia",
+      "uae": "United Arab Emirates",
+      "kuwait": "Kuwait",
+      "qatar": "Qatar",
+      "bahrain": "Bahrain",
+      "oman": "Oman",
+      "egypt": "Egypt",
+      "jordan": "Jordan",
+      "iraq": "Iraq",
+      "lebanon": "Lebanon",
+      "morocco": "Morocco",
+      "turkey": "Türkiye",
+      "unitedStates": "United States",
+      "unitedKingdom": "United Kingdom"
+    },
+    "errors": {
+      "fetchData": "Could not load data from the server.",
+      "recommendationsLoadFailed": "Could not load recommended campaigns right now.",
+      "invalidWalletBalance": "The server returned an invalid wallet balance.",
+      "walletLoadFailed": "Could not load your wallet balance.",
+      "applicationsLoadFailed": "Could not load campaign applications."
+    }
+  },
   "nav": {
     "orders": "Orders",
     "partners": "Partners",

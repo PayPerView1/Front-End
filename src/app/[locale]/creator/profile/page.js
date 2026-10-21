@@ -1,4 +1,4 @@
-import ProfileContent from "@/app/[locale]/creator/dashboard/components/ProfileContent";
+import ProfileContent from "@/app/[locale]/creator/profile/components/ProfileContent";
 
 export const metadata = {
   title: "الملف الشخصي | Pay Per View",
