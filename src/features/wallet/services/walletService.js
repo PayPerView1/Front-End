@@ -123,6 +123,21 @@ export const adminReviewBankTransfer = async (id, data) => {
   }
 };
 
+/**
+ * 2.4 مراجعة طلب استرداد (مسؤول النظام)
+ * PUT /api/v1/admin/wallet/refund/:id
+ * @param {string} id
+ * @param {{ action: "APPROVE" | "REJECT", note?: string }} data
+ */
+export const adminReviewRefund = async (id, data) => {
+  try {
+    const response = await axiosInstance.put(`/api/v1/admin/wallet/refund/${encodeURIComponent(id)}`, data);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 // ─── 3. Transactions ─────────────────────────────────────────────────────────
 
 /**

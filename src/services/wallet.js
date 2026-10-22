@@ -11,6 +11,7 @@ export {
   initiateWalletFunding,
   uploadBankTransferReceipt,
   adminReviewBankTransfer,
+  adminReviewRefund,
   getTransactions,
   getTransactionById,
   getTransactionDetail,
