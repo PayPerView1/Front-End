@@ -210,13 +210,11 @@ export default function CampaignDetails({ campaign }) {
             <h2 className={`text-base font-bold pt-1 ${isRTL ? "text-right" : "text-left"} ${th.text}`}>{t("kpi")}</h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
               {kpis.map((kpi, i) => (
-                <div key={kpi.label} className={`flex flex-col gap-1 ${isRTL ? "text-right" : "text-left"} ${
-                  i > 0 ? `lg:border-${isRTL ? "r" : "l"} ${th.divider} lg:${isRTL ? "pr" : "pl"}-4` : ""}`}>
+                <div key={kpi.label} className={`flex flex-col gap-1 ${isRTL ? "text-right" : "text-left"} ${i > 0 ? `lg:border-${isRTL ? "r" : "l"} ${th.divider} lg:${isRTL ? "pr" : "pl"}-4` : ""}`}>
                   <p className={`text-xs ${th.subText}`}>{kpi.label}</p>
                   <p className="text-xl sm:text-2xl font-bold" style={{ color: kpi.color }}>{kpi.value}</p>
                   {kpi.sub && (
-                    <p className={`text-[10px] flex items-center gap-0.5 ${
-                      kpi.positive === true ? "text-green-400" : kpi.positive === false ? "text-red-400" : th.subText}`}>
+                    <p className={`text-[10px] flex items-center gap-0.5 ${kpi.positive === true ? "text-green-400" : kpi.positive === false ? "text-red-400" : th.subText}`}>
                       {kpi.positive === true && <MdTrendingUp size={12} />}
                       {kpi.positive === false && <MdTrendingDown size={12} />}
                       {kpi.sub}
@@ -340,7 +338,7 @@ export default function CampaignDetails({ campaign }) {
       <div className="px-4 py-5 mx-1 flex flex-col gap-5 relative overflow-hidden rounded-xl"
         style={{ border: `1px solid ${th.cardBorder}`, background: th.cardBg, backdropFilter: "blur(20px)" }}>
         <div className="absolute top-0 left-0 w-full h-[3px]" style={{ background: th.gradientLine }} />
-        
+
         <h2 className={`text-lg font-bold ${th.text}`}>
           {isRTL ? "تفاصيل إعدادات الحملة والـ Brief" : "Campaign Brief & Full Configuration"}
         </h2>

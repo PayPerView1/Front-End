@@ -29,6 +29,9 @@ export default function MainLayout({ children, locale }) {
     "/account-settings",
     "/interests-recommendations",
     "/macbook-190",
+    "/macbook-214",
+    "/macbook-215",
+    "/preview-modal",
   ];
 
   // Check if current path matches or starts with any of the excluded paths
