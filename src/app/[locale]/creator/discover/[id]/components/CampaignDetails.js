@@ -817,7 +817,7 @@ export default function CampaignDetails({ id, campaign }) {
             type="button"
             onClick={handleApply}
             disabled={isMockCampaign}
-            className="inline-flex h-11 flex-1 items-center justify-center rounded-xl text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-12 min-h-12 w-full shrink-0 items-center justify-center rounded-xl px-4 text-base font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:flex-1 sm:text-sm"
             style={{ background: ORANGE }}
           >
             {hasApplied ? s("applied") : s("apply")}

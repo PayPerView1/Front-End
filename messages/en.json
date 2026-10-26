@@ -1,4 +1,52 @@
 {
+  "advertiserProfile": {
+    "companyName": "Company name",
+    "tabs": {
+      "campaigns": "Campaigns",
+      "stats": "Statistics"
+    },
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "completed": "Completed",
+      "pendingReview": "Under review"
+    },
+    "statuses": {
+      "active": "Active",
+      "completed": "Completed",
+      "pendingReview": "Under review",
+      "cancelled": "Cancelled",
+      "draft": "Draft",
+      "rejected": "Rejected",
+      "archived": "Archived"
+    },
+    "stats": {
+      "totalCampaigns": "Total campaigns",
+      "activeCampaigns": "Active campaigns",
+      "completedCampaigns": "Completed campaigns",
+      "totalSpend": "Total spend"
+    },
+    "uploadError": "Could not update the profile picture.",
+    "uploading": "Updating picture...",
+    "coverImage": "Cover image",
+    "companyLogo": "Company logo",
+    "shareProfile": "Share profile",
+    "shareTitle": "Advertiser profile",
+    "copyLink": "Copy link",
+    "editProfile": "Edit profile",
+    "verifiedBadge": "Verified advertiser",
+    "advertiser": "Advertiser",
+    "listSeparator": ", ",
+    "createCampaign": "Create campaign",
+    "dashboard": "Dashboard",
+    "campaignCount": "{count, plural, =0 {No campaigns} one {# campaign} other {# campaigns}}",
+    "campaignWithoutName": "Untitled campaign",
+    "campaignCategory": "Advertising campaign",
+    "noCampaigns": "There are no campaigns to display.",
+    "campaignStatistics": "Campaign statistics",
+    "accountData": "Current data from your account",
+    "recentCampaigns": "Your recent campaigns"
+  },
   "creatorDashboard": {
     "creator": "Creator",
     "welcome": "Welcome, {name}",
@@ -2204,5 +2252,317 @@
       "whyTitle": "Why does the system block link reuse?",
       "whyDesc": "Because the platform calculates earnings based on the unique views of each new clip published independently. A video that has already been rewarded can't be submitted again."
     }
+  },
+  "contentPerformance": {
+    "title": "My Published Clips Views",
+    "subtitle": "Track the live views your approved clips are getting, clearly and in real time",
+    "downloadReport": "Download report (Excel)",
+    "stats": {
+      "liveViews": {
+        "label": "Total live views",
+        "unit": "views",
+        "note": "Growth this week"
+      },
+      "activeClips": {
+        "label": "Active clips",
+        "unit": "videos",
+        "note": "Earning active, live revenue"
+      },
+      "verifiedViews": {
+        "label": "Verified views",
+        "unit": "views",
+        "note": "100% real human visits"
+      },
+      "flowSpeed": {
+        "label": "Current flow rate",
+        "unit": "views / second",
+        "note": "During current peak hours",
+        "badge": "Excellent flow"
+      }
+    },
+    "tabs": {
+      "all": "All clips",
+      "tiktok": "TikTok",
+      "shorts": "YouTube Shorts",
+      "reels": "Instagram Reels"
+    },
+    "searchPlaceholder": "Search by clip or campaign name...",
+    "listTitle": "Approved clips and current view rate",
+    "liveNow": "Live now",
+    "showing": "Showing {count} active clips earning revenue",
+    "noResults": "No clips match your search",
+    "info": {
+      "title": "How are your views and earnings updated?",
+      "text": "The system updates the view counter and calculates your earnings automatically every 10 to 15 minutes through a direct connection to the platforms, with no need to refresh the page manually. All views go through automated verification to protect your financial rights with the highest Sharia-compliance integrity standards."
+    },
+    "card": {
+      "platform": {
+        "tiktok": "TikTok",
+        "shorts": "Shorts",
+        "reels": "Reels"
+      },
+      "campaign": "{name} campaign",
+      "published": "Published: {time} ago",
+      "completion": "Completion rate:",
+      "earnings": "Estimated earnings:",
+      "currency": "SAR",
+      "verifiedViews": "Current verified views",
+      "views": "views",
+      "details": "Stats details",
+      "openClip": "Open clip"
+    },
+    "export": {
+      "sheetName": "Clip views",
+      "fileName": "clips-report",
+      "total": "Total",
+      "columns": {
+        "clip": "Clip",
+        "platform": "Platform",
+        "campaign": "Campaign",
+        "published": "Publish date",
+        "completion": "Completion rate %",
+        "earnings": "Estimated earnings (SAR)",
+        "views": "Verified views",
+        "url": "Clip URL"
+      }
+    },
+    "details": {
+      "back": "Back",
+      "backToList": "Back to clips list",
+      "header": {
+        "platform": {
+          "tiktok": "TikTok",
+          "shorts": "YouTube Shorts",
+          "reels": "Instagram • Reels"
+        },
+        "verifiedLink": "Link and hashtags verified successfully",
+        "campaign": "Official campaign:",
+        "publisher": "Publisher:",
+        "updating": "Updating",
+        "openOriginal": "Open original clip",
+        "downloadReport": "Download report",
+        "stats": {
+          "views": {
+            "label": "Approved views",
+            "labelEmpty": "Recorded views",
+            "unit": "views",
+            "note": "100% verified real visits",
+            "noteEmpty": "The counter starts as soon as the first viewer arrives"
+          },
+          "earnings": {
+            "label": "Net earnings calculated",
+            "unit": "SAR",
+            "note": "Ready for automatic transfer to your wallet",
+            "noteEmpty": "Calculation starts: {rate} SAR per 1,000 views"
+          },
+          "watch": {
+            "label": "Average watch time",
+            "unit": "seconds of {total}",
+            "unitEmpty": "seconds",
+            "noteUp": "{percent}% above the platform average",
+            "noteDown": "{percent}% below the platform average",
+            "noteEmpty": "Will be measured automatically once it starts"
+          },
+          "engagement": {
+            "label": "Engagement rate",
+            "unit": "({count} interactions)",
+            "note": "Very high likes and shares",
+            "noteEmpty": "Based on likes, shares and comments"
+          }
+        }
+      },
+      "status": {
+        "publishTime": "Clip publish time:",
+        "anomaly": {
+          "title": "Unusual view activity detected. The clip is under precautionary review and audit.",
+          "desc": "The AI engine detected a sudden, abnormal burst in view flow within a very short period. Only these suspicious views have been put on hold for auditing, while all previous views and approved earnings remain safe and fully preserved in your wallet, unaffected.",
+          "cta": "Submit an explanation or report",
+          "tag": "AI protection security alert",
+          "meta": {
+            "eta": "Expected audit time:",
+            "etaValue": "< 2 hours",
+            "detectedAt": "Detected at:",
+            "patternLabel": "Pattern type:",
+            "patternValue": "Sharp spike inconsistent with human engagement"
+          }
+        },
+        "waiting": {
+          "title": "No views recorded yet. Please wait a moment",
+          "desc": "Your clip was linked successfully and views are being verified automatically. The first views usually appear within 5 to 15 minutes of posting on TikTok, and the system will update everything instantly with no effort from you."
+        },
+        "error": {
+          "title": "Unable to fetch views right now. Retrying automatically",
+          "desc": "A temporary connection interruption occurred with TikTok. Don't worry, your clip is registered and your previously confirmed earnings are completely safe. The system retries the connection automatically every minute to fetch the latest approved update."
+        }
+      },
+      "chart": {
+        "title": "Daily views activity (last 7 days)",
+        "subtitle": "Precise, powerful tracking of daily traffic volume and spread pace analysis",
+        "ranges": {
+          "24h": "Last 24 hours",
+          "7d": "Last 7 days",
+          "30d": "Last 30 days"
+        },
+        "legend": {
+          "views": "Total daily views",
+          "earnings": "Views approved for earnings"
+        },
+        "peakBadge": "Top day: {day} ({views} views)",
+        "today": "(Today)",
+        "peakTag": "(Peak)",
+        "refresh": "Continuous automatic refresh every 15 minutes directly from the platform",
+        "average": "Daily average views: {value} views",
+        "days": {
+          "sat": "Sat",
+          "sun": "Sun",
+          "mon": "Mon",
+          "tue": "Tue",
+          "wed": "Wed",
+          "thu": "Thu",
+          "fri": "Fri"
+        }
+      },
+      "insights": {
+        "retention": {
+          "title": "Where did viewers get to in the video?",
+          "subtitle": "Viewer retention up to the end of the clip",
+          "excellent": "Excellent",
+          "rows": {
+            "start": {
+              "label": "First 5 seconds (clip start)",
+              "suffix": "stayed"
+            },
+            "middle": {
+              "label": "Mid-video (the preparation secret)",
+              "suffix": "stayed"
+            },
+            "end": {
+              "label": "Watched the video to the end",
+              "suffix": "finished watching"
+            }
+          },
+          "completion": "Views completion rate:",
+          "average": "Average viewers:"
+        },
+        "integrity": {
+          "title": "Integrity and financial safety check",
+          "subtitle": "Ensuring protection of earnings and legitimate views",
+          "rows": {
+            "human": {
+              "label": "Views from real human sources",
+              "badge": "100% confirmed"
+            },
+            "bots": {
+              "label": "Blocked bots or fake visits",
+              "badge": "0 visits (clean)",
+              "badgeFound": "{count} visits blocked"
+            },
+            "sharia": {
+              "label": "Compliance with Sharia integrity standards",
+              "badge": "Approved and certified"
+            }
+          },
+          "ledger": "Recorded and protected in the accounting system (Ledger {id})"
+        }
+      },
+      "waiting": {
+        "title": "We're now monitoring your clip on TikTok to capture views as they happen",
+        "desc": "Everything is set up successfully, you don't need to do anything. As soon as anyone opens your clip on TikTok, it will show up here instantly.",
+        "cta": "Refresh now and check views",
+        "stepsTitle": "Your clip's progress",
+        "stepOf": "Step {current} of {total}",
+        "steps": [
+          {
+            "title": "Clip published and link confirmed",
+            "note": "Link is valid and meets the requirements"
+          },
+          {
+            "title": "Waiting for the first views from TikTok",
+            "note": "Tracking and monitoring automatically"
+          },
+          {
+            "title": "Calculating earnings and adding them to your wallet",
+            "note": "Earnings are added automatically as views grow"
+          }
+        ]
+      },
+      "error": {
+        "title": "System status and operational guarantees",
+        "visualCaption": "TikTok servers are running at 100% efficiency",
+        "visualSub": "Waiting for TikTok's external servers to respond to complete the connection",
+        "handshake": "Handshake pending...",
+        "tiktok": {
+          "title": "TikTok external platform servers",
+          "desc": "Connection failed, we're sending a new request automatically every minute.",
+          "badge": "Temporarily unresponsive (HTTP 504)"
+        },
+        "funds": {
+          "title": "Protection of your earnings and wallet",
+          "desc": "{amount} SAR is held in the approved account vault and is unaffected by any update.",
+          "badge": "100% secured and confirmed"
+        },
+        "retry": {
+          "title": "Automatic retry (Auto-Retry)",
+          "desc": "The system retries automatically without any action from you.",
+          "badge": "In progress (attempt 2/5)"
+        },
+        "recheck": "Re-check now",
+        "statusPage": "Public platform status log (Status Page)"
+      },
+      "tips": {
+        "waiting": {
+          "title": "How to boost your clip's views fast? (easy, proven tips)",
+          "items": [
+            {
+              "title": "Check the clip's privacy",
+              "text": "Make sure the clip on TikTok is set to \"Public\", not \"Private\" or \"Friends only\", so everyone can see it."
+            },
+            {
+              "title": "Share the link for a strong start",
+              "text": "Share the clip link in WhatsApp or Telegram groups to get the first views quickly and kick-start the algorithm."
+            },
+            {
+              "title": "Engage with the first comments",
+              "text": "Replying to the first comments boosts engagement and pushes the platform to show your clip to a wider audience."
+            }
+          ]
+        },
+        "error": {
+          "title": "Simple guidance for content creators",
+          "items": [
+            {
+              "title": "What does this error mean?",
+              "text": "This is a temporary interruption on TikTok's side, not from your clip or account. It happens occasionally and is usually resolved within minutes.",
+              "footer": "Clip is published and publicly available as normal"
+            },
+            {
+              "title": "Will I lose my views or earnings?",
+              "text": "No, never. All previous views and earnings are saved, and the system will update the counter as soon as the connection returns.",
+              "footer": "Cumulative total saved instantly"
+            },
+            {
+              "title": "What should I do now?",
+              "text": "Nothing. You can close the page and come back later, automatic retries continue on your behalf.",
+              "footer": "Processing runs fully automatically in the background"
+            }
+          ]
+        }
+      },
+      "explain": {
+        "title": "Submit an explanation or report",
+        "desc": "Tell us what caused this spike in views (e.g. a paid ad, a share from a large account) and the audit team will review it.",
+        "placeholder": "Write your explanation here...",
+        "attach": "Attach an image or PDF (optional)",
+        "send": "Send",
+        "sending": "Sending...",
+        "cancel": "Cancel",
+        "close": "Close",
+        "success": "Your explanation was sent successfully. The audit team will review it soon.",
+        "tooShort": "Please write at least 10 characters.",
+        "fileTooBig": "File size exceeds {size} MB.",
+        "failed": "Couldn't send, please try again."
+      }
+    }
   }
+
 }

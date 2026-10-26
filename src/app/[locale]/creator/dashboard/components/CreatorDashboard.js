@@ -5,8 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { getCreatorRecommendations, getMyCampaignApplications } from "@/services/campaign";
+import {
+  addCampaignFavorite,
+  getCreatorFavorites,
+  removeCampaignFavorite,
+} from "@/lib/creatorCampaignApi";
 import { getProfile } from "@/services/profile";
 import { getWalletBalance } from "@/services/wallet";
+import { toast } from "@/components/ui/Toast";
 import {
   FiCompass,
   FiUser,
@@ -18,6 +24,7 @@ import {
   FiHeart,
   FiInfo,
   FiUpload,
+  FiSend,
   FiZap,
   FiShare2,
   FiTrendingUp,
@@ -173,6 +180,8 @@ export default function CreatorDashboard({ locale: localeOverride }) {
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
+  const [favoriteIds, setFavoriteIds] = useState({});
+  const [favoriteRequests, setFavoriteRequests] = useState(() => new Set());
   const [hasPreferences, setHasPreferences] = useState(null);
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(true);
   const [recommendationError, setRecommendationError] = useState("");
@@ -191,9 +200,41 @@ export default function CreatorDashboard({ locale: localeOverride }) {
     setRecommendationError("");
     setIsLoadingRecommendations(true);
     try {
-      const response = await getCreatorRecommendations(10);
-      setRecommendations(Array.isArray(response?.data) ? response.data : []);
+      const [recommendationsResult, favoritesResult] = await Promise.allSettled([
+        getCreatorRecommendations(10),
+        getCreatorFavorites({ page: 1, perPage: 50 }),
+      ]);
+      if (recommendationsResult.status === "rejected") {
+        throw recommendationsResult.reason;
+      }
 
+      const response = recommendationsResult.value;
+      const favoriteRows =
+        favoritesResult.status === "fulfilled" &&
+        Array.isArray(favoritesResult.value?.data)
+          ? favoritesResult.value.data
+          : [];
+      const loadedFavoriteIds = Object.fromEntries(
+        favoriteRows
+          .filter((favorite) => favorite.campaign?.id && favorite.id)
+          .map((favorite) => [favorite.campaign.id, favorite.id]),
+      );
+      setFavoriteIds(loadedFavoriteIds);
+      if (favoritesResult.status === "rejected") {
+        console.error("Could not load creator favorites:", favoritesResult.reason);
+      }
+
+      const campaigns = Array.isArray(response?.data) ? response.data : [];
+      setRecommendations(
+        campaigns.map((campaign) => ({
+          ...campaign,
+          isFavorited: loadedFavoriteIds[campaign.id]
+            ? true
+            : favoritesResult.status === "fulfilled"
+              ? false
+              : Boolean(campaign.isFavorited),
+        })),
+      );
       setHasPreferences(response?.meta?.hasPreferences ?? null);
     } catch (error) {
       setRecommendations([]);
@@ -202,6 +243,64 @@ export default function CreatorDashboard({ locale: localeOverride }) {
       setIsLoadingRecommendations(false);
     }
   }, [t]);
+
+  const handleToggleFavorite = async (campaignId) => {
+    if (favoriteRequests.has(campaignId)) return;
+    setFavoriteRequests((current) => new Set(current).add(campaignId));
+
+    try {
+      const campaign = recommendations.find((item) => item.id === campaignId);
+      const wasFavorite = Boolean(campaign?.isFavorited);
+      let favoriteId = favoriteIds[campaignId];
+
+      if (wasFavorite && !favoriteId) {
+        const response = await getCreatorFavorites({ page: 1, perPage: 50 });
+        favoriteId = response?.data?.find(
+          (favorite) => favorite.campaign?.id === campaignId,
+        )?.id;
+        if (!favoriteId) {
+          throw new Error(
+            locale === "ar"
+              ? "تعذر العثور على الحملة في المفضلة لإزالتها"
+              : "Could not find this campaign in favorites to remove it",
+          );
+        }
+      }
+
+      const favorite = wasFavorite
+        ? await removeCampaignFavorite(favoriteId)
+        : await addCampaignFavorite(campaignId);
+      setFavoriteIds((current) => {
+        const next = { ...current };
+        if (wasFavorite) {
+          delete next[campaignId];
+        } else if (favorite?.id) {
+          next[campaignId] = favorite.id;
+        }
+        return next;
+      });
+      setRecommendations((current) =>
+        current.map((item) =>
+          item.id === campaignId
+            ? { ...item, isFavorited: !wasFavorite }
+            : item,
+        ),
+      );
+    } catch (error) {
+      toast.error(
+        error?.message ||
+          (locale === "ar"
+            ? "تعذر تحديث المفضلة"
+            : "Could not update favorites"),
+      );
+    } finally {
+      setFavoriteRequests((current) => {
+        const next = new Set(current);
+        next.delete(campaignId);
+        return next;
+      });
+    }
+  };
 
   const loadHomeData = useCallback(async () => {
     setIsLoadingHomeData(true);
@@ -322,13 +421,17 @@ export default function CreatorDashboard({ locale: localeOverride }) {
   const loadingDash = (value) => (isLoadingHomeData ? "…" : value ?? "—");
 
   // ─── ثوابت التصميم ───────────────────────────────────────────
-  const gradient = { background: "linear-gradient(90deg, #FC9102 0%, #FB6103 100%)" };
+  const gradient = {
+    background: "linear-gradient(90deg, #FC9102 0%, #FB6103 100%)",
+    color: "#FFFFFF",
+  };
   const card =
     "rounded-2xl border border-[#E2E8E5] bg-white shadow-sm dark:border-[#1E2425] dark:bg-[#121617] dark:shadow-none";
   const inner =
     "rounded-xl border border-[#E5EBE8] bg-[#F7FAF9] dark:border-[#252c2d] dark:bg-[#181d1e]";
-  const darkBtn =
-    "flex items-center justify-center gap-2 rounded-xl border border-[#D6DDD9] bg-[#EBF0EE] text-[#374441] hover:bg-[#E2E9E6] hover:text-[#111817] dark:border-[#252c2d] dark:bg-[#181d1e] dark:text-gray-200 dark:hover:text-white transition";
+  const darkBtnBase =
+    "flex items-center justify-center gap-2 rounded-xl border border-[#D6DDD9] bg-[#EBF0EE] text-[#FF8A00] dark:border-[#252c2d] dark:bg-[#181d1e] dark:text-white transition";
+  const darkBtn = `${darkBtnBase} hover:bg-[#E2E9E6] hover:text-[#FF8A00] dark:hover:text-white`;
   const iconBox =
     "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#E5F5F0] text-[#1D7762] dark:bg-[#212f2c] dark:text-[#94D3C1]";
 
@@ -395,7 +498,7 @@ export default function CreatorDashboard({ locale: localeOverride }) {
             </Link>
             <Link
               href={`/${locale}/creator/profile`}
-              className={`${darkBtn} flex-1 px-4 py-2.5 text-xs font-medium md:text-sm lg:flex-none`}
+              className={`${darkBtnBase} flex-1 px-4 py-2.5 text-xs font-medium md:text-sm lg:flex-none`}
             >
               <FiUser size={16} className="text-[#1D7762] dark:text-[#94D3C1]" />
               <span>{t("nav.profile")}</span>
@@ -540,7 +643,7 @@ export default function CreatorDashboard({ locale: localeOverride }) {
                 type="button"
                 onClick={handleRefresh}
                 disabled={isLoadingRecommendations || isRefreshing}
-                className={`${darkBtn} px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50`}
+                className={`${darkBtnBase} px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50`}
               >
                 <FiRefreshCw
                   size={13}
@@ -550,7 +653,7 @@ export default function CreatorDashboard({ locale: localeOverride }) {
               </button>
               <Link
                 href={`/${locale}/creator/discover`}
-                className={`${darkBtn} px-3.5 py-2 text-xs`}
+                className={`${darkBtnBase} px-3.5 py-2 text-xs`}
               >
                 <span>
                   {L("viewAll")}
@@ -745,13 +848,19 @@ export default function CreatorDashboard({ locale: localeOverride }) {
                       <span className="absolute right-3 top-3 rounded-md border border-[#E9C349]/50 bg-white/90 px-2.5 py-1 text-[10px] font-bold text-[#946200] shadow-sm dark:border-[#E9C349]/30 dark:bg-black/60 dark:text-[#E9C349]">
                         {contentTypeLabel}
                       </span>
-                      <span
+                      <button
+                        type="button"
                         aria-label={camp.isFavorited ? t("favorited") : L("addFav")}
-                        className={`absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 shadow-sm dark:bg-black/50 ${camp.isFavorited ? "text-pink-600 dark:text-pink-300" : "text-gray-700 dark:text-white"
-                          }`}
+                        aria-pressed={Boolean(camp.isFavorited)}
+                        disabled={favoriteRequests.has(camp.id)}
+                        onClick={() => handleToggleFavorite(camp.id)}
+                        className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-gray-700 shadow-sm transition-colors disabled:cursor-wait dark:bg-black/50 dark:text-white"
+                        style={{
+                          color: camp.isFavorited ? "#FF8A00" : undefined,
+                        }}
                       >
                         <FiHeart size={15} fill={camp.isFavorited ? "currentColor" : "none"} />
-                      </span>
+                      </button>
                     </div>
 
                     <div className="flex flex-1 flex-col gap-3 p-4">
@@ -825,13 +934,21 @@ export default function CreatorDashboard({ locale: localeOverride }) {
                           style={gradient}
                           className="flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-xs font-bold text-white shadow-[0_0_20px_rgba(252,145,2,0.25)]"
                         >
-                          <FiArrowLeft size={14} />
+                          <FiSend
+                            size={14}
+                            style={{
+                              transform:
+                                locale === "ar"
+                                  ? "rotate(45deg)"
+                                  : "rotate(-135deg)",
+                            }}
+                          />
                           {L("applyNow")}
                         </Link>
                         <Link
                           href={`/${locale}/creator/discover/${camp.id}`}
                           aria-label={L("campaignInfo")}
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition dark:text-[#9CA3AF] dark:hover:text-white dark:hover:bg-transparent"
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-400 transition dark:text-white "
                         >
                           <FiInfo size={17} />
                         </Link>
@@ -858,7 +975,7 @@ export default function CreatorDashboard({ locale: localeOverride }) {
             </div>
             <Link
               href={`/${locale}/creator/orders`}
-              className="flex items-center gap-1 self-start text-xs font-semibold text-[#A87800] hover:underline sm:self-auto dark:text-[#E9C349]"
+              className="flex items-center gap-1 self-start text-xs font-semibold text-[#A87800] sm:self-auto dark:text-[#E9C349]"
             >
               <span>{L("goOrders")}</span>
               <FiArrowLeft size={13} />
@@ -984,7 +1101,7 @@ export default function CreatorDashboard({ locale: localeOverride }) {
                         ) : (
                           <Link
                             href={`/${locale}/creator/discover/${campaignId}`}
-                            className={`${darkBtn} px-4 py-2.5 text-xs font-bold`}
+                            className={`${darkBtnBase} px-4 py-2.5 text-xs font-bold`}
                           >
                             {L("details")}
                           </Link>

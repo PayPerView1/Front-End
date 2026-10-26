@@ -414,6 +414,7 @@ function CampaignCard({
   s,
   c,
   isDark,
+  isRtl,
   countryName,
   favorite,
   onToggleFav,
@@ -579,8 +580,13 @@ function CampaignCard({
             className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-opacity hover:opacity-90"
             style={{ background: ORANGE }}
           >
+            {!applied && (
+              <MdSend
+                size={14}
+                style={{ transform: isRtl ? "rotate(0deg)" : "rotate(180deg)" }}
+              />
+            )}
             {applied ? s("applied") : s("apply")}
-            {!applied && <MdSend size={15} className="rtl:-scale-x-100" />}
           </button>
           <button
             type="button"
@@ -954,12 +960,13 @@ export default function DiscoverCampaigns() {
               s={s}
               c={c}
               isDark={isDark}
+              isRtl={isRtl}
               countryName={countryName}
               favorite={favorites.has(c.id)}
               onToggleFav={toggleFav}
               onApply={handleApply}
-  onDetails={handleDetails}
-  applied={appliedIds.has(c.id)}
+              onDetails={handleDetails}
+              applied={appliedIds.has(c.id)}
             />
           ))}
         </div>
