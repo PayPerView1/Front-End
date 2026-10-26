@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import PageLoader from "@/components/PageLoader";
 import { getProfile, updateProfile } from "@/services/profile";
@@ -10,21 +10,21 @@ import { getCampaigns, getCampaignStatistics } from "@/services/campaign";
 import { getSavedUser, getToken, saveAuthData } from "@/lib/axiosInstance";
 import {
     FiEdit2, FiCopy, FiShare2, FiSettings,
-    FiTarget, FiMapPin, FiCalendar,
+    FiTarget, FiMapPin, FiCalendar, FiGlobe, FiPlus,
 } from "react-icons/fi";
 import { BsThreeDots } from "react-icons/bs";
-import { MdOutlineRocketLaunch, MdOutlineBarChart, MdVerified } from "react-icons/md";
+import { MdOutlineBarChart, MdVerified } from "react-icons/md";
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 
 /* ── helpers ─────────────────────────────────────────── */
-function getUserName(user) {
+function getUserName(user, fallback) {
     return (
         user?.companyName ||
         user?.fullName ||
         user?.name ||
         [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
         user?.username ||
-        "اسم الشركة"
+        fallback
     );
 }
 
@@ -42,21 +42,48 @@ function formatDate(value, locale, options) {
     return new Intl.DateTimeFormat(locale, options).format(date);
 }
 
-const statusMap = {
-    ACTIVE: { label: "نشطة", bg: "bg-[#FFA600]/15 text-[#FFA600] border border-[#FFA600]/30" },
-    COMPLETED: { label: "مكتملة", bg: "bg-[#94D3C1]/15 text-[#94D3C1] border border-[#94D3C1]/30" },
-    PENDING_REVIEW: { label: "قيد المراجعة", bg: "bg-[#89938F]/15 text-[#89938F] border border-[#89938F]/30" },
-    CANCELLED: { label: "ملغاة", bg: "bg-red-500/15 text-red-400 border border-red-500/30" },
-    DRAFT: { label: "مسودة", bg: "bg-blue-500/15 text-blue-400 border border-blue-500/30" },
-    REJECTED: { label: "مرفوضة", bg: "bg-red-500/15 text-red-400 border border-red-500/30" },
-    ARCHIVED: { label: "مؤرشفة", bg: "bg-[#89938F]/15 text-[#89938F] border border-[#89938F]/30" },
+const STATUS_LABELS = {
+    ACTIVE: "active",
+    COMPLETED: "completed",
+    PENDING_REVIEW: "pendingReview",
+    CANCELLED: "cancelled",
+    DRAFT: "draft",
+    REJECTED: "rejected",
+    ARCHIVED: "archived",
 };
+
+function getStatusStyle(status, isDark) {
+    const key = String(status || "").toUpperCase();
+
+    const styles = {
+        ACTIVE: isDark
+            ? "bg-[#94D3C1]/15 text-[#94D3C1] border border-[#94D3C1]/30"
+            : "bg-[#AFEFDD]/40 text-[#176B56] border border-[#287B67]/30",
+        PENDING_REVIEW: isDark
+            ? "bg-[#FB6103]/15 text-[#FFA600] border border-[#FFA600]/30"
+            : "bg-[#FFA600]/15 text-[#FB6103] border border-[#FB6103]/30",
+        COMPLETED: isDark
+            ? "bg-[#94D3C1]/10 text-[#94D3C1] border border-[#94D3C1]/20"
+            : "bg-[#94D3C1]/15 text-[#287B67] border border-[#94D3C1]/30",
+        CANCELLED: "bg-red-500/15 text-red-400 border border-red-500/30",
+        REJECTED: "bg-red-500/15 text-red-400 border border-red-500/30",
+        DRAFT: "bg-blue-500/15 text-blue-400 border border-blue-500/30",
+        ARCHIVED: "bg-[#89938F]/15 text-[#89938F] border border-[#89938F]/30",
+    };
+
+    return {
+        known: Boolean(STATUS_LABELS[key]),
+        labelKey: STATUS_LABELS[key],
+        className: styles[key] || "bg-[#89938F]/15 text-[#89938F] border border-[#89938F]/30",
+    };
+}
 
 /* ════════════════════════════════════════════════════ */
 export default function AdvertiserProfileContent() {
     const { isDark } = useTheme();
     const router = useRouter();
     const locale = useLocale();
+    const t = useTranslations("advertiserProfile");
     const isRTL = locale === "ar";
 
     const [user, setUser] = useState(null);
@@ -74,7 +101,7 @@ export default function AdvertiserProfileContent() {
     const [profileImage, setProfileImage] = useState(null);
     const [profileUploading, setProfileUploading] = useState(false);
     const [profileUploadError, setProfileUploadError] = useState("");
-    const [campaignFilter, setCampaignFilter] = useState("الكل");
+    const [campaignFilter, setCampaignFilter] = useState("all");
 
     const coverInputRef = useRef(null);
     const profileInputRef = useRef(null);
@@ -83,7 +110,7 @@ export default function AdvertiserProfileContent() {
         bg: isDark ? "bg-[#0D0D0D]" : "bg-[#F5F5F5]",
         cardBg: isDark ? "bg-[#191C1D]" : "bg-white",
         cardBorder: isDark ? "border-[#2D3132]" : "border-[#E5E5E5]",
-        coverBg: isDark ? "bg-[#191C1D]" : "bg-[#E0E0E0]",
+        coverBg: isDark ? "bg-[#191C1D]" : "bg-[#EAEAEA]", // رمادي فاتح موحد وصافي
         avatarBg: isDark ? "bg-[#2D3132]" : "bg-[#D0D0D0]",
         avatarBorder: isDark ? "border-[#0D0D0D]" : "border-white",
         text: isDark ? "text-white" : "text-black",
@@ -154,19 +181,25 @@ export default function AdvertiserProfileContent() {
     if (loading) return <PageLoader />;
 
     const tabs = [
-        { key: "campaigns", label: "الحملات" },
-        { key: "stats", label: "الإحصائيات" },
+        { key: "campaigns", label: t("tabs.campaigns") },
+        { key: "stats", label: t("tabs.stats") },
     ];
 
-    const filterMap = { "الكل": null, "نشطة": "ACTIVE", "مكتملة": "COMPLETED", "قيد المراجعة": "PENDING_REVIEW" };
-    const filteredCampaigns = filterMap[campaignFilter]
-        ? campaigns.filter(campaign => campaign.status === filterMap[campaignFilter])
+    const campaignFilters = [
+        { key: "all", label: t("filters.all"), status: null },
+        { key: "active", label: t("filters.active"), status: "ACTIVE" },
+        { key: "completed", label: t("filters.completed"), status: "COMPLETED" },
+        { key: "pendingReview", label: t("filters.pendingReview"), status: "PENDING_REVIEW" },
+    ];
+    const selectedFilter = campaignFilters.find((filter) => filter.key === campaignFilter);
+    const filteredCampaigns = selectedFilter?.status
+        ? campaigns.filter((campaign) => campaign.status === selectedFilter.status)
         : campaigns;
     const summaryStats = [
-        { label: "إجمالي الحملات", value: Number(apiStats.totalCampaigns ?? campaigns.length).toLocaleString(locale), icon: FiTarget, color: "#FFA600" },
-        { label: "حملات نشطة", value: Number(apiStats.activeCampaigns ?? campaigns.filter((campaign) => campaign.status === "ACTIVE").length).toLocaleString(locale), icon: FiTarget, color: "#94D3C1" },
-        { label: "حملات مكتملة", value: Number(apiStats.completedCampaigns ?? campaigns.filter((campaign) => campaign.status === "COMPLETED").length).toLocaleString(locale), icon: FiTarget, color: "#E9C349" },
-        { label: "إجمالي الإنفاق", value: `$${Number(apiStats.totalBudgetSpent ?? 0).toLocaleString(locale)}`, icon: FiTarget, color: "#FFA600" },
+        { label: t("stats.totalCampaigns"), value: Number(apiStats.totalCampaigns ?? campaigns.length).toLocaleString(locale), icon: FiTarget, color: "#FFA600" },
+        { label: t("stats.activeCampaigns"), value: Number(apiStats.activeCampaigns ?? campaigns.filter((campaign) => campaign.status === "ACTIVE").length).toLocaleString(locale), icon: FiTarget, color: "#94D3C1" },
+        { label: t("stats.completedCampaigns"), value: Number(apiStats.completedCampaigns ?? campaigns.filter((campaign) => campaign.status === "COMPLETED").length).toLocaleString(locale), icon: FiTarget, color: "#287B67" },
+        { label: t("stats.totalSpend"), value: `$${Number(apiStats.totalBudgetSpent ?? 0).toLocaleString(locale)}`, icon: FiTarget, color: "#FFA600" },
     ];
 
     async function handleProfileImageChange(event) {
@@ -197,7 +230,7 @@ export default function AdvertiserProfileContent() {
                 if (getToken()) saveAuthData(getToken(), nextUser);
             }
         } catch (error) {
-            setProfileUploadError(error.message || "تعذر تحديث صورة الملف الشخصي.");
+            setProfileUploadError(error.message || t("uploadError"));
         } finally {
             URL.revokeObjectURL(previewUrl);
             setProfileImage(null);
@@ -214,18 +247,8 @@ export default function AdvertiserProfileContent() {
                     className={`relative h-[190px] sm:h-[230px] w-full rounded-2xl overflow-hidden cursor-pointer ${tk.coverBg}`}
                     onClick={() => coverInputRef.current?.click()}
                 >
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/55 z-10" />
-
-                    {coverImage ? (
-                        <img src={coverImage} alt="Cover" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
-                    ) : (
-                        <div
-                            className="absolute inset-0 opacity-[0.15]"
-                            style={{
-                                backgroundImage: "repeating-linear-gradient(45deg,#FFA600 0,#FFA600 1px,transparent 0,transparent 50%)",
-                                backgroundSize: "14px 14px",
-                            }}
-                        />
+                    {coverImage && (
+                        <img src={coverImage} alt={t("coverImage")} className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
                     )}
 
                     {/* ثلاث نقاط */}
@@ -234,7 +257,7 @@ export default function AdvertiserProfileContent() {
                             type="button"
                             data-covermenu="true"
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCoverMenuOpen(p => !p); }}
-                            className="w-8 h-8 rounded-full bg-black/60 flex items-center justify-center border-none cursor-pointer hover:bg-black/80 transition-colors"
+                            className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center border-none cursor-pointer transition-colors"
                         >
                             <BsThreeDots size={15} color="#FFF" />
                         </button>
@@ -245,18 +268,18 @@ export default function AdvertiserProfileContent() {
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 {[
-                                    { label: "مشاركة الملف", icon: FiShare2, action: async () => { try { navigator.share && await navigator.share({ title: "ملف المعلن", url: window.location.href }); } catch { } setCoverMenuOpen(false); } },
-                                    { label: "نسخ الرابط", icon: FiCopy, action: async () => { try { await navigator.clipboard.writeText(window.location.href); } catch { } setCoverMenuOpen(false); } },
-                                    { label: "تعديل الملف", icon: FiEdit2, action: () => { router.push(`/${locale}/advertiser/edit-profile`); setCoverMenuOpen(false); } },
+                                    { label: t("shareProfile"), icon: FiShare2, action: async () => { try { navigator.share && await navigator.share({ title: t("shareTitle"), url: window.location.href }); } catch { } setCoverMenuOpen(false); } },
+                                    { label: t("copyLink"), icon: FiCopy, action: async () => { try { await navigator.clipboard.writeText(window.location.href); } catch { } setCoverMenuOpen(false); } },
+                                    { label: t("editProfile"), icon: FiEdit2, action: () => { router.push(`/${locale}/advertiser/edit-profile`); setCoverMenuOpen(false); } },
                                 ].map(({ label, icon: Icon, action }) => (
                                     <button
                                         key={label}
                                         type="button"
                                         data-covermenu="true"
                                         onClick={action}
-                                        className="group w-full flex items-center gap-3 px-3 py-2.5 text-[11px] rounded-lg bg-transparent border-none cursor-pointer hover:bg-[#FFA600]/10 transition-all"
+                                        className="group w-full flex items-center gap-3 px-3 py-2.5 text-[11px] rounded-lg bg-transparent border-none cursor-pointer hover:bg-[#AFEFDD]/10 transition-all"
                                     >
-                                        <Icon size={13} className={`${tk.subText} group-hover:text-[#FFA600] transition-colors`} />
+                                        <Icon size={13} className={`${tk.subText} group-hover:text-[#AFEFDD] transition-colors`} />
                                         <span className={tk.menuText}>{label}</span>
                                     </button>
                                 ))}
@@ -266,9 +289,9 @@ export default function AdvertiserProfileContent() {
 
                     {/* بادج موثّق */}
                     {(user?.isVerified || user?.verified) && (
-                        <div className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm rounded-full px-2.5 py-1">
-                            <MdVerified size={13} className="text-[#FFA600]" />
-                            <span className="text-white text-[10px] font-semibold">معلن موثّق</span>
+                        <div className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm rounded-full px-2.5 py-1">
+                            <MdVerified size={13} className="text-[#AFEFDD]" />
+                            <span className="text-white text-[10px] font-semibold">{t("verifiedBadge")}</span>
                         </div>
                     )}
 
@@ -283,11 +306,11 @@ export default function AdvertiserProfileContent() {
                 >
                     <div className={`relative w-[68px] h-[68px] rounded-2xl border-[3px] flex items-center justify-center overflow-hidden ${tk.avatarBg} ${tk.avatarBorder}`}>
                         {profileImage ? (
-                            <img src={profileImage} alt="Logo" className="w-full h-full object-cover" />
+                            <img src={profileImage} alt={t("companyLogo")} className="w-full h-full object-cover" />
                         ) : user?.profilePicture && user.profilePicture !== "default-avatar.png" ? (
-                            <img src={getProfileImageUrl(user.profilePicture)} alt="Logo" className="w-full h-full object-cover" />
+                            <img src={getProfileImageUrl(user.profilePicture)} alt={t("companyLogo")} className="w-full h-full object-cover" />
                         ) : (
-                            <HiOutlineBuildingOffice2 size={30} className="text-[#FFA600]" />
+                            <HiOutlineBuildingOffice2 size={30} className={isDark ? "text-[#AFEFDD]" : "text-[#287B67]"} />
                         )}
                         <div className="absolute inset-0 bg-black/45 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
                             <FiEdit2 size={14} className="text-white" />
@@ -296,7 +319,7 @@ export default function AdvertiserProfileContent() {
                     <input ref={profileInputRef} type="file" accept="image/*" className="hidden"
                         onChange={handleProfileImageChange}
                     />
-                    {profileUploading && <span className={`absolute top-[74px] whitespace-nowrap text-[10px] ${tk.subText}`}>جارٍ تحديث الصورة...</span>}
+                    {profileUploading && <span className={`absolute top-[74px] whitespace-nowrap text-[10px] ${tk.subText}`}>{t("uploading")}</span>}
                     {profileUploadError && <span className="absolute top-[74px] max-w-40 text-[10px] text-red-400">{profileUploadError}</span>}
                 </div>
             </div>
@@ -307,10 +330,10 @@ export default function AdvertiserProfileContent() {
                     {/* يسار: الاسم والمعلومات */}
                     <div className="space-y-1.5">
                         <div className="flex items-center gap-2 flex-wrap">
-                            <h1 className={`text-xl sm:text-2xl font-bold ${tk.text}`}>{getUserName(user)}</h1>
-                            {(user?.isVerified || user?.verified) && <MdVerified size={18} className="text-[#FFA600]" />}
-                            <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#FFA600]/15 text-[#FFA600] border border-[#FFA600]/30 font-bold">
-                                معلن
+                            <h1 className={`text-xl sm:text-2xl font-bold ${tk.text}`}>{getUserName(user, t("companyName"))}</h1>
+                            {(user?.isVerified || user?.verified) && <MdVerified size={18} className={isDark ? "text-[#AFEFDD]" : "text-[#287B67]"} />}
+                            <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold ${isDark ? "bg-[#AFEFDD]/15 text-[#AFEFDD] border border-[#AFEFDD]/30" : "bg-[#AFEFDD]/50 text-[#287B67] border border-[#287B67]/30"}`}>
+                                {t("advertiser")}
                             </span>
                         </div>
                         <p className={`text-sm ${tk.subText}`}>{user?.email}</p>
@@ -319,7 +342,7 @@ export default function AdvertiserProfileContent() {
                             {(user?.city || user?.country) && (
                                 <span className="flex items-center gap-1.5">
                                     <FiMapPin size={11} />
-                                    {[user?.city, user?.country].filter(Boolean).join("، ")}
+                                    {[user?.city, user?.country].filter(Boolean).join(t("listSeparator"))}
                                 </span>
                             )}
                             {(user?.createdAt || user?.created_at) && (
@@ -341,23 +364,23 @@ export default function AdvertiserProfileContent() {
                     <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
                         <button
                             onClick={() => router.push(`/${locale}/advertiser/edit-profile`)}
-                            className={`flex items-center gap-1.5 h-9 px-4 rounded-xl border text-xs font-bold cursor-pointer transition-all hover:opacity-80 ${tk.cardBg} ${tk.cardBorder} ${tk.text}`}
+                            className={`flex items-center gap-1.5 h-9 px-4 rounded-xl border text-xs font-bold cursor-pointer transition-all  ${tk.cardBg} ${tk.cardBorder} ${tk.text}`}
                         >
                             <FiEdit2 size={13} />
-                            تعديل الملف
+                            {t("editProfile")}
                         </button>
                         <button
                             onClick={() => router.push(`/${locale}/advertiser/create-campaign`)}
-                            className="flex items-center gap-1.5 h-9 px-4 rounded-xl text-white text-xs font-bold cursor-pointer border-none transition-all hover:brightness-110"
+                            className="flex items-center gap-1.5 h-9 px-4 rounded-xl text-white text-xs font-bold cursor-pointer border-none transition-all"
                             style={{ background: "linear-gradient(to left, #FF4B04, #FFA600)" }}
                         >
-                            <MdOutlineRocketLaunch size={14} />
-                            إنشاء حملة
+                            <FiPlus size={14} />
+                            {t("createCampaign")}
                         </button>
                         <button
                             onClick={() => router.push(`/${locale}/advertiser/dashboard`)}
-                            className={`h-9 w-9 flex items-center justify-center rounded-xl border cursor-pointer transition-all hover:opacity-80 ${tk.cardBg} ${tk.cardBorder}`}
-                            title="لوحة التحكم"
+                            className={`h-9 w-9 flex items-center justify-center rounded-xl border cursor-pointer transition-all  ${tk.cardBg} ${tk.cardBorder}`}
+                            title={t("dashboard")}
                         >
                             <FiSettings size={15} className={tk.subText} />
                         </button>
@@ -399,7 +422,7 @@ export default function AdvertiserProfileContent() {
                             {tab.label}
                         </button>
                         {activeTab === tab.key && (
-                            <div className="h-[2px] rounded-full w-3/4 mx-auto" style={{ background: "#FFA600" }} />
+                            <div className="h-[2px] rounded-full w-3/4 mx-auto" style={{ background: "linear-gradient(90deg, #FFA600 0%, #94D3C1 100%)" }} />
                         )}
                     </div>
                 ))}
@@ -413,38 +436,33 @@ export default function AdvertiserProfileContent() {
                     <div className="space-y-4">
                         {/* فلاتر */}
                         <div className="flex items-center gap-2 flex-wrap">
-                            {["الكل", "نشطة", "مكتملة", "قيد المراجعة"].map((f) => (
+                            {campaignFilters.map((filter) => (
                                 <button
-                                    key={f}
+                                    key={filter.key}
                                     type="button"
-                                    onClick={() => setCampaignFilter(f)}
-                                    className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold border cursor-pointer transition-all
-                                        ${campaignFilter === f
-                                            ? "bg-[#FFA600]/15 text-[#FFA600] border-[#FFA600]/30"
-                                            : `${tk.cardBg} ${tk.cardBorder} ${tk.subText} hover:text-[#FFA600]`
+                                    onClick={() => setCampaignFilter(filter.key)}
+                                    className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer 
+                                        ${campaignFilter === filter.key
+                                            ? "bg-[linear-gradient(90deg,#FD9501_0%,#FD5903_100%)] text-white"
+                                            : `${tk.cardBg} ${tk.cardBorder} ${tk.subText} `
                                         }`}
                                 >
-                                    {f}
+                                    {filter.label}
                                 </button>
                             ))}
-                            <span className={`mr-auto text-xs ${tk.subText}`}>{filteredCampaigns.length} حملة</span>
+                            <span className={`mr-auto text-xs ${tk.subText}`}>{t("campaignCount", { count: filteredCampaigns.length })}</span>
                         </div>
 
                         {/* شبكة الحملات */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                             {filteredCampaigns.map((campaign) => {
-                                const si = statusMap[campaign.status] || {
-                                    label: campaign.status || "—",
-                                    bg: "bg-[#89938F]/15 text-[#89938F] border border-[#89938F]/30",
-                                };
+                                const si = getStatusStyle(campaign.status, isDark);
                                 const campaignId = campaign._id || campaign.id;
                                 return (
                                     <div
                                         key={campaignId || campaign.name}
                                         onClick={() => campaignId && router.push(`/${locale}/advertiser/campaigns/${campaignId}`)}
                                         className={`rounded-2xl border p-4 cursor-pointer transition-all
-                                            hover:border-[#FFA600]/50 hover:-translate-y-0.5
-                                            hover:shadow-xl hover:shadow-black/25
                                             ${tk.cardBg} ${tk.cardBorder}`}
                                     >
                                         <div className="flex items-start justify-between mb-3">
@@ -453,14 +471,14 @@ export default function AdvertiserProfileContent() {
                                                     <FiTarget size={16} className="text-[#FFA600]" />
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <h3 className={`text-xs font-bold leading-tight truncate ${tk.text}`}>{campaign.name || "حملة بدون اسم"}</h3>
+                                                    <h3 className={`text-xs font-bold leading-tight truncate ${tk.text}`}>{campaign.name || t("campaignWithoutName")}</h3>
                                                     <p className={`text-[10px] mt-0.5 ${tk.subText}`}>
-                                                        {typeof campaign.category === "string" ? campaign.category : campaign.category?.name || campaign.contentType || "حملة إعلانية"}
+                                                        {typeof campaign.category === "string" ? campaign.category : campaign.category?.name || campaign.contentType || t("campaignCategory")}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ml-2 ${si.bg}`}>
-                                                {si.label}
+                                            <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ml-2 ${si.className}`}>
+                                                {si.known ? t(`statuses.${si.labelKey}`) : campaign.status || "—"}
                                             </span>
                                         </div>
 
@@ -475,7 +493,7 @@ export default function AdvertiserProfileContent() {
                         </div>
                         {filteredCampaigns.length === 0 && (
                             <div className={`rounded-2xl border p-8 text-center text-sm ${tk.cardBg} ${tk.cardBorder} ${tk.subText}`}>
-                                لا توجد حملات لعرضها.
+                                {t("noCampaigns")}
                             </div>
                         )}
                     </div>
@@ -490,8 +508,8 @@ export default function AdvertiserProfileContent() {
                                     <MdOutlineBarChart size={18} className="text-[#FFA600]" />
                                 </div>
                                 <div>
-                                    <h3 className={`text-sm font-bold ${tk.text}`}>إحصائيات الحملات</h3>
-                                    <p className={`text-[11px] ${tk.subText}`}>البيانات الحالية من حسابك</p>
+                                    <h3 className={`text-sm font-bold ${tk.text}`}>{t("campaignStatistics")}</h3>
+                                    <p className={`text-[11px] ${tk.subText}`}>{t("accountData")}</p>
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -505,22 +523,29 @@ export default function AdvertiserProfileContent() {
                         </div>
 
                         <div className={`rounded-2xl border p-5 ${tk.cardBg} ${tk.cardBorder}`}>
-                            <h3 className={`text-sm font-bold mb-4 ${tk.text}`}>حملاتك الأخيرة</h3>
+                            <h3 className={`text-sm font-bold mb-4 ${tk.text}`}>{t("recentCampaigns")}</h3>
                             <div className="space-y-3">
                                 {campaigns.slice(0, 5).map((campaign) => {
-                                    const status = statusMap[campaign.status] || {
-                                        label: campaign.status || "—",
-                                        bg: "bg-[#89938F]/15 text-[#89938F] border border-[#89938F]/30",
-                                    };
-                                    return (
-                                        <div key={campaign._id || campaign.id || campaign.name} className={`flex items-center justify-between gap-3 p-3 rounded-xl ${tk.innerBg}`}>
-                                            <span className={`text-xs font-bold truncate ${tk.text}`}>{campaign.name || "حملة بدون اسم"}</span>
-                                            <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ${status.bg}`}>{status.label}</span>
-                                        </div>
-                                    );
+                                const status = getStatusStyle(campaign.status, isDark);
+                                return (
+                                    <div
+                                        key={campaign._id || campaign.id || campaign.name}
+                                        className={`flex items-center justify-between gap-3 p-3 rounded-xl ${tk.innerBg}`}
+                                    >
+                                        <span className={`text-xs font-bold truncate ${tk.text}`}>
+                                            {campaign.name || t("campaignWithoutName")}
+                                        </span>
+
+                                        <span
+                                            className={`text-[9px] px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ${status.className}`}
+                                        >
+                                            {status.known ? t(`statuses.${status.labelKey}`) : campaign.status || "—"}
+                                        </span>
+                                    </div>
+                                );
                                 })}
                                 {campaigns.length === 0 && (
-                                    <p className={`text-xs text-center py-4 ${tk.subText}`}>لا توجد حملات لعرضها.</p>
+                                    <p className={`text-xs text-center py-4 ${tk.subText}`}>{t("noCampaigns")}</p>
                                 )}
                             </div>
                         </div>

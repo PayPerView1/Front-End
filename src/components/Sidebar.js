@@ -10,6 +10,7 @@ import {
   User,
   MoreCircle,
   Document,
+  Chart,
 } from "react-iconly";
 import {
   MdOutlineDashboard,
@@ -32,6 +33,7 @@ const creatorNavItems = [
   { label: "orders", href: "/creator/orders", icon: Bag }, // عدّل الرابط حسب مشروعك
   { label: "discover", href: "/creator/discover", icon: Discovery },
   { label: "startProject", href: "/creator/start-project", icon: Plus },
+  {label: "contentPerformance",href: "/creator/content-performance",icon: Chart,},
 ];
 
 const creatorResourceItems = [
@@ -89,6 +91,7 @@ const sidebarFallbacksEn = {
 
   discover: "Discover",
   startProject: "Start a project",
+  contentPerformance: "Content Performance",
 
   resources: "Resources",
   profile: "Profile",
@@ -109,6 +112,7 @@ const sidebarFallbacksAr = {
   orders: "طلباتي",
   discover: "اكتشف",
   startProject: "ابدأ مشروعًا",
+  contentPerformance: "أداء المحتوى",
   resources: "موارد",
   profile: "الملف الشخصي",
   help: "يساعد",
@@ -182,6 +186,8 @@ export default function Sidebar() {
     const isActive =
       pathname === item.href ||
       (item.label === "startProject" && pathname?.startsWith(`${item.href}/`)) ||
+      (item.label === "discover" && pathname?.startsWith(`${item.href}/`)) ||
+      (item.label === "contentPerformance" && pathname?.startsWith(`${item.href}/`)) ||
       (item.label === "billing" && pathname?.startsWith("/advertiser/wallet"));
     const Icon = item.icon;
 

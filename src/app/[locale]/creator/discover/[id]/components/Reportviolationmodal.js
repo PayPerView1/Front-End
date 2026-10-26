@@ -52,9 +52,9 @@ function getTokens(isDark) {
         text: "#FFFFFF",
         sub: "#9A9A9A",
         accent: "#94D3C1",
-        accentBg: "rgba(148,211,193,0.08)",
+        accentBg: "#004D404D",
         accentBorder: "rgba(148,211,193,0.55)",
-        badgeBg: "rgba(20,70,52,0.7)",
+        badgeBg: "#004D404D",
         danger: "#F87171",
         secondary: "rgba(40, 42, 43, 1)",
         secondaryText: "#E1E3E4",
@@ -69,9 +69,9 @@ function getTokens(isDark) {
         text: "#0F172A",
         sub: "#64748B",
         accent: "#1C6B58",
-        accentBg: "rgba(148,211,193,0.22)",
+        accentBg: "#004D404D",
         accentBorder: "rgba(28,107,88,0.55)",
-        badgeBg: "rgba(148,211,193,0.35)",
+        badgeBg: "#004D404D",
         danger: "#DC2626",
         secondary: "#E6ECEA",
         secondaryText: "#334155",
@@ -173,7 +173,9 @@ function ModalContent({ campaign, onClose, onSubmit }) {
 
   return (
     <div
-      className="fixed inset-0 z-[2147483000] flex items-center justify-center overflow-y-auto p-3 sm:p-6"
+      className={`fixed inset-0 z-[2147483000] flex items-center justify-center overflow-y-auto p-3 sm:p-6 ${
+        isRtl ? "min-[1280px]:right-[260px]" : "min-[1280px]:left-[260px]"
+      }`}
       style={{ background: t.overlay, backdropFilter: "blur(6px)" }}
       onMouseDown={(e) => {
         if (e.target === e.currentTarget && !submitting) onClose?.();
@@ -184,11 +186,7 @@ function ModalContent({ campaign, onClose, onSubmit }) {
         aria-modal="true"
         aria-labelledby="report-title"
         dir={isRtl ? "rtl" : "ltr"}
-        className={`flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[560px] flex-col gap-2 overflow-y-auto rounded-xl border p-2.5 sm:p-3 ${
-          isRtl
-            ? "min-[1280px]:-translate-x-[130px]"
-            : "min-[1280px]:translate-x-[130px]"
-        }`}
+        className="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[560px] flex-col gap-2 overflow-y-auto rounded-xl border p-2.5 sm:p-3"
         style={{
           background: t.card,
           borderColor: t.border,
@@ -197,13 +195,13 @@ function ModalContent({ campaign, onClose, onSubmit }) {
         }}
       >
         {/* الهيدر */}
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 pl-9">
           <button
             type="button"
             aria-label={tr("close")}
             onClick={onClose}
             disabled={submitting}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border transition-opacity hover:opacity-70 disabled:opacity-40"
+            className="absolute left-2.5 top-2.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border transition-opacity disabled:opacity-40"
             style={{
               background: t.iconBg,
               borderColor: t.border,
@@ -282,7 +280,7 @@ function ModalContent({ campaign, onClose, onSubmit }) {
                   role="radio"
                   aria-checked={on}
                   onClick={() => setReason(r.id)}
-                  className={`flex items-start gap-2 rounded-xl border p-2 text-start transition-all hover:brightness-110 ${
+                  className={`flex items-start gap-2 rounded-xl border p-2 text-start transition-all ${
                     r.full ? "sm:col-span-2" : ""
                   }`}
                   style={{
@@ -335,23 +333,28 @@ function ModalContent({ campaign, onClose, onSubmit }) {
           </div>
 
           <div
-            className="relative rounded-xl border focus-within:border-[#94D3C1]"
+            className="flex flex-col rounded-xl border focus-within:border-[#94D3C1]"
             style={{ background: t.inner, borderColor: t.innerBorder }}
           >
             <textarea
               id="report-details"
               ref={textareaRef}
               value={details}
-              onChange={(e) => setDetails(e.target.value)}
+              onChange={(e) => {
+                const textarea = e.currentTarget;
+                textarea.style.height = "auto";
+                textarea.style.height = `${Math.min(textarea.scrollHeight, 240)}px`;
+                setDetails(textarea.value);
+              }}
               maxLength={1000}
               placeholder={tr("detailsPlaceholder")}
-              className="block min-h-[64px] w-full resize-none rounded-xl bg-transparent p-2 pb-9 text-xs leading-5 outline-none"
+              className="block min-h-[64px] max-h-[240px] w-full resize-none overflow-y-auto rounded-t-xl bg-transparent p-2 text-xs leading-5 outline-none"
               style={{ color: t.text }}
             />
             <button
               type="button"
               onClick={appendLink}
-              className="absolute bottom-3 start-3 inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-medium transition-opacity hover:opacity-80"
+              className="mx-2 mb-2 mt-1 inline-flex w-fit items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-medium transition-opacity"
               style={{
                 background: t.iconBg,
                 borderColor: t.border,
@@ -381,24 +384,25 @@ function ModalContent({ campaign, onClose, onSubmit }) {
         >
           <button
             type="button"
-            onClick={onClose}
-            disabled={submitting}
-            className="inline-flex h-8 items-center justify-center rounded-xl px-5 text-xs font-bold transition-opacity hover:opacity-80 disabled:opacity-50"
-            style={{ background: t.secondary, color: t.secondaryText }}
-          >
-            {tr("cancel")}
-          </button>
-
-          <button
-            type="button"
             onClick={handleSubmit}
             disabled={!reason || submitting}
-            className="inline-flex h-9 items-center justify-center gap-2 rounded-xl px-6 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-xl px-6 text-sm font-bold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
             style={{ background: ORANGE }}
           >
             <MdOutlineShield size={16} />
             {submitting ? tr("sending") : tr("send")}
           </button>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={submitting}
+            className="inline-flex h-8 items-center justify-center rounded-xl px-5 text-xs font-bold transition-opacity disabled:opacity-50"
+            style={{ background: t.secondary, color: t.secondaryText }}
+          >
+            {tr("cancel")}
+          </button>
+
+          
         </div>
       </div>
     </div>

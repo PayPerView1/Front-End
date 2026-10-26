@@ -22,6 +22,18 @@ function triggerAiReview(campaignId) {
     .catch((err) => console.warn("⚠️ [AI Review] فشل تشغيل المراجعة:", err?.message));
 }
 
+// Helper: رفع صورة الحملة (عدّلي المسار حسب الـ API عندكم)
+async function uploadCoverImage(file) {
+  const fd = new FormData();
+  fd.append("file", file);
+
+  const res = await fetch("/api/upload", { method: "POST", body: fd });
+  if (!res.ok) throw new Error("فشل رفع صورة الحملة");
+
+  const data = await res.json();
+  return data?.data?.url || data?.url;
+}
+
 import {
   MdVolumeUp,
   MdImage,
@@ -122,8 +134,108 @@ function DateInput({ value, onChange, hasError, isRtl, dark }) {
   );
 }
 
+// ─── ImageField ───────────────────────────────────────────────
+function ImageField({ label, image, setImage, dark, isRtl, hasError, maxMB = 5 }) {
+  const inputRef = useRef(null);
+
+  const handleFile = (file) => {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.warning("يرجى اختيار ملف صورة فقط.");
+      return;
+    }
+    if (file.size > maxMB * 1024 * 1024) {
+      toast.warning(`حجم الصورة يتجاوز ${maxMB} ميجابايت.`);
+      return;
+    }
+    setImage(file);
+  };
+
+  const clearImage = () => {
+    setImage(null);
+    if (inputRef.current) inputRef.current.value = "";
+  };
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className={`text-xs ${dark ? "text-white" : "text-[#111]"}`}>
+        {label}
+      </label>
+
+      <div
+        className={`flex items-center gap-3 w-full rounded-lg border px-3.5 py-2.5 text-sm box-border transition-colors ${
+          dark
+            ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)]"
+            : "bg-white border-[#E5E5E5]"
+        } ${hasError ? "!border-[#E53535]" : ""}`}
+        style={{
+          direction: isRtl ? "rtl" : "ltr",
+          fontFamily: "var(--font-tajawal,inherit)",
+        }}
+      >
+        {/* اسم الصورة أو النص الافتراضي */}
+        <span
+          className={`flex-1 truncate ${
+            image
+              ? dark
+                ? "text-white"
+                : "text-[#111]"
+              : "text-[#999]"
+          }`}
+        >
+          {image ? image.name : "لم يتم اختيار صورة"}
+        </span>
+
+        {/* زر الحذف يظهر فقط إذا في صورة */}
+        {image && (
+          <button
+            type="button"
+            onClick={clearImage}
+            className={`bg-transparent border-none cursor-pointer p-1 ${
+              dark ? "text-[#9A9A9A]" : "text-[#666]"
+            }`}
+          >
+            <MdDelete size={18} />
+          </button>
+        )}
+
+        {/* زر اختيار الصورة */}
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className={`border rounded-lg px-4 py-1.5 text-sm cursor-pointer bg-transparent shrink-0 ${
+            dark
+              ? "border-[rgba(63,73,69,1)] text-white"
+              : "border-[#E5E5E5] text-[#111]"
+          }`}
+        >
+          {image ? "تغيير" : "اختيار صورة"}
+        </button>
+      </div>
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        className="hidden"
+        onChange={(e) => handleFile(e.target.files?.[0])}
+      />
+    </div>
+  );
+}
+
 // ─── Step1 ────────────────────────────────────────────────────
-function Step1({ t, dark, isRtl, form, setForm, attempted }) {
+function Step1({
+  t,
+  dark,
+  isRtl,
+  form,
+  setForm,
+  attempted,
+  coverImage,
+  setCoverImage,
+}) {
   return (
     <div className="flex flex-col gap-5">
       {/* اسم الحملة */}
@@ -164,6 +276,15 @@ function Step1({ t, dark, isRtl, form, setForm, attempted }) {
           </span>
         )}
       </div>
+
+      {/* صورة الحملة */}
+      <ImageField
+        label="صورة الحملة"
+        image={coverImage}
+        setImage={setCoverImage}
+        dark={dark}
+        isRtl={isRtl}
+      />
 
       {/* الميزانية + CPM */}
       <div className="grid grid-cols-2 gap-4">
@@ -857,7 +978,7 @@ function Step3({
 }
 
 // ─── Step4 ────────────────────────────────────────────────────
-function Step4({ t, dark, form, files }) {
+function Step4({ t, dark, form, files, coverImage }) {
   const cardCls = `border rounded-xl p-5 ${
     dark
       ? "bg-[#141414] border-[#262626]"
@@ -982,6 +1103,27 @@ function Step4({ t, dark, form, files }) {
                   }`}
                 >
                   {form.endDate || "-"}
+                </span>
+              </div>
+
+              {/* صورة الحملة */}
+              <div className="flex flex-col gap-1 col-span-2 min-w-0">
+                <span
+                  className={`text-xs ${
+                    dark
+                      ? "text-[#9A9A9A]"
+                      : "text-[#666]"
+                  }`}
+                >
+                  صورة الحملة
+                </span>
+
+                <span
+                  className={`text-sm font-semibold truncate ${
+                    dark ? "text-white" : "text-[#111]"
+                  }`}
+                >
+                  {coverImage?.name || "-"}
                 </span>
               </div>
             </div>
@@ -1196,6 +1338,7 @@ export default function NewCampaignPage() {
 
   const [step, setStep] = useState(1);
   const [attempted, setAttempted] = useState(false);
+  const [coverImage, setCoverImage] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -1484,6 +1627,21 @@ export default function NewCampaignPage() {
     setIsSubmitting(true);
 
     try {
+      // رفع صورة الحملة أولاً (إن وُجدت)
+      let coverImageUrl;
+
+      if (coverImage) {
+        try {
+          coverImageUrl = await uploadCoverImage(coverImage);
+        } catch (uploadErr) {
+          console.warn(
+            "⚠️ [Cover Upload Error]:",
+            uploadErr?.message || uploadErr
+          );
+          toast.warning("تعذّر رفع صورة الحملة، سيتم الإرسال بدونها.");
+        }
+      }
+
       const payload = {
         name: form.name,
         contentType: form.contentType,
@@ -1522,6 +1680,10 @@ export default function NewCampaignPage() {
           audience: form.audience,
         },
       };
+
+      if (coverImageUrl) {
+        payload.coverImage = coverImageUrl;
+      }
 
       console.log(
         "📤 [Payload] البيانات المرسلة:",
@@ -1710,6 +1872,8 @@ export default function NewCampaignPage() {
           form={form}
           setForm={setForm}
           attempted={attempted}
+          coverImage={coverImage}
+          setCoverImage={setCoverImage}
         />
       );
     }
@@ -1749,6 +1913,7 @@ export default function NewCampaignPage() {
         dark={dark}
         form={form}
         files={files}
+        coverImage={coverImage}
       />
     );
   };

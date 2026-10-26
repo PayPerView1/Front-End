@@ -94,7 +94,9 @@ function ModalContent({
 
   return (
     <div
-      className="fixed inset-0 z-[2147483000] flex items-center justify-center overflow-y-auto p-3 sm:p-6"
+      className={`fixed inset-0 z-[2147483000] flex items-center justify-center overflow-y-auto p-3 sm:p-6 ${
+        isRtl ? "min-[1280px]:right-[260px]" : "min-[1280px]:left-[260px]"
+      }`}
       style={{ background: t.overlay, backdropFilter: "blur(6px)" }}
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose?.();
@@ -105,11 +107,7 @@ function ModalContent({
         aria-modal="true"
         aria-labelledby="apply-already-title"
         dir={isRtl ? "rtl" : "ltr"}
-        className={`relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[520px] flex-col items-center gap-3 overflow-y-auto rounded-2xl border p-4 pt-10 text-center sm:p-6 sm:pt-12 ${
-          isRtl
-            ? "min-[1280px]:-translate-x-[130px]"
-            : "min-[1280px]:translate-x-[130px]"
-        }`}
+        className="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[520px] flex-col items-center gap-3 overflow-y-auto rounded-2xl border p-4 pt-10 text-center sm:p-6 sm:pt-12"
         style={{
           background: t.card,
           borderColor: t.border,
@@ -253,7 +251,7 @@ function ModalContent({
               if (onViewOrders) onViewOrders();
               else router.push(`/${locale}/creator/dashboard`);
             }}
-            className="inline-flex h-10 w-full items-center justify-center rounded-xl text-xs font-bold text-white transition-opacity hover:opacity-90"
+            className="inline-flex h-12 shrink-0 w-full items-center justify-center rounded-xl px-3 text-center text-xs font-bold text-white transition-opacity hover:opacity-90 sm:h-10"
             style={{ background: ORANGE }}
           >
             {s("viewOrders")}
@@ -262,7 +260,7 @@ function ModalContent({
           <button
             type="button"
             onClick={onExplore}
-            className="inline-flex h-10 w-full items-center justify-center rounded-xl text-xs font-bold transition-opacity hover:opacity-80"
+            className="inline-flex h-12 shrink-0 w-full items-center justify-center rounded-xl px-3 text-center text-xs font-bold transition-opacity hover:opacity-80 sm:h-10"
             style={{ background: t.secondary, color: t.secondaryText }}
           >
             {s("explore")}
@@ -271,7 +269,7 @@ function ModalContent({
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl text-[11px] font-medium transition-opacity hover:opacity-80"
+            className="inline-flex h-12 shrink-0 w-full items-center justify-center gap-2 rounded-xl px-3 text-center text-[11px] font-medium transition-opacity hover:opacity-80 sm:h-10"
             style={{ background: t.secondary, color: t.sub }}
           >
             <BackIcon size={14} />
