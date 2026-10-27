@@ -16,13 +16,17 @@ import {
 import { SiInstagram, SiTiktok, SiYoutube } from "react-icons/si";
 import { useTheme } from "@/context/ThemeContext";
 import { validateLink } from "./validateLink";
-import { createSubmission } from "./submissionsApi";
+import { createSubmission, verifyLink, saveDraft } from "./submissionsApi";
 import PreviousSubmission from "./PreviousSubmission";
 
-// كود الخطأ اللي بيرجع من الـ API ← اسم الحالة عندنا
+// Sprint 5 error codes → internal reason keys
 const serverReasons = {
-  MISSING_HASHTAGS: "missingHashtags",
-  DUPLICATE_LINK: "duplicateLink",
+  CONTENT_REQUIREMENTS_NOT_MET: "missingHashtags",
+  LINK_ALREADY_SUBMITTED:       "duplicateLink",
+  PLATFORM_MISMATCH:            "platformMismatch",
+  INVALID_LINK:                 "invalidUrl",
+  POST_NOT_PUBLIC:              "notPublic",
+  UNSUPPORTED_PLATFORM:        "unsupportedPlatform",
 };
 
 const platforms = [
@@ -55,6 +59,8 @@ export default function SubmitForm({ campaign, campaignId, onChange, onError }) 
   const [copied, setCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [verifyPreview, setVerifyPreview] = useState(null); // data from verify-link
+  const [savingDraft, setSavingDraft] = useState(false);
 
   // نبلغ الصفحة الأم بالرابط والمنصة (لمعاينة الفيديو)
   useEffect(() => {
@@ -123,6 +129,7 @@ const errorKey = isDuplicate
     setServerError(null);
     setPlatformError(false);
     setDetectedPlatform("");
+    setVerifyPreview(null);
     reportError(null);
   };
   const placeholders = {
@@ -130,23 +137,48 @@ const errorKey = isDuplicate
     instagram: "https://www.instagram.com/reel/...",
     youtube: "https://www.youtube.com/shorts/...",
   };
-  const checkLink = () => {
+
+  // §4.3 Check link via API
+  const checkLink = async () => {
     if (!platform) {
       setPlatformError(true);
       return false;
     }
-    const result = validateLink(link, platform, locale);
-    setLinkState(result.valid ? "ok" : result.reason);
-    setDetectedPlatform(result.platformName || "");
-    reportError(
-      result.valid ? null : result.reason,
-      result.platformName ? { platformName: ` (${result.platformName})` } : { platformName: "" }
-    );
-    return result.valid;
+    // fast client-side shape validation first
+    const local = validateLink(link, platform, locale);
+    if (!local.valid) {
+      setLinkState(local.reason);
+      setDetectedPlatform(local.platformName || "");
+      reportError(local.reason, { platformName: local.platformName ? ` (${local.platformName})` : "" });
+      return false;
+    }
+    // then ask the server
+    try {
+      const result = await verifyLink({ campaignId, platform, url: link.trim() });
+      setVerifyPreview(result?.preview || null);
+      if (result?.canSubmit === false) {
+        setLinkState("serverRejected");
+        reportError("serverRejected", {});
+        return false;
+      }
+      setLinkState("ok");
+      reportError(null);
+      return true;
+    } catch (err) {
+      const data = err?.response?.data;
+      const reason = serverReasons[data?.code] || "invalidUrl";
+      const det = data?.details || {};
+      setLinkState(reason);
+      setServerError({ reason, details: det });
+      if (data?.code === "PLATFORM_MISMATCH") setDetectedPlatform(det.detected || "");
+      reportError(reason, det);
+      return false;
+    }
   };
 
   const handleSubmit = async () => {
-    if (!checkLink()) return;
+    const ok = await checkLink();
+    if (!ok) return;
     setSubmitting(true);
     setSubmitError("");
 
@@ -154,7 +186,10 @@ const errorKey = isDuplicate
       const submission = await createSubmission({
         campaignId,
         platform,
-        link: link.trim(),
+        url: link.trim(),
+        hashtags,
+        notes: "",
+        halalPledge: checked,
       });
       router.push(
         `/creator/start-project/${campaignId}/result?submissionId=${submission.id}`
@@ -172,6 +207,23 @@ const errorKey = isDuplicate
         setSubmitError(data?.message || "تعذر إرسال المقطع");
       }
       setSubmitting(false);
+    }
+  };
+
+  // §4.4 Save draft
+  const handleSaveDraft = async () => {
+    if (!campaignId) return;
+    setSavingDraft(true);
+    try {
+      await saveDraft(campaignId, {
+        platform: platform?.toUpperCase(),
+        url: link.trim() || undefined,
+        halalPledge: checked,
+      });
+    } catch {
+      // silent — not critical
+    } finally {
+      setSavingDraft(false);
     }
   };
 
@@ -394,10 +446,12 @@ const errorKey = isDuplicate
         </button>
         <button
           type="button"
-          className={`flex h-11 min-h-11 w-full flex-none items-center justify-center gap-2 rounded-xl border px-5 text-xs font-bold sm:w-auto ${theme.inset} ${theme.secondaryText}`}
+          onClick={handleSaveDraft}
+          disabled={savingDraft}
+          className={`flex h-11 min-h-11 w-full flex-none items-center justify-center gap-2 rounded-xl border px-5 text-xs font-bold sm:w-auto ${theme.inset} ${theme.secondaryText} disabled:opacity-50`}
         >
           <Bookmark size={14} />
-          {t("saveLater")}
+          {savingDraft ? "..." : t("saveLater")}
         </button>
       </div>
 
