@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
@@ -9,15 +9,23 @@ import {
   Clock3,
   Hash,
   AtSign,
-  Wallet,
   FileText,
   Upload,
   Headset,
   MessageSquare,
   BadgeCheck,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
-import { mockCampaigns } from "./campaignsData";
+import { getEligibleCampaigns } from "./submissionsApi";
+
+// Tab key → API tab value
+const TAB_MAP = {
+  all: "ALL",
+  ready: "READY",
+  endingSoon: "ENDING_SOON",
+};
 
 export default function CampaignsContent() {
   const t = useTranslations("startProject");
@@ -26,6 +34,10 @@ export default function CampaignsContent() {
 
   const [activeFilter, setActiveFilter] = useState("all");
   const [query, setQuery] = useState("");
+  const [campaigns, setCampaigns] = useState([]);
+  const [counts, setCounts] = useState({ all: 0, ready: 0, endingSoon: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const theme = {
     page: isDark ? "bg-[#050505] text-gray-100" : "bg-[#f4f6f5] text-[#191c1d]",
@@ -40,18 +52,36 @@ export default function CampaignsContent() {
 
   const gradient = { background: "linear-gradient(90deg, #FB8F00 0%, #FB6103 100%)" };
 
-  const filtered = mockCampaigns.filter((c) => {
-    if (activeFilter === "endingSoon" && !c.remaining.endsWith("h")) return false;
-    const text = `${t(`campaigns.${c.title}`)} ${c.code} ${t(`campaigns.${c.company}`)}`;
-    if (query && !text.toLowerCase().includes(query.toLowerCase())) return false;
-    return true;
-  });
-
-  const counts = {
-    all: mockCampaigns.length,
-    ready: mockCampaigns.length,
-    endingSoon: mockCampaigns.filter((c) => c.remaining.endsWith("h")).length,
-  };
+  // Fetch on filter / search change
+  useEffect(() => {
+    let cancelled = false;
+    const fetchCampaigns = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await getEligibleCampaigns({
+          tab: TAB_MAP[activeFilter],
+          search: query || undefined,
+        });
+        if (!cancelled) {
+          setCampaigns(res?.data || []);
+          if (res?.meta?.counts) {
+            setCounts({
+              all: res.meta.counts.all ?? 0,
+              ready: res.meta.counts.ready ?? 0,
+              endingSoon: res.meta.counts.endingSoon ?? 0,
+            });
+          }
+        }
+      } catch (err) {
+        if (!cancelled) setError(err?.response?.data?.message || "حدث خطأ في تحميل الحملات");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchCampaigns();
+    return () => { cancelled = true; };
+  }, [activeFilter, query]);
 
   const filters = [
     { key: "all", label: t("filters.all") },
@@ -59,11 +89,11 @@ export default function CampaignsContent() {
     { key: "endingSoon", label: t("filters.endingSoon") },
   ];
 
-  const formatRemaining = (value) => {
-    const n = parseInt(value, 10);
-    return value.endsWith("h")
-      ? t("card.remainingHours", { count: n })
-      : t("card.remainingDays", { count: n });
+  // Format hoursLeft from API into display string
+  const formatRemaining = (hoursLeft) => {
+    if (hoursLeft == null) return "";
+    if (hoursLeft < 48) return t("card.remainingHours", { count: hoursLeft });
+    return t("card.remainingDays", { count: Math.ceil(hoursLeft / 24) });
   };
 
   return (
@@ -125,37 +155,66 @@ export default function CampaignsContent() {
 
       {/* Campaigns */}
       <div className="space-y-4">
-        {filtered.map((c) => {
-          const isInstant = c.status === "instant";
+        {/* Loading state */}
+        {loading && (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 size={28} className="animate-spin text-[#FB8F00]" />
+          </div>
+        )}
+
+        {/* Error state */}
+        {!loading && error && (
+          <div className={`flex items-center gap-3 rounded-2xl border p-4 ${theme.surface}`}>
+            <AlertCircle size={20} className="text-red-400 shrink-0" />
+            <p className="text-sm text-red-400">{error}</p>
+          </div>
+        )}
+
+        {/* Campaign cards */}
+        {!loading && !error && campaigns.map((c) => {
+          const req = c.requirements || {};
+          const hashtag = req.requiredHashtags?.[0] || "";
+          const mention = req.requiredMentions?.[0] || "";
+          const sharia = req.shariaNote || t("card.noMusic");
+          const isUnavailable = c.availability === "UNAVAILABLE";
 
           return (
             <div
-                key={c.id}
-                className={`${theme.surface} rounded-2xl p-4 sm:p-5 space-y-4`}
-              >
-                {/* Top row */}
+              key={c.campaignId}
+              className={`${theme.surface} rounded-2xl p-4 sm:p-5 space-y-4 ${
+                isUnavailable ? "opacity-60" : ""
+              }`}
+            >
+              {/* Top row */}
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <span
                     className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-bold ${
                       isDark
-                        ? "border-emerald-500/30 bg-emerald-500/10 text-#94D3C1"
+                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
                         : "border-emerald-200 bg-emerald-50 text-emerald-800"
                     }`}
                   >
                     <BadgeCheck size={12} />
-                    {t(`status.${c.status}`)}
+                    {c.isHalalVerified ? t("status.instant") : t("status.production")}
                   </span>
-                  <span
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-bold ${
-                      isDark
-                        ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
-                        : "border-amber-200 bg-amber-50 text-amber-800"
-                    }`}
-                  >
-                    <Clock3 size={12} />
-                    {formatRemaining(c.remaining)}
-                  </span>
+                  {c.hoursLeft != null && (
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-bold ${
+                        isDark
+                          ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
+                          : "border-amber-200 bg-amber-50 text-amber-800"
+                      }`}
+                    >
+                      <Clock3 size={12} />
+                      {formatRemaining(c.hoursLeft)}
+                    </span>
+                  )}
+                  {isUnavailable && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-red-500/30 bg-red-500/10 text-red-300 px-3 py-1 text-[10px] font-bold">
+                      {t(`unavailable.${c.unavailableReason}`) || c.unavailableReason}
+                    </span>
+                  )}
                 </div>
                 <span className={`max-w-full break-all text-[10px] font-mono ${theme.secondaryText}`}>
                   {t("card.campaignNumber")}: {c.code}
@@ -164,61 +223,66 @@ export default function CampaignsContent() {
 
               {/* Body */}
               <div className="campaign-card-body flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
-              {/* Thumbnail */}
+                {/* Thumbnail */}
                 <div
                   className={`campaign-card-image relative h-[170px] w-full shrink-0 overflow-hidden rounded-xl border lg:w-[310px] ${
                     isDark ? "border-[#233532]" : "border-[#d3e6de]"
                   }`}
                 >
                   <img
-                    src={c.image}
-                    alt={t(`campaigns.${c.title}`)}
+                    src={c.coverImage || "/images/parthiom.webp"}
+                    alt={c.name}
                     className="w-full h-full object-cover"
                   />
-                  <span className="absolute bottom-2 start-2 text-[10px] font-bold text-white bg-black/60 rounded px-2 py-0.5">
-                    {c.duration} {t("card.seconds")}
-                  </span>
+                  {req.durationRange && (
+                    <span className="absolute bottom-2 start-2 text-[10px] font-bold text-white bg-black/60 rounded px-2 py-0.5">
+                      {req.durationRange.min} - {req.durationRange.max} {t("card.seconds")}
+                    </span>
+                  )}
                 </div>
+
                 <div className="campaign-card-details flex-1 min-w-0 space-y-3">
                   <div>
                     <h3 className={`break-words text-base sm:text-lg font-bold ${theme.primaryText}`}>
-                      {t(`campaigns.${c.title}`)}
+                      {c.name}
                     </h3>
                     <p className={`text-[11px] mt-1 ${theme.secondaryText}`}>
-                      {t(`campaigns.${c.company}`)} · {t("card.verifiedCompany")}
+                      {c.brand?.name} · {t("card.verifiedCompany")}
                     </p>
                   </div>
 
-                <div className="campaign-info-grid grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-3">
-                {/* 1. الهاشتاق */}
-                <InfoBox
-                  theme={theme}
-                  icon={<Hash size={18} className="text-[#94D3C1]" />}
-                  label={t("card.requiredHashtag")}
-                  value={c.hashtag}
-                />
+                  <div className="campaign-info-grid grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-3">
+                    {/* 1. الهاشتاق */}
+                    <InfoBox
+                      theme={theme}
+                      icon={<Hash size={18} className="text-[#94D3C1]" />}
+                      label={t("card.requiredHashtag")}
+                      value={hashtag || "-"}
+                    />
 
-                {/* 2. المنشن */}
-                <InfoBox
-                  theme={theme}
-                  icon={<AtSign size={18} className="text-[#94D3C1]" />}
-                  label={t("card.requiredMention")}
-                  value={c.account}
-                />
+                    {/* 2. المنشن */}
+                    <InfoBox
+                      theme={theme}
+                      icon={<AtSign size={18} className="text-[#94D3C1]" />}
+                      label={t("card.requiredMention")}
+                      value={mention || "-"}
+                    />
 
-                {/* 3. الضابط الشرعي */}
-                <InfoBox
-                  theme={theme}
-                  icon={<ShieldCheck size={18} className="text-[#94D3C1]" />}
-                  label={t("card.shariaRule")}
-                  value={c.shariaCondition || t("card.noMusic")}
-                />
-              </div>
+                    {/* 3. الضابط الشرعي */}
+                    <InfoBox
+                      theme={theme}
+                      icon={<ShieldCheck size={18} className="text-[#94D3C1]" />}
+                      label={t("card.shariaRule")}
+                      value={sharia}
+                    />
+                  </div>
 
                   <div className="campaign-actions flex flex-col gap-2 sm:flex-row">
                     <Link
-                      href={`/creator/start-project/${c.id}`}
-                      className="flex-1 flex min-w-0 items-center justify-center gap-2 px-3 sm:px-4 py-3 rounded-xl text-center text-xs font-bold text-white shadow-[0_4px_20px_rgba(251,96,1,0.5)]"
+                      href={`/creator/start-project/${c.campaignId}`}
+                      className={`flex-1 flex min-w-0 items-center justify-center gap-2 px-3 sm:px-4 py-3 rounded-xl text-center text-xs font-bold text-white shadow-[0_4px_20px_rgba(251,96,1,0.5)] ${
+                        isUnavailable ? "pointer-events-none" : ""
+                      }`}
                       style={gradient}
                     >
                       <Upload size={15} />
@@ -233,18 +297,17 @@ export default function CampaignsContent() {
                       }`}
                     >
                       <FileText size={14} />
-                      {t(`card.${c.secondaryAction}`)}
+                      {t("card.terms")}
                     </button>
                   </div>
                 </div>
-
-                
               </div>
             </div>
           );
         })}
 
-        {filtered.length === 0 && (
+        {/* Empty state */}
+        {!loading && !error && campaigns.length === 0 && (
           <p className={`text-center text-sm py-10 ${theme.secondaryText}`}>
             {t("empty")}
           </p>

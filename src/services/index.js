@@ -10,6 +10,7 @@ import * as drafts from "@/services/drafts";
 import * as wallet from "@/services/wallet";
 import * as campaign from "@/services/campaign";
 import * as applications from "@/services/applications";
+import * as submissions from "@/services/submissions";
 import {
   getToken,
   getSavedUser,
@@ -40,6 +41,7 @@ const api = {
   wallet,
   campaign,
   applications,
+  submissions,
 
   // Auth shortcuts
   register: auth.register,
@@ -113,6 +115,20 @@ const api = {
   markNotificationRead: applications.markNotificationRead,
   markAllNotificationsRead: applications.markAllNotificationsRead,
 
+  // Submissions (Sprint 5)
+  getEligibleCampaigns: submissions.getEligibleCampaigns,
+  getSubmissionRequirements: submissions.getSubmissionRequirements,
+  verifyLink: submissions.verifyLink,
+  getDraft: submissions.getDraft,
+  saveDraft: submissions.saveDraft,
+  deleteSubmissionDraft: submissions.deleteDraft,
+  createSubmission: submissions.createSubmission,
+  getMySubmissions: submissions.getMySubmissions,
+  getSubmission: submissions.getSubmission,
+  withdrawSubmission: submissions.withdrawSubmission,
+  updateSubmissionLink: submissions.updateSubmissionLink,
+  resubmit: submissions.resubmit,
+
   // Helpers
   getToken,
   getSavedUser,
@@ -121,5 +137,17 @@ const api = {
   isAuthenticated,
   createFormData,
 };
+
+export {
+  auth,
+  profile,
+  drafts,
+  wallet,
+  campaign,
+  applications,
+  submissions,
+};
+
+export * from "@/services/submissions";
 
 export default api;

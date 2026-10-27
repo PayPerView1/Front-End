@@ -190,6 +190,9 @@ export function handleError(error) {
     (error.response?.status === 403 ? "FORBIDDEN" : undefined) ||
     (error.response ? undefined : "NETWORK_ERROR");
   err.status = error.response?.status;
+  err.response = error.response;
+  err.details = responseData?.details;
+  err.data = responseData;
   throw err;
 }
 
