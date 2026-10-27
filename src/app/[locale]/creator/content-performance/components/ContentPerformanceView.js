@@ -1,22 +1,76 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { clips } from "../data";
-import { useLocale,useTranslations } from "next-intl";
+import { useMemo, useState, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
+import { getMySubmissions } from "@/services/submissions";
 import {
   FiDownload,
   FiPlayCircle,
   FiSearch,
   FiTrendingUp,
   FiCheckCircle,
+  FiAlertCircle,
 } from "react-icons/fi";
 import {
   MdOutlineVideoLibrary,
   MdOutlineVerifiedUser,
   MdOutlineSpeed,
 } from "react-icons/md";
+import { Loader2 } from "lucide-react";
 import ClipCard from "./ClipCard";
+
+// ─── نربط platform API → platform ClipCard ───────────────────────────────────
+const PLATFORM_MAP = {
+  TIKTOK: "tiktok",
+  INSTAGRAM: "reels",
+  YOUTUBE: "shorts",
+};
+
+/** تحويل displayStatus (API) → status محلي يُفهم من ClipCard/ClipDetailsView */
+function mapDisplayStatus(ds) {
+  if (ds === "PROCESSING" || ds === "MANUAL_REVIEW") return "waiting";
+  if (ds === "AI_REJECTED" || ds === "REJECTED") return "error";
+  return "normal"; // APPROVED, AWAITING_ADVERTISER, WITHDRAWN
+}
+
+function formatDuration(sec) {
+  if (!sec) return null;
+  const m = Math.floor(sec / 60).toString().padStart(2, "0");
+  const s = (sec % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+/**
+ * SubmissionListItem (API) → الشكل المتوقع من ClipCard
+ */
+function mapSubmission(s) {
+  return {
+    id: s.id,
+    code: s.code,
+    displayStatus: s.displayStatus,
+    status: mapDisplayStatus(s.displayStatus),
+    platform: PLATFORM_MAP[s.platform] || "tiktok",
+    title: s.campaign?.name || "—",
+    campaign: s.campaign?.brand?.name || "—",
+    publishedAgo: s.submittedAt
+      ? new Date(s.submittedAt).toLocaleDateString("ar-SA")
+      : "",
+    publishedLabel: s.submittedAt
+      ? new Date(s.submittedAt).toLocaleString("ar-SA")
+      : "",
+    completion: null,
+    earnings: null,
+    rate: null,
+    views: s.preview?.stats?.viewCount ?? null,
+    duration: formatDuration(s.preview?.durationSec),
+    seconds: s.preview?.durationSec ?? null,
+    thumbnail: s.preview?.thumbnailUrl || null,
+    url: s.postUrl || "#",
+    daily: null,
+    aiScore: s.aiScore ?? null,
+  };
+}
 
 // ─── ألوان الثيمين ───────────────────────────────────────────
 const darkTheme = {
@@ -57,7 +111,6 @@ const lightTheme = {
   placeholder: "placeholder:text-[#8A8A8A]",
 };
 
-
 const tabKeys = ["all", "tiktok", "shorts", "reels"];
 
 export default function ContentPerformanceView() {
@@ -68,12 +121,47 @@ export default function ContentPerformanceView() {
 
   const [tab, setTab] = useState("all");
   const [query, setQuery] = useState("");
+  const [clips, setClips] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // ─── جلب التسليمات من الـ API ──────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+    const fetch = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await getMySubmissions({ perPage: 50 });
+        if (!cancelled) {
+          setClips((res?.data || []).map(mapSubmission));
+        }
+      } catch (err) {
+        if (!cancelled)
+          setError(err?.response?.data?.message || "تعذّر تحميل المقاطع");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetch();
+    return () => { cancelled = true; };
+  }, []);
+
+  // ─── إحصائيات محسوبة من البيانات الحقيقية ─────────────────
+  const totalViews = useMemo(
+    () => clips.reduce((sum, c) => sum + (c.views || 0), 0),
+    [clips]
+  );
+  const activeClips = useMemo(
+    () => clips.filter((c) => c.status === "normal").length,
+    [clips]
+  );
 
   const counts = useMemo(() => {
     const c = { all: clips.length };
     clips.forEach((x) => (c[x.platform] = (c[x.platform] || 0) + 1));
     return c;
-  }, []);
+  }, [clips]);
 
   const filtered = useMemo(
     () =>
@@ -82,74 +170,65 @@ export default function ContentPerformanceView() {
           (tab === "all" || c.platform === tab) &&
           (c.title.includes(query) || c.campaign.includes(query))
       ),
-    [tab, query]
+    [tab, query, clips]
   );
+
   const [exporting, setExporting] = useState(false);
 
-const handleExport = async () => {
-  if (exporting || !filtered.length) return;
-  setExporting(true);
+  const handleExport = async () => {
+    if (exporting || !filtered.length) return;
+    setExporting(true);
+    try {
+      const XLSX = await import("xlsx");
+      const col = (key) => tr(`export.columns.${key}`);
+      const toNumber = (v) => parseFloat(String(v || "0").replace(/,/g, "")) || 0;
 
-  try {
-    // تحميل المكتبة عند الحاجة فقط (ما بتثقّل الصفحة)
-    const XLSX = await import("xlsx");
-    const col = (key) => tr(`export.columns.${key}`);
-    const toNumber = (v) => parseFloat(String(v).replace(/,/g, "")) || 0;
+      const rows = filtered.map((c) => ({
+        [col("clip")]: c.title,
+        [col("platform")]: tr(`tabs.${c.platform}`),
+        [col("campaign")]: c.campaign,
+        [col("published")]: c.publishedAgo,
+        [col("completion")]: c.completion ?? "",
+        [col("earnings")]: toNumber(c.earnings),
+        [col("views")]: c.views ?? "",
+        [col("url")]: c.url,
+      }));
 
-    const rows = filtered.map((c) => ({
-      [col("clip")]: c.title,
-      [col("platform")]: tr(`tabs.${c.platform}`),
-      [col("campaign")]: c.campaign,
-      [col("published")]: c.publishedAgo,
-      [col("completion")]: c.completion,
-      [col("earnings")]: toNumber(c.earnings),
-      [col("views")]: c.views,
-      [col("url")]: c.url,
-    }));
+      rows.push({
+        [col("clip")]: tr("export.total"),
+        [col("earnings")]: filtered.reduce((s, c) => s + toNumber(c.earnings), 0),
+        [col("views")]: filtered.reduce((s, c) => s + (c.views || 0), 0),
+      });
 
-    // صف الإجمالي
-    rows.push({
-      [col("clip")]: tr("export.total"),
-      [col("earnings")]: filtered.reduce((s, c) => s + toNumber(c.earnings), 0),
-      [col("views")]: filtered.reduce((s, c) => s + c.views, 0),
-    });
+      const ws = XLSX.utils.json_to_sheet(rows);
+      ws["!cols"] = [
+        { wch: 48 }, { wch: 16 }, { wch: 26 }, { wch: 14 },
+        { wch: 14 }, { wch: 22 }, { wch: 18 }, { wch: 32 },
+      ];
 
-    const ws = XLSX.utils.json_to_sheet(rows);
-    ws["!cols"] = [
-      { wch: 48 },
-      { wch: 16 },
-      { wch: 26 },
-      { wch: 14 },
-      { wch: 14 },
-      { wch: 22 },
-      { wch: 18 },
-      { wch: 32 },
-    ];
+      const wb = XLSX.utils.book_new();
+      wb.Workbook = { Views: [{ RTL: locale === "ar" }] };
+      XLSX.utils.book_append_sheet(wb, ws, tr("export.sheetName"));
 
-    const wb = XLSX.utils.book_new();
-    wb.Workbook = { Views: [{ RTL: locale === "ar" }] }; // اتجاه الورقة
-    XLSX.utils.book_append_sheet(wb, ws, tr("export.sheetName"));
+      const date = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `${tr("export.fileName")}-${date}.xlsx`);
+    } finally {
+      setExporting(false);
+    }
+  };
 
-    const date = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `${tr("export.fileName")}-${date}.xlsx`);
-  } finally {
-    setExporting(false);
-  }
-};
   const stats = [
     {
       key: "liveViews",
-      value: "1,842,500",
+      value: loading ? "—" : totalViews.toLocaleString("en-US"),
       Icon: FiPlayCircle,
       valueColor: t.title,
       unitColor: t.muted,
       footer: (
         <div className="flex items-center gap-2 text-xs">
-          <span
-            className={`flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] ${t.mintBadge}`}
-          >
+          <span className={`flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] ${t.mintBadge}`}>
             <FiTrendingUp size={11} />
-            <span dir="ltr">+18.4%</span>
+            <span dir="ltr">Live</span>
           </span>
           <span className={t.muted}>{tr("stats.liveViews.note")}</span>
         </div>
@@ -157,7 +236,7 @@ const handleExport = async () => {
     },
     {
       key: "activeClips",
-      value: "4",
+      value: loading ? "—" : String(activeClips),
       Icon: MdOutlineVideoLibrary,
       valueColor: t.title,
       unitColor: `font-bold ${t.gold}`,
@@ -170,7 +249,7 @@ const handleExport = async () => {
     },
     {
       key: "verifiedViews",
-      value: "1,620,000",
+      value: loading ? "—" : totalViews.toLocaleString("en-US"),
       Icon: MdOutlineVerifiedUser,
       valueColor: t.title,
       unitColor: t.muted,
@@ -183,16 +262,14 @@ const handleExport = async () => {
     },
     {
       key: "flowSpeed",
-      value: "~48",
+      value: loading ? "—" : `~${clips.length > 0 ? Math.round(totalViews / Math.max(clips.length, 1) / 1000) : 0}K`,
       Icon: MdOutlineSpeed,
       valueColor: t.gold,
       unitColor: t.muted,
       footer: (
         <div className="flex w-full items-center justify-between text-xs">
           <span className={t.muted}>{tr("stats.flowSpeed.note")}</span>
-          <span
-            className={`rounded-md px-2 py-0.5 text-[10px] ${t.mintBadge}`}
-          >
+          <span className={`rounded-md px-2 py-0.5 text-[10px] ${t.mintBadge}`}>
             {tr("stats.flowSpeed.badge")}
           </span>
         </div>
@@ -321,13 +398,31 @@ const handleExport = async () => {
 
       {/* القائمة */}
       <div className="space-y-4">
-        {filtered.length ? (
-                filtered.map((clip) => <ClipCard key={clip.id} clip={clip} />)
-              ) : (
-                <p className={`rounded-2xl border p-8 text-center text-sm ${t.card} ${t.muted}`}>
-                  {tr("noResults")}
-                </p>
-              )}
+        {/* حالة التحميل */}
+        {loading && (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 size={28} className="animate-spin text-[#FB8F00]" />
+          </div>
+        )}
+
+        {/* حالة الخطأ */}
+        {!loading && error && (
+          <div className={`flex items-center gap-3 rounded-2xl border p-5 ${t.card}`}>
+            <FiAlertCircle size={20} className="shrink-0 text-red-400" />
+            <p className="text-sm text-red-400">{error}</p>
+          </div>
+        )}
+
+        {/* القائمة الفعلية */}
+        {!loading && !error && (
+          filtered.length ? (
+            filtered.map((clip) => <ClipCard key={clip.id} clip={clip} />)
+          ) : (
+            <p className={`rounded-2xl border p-8 text-center text-sm ${t.card} ${t.muted}`}>
+              {tr("noResults")}
+            </p>
+          )
+        )}
       </div>
 
       {/* صندوق التوضيح */}

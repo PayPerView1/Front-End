@@ -38,6 +38,11 @@ import {
   MdOutlineCategory,
   MdOutlineApps,
   MdOutlineNotificationsActive,
+  MdOutlineTag,
+  MdOutlineKey,
+  MdOutlineAlternateEmail,
+  MdOutlineTimer,
+  MdOutlineAspectRatio,
 } from "react-icons/md";
 import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
@@ -238,6 +243,22 @@ const mapDiscoverCampaign = (campaign) => ({
   total: Number(campaign.totalBudget ?? campaign.remainingBudget ?? 0),
   endsAt: campaign.endDate,
   applied: Boolean(campaign.applicationStatus),
+  // ── الحقول الجديدة ──
+  requiredHashtags: Array.isArray(campaign.requiredHashtags)
+    ? campaign.requiredHashtags
+    : campaign.requiredHashtags ? String(campaign.requiredHashtags).split(/[\s,]+/).filter(Boolean) : [],
+  requiredKeywords: Array.isArray(campaign.requiredKeywords)
+    ? campaign.requiredKeywords
+    : campaign.requiredKeywords ? String(campaign.requiredKeywords).split(/[,،]+/).map((k) => k.trim()).filter(Boolean) : [],
+  requiredMentions: Array.isArray(campaign.requiredMentions)
+    ? campaign.requiredMentions
+    : campaign.requiredMentions ? String(campaign.requiredMentions).split(/\s+/).filter(Boolean) : [],
+  aspectRatio: campaign.aspectRatio ?? "",
+  minDurationSec: campaign.minDurationSec ?? null,
+  maxDurationSec: campaign.maxDurationSec ?? null,
+  shariaNote: campaign.shariaNote ?? "",
+  offerCondition: campaign.offerCondition ?? "",
+  clipIdea: campaign.clipIdea ?? "",
 });
 
 function pageList(current, totalPages) {
@@ -526,6 +547,83 @@ function CampaignCard({
               })}
             </span>
           </div>
+
+          {/* هاشتاغات */}
+          {c.requiredHashtags && c.requiredHashtags.length > 0 && (
+            <div className="flex items-start gap-2">
+              <span className={`flex w-16 shrink-0 items-center gap-1 ${t.subText}`}>
+                <MdOutlineTag size={14} />
+                هاشتاغات
+              </span>
+              <span className={`flex flex-wrap gap-x-1.5 gap-y-1 ${t.text}`}>
+                {c.requiredHashtags.slice(0, 4).map((tag, i) => (
+                  <span key={i} className="text-[10px] text-[#94D3C1] font-medium">{tag.startsWith('#') ? tag : `#${tag}`}</span>
+                ))}
+                {c.requiredHashtags.length > 4 && (
+                  <span className={`text-[10px] ${t.subText}`}>+{c.requiredHashtags.length - 4}</span>
+                )}
+              </span>
+            </div>
+          )}
+
+          {/* كلمات مفتاحية */}
+          {c.requiredKeywords && c.requiredKeywords.length > 0 && (
+            <div className="flex items-start gap-2">
+              <span className={`flex w-16 shrink-0 items-center gap-1 ${t.subText}`}>
+                <MdOutlineKey size={14} />
+                كلمات
+              </span>
+              <span className={`flex flex-wrap gap-x-1.5 gap-y-1 ${t.text}`}>
+                {c.requiredKeywords.slice(0, 3).map((kw, i) => (
+                  <span key={i} className={`text-[10px] rounded px-1.5 py-0.5 border ${isDark ? 'border-[#2D2D2D] text-[#9A9A9A]' : 'border-[#E2E8F0] text-[#64748B]'}`}>{kw}</span>
+                ))}
+                {c.requiredKeywords.length > 3 && (
+                  <span className={`text-[10px] ${t.subText}`}>+{c.requiredKeywords.length - 3}</span>
+                )}
+              </span>
+            </div>
+          )}
+
+          {/* منشنات */}
+          {c.requiredMentions && c.requiredMentions.length > 0 && (
+            <div className="flex items-start gap-2">
+              <span className={`flex w-16 shrink-0 items-center gap-1 ${t.subText}`}>
+                <MdOutlineAlternateEmail size={14} />
+                منشنات
+              </span>
+              <span className={`flex flex-wrap gap-x-1.5 gap-y-1 ${t.text}`}>
+                {c.requiredMentions.slice(0, 3).map((m, i) => (
+                  <span key={i} className="text-[10px] text-[#E9C349] font-medium">{m.startsWith('@') ? m : `@${m}`}</span>
+                ))}
+                {c.requiredMentions.length > 3 && (
+                  <span className={`text-[10px] ${t.subText}`}>+{c.requiredMentions.length - 3}</span>
+                )}
+              </span>
+            </div>
+          )}
+
+          {/* نسبة الأبعاد + المدة */}
+          {(c.aspectRatio || c.minDurationSec != null || c.maxDurationSec != null) && (
+            <div className="flex items-center gap-2">
+              <span className={`flex w-16 shrink-0 items-center gap-1 ${t.subText}`}>
+                <MdOutlineAspectRatio size={14} />
+                مواصف
+              </span>
+              <span className={`flex items-center gap-2 ${t.text}`}>
+                {c.aspectRatio && (
+                  <span className="text-[10px] rounded border px-1.5 py-0.5 border-[#FF8C00]/40 text-[#FF8C00]">{c.aspectRatio}</span>
+                )}
+                {(c.minDurationSec != null || c.maxDurationSec != null) && (
+                  <span className={`text-[10px] flex items-center gap-0.5 ${t.subText}`}>
+                    <MdOutlineTimer size={11} />
+                    {c.minDurationSec != null ? `${c.minDurationSec}s` : ""}
+                    {c.minDurationSec != null && c.maxDurationSec != null ? " - " : ""}
+                    {c.maxDurationSec != null ? `${c.maxDurationSec}s` : ""}
+                  </span>
+                )}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* العائد والميزانية */}

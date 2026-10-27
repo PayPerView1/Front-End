@@ -103,3 +103,49 @@ export async function updateDraft(draftId, data) {
     };
   }
 }
+
+// ─── UPLOAD Cover Image ────────────────────────────────────────────────────────
+/**
+ * ترفع صورة الحملة للباك وتُرجع الـ URL.
+ * تجرب endpoints متعددة بالترتيب حتى تنجح.
+ * @param {File} file
+ * @returns {Promise<string>} imageUrl
+ */
+export async function uploadCoverImage(file) {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("type", "campaign_cover");
+
+  const endpoints = [
+    "/api/v1/upload/image",
+    "/api/v1/media/upload",
+    "/api/v1/files/upload",
+    "/api/v1/upload",
+  ];
+
+  for (const endpoint of endpoints) {
+    try {
+      const response = await axiosInstance.post(endpoint, fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const d = response.data;
+      const url =
+        d?.data?.url ??
+        d?.data?.imageUrl ??
+        d?.data?.file?.url ??
+        d?.data?.path ??
+        d?.url ??
+        d?.imageUrl ??
+        d?.file?.url ??
+        d?.path ??
+        d?.link;
+      if (url && typeof url === "string") return url;
+    } catch (err) {
+      const status = err?.status ?? err?.response?.status;
+      if (status === 404) continue; // جرب التالي
+      throw err; // خطأ حقيقي (auth، server error...)
+    }
+  }
+
+  throw new Error("لم يتم العثور على endpoint لرفع الصور — تحقق من إعدادات الباك");
+}

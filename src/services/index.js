@@ -115,7 +115,16 @@ const api = {
   markNotificationRead: applications.markNotificationRead,
   markAllNotificationsRead: applications.markAllNotificationsRead,
 
-  // Submissions (Sprint 5)
+  // Downloads §3 (Sprint 5)
+  getApplicationMaterialsV5: submissions.getApplicationMaterialsV5,
+  getDownloadLink: submissions.getDownloadLink,
+  downloadAll: submissions.downloadAll,
+  redeemDownloadLink: submissions.redeemDownloadLink,
+  getRedeemDownloadUrl: submissions.getRedeemDownloadUrl,
+  reportDownload: submissions.reportDownload,
+  getWhoDownloaded: submissions.getWhoDownloaded,
+
+  // Submissions §5 (Sprint 5)
   getEligibleCampaigns: submissions.getEligibleCampaigns,
   getSubmissionRequirements: submissions.getSubmissionRequirements,
   verifyLink: submissions.verifyLink,
@@ -128,6 +137,12 @@ const api = {
   withdrawSubmission: submissions.withdrawSubmission,
   updateSubmissionLink: submissions.updateSubmissionLink,
   resubmit: submissions.resubmit,
+
+  // Review §6 (Sprint 5)
+  getCampaignSubmissions: submissions.getCampaignSubmissions,
+  reviewSubmission: submissions.reviewSubmission,
+  getManualReviewQueue: submissions.getManualReviewQueue,
+  decideManualReview: submissions.decideManualReview,
 
   // Helpers
   getToken,

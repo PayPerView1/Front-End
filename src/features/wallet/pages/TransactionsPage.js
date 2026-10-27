@@ -16,6 +16,7 @@ import {
   getTransactions,
   getTransactionById,
   exportTransactions,
+  exportTransactionsPdf,
 } from "@/features/wallet/services/walletService";
 
 // Components
@@ -117,7 +118,11 @@ export default function AnalyticsPage() {
 
   // ─── Export ──────────────────────────────────────────────────────────────────
   const handleExport = useCallback(async (params = {}) => {
-    await exportTransactions({ ...exportFilters, ...params });
+    if (params?.format === "pdf") {
+      await exportTransactionsPdf({ ...exportFilters, ...params });
+    } else {
+      await exportTransactions({ ...exportFilters, ...params });
+    }
   }, [exportFilters]);
 
   if (isInitialLoad) return <PageLoader />;

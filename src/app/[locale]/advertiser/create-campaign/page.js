@@ -9,6 +9,7 @@ import {
   saveDraft,
   autoSaveDraft,
   createCampaignJson,
+  uploadCoverImage,
 } from "@/services/campaignApi";
 import { getDraftById, deleteDraft } from "@/services/drafts";
 import { submitDraft as submitDraftToCampaign, getCampaignAiReview } from "@/services/campaign";
@@ -20,18 +21,6 @@ function triggerAiReview(campaignId) {
   getCampaignAiReview(campaignId)
     .then((res) => console.log("🤖 [AI Review] تم تشغيل المراجعة:", res))
     .catch((err) => console.warn("⚠️ [AI Review] فشل تشغيل المراجعة:", err?.message));
-}
-
-// Helper: رفع صورة الحملة (عدّلي المسار حسب الـ API عندكم)
-async function uploadCoverImage(file) {
-  const fd = new FormData();
-  fd.append("file", file);
-
-  const res = await fetch("/api/upload", { method: "POST", body: fd });
-  if (!res.ok) throw new Error("فشل رفع صورة الحملة");
-
-  const data = await res.json();
-  return data?.data?.url || data?.url;
 }
 
 import {
@@ -50,7 +39,27 @@ import {
   MdPublic,
   MdPeopleOutline,
   MdErrorOutline,
+  MdOutlineTimer,
+  MdOutlineAspectRatio,
+  MdOutlineTag,
+  MdOutlineKey,
+  MdOutlineAlternateEmail,
+  MdOutlineGavel,
+  MdLocalOffer,
+  MdOutlineLightbulb,
 } from "react-icons/md";
+import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+
+const ALL_PLATFORMS = [
+  { key: "tiktok",    icon: FaTiktok,     label: "TikTok",     color: "#FFFFFF",  darkOnly: true },
+  { key: "instagram", icon: FaInstagram,  label: "Instagram",  color: "#E1306C" },
+  { key: "youtube",   icon: FaYoutube,    label: "YouTube",    color: "#FF0000" },
+  { key: "facebook",  icon: FaFacebookF,  label: "Facebook",   color: "#1877F2" },
+  { key: "x",         icon: FaXTwitter,   label: "X (Twitter)", color: "#E7E9EA" },
+];
+
+const ASPECT_RATIOS = ["9:16", "1:1", "4:5", "16:9", "3:4"];
 
 const CONTENT_TYPE_IDS = [
   "CLIPPING",
@@ -520,6 +529,119 @@ function Step1({
           }}
         />
       </div>
+
+      {/* ── المنصات ── */}
+      <div>
+        <label className={`text-xs block mb-2.5 ${dark ? "text-white" : "text-[#111]"}`}>
+          المنصات المستهدفة
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {ALL_PLATFORMS.map((p) => {
+            const active = (form.platforms || []).includes(p.key);
+            const PIcon = p.icon;
+            return (
+              <button
+                key={p.key}
+                type="button"
+                onClick={() =>
+                  setForm((prev) => {
+                    const cur = prev.platforms || [];
+                    return {
+                      ...prev,
+                      platforms: active
+                        ? cur.filter((k) => k !== p.key)
+                        : [...cur, p.key],
+                    };
+                  })
+                }
+                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition-all ${
+                  active
+                    ? dark
+                      ? "border-[#94D3C1] bg-[#94D3C1]/10 text-white"
+                      : "border-[#94D3C1] bg-[#94D3C1]/15 text-[#0D4C3C]"
+                    : dark
+                    ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-[#9A9A9A]"
+                    : "bg-white border-[#E5E5E5] text-[#666]"
+                }`}
+              >
+                <PIcon size={14} color={active ? p.color : "#9A9A9A"} />
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── نسبة العرض إلى الارتفاع ── */}
+      <div>
+        <label className={`text-xs block mb-2.5 ${dark ? "text-white" : "text-[#111]"}`}>
+          <MdOutlineAspectRatio size={13} className="inline mr-1" />
+          نسبة الأبعاد (Aspect Ratio)
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {ASPECT_RATIOS.map((ratio) => {
+            const active = form.aspectRatio === ratio;
+            return (
+              <button
+                key={ratio}
+                type="button"
+                onClick={() => setForm((p) => ({ ...p, aspectRatio: active ? "" : ratio }))}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition-all ${
+                  active
+                    ? "border-[#FF8C00] bg-[#FF8C00]/15 text-[#FF8C00]"
+                    : dark
+                    ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-[#9A9A9A]"
+                    : "bg-white border-[#E5E5E5] text-[#666]"
+                }`}
+              >
+                {ratio}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── مدة الفيديو (ثانية) ── */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label className={`text-xs flex items-center gap-1 ${dark ? "text-white" : "text-[#111]"}`}>
+            <MdOutlineTimer size={13} />
+            الحد الأدنى للمدة (ثانية)
+          </label>
+          <input
+            type="number"
+            min="0"
+            value={form.minDurationSec}
+            onChange={(e) => setForm((p) => ({ ...p, minDurationSec: e.target.value }))}
+            placeholder="15"
+            className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors focus:border-[rgba(148,211,193,1)] ${
+              dark
+                ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+                : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
+            }`}
+            style={{ direction: "ltr", colorScheme: dark ? "dark" : "light" }}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className={`text-xs flex items-center gap-1 ${dark ? "text-white" : "text-[#111]"}`}>
+            <MdOutlineTimer size={13} />
+            الحد الأقصى للمدة (ثانية)
+          </label>
+          <input
+            type="number"
+            min="0"
+            value={form.maxDurationSec}
+            onChange={(e) => setForm((p) => ({ ...p, maxDurationSec: e.target.value }))}
+            placeholder="60"
+            className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors focus:border-[rgba(148,211,193,1)] ${
+              dark
+                ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+                : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
+            }`}
+            style={{ direction: "ltr", colorScheme: dark ? "dark" : "light" }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
@@ -528,11 +650,14 @@ function Step1({
 function Step2({
   t,
   dark,
+  isRtl,
   checked,
   setChecked,
   attempted,
   description,
   setDescription,
+  form,
+  setForm,
 }) {
   const allChecked = Object.values(checked).every(Boolean);
   const showError =
@@ -661,6 +786,126 @@ function Step2({
             {t("step1.required")}
           </span>
         )}
+      </div>
+
+      {/* ── الهاشتاغات المطلوبة ── */}
+      <div className="flex flex-col gap-1.5">
+        <label className={`text-xs flex items-center gap-1 ${dark ? "text-white" : "text-[#111]"}`}>
+          <MdOutlineTag size={14} />
+          الهاشتاغات المطلوبة
+        </label>
+        <input
+          type="text"
+          value={form.requiredHashtags}
+          onChange={(e) => setForm((p) => ({ ...p, requiredHashtags: e.target.value }))}
+          placeholder="#حلال #استثمار #ادخار (افصل بمسافة أو فاصلة)"
+          className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors focus:border-[rgba(148,211,193,1)] ${
+            dark
+              ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+              : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
+          }`}
+          style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
+        />
+      </div>
+
+      {/* ── الكلمات المفتاحية ── */}
+      <div className="flex flex-col gap-1.5">
+        <label className={`text-xs flex items-center gap-1 ${dark ? "text-white" : "text-[#111]"}`}>
+          <MdOutlineKey size={14} />
+          الكلمات المفتاحية المطلوبة
+        </label>
+        <input
+          type="text"
+          value={form.requiredKeywords}
+          onChange={(e) => setForm((p) => ({ ...p, requiredKeywords: e.target.value }))}
+          placeholder="استثمار، ادخار، ذهب، شريعة (افصل بفاصلة)"
+          className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors focus:border-[rgba(148,211,193,1)] ${
+            dark
+              ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+              : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
+          }`}
+          style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
+        />
+      </div>
+
+      {/* ── المنشنات المطلوبة ── */}
+      <div className="flex flex-col gap-1.5">
+        <label className={`text-xs flex items-center gap-1 ${dark ? "text-white" : "text-[#111]"}`}>
+          <MdOutlineAlternateEmail size={14} />
+          المنشنات المطلوبة
+        </label>
+        <input
+          type="text"
+          value={form.requiredMentions}
+          onChange={(e) => setForm((p) => ({ ...p, requiredMentions: e.target.value }))}
+          placeholder="@حساب1 @حساب2 (افصل بمسافة)"
+          className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none box-border transition-colors focus:border-[rgba(148,211,193,1)] ${
+            dark
+              ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+              : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
+          }`}
+          style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
+        />
+      </div>
+
+      {/* ── ملاحظة شرعية ── */}
+      <div className="flex flex-col gap-1.5">
+        <label className={`text-xs flex items-center gap-1 ${dark ? "text-white" : "text-[#111]"}`}>
+          <MdOutlineGavel size={14} />
+          الملاحظة الشرعية (Sharia Note)
+        </label>
+        <textarea
+          value={form.shariaNote}
+          onChange={(e) => setForm((p) => ({ ...p, shariaNote: e.target.value }))}
+          placeholder="أي قيود أو ضوابط شرعية تنطبق على هذه الحملة..."
+          rows={3}
+          className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none resize-y box-border transition-colors focus:border-[rgba(148,211,193,1)] ${
+            dark
+              ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+              : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
+          }`}
+          style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
+        />
+      </div>
+
+      {/* ── شرط العرض / Offer Condition ── */}
+      <div className="flex flex-col gap-1.5">
+        <label className={`text-xs flex items-center gap-1 ${dark ? "text-white" : "text-[#111]"}`}>
+          <MdLocalOffer size={14} />
+          شرط العرض (Offer Condition)
+        </label>
+        <textarea
+          value={form.offerCondition}
+          onChange={(e) => setForm((p) => ({ ...p, offerCondition: e.target.value }))}
+          placeholder="الشروط الخاصة التي يجب تلبيتها للحصول على المكافأة..."
+          rows={3}
+          className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none resize-y box-border transition-colors focus:border-[rgba(148,211,193,1)] ${
+            dark
+              ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+              : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
+          }`}
+          style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
+        />
+      </div>
+
+      {/* ── فكرة الكليب / Clip Idea ── */}
+      <div className="flex flex-col gap-1.5">
+        <label className={`text-xs flex items-center gap-1 ${dark ? "text-white" : "text-[#111]"}`}>
+          <MdOutlineLightbulb size={14} />
+          فكرة الكليب (Clip Idea)
+        </label>
+        <textarea
+          value={form.clipIdea}
+          onChange={(e) => setForm((p) => ({ ...p, clipIdea: e.target.value }))}
+          placeholder="وصف مختصر للفكرة الإبداعية المطلوب تنفيذها في الكليب..."
+          rows={3}
+          className={`w-full rounded-lg border px-3.5 py-2.5 text-sm outline-none resize-y box-border transition-colors focus:border-[rgba(148,211,193,1)] ${
+            dark
+              ? "bg-[rgba(17,20,21,1)] border-[rgba(63,73,69,1)] text-white placeholder:text-[#9A9A9A]"
+              : "bg-white border-[#E5E5E5] text-[#111] placeholder:text-[#999]"
+          }`}
+          style={{ direction: isRtl ? "rtl" : "ltr", fontFamily: "var(--font-tajawal,inherit)" }}
+        />
       </div>
 
       {showError && (
@@ -1351,6 +1596,17 @@ export default function NewCampaignPage() {
     audience: "",
     subCategories: [],
     targetCountries: [],
+    // ── الحقول الجديدة ──
+    platforms: [],
+    requiredHashtags: "",
+    requiredKeywords: "",
+    requiredMentions: "",
+    aspectRatio: "",
+    minDurationSec: "",
+    maxDurationSec: "",
+    shariaNote: "",
+    offerCondition: "",
+    clipIdea: "",
     brief: {
       mainIdea: "",
       tone: "",
@@ -1446,7 +1702,25 @@ export default function NewCampaignPage() {
               d.brief?.audience || d.audience || "",
             subCategories: d.subCategories || [],
             targetCountries: d.targetCountries || [],
-
+            // ── الحقول الجديدة ──
+            platforms: Array.isArray(d.platforms)
+              ? d.platforms.map((p) => (typeof p === "string" ? p.toLowerCase() : p?.key ?? ""))
+              : [],
+            requiredHashtags: Array.isArray(d.requiredHashtags)
+              ? d.requiredHashtags.join(" ")
+              : (d.requiredHashtags || ""),
+            requiredKeywords: Array.isArray(d.requiredKeywords)
+              ? d.requiredKeywords.join(", ")
+              : (d.requiredKeywords || ""),
+            requiredMentions: Array.isArray(d.requiredMentions)
+              ? d.requiredMentions.join(" ")
+              : (d.requiredMentions || ""),
+            aspectRatio: d.aspectRatio || "",
+            minDurationSec: d.minDurationSec != null ? String(d.minDurationSec) : "",
+            maxDurationSec: d.maxDurationSec != null ? String(d.maxDurationSec) : "",
+            shariaNote: d.shariaNote || "",
+            offerCondition: d.offerCondition || "",
+            clipIdea: d.clipIdea || "",
             brief: {
               ...prev.brief,
               mainIdea: mainIdeaVal,
@@ -1597,6 +1871,24 @@ export default function NewCampaignPage() {
 
       halalDeclared:
         Object.values(checked).every(Boolean),
+
+      // ── الحقول الجديدة ──
+      platforms: form.platforms,
+      requiredHashtags: form.requiredHashtags
+        ? form.requiredHashtags.split(/[\s,]+/).filter(Boolean)
+        : undefined,
+      requiredKeywords: form.requiredKeywords
+        ? form.requiredKeywords.split(/[,،]+/).map((k) => k.trim()).filter(Boolean)
+        : undefined,
+      requiredMentions: form.requiredMentions
+        ? form.requiredMentions.split(/\s+/).filter(Boolean)
+        : undefined,
+      aspectRatio: form.aspectRatio || undefined,
+      minDurationSec: form.minDurationSec ? Number(form.minDurationSec) : undefined,
+      maxDurationSec: form.maxDurationSec ? Number(form.maxDurationSec) : undefined,
+      shariaNote: form.shariaNote || undefined,
+      offerCondition: form.offerCondition || undefined,
+      clipIdea: form.clipIdea || undefined,
     };
 
     try {
@@ -1679,6 +1971,24 @@ export default function NewCampaignPage() {
             form.brief.mainIdea,
           audience: form.audience,
         },
+
+        // ── الحقول الجديدة ──
+        platforms: form.platforms,
+        requiredHashtags: form.requiredHashtags
+          ? form.requiredHashtags.split(/[\s,]+/).filter(Boolean)
+          : [],
+        requiredKeywords: form.requiredKeywords
+          ? form.requiredKeywords.split(/[,،]+/).map((k) => k.trim()).filter(Boolean)
+          : [],
+        requiredMentions: form.requiredMentions
+          ? form.requiredMentions.split(/\s+/).filter(Boolean)
+          : [],
+        aspectRatio: form.aspectRatio || undefined,
+        minDurationSec: form.minDurationSec ? Number(form.minDurationSec) : undefined,
+        maxDurationSec: form.maxDurationSec ? Number(form.maxDurationSec) : undefined,
+        shariaNote: form.shariaNote || undefined,
+        offerCondition: form.offerCondition || undefined,
+        clipIdea: form.clipIdea || undefined,
       };
 
       if (coverImageUrl) {
@@ -1883,11 +2193,14 @@ export default function NewCampaignPage() {
         <Step2
           t={t}
           dark={dark}
+          isRtl={isRtl}
           checked={checked}
           setChecked={setChecked}
           attempted={attempted}
           description={description}
           setDescription={setDescription}
+          form={form}
+          setForm={setForm}
         />
       );
     }

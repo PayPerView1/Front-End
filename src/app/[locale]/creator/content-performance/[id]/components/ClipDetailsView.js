@@ -1,10 +1,11 @@
 "use client";
 
-import { useParams, useSearchParams, notFound } from "next/navigation";
-import { getClipById } from "../../data";
+import { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import { Link } from "@/i18n/navigation";
+import { getSubmission, withdrawSubmission } from "@/services/submissions";
 import {
   FiArrowRight,
   FiArrowLeft,
@@ -20,6 +21,7 @@ import {
 } from "react-icons/fi";
 import { FaTiktok } from "react-icons/fa";
 import { MdOutlineLightbulb } from "react-icons/md";
+import { Loader2 } from "lucide-react";
 import ClipHeader from "./ClipHeader";
 import StatusBanner from "./StatusBanner";
 import DailyViewsChart from "./DailyViewsChart";
@@ -79,6 +81,65 @@ const lightTheme = {
 
 const cta =
   "bg-[linear-gradient(90deg,#FB8B03_0%,#FA6203_100%)] text-white font-bold";
+
+// ─── تحويل SubmissionDetail → شكل clip المحلي ─────────────────────────────────
+const PLATFORM_MAP = {
+  TIKTOK: "tiktok",
+  INSTAGRAM: "reels",
+  YOUTUBE: "shorts",
+};
+
+function mapDisplayStatus(ds) {
+  if (ds === "PROCESSING" || ds === "MANUAL_REVIEW") return "waiting";
+  if (ds === "AI_REJECTED" || ds === "REJECTED") return "error";
+  if (ds === "APPROVED" || ds === "AWAITING_ADVERTISER") return "normal";
+  return "normal";
+}
+
+function formatDuration(sec) {
+  if (!sec) return "00:00";
+  const m = Math.floor(sec / 60).toString().padStart(2, "0");
+  const s = (sec % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+function mapToClip(sub) {
+  return {
+    id: sub.id,
+    code: sub.code,
+    displayStatus: sub.displayStatus,
+    status: mapDisplayStatus(sub.displayStatus),
+    platform: PLATFORM_MAP[sub.platform] || "tiktok",
+    title: sub.campaign?.name || "—",
+    campaign: sub.campaign?.brand?.name || "—",
+    publishedAgo: sub.submittedAt
+      ? new Date(sub.submittedAt).toLocaleDateString("ar-SA")
+      : "",
+    publishedLabel: sub.submittedAt
+      ? new Date(sub.submittedAt).toLocaleString("ar-SA")
+      : "",
+    completion: null,
+    earnings: sub.reward ?? null,
+    rate: null,
+    views: sub.preview?.stats?.viewCount ?? null,
+    duration: formatDuration(sub.preview?.durationSec),
+    seconds: sub.preview?.durationSec ?? null,
+    thumbnail: sub.preview?.thumbnailUrl || null,
+    url: sub.postUrl || sub.canonicalUrl || "#",
+    daily: null,
+    aiScore: sub.aiScore ?? null,
+    checks: sub.checks || [],
+    rejectionReasons: sub.rejectionReasons || [],
+    rejectedBy: sub.rejectedBy || null,
+    reviewNote: sub.reviewNote || null,
+    canWithdraw: sub.canWithdraw ?? false,
+    canUpdateLink: sub.canUpdateLink ?? false,
+    canResubmit: sub.canResubmit ?? false,
+    steps: sub.steps || [],
+    manualReview: sub.manualReview || null,
+    campaignId: sub.campaign?.id || sub.campaignId || sub.campaign?._id || "",
+  };
+}
 
 /* ---------- حالة الانتظار ---------- */
 function WaitingSection({ t, tr, isDark }) {
@@ -182,43 +243,29 @@ function ErrorSection({ t, tr, clip }) {
 
   return (
     <div className={`grid grid-cols-1 gap-4 rounded-2xl border p-5 lg:grid-cols-5 ${t.card}`}>
-    {/*  البطاقة المرئية المطابقة تماماً للتصميم الجديد */}
       <div
         className={`flex flex-col items-center justify-center gap-4 rounded-xl p-6 text-center lg:col-span-2 ${t.sub}`}
       >
         <PulseRings color="#94D3C1" size={190}>
           <div className="flex items-center gap-2">
-            {/* الدائرة الأولى (منجز) */}
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0F3830] text-[#94D3C1] border border-[#94D3C1]/50">
               <FiCheck size={16} />
             </div>
-
-            {/* خط منقط فاصل */}
             <div className="w-5 border-t border-dashed border-[#94D3C1]/40" />
-
-            {/* الدائرة الثانية (نشط/قيد المعالجة) */}
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FA6203]/20 text-[#FA6203] border-2 border-[#FA6203]">
               <FiRefreshCw size={18} className="animate-spin" />
             </div>
-
-            {/* خط منقط فاصل */}
             <div className="w-5 border-t border-dashed border-[#94D3C1]/40" />
-
-            {/* الدائرة الثالثة (TikTok) */}
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1A1C1D] text-[#E9C349] border border-[#E9C349]/50">
               <FaTiktok size={14} />
             </div>
           </div>
         </PulseRings>
 
-        {/* شريط حالة Handshake */}
-        <span
-          className={`flex items-center gap-2 rounded-full border border-[#E9C349]/30 bg-[#1A1C1D] px-4 py-1.5 text-xs font-medium text-[#E9C349]`}
-        >
+        <span className="flex items-center gap-2 rounded-full border border-[#E9C349]/30 bg-[#1A1C1D] px-4 py-1.5 text-xs font-medium text-[#E9C349]">
           Handshake pending... <span className="h-2 w-2 rounded-full bg-[#AF8D11]" />
         </span>
 
-        {/* النصوص السفلية */}
         <div className="space-y-1">
           <p className={`text-sm font-bold ${t.title}`}>
             خوادم الزمرد تعمل بكفاءة 100%
@@ -228,7 +275,7 @@ function ErrorSection({ t, tr, clip }) {
           </p>
         </div>
       </div>
-      {/* الصفوف الثلاثة + الأزرار */}
+
       <div className="space-y-4 lg:col-span-3">
         <h3 className={`text-lg font-extrabold ${t.title}`}>
           {tr("error.title")}
@@ -254,9 +301,7 @@ function ErrorSection({ t, tr, clip }) {
                 </p>
               </div>
             </div>
-            <span
-              className={`w-fit shrink-0 rounded-md px-2 py-1 text-[11px] ${tone}`}
-            >
+            <span className={`w-fit shrink-0 rounded-md px-2 py-1 text-[11px] ${tone}`}>
               {tr(`error.${key}.badge`)}
             </span>
           </div>
@@ -279,8 +324,6 @@ function ErrorSection({ t, tr, clip }) {
           </a>
         </div>
       </div>
-
-      
     </div>
   );
 }
@@ -292,12 +335,8 @@ function Tips({ t, tr, type }) {
 
   return (
     <div className={`space-y-4 rounded-2xl border p-5 ${t.card}`}>
-      <h3
-        className={`flex items-center gap-2 text-base font-extrabold ${t.title}`}
-      >
-        <span
-          className={`flex h-9 w-9 items-center justify-center rounded-full ${t.sub} ${t.mint}`}
-        >
+      <h3 className={`flex items-center gap-2 text-base font-extrabold ${t.title}`}>
+        <span className={`flex h-9 w-9 items-center justify-center rounded-full ${t.sub} ${t.mint}`}>
           <TitleIcon size={18} />
         </span>
         {tr(`tips.${type}.title`)}
@@ -305,12 +344,8 @@ function Tips({ t, tr, type }) {
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         {items.map((item, i) => (
           <div key={item.title} className={`space-y-2 rounded-xl p-4 ${t.sub}`}>
-            <p
-              className={`flex items-center gap-2 text-sm font-bold ${t.title}`}
-            >
-              <span
-                className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${t.num}`}
-              >
+            <p className={`flex items-center gap-2 text-sm font-bold ${t.title}`}>
+              <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${t.num}`}>
                 {i + 1}
               </span>
               {item.title}
@@ -329,7 +364,7 @@ function Tips({ t, tr, type }) {
   );
 }
 
-/* ---------- الصفحة ---------- */
+/* ---------- الصفحة الرئيسية ---------- */
 export default function ClipDetailsView() {
   const { id } = useParams();
   const searchParams = useSearchParams();
@@ -338,12 +373,77 @@ export default function ClipDetailsView() {
   const { isDark } = useTheme();
   const t = isDark ? darkTheme : lightTheme;
 
-  const clip = getClipById(id);
-  if (!clip) notFound();
-  // ?status=anomaly | waiting | error للتجربة، احذفيها عند الربط بالـ API
-  const status = searchParams.get("status") || clip.status;
+  const [clip, setClip] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [withdrawing, setWithdrawing] = useState(false);
+  const [actionAlert, setActionAlert] = useState(null);
+
+  const handleWithdraw = async () => {
+    if (!window.confirm("هل أنت متأكد من سحب هذا التسليم لتحرير الرابط وتعديله؟")) return;
+    setWithdrawing(true);
+    try {
+      await withdrawSubmission(id);
+      setActionAlert({ type: "success", text: "تم سحب المقطع بنجاح، يمكنك الآن تعديله وإعادة تقديمه." });
+      setTimeout(() => window.location.reload(), 1500);
+    } catch (err) {
+      setActionAlert({ type: "error", text: err?.response?.data?.message || "فشلت عملية السحب" });
+    } finally {
+      setWithdrawing(false);
+    }
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchSubmission = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getSubmission(id);
+        if (!cancelled && data) {
+          setClip(mapToClip(data));
+        } else if (!cancelled) {
+          setError("لم يُعثر على التسليم");
+        }
+      } catch (err) {
+        if (!cancelled)
+          setError(err?.response?.data?.message || "تعذّر تحميل التفاصيل");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchSubmission();
+    return () => { cancelled = true; };
+  }, [id]);
+
+  // ?status=anomaly | waiting | error للتجربة، تُلغى عند الربط الكامل بالـ API
+  const statusOverride = searchParams.get("status");
+  const status = statusOverride || clip?.status || "normal";
   const showAnalytics = status === "normal" || status === "anomaly";
   const BackIcon = locale === "ar" ? FiArrowRight : FiArrowLeft;
+
+  if (loading) {
+    return (
+      <div className={`flex min-h-screen items-center justify-center ${t.page}`}>
+        <Loader2 size={32} className="animate-spin text-[#FB8F00]" />
+      </div>
+    );
+  }
+
+  if (error || !clip) {
+    return (
+      <div className={`flex min-h-screen flex-col items-center justify-center gap-4 p-8 ${t.page}`}>
+        <p className={`text-sm ${t.muted}`}>{error || "لم يُعثر على التسليم"}</p>
+        <Link
+          href="/creator/content-performance"
+          className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm transition ${t.pill}`}
+        >
+          <BackIcon size={16} />
+          {tr("back")}
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -359,6 +459,52 @@ export default function ClipDetailsView() {
           {status === "anomaly" ? tr("backToList") : tr("back")}
         </Link>
       </div>
+
+      {actionAlert && (
+        <div
+          className={`p-3 rounded-xl border text-xs font-bold ${
+            actionAlert.type === "success"
+              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+              : "bg-red-500/10 border-red-500/30 text-red-400"
+          }`}
+        >
+          {actionAlert.text}
+        </div>
+      )}
+
+      {(clip.canWithdraw || clip.canResubmit) && (
+        <div className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4 ${t.card}`}>
+          <div>
+            <p className={`text-sm font-bold ${t.title}`}>
+              {clip.canResubmit ? "المقطع بحاجة لتعديل وإعادة تسليم" : "متاح سحب المقطع لتعديل المنشور"}
+            </p>
+            <p className={`text-xs ${t.muted}`}>
+              {clip.canResubmit
+                ? "يمكنك تعديل الفيديو على المنصة ثم الضغط على زر إعادة التسليم لتحديث الرابط."
+                : "طالما أن المقطع لم يتم اعتماده نهائياً، يمكنك سحبه لتحرير الرابط ونشره مجدداً."}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {clip.canWithdraw && (
+              <button
+                onClick={handleWithdraw}
+                disabled={withdrawing}
+                className="flex items-center gap-1.5 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-2 text-xs font-bold text-red-400 hover:bg-red-500/20 transition disabled:opacity-50"
+              >
+                {withdrawing ? "جاري السحب..." : "سحب المقطع للتعديل"}
+              </button>
+            )}
+            {clip.canResubmit && (
+              <Link
+                href={clip.campaignId ? `/creator/start-project/${clip.campaignId}` : "/creator/start-project"}
+                className="flex items-center gap-1.5 rounded-xl bg-[linear-gradient(90deg,#FB8B03_0%,#FA6203_100%)] px-4 py-2 text-xs font-bold text-white hover:opacity-90 transition"
+              >
+                إعادة التسليم
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
 
       <StatusBanner status={status} clip={clip} />
       <ClipHeader clip={clip} status={status} />

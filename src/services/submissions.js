@@ -3,7 +3,190 @@ import axiosInstance, { handleError } from "@/lib/axiosInstance";
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const unwrap = (res) => (res?.data?.data !== undefined ? res.data.data : res?.data);
 
-// ─── 5. Submissions (Sprint 5) ────────────────────────────────────────────────
+// ─── §3. Source Materials & Downloads — CLIPPER ───────────────────────────────
+
+/**
+ * §3.1 قائمة المواد المصدرية للطلب (Breaking: downloadUrl مُزال — استخدم §3.2)
+ * GET /api/v1/applications/:id/materials
+ * @param {string} applicationId
+ */
+export const getApplicationMaterialsV5 = async (applicationId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/v1/applications/${applicationId}/materials`
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * §3.2 رابط تحميل ملف واحد (single-use, expires in ~5 min)
+ * POST /api/v1/applications/:id/materials/:materialId/download-link
+ * @param {string} applicationId
+ * @param {string} materialId
+ */
+export const getDownloadLink = async (applicationId, materialId) => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/v1/applications/${applicationId}/materials/${materialId}/download-link`
+    );
+    return unwrap(response);
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * §3.3 روابط تحميل جميع الملفات (one link per file — frontend downloads sequentially)
+ * POST /api/v1/applications/:id/materials/download-all
+ * @param {string} applicationId
+ */
+export const downloadAll = async (applicationId) => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/v1/applications/${applicationId}/materials/download-all`
+    );
+    return unwrap(response);
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * §3.4 استرداد رابط التحميل (Redeem link — 302 redirect) [PUBLIC-TOKEN]
+ * GET /api/v1/materials/download/:token
+ * @param {string} token
+ */
+export const redeemDownloadLink = async (token) => {
+  try {
+    const response = await axiosInstance.get(`/api/v1/materials/download/${token}`);
+    return unwrap(response);
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * رابط الاسترداد المباشر كـ URL
+ * @param {string} token
+ */
+export const getRedeemDownloadUrl = (token) => {
+  const baseURL = axiosInstance.defaults.baseURL || "";
+  return `${baseURL}/api/v1/materials/download/${token}`;
+};
+
+/**
+ * §3.5 الإبلاغ عن نتيجة التحميل (COMPLETED | FAILED)
+ * PATCH /api/v1/downloads/:logId
+ * @param {string} logId
+ * @param {{ status: 'COMPLETED'|'FAILED', reason?: string }} data
+ */
+export const reportDownload = async (logId, { status, reason } = {}) => {
+  try {
+    const response = await axiosInstance.patch(`/api/v1/downloads/${logId}`, {
+      status,
+      ...(reason ? { reason } : {}),
+    });
+    return unwrap(response);
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * §3.6 من قام بالتحميل — BRAND (مالك الحملة)
+ * GET /api/v1/campaigns/:campaignId/downloads
+ * @param {string} campaignId
+ * @param {{ page?: number, perPage?: number }} params
+ */
+export const getWhoDownloaded = async (campaignId, params = {}) => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/v1/campaigns/${campaignId}/downloads`,
+      { params }
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// ─── §6. Review (Brand & Admin) ───────────────────────────────────────────────
+
+/**
+ * §6.1 قائمة تسليمات حملة معينة — BRAND (مالك الحملة)
+ * GET /api/v1/campaigns/:campaignId/submissions
+ * @param {string} campaignId
+ * @param {{ displayStatus?: string, page?: number, perPage?: number }} params
+ */
+export const getCampaignSubmissions = async (campaignId, params = {}) => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/v1/campaigns/${campaignId}/submissions`,
+      { params }
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * §6.2 الموافقة أو الرفض — BRAND (مالك الحملة)
+ * PUT /api/v1/submissions/:id/review
+ * @param {string} submissionId
+ * @param {{ decision: 'APPROVE'|'REJECT', note?: string }} data
+ */
+export const reviewSubmission = async (submissionId, { decision, note } = {}) => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/v1/submissions/${submissionId}/review`,
+      { decision, ...(note ? { note } : {}) }
+    );
+    return unwrap(response);
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * §6.3 طابور المراجعة اليدوية — ADMIN
+ * GET /api/v1/admin/submissions/manual-review
+ * @param {{ page?: number, perPage?: number }} params
+ */
+export const getManualReviewQueue = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get(
+      "/api/v1/admin/submissions/manual-review",
+      { params }
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * §6.4 قرار المراجعة اليدوية — ADMIN
+ * PUT /api/v1/admin/submissions/:id/review
+ * @param {string} submissionId
+ * @param {{ decision: 'APPROVE'|'REJECT', note?: string }} data
+ */
+export const decideManualReview = async (submissionId, { decision, note } = {}) => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/v1/admin/submissions/${submissionId}/review`,
+      { decision, ...(note ? { note } : {}) }
+    );
+    return unwrap(response);
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// ─── §5. Submissions (Sprint 5) ───────────────────────────────────────────────
 
 /**
  * 4.1 الحملات المؤهلة لتسليم المشاريع (Eligible Campaigns for delivery)
@@ -227,6 +410,16 @@ export const resubmit = async (id, data = {}) => {
 };
 
 const submissionsService = {
+  // Downloads §3 (Sprint 5)
+  getApplicationMaterialsV5,
+  getDownloadLink,
+  downloadAll,
+  redeemDownloadLink,
+  getRedeemDownloadUrl,
+  reportDownload,
+  getWhoDownloaded,
+
+  // Submissions §4 & §5 (Sprint 5)
   getEligibleCampaigns,
   getSubmissionRequirements,
   verifyLink,
@@ -239,6 +432,12 @@ const submissionsService = {
   withdrawSubmission,
   updateSubmissionLink,
   resubmit,
+
+  // Review §6 (Sprint 5)
+  getCampaignSubmissions,
+  reviewSubmission,
+  getManualReviewQueue,
+  decideManualReview,
 };
 
 export default submissionsService;

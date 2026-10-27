@@ -1,11 +1,12 @@
 "use client";
 import ErrorBanner from "./ErrorBanner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Lightbulb } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { mockCampaigns } from "./campaignsData";
+import { getSubmissionRequirements } from "./submissionsApi";
 import ProgressSteps from "./ProgressSteps";
 import VideoPreview from "./VideoPreview";
 import DeadlineTimer from "./DeadlineTimer";
@@ -22,7 +23,32 @@ export default function SubmitContent() {
   const { isDark } = useTheme();
   const { campaignId } = useParams();
 
-  const campaign = mockCampaigns.find((c) => c.id === campaignId);
+  const mockCampaign = mockCampaigns.find((c) => c.id === campaignId);
+  const [realCampaign, setRealCampaign] = useState(null);
+
+  useEffect(() => {
+    if (!campaignId || mockCampaign) return;
+    getSubmissionRequirements(campaignId)
+      .then((data) => {
+        if (data) {
+          setRealCampaign({
+            id: data.campaignId,
+            code: data.code || data.campaignId?.slice(-8)?.toUpperCase(),
+            title: data.name,
+            account: data.requirements?.requiredMentions?.[0] || "",
+            hashtag: data.requirements?.requiredHashtags?.[0] || "",
+            hashtags: data.requirements?.requiredHashtags || [],
+            image: "/images/parthiom.webp",
+            duration: data.requirements?.durationRange
+              ? `${data.requirements.durationRange.min} - ${data.requirements.durationRange.max}`
+              : "30 - 60",
+          });
+        }
+      })
+      .catch(() => {});
+  }, [campaignId, mockCampaign]);
+
+  const campaign = mockCampaign || realCampaign;
 
   // الرابط والمنصة بتجي من النموذج لمعاينة الفيديو
   const [draft, setDraft] = useState({ link: "", platform: null });

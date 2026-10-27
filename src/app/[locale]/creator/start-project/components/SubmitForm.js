@@ -16,7 +16,7 @@ import {
 import { SiInstagram, SiTiktok, SiYoutube } from "react-icons/si";
 import { useTheme } from "@/context/ThemeContext";
 import { validateLink } from "./validateLink";
-import { createSubmission, verifyLink, saveDraft } from "./submissionsApi";
+import { createSubmission, verifyLink, saveDraft, getDraft } from "./submissionsApi";
 import PreviousSubmission from "./PreviousSubmission";
 
 // Sprint 5 error codes → internal reason keys
@@ -27,6 +27,8 @@ const serverReasons = {
   INVALID_LINK:                 "invalidUrl",
   POST_NOT_PUBLIC:              "notPublic",
   UNSUPPORTED_PLATFORM:        "unsupportedPlatform",
+  SUBMISSION_LIMIT_REACHED:     "limitReached",
+  APPLICATION_NOT_ACCEPTED:     "notAccepted",
 };
 
 const platforms = [
@@ -66,6 +68,22 @@ export default function SubmitForm({ campaign, campaignId, onChange, onError }) 
   useEffect(() => {
     onChange?.({ link, platform });
   }, [link, platform]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // §4.4: استرجاع المسودة المحفوظة مسبقاً للحملة
+  useEffect(() => {
+    if (!campaignId) return;
+    let cancelled = false;
+    getDraft(campaignId)
+      .then((draft) => {
+        if (!cancelled && draft) {
+          if (draft.platform) setPlatform(draft.platform.toLowerCase());
+          if (draft.url) setLink(draft.url);
+          if (draft.halalPledge) setChecked(true);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [campaignId]);
 
   const theme = {
     surface: isDark ? "bg-[#121617] border-[#1e2425]" : "bg-white border-[#e1e7e4]",

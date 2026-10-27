@@ -57,8 +57,9 @@ const normaliseApplication = (app) => ({
   note: app.message ?? null,
   trackingCode: app.id?.slice(-8)?.toUpperCase() ?? '',
   rejectionReason: null,
-  // keep a reference to the original applicationId for the API call
+  // keep a reference to the original applicationId and campaignId for the API calls
   applicationId: app.id,
+  campaignId: app.campaign?.id || app.campaignId || app.campaign?._id || '',
 });
 
 
@@ -672,9 +673,12 @@ export function OrdersContent() {
                         >
                           <XCircle size={14} /> {t('order.withdraw')}
                         </button>
-                        <button className={`${grayBtn} w-full justify-center sm:w-auto`}>
+                        <Link
+                          href={order.campaignId ? `/creator/discover/${order.campaignId}` : '/creator/discover'}
+                          className={`${grayBtn} w-full justify-center sm:w-auto`}
+                        >
                           <ExternalLink size={14} /> {t('order.campaignDetails')}
-                        </button>
+                        </Link>
                       </>
                     )}
 
@@ -683,9 +687,12 @@ export function OrdersContent() {
                         <button className={`${grayBtn} w-full justify-center sm:w-auto`}>
                           <MessageSquare size={14} /> {t('order.contactAdvertiser')}
                         </button>
-                        <button className="w-full justify-center px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 bg-[#94D3C1] text-[#0b2a22] sm:w-auto">
+                        <Link
+                          href={order.campaignId ? `/creator/start-project/${order.campaignId}` : '/creator/start-project'}
+                          className="w-full justify-center px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 bg-[#94D3C1] text-[#0b2a22] sm:w-auto hover:opacity-90"
+                        >
                           <Upload size={14} /> {t('order.uploadVideo')}
-                        </button>
+                        </Link>
                       </>
                     )}
                   </div>
