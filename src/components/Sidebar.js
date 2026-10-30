@@ -182,13 +182,27 @@ export default function Sidebar() {
         : "#666666";
 
   // ─── رندر رابط واحد ───────────────────────────────────────
+  const isItemActive = (item) => {
+    if (pathname === item.href) return true;
+    if (item.label === "startProject" && pathname?.startsWith(`${item.href}/`)) return true;
+    if (item.label === "discover" && pathname?.startsWith(`${item.href}/`)) return true;
+    if (item.label === "contentPerformance" && pathname?.startsWith(`${item.href}/`)) return true;
+    if (item.label === "billing" && pathname?.startsWith("/advertiser/wallet")) return true;
+    if (
+      item.label === "profile" &&
+      (pathname?.startsWith("/creator/edit-profile") ||
+        pathname?.startsWith("/advertiser/edit-profile") ||
+        pathname?.startsWith("/creator/profile") ||
+        pathname?.startsWith("/advertiser/profile") ||
+        pathname?.startsWith(`${item.href}/`))
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   const renderLink = (item) => {
-    const isActive =
-      pathname === item.href ||
-      (item.label === "startProject" && pathname?.startsWith(`${item.href}/`)) ||
-      (item.label === "discover" && pathname?.startsWith(`${item.href}/`)) ||
-      (item.label === "contentPerformance" && pathname?.startsWith(`${item.href}/`)) ||
-      (item.label === "billing" && pathname?.startsWith("/advertiser/wallet"));
+    const isActive = isItemActive(item);
     const Icon = item.icon;
 
     return (
@@ -275,7 +289,7 @@ export default function Sidebar() {
           </p>
           <nav className="flex flex-col gap-1">
             {resourceItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = isItemActive(item);
               const Icon = item.icon;
 
               return (

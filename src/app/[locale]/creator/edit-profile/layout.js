@@ -8,6 +8,7 @@ import { MdOutlineSecurity } from "react-icons/md";
 import {
   FiTarget,
   FiHeart,
+  FiUsers,      
   FiLink,
   FiBell,
   FiCreditCard,
@@ -20,6 +21,7 @@ const menuItems = [
   { key: "profile", path: "", icon: RiUserLine },
   { key: "interests", path: "interests", icon: FiTarget },
   { key: "favorites", path: "favorites", icon: FiHeart },
+  { key: "audience", path: "audience", icon: FiUsers },   // جديد
   { key: "linkedAccounts", path: "linked-accounts", icon: FiLink },
   { key: "security", path: "security", icon: MdOutlineSecurity },
   { key: "notifications", path: "notifications", icon: FiBell },
@@ -90,7 +92,7 @@ export default function Sidebar({ children }) {
                 ${
                   isActive
                     ? t.activeMenu
-                    : `bg-transparent ${t.subText}${t.hoverMenu}`
+                    : `bg-transparent ${t.subText} ${t.hoverMenu}`
                 }`}
               >
                 {/* الأيقونة مباشرة بدون إطار */}
