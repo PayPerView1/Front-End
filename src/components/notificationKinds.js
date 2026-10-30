@@ -17,6 +17,8 @@ export const KINDS = {
   CAMPAIGN_SUSPENDED: "CAMPAIGN_SUSPENDED",
   APPLICATION_REJECTED: "APPLICATION_REJECTED",
   APPLICATION_ACCEPTED: "APPLICATION_ACCEPTED",
+  AD_CLIP_SUBMITTED: "AD_CLIP_SUBMITTED",
+  CLIP_APPROVED: "CLIP_APPROVED",
 };
 
 export const KIND_META = {
@@ -102,6 +104,30 @@ export const KIND_META = {
     en: {
       title: "Congratulations! Your request to join the campaign was approved",
       body: "Your request for \"{campaign}\" was accepted. You now have full access to the ad materials, your tracking links and the creative guide, so you can start producing right away.",
+    },
+  },
+  [KINDS.AD_CLIP_SUBMITTED]: {
+    Icon: MdOutlineSend,
+    color: "#94D3C1",
+    ar: {
+      title: "{campaign}",
+      body: "تم تسليم مقطع فيديو إعلاني جديد بواسطة صانع المحتوى",
+    },
+    en: {
+      title: "{campaign}",
+      body: "A new advertising video clip has been submitted by the content creator.",
+    },
+  },
+  [KINDS.CLIP_APPROVED]: {
+    Icon: MdOutlineCheckCircleOutline,
+    color: "#4CC96B",
+    ar: {
+      title: "تم اعتماد المقطع",
+      body: "تم اعتماد مقطع {creator} لحملة «{campaign}».",
+    },
+    en: {
+      title: "Clip approved",
+      body: "{creator}'s clip for \"{campaign}\" has been approved.",
     },
   },
 };

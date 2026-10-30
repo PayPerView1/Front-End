@@ -91,7 +91,7 @@ export default function NotificationsPanel({ side = "left" }) {
 
   // Format message text to highlight @everyone
   const formatMessage = (msg) => {
-    const parts = msg.split(/(@everyone)/g);
+    const parts = String(msg ?? "").split(/(@everyone)/g);
     return parts.map((part, i) => {
       if (part === "@everyone") {
         return (
@@ -141,7 +141,9 @@ export default function NotificationsPanel({ side = "left" }) {
         {/* Text */}
         <div className="flex-1 min-w-0 flex flex-col">
           <div className="flex flex-row items-start justify-between gap-2 mb-1">
-            <h4 className={`text-xs font-bold leading-snug ${t.senderText}`}>{txt.title}</h4>
+            <h4 className={`text-xs font-bold leading-snug ${t.senderText}`}>
+              {fillText(txt.title, notif.params)}
+            </h4>
             <span className="text-[10px] text-gray-500 whitespace-nowrap">{date}</span>
           </div>
           <p className={`text-[11px] leading-relaxed break-words ${t.msgText}`}>

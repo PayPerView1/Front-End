@@ -315,7 +315,7 @@ export default function Sidebar() {
         className={`
           min-[1280px]:hidden fixed top-4
           ${locale === "ar" ? "right-4" : "left-4"}
-          z-[999999999999] w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
+          z-[90] w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
           ${
             isDark
               ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
@@ -339,7 +339,7 @@ export default function Sidebar() {
         dir={locale === "ar" ? "rtl" : "ltr"}
         className={`
           fixed ${locale === "ar" ? "right-0 border-l" : "left-0 border-r"}
-          top-0 h-screen w-[260px] flex flex-col z-[9999999999]
+          top-0 h-screen w-[260px] flex flex-col z-[80]
           ${t.bg}
           transition-transform duration-300 ease-in-out
           min-[1280px]:translate-x-0
