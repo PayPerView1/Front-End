@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 const tajawal = Tajawal({
   variable: "--font-tajawal",
-  subsets: ["arabic"],
+  subsets: ["arabic", "latin"],
   weight: ["400", "500", "700"],
   fallback: ["Tajawal", "system-ui", "sans-serif"],
 });

@@ -1407,14 +1407,7 @@
     "flowEyebrow": "A BETTER KIND OF REACH",
     "flowTitle": "Every view\nhas [[value.]]",
     "flowIntro": "From the first brief to the final verified view, every step connects to the next. A clear path from content to outcome.",
-    "steps": [
-      "Brand",
-      "Campaign",
-      "Clip",
-      "Views",
-      "Verified",
-      "Reward"
-    ],
+    "steps": ["Brand", "Campaign", "Clip", "Views", "Verified", "Reward"],
     "stepDetails": [
       "Set the brief",
       "Fund an idea",
@@ -1427,14 +1420,7 @@
     "loopEyebrow": "THE PAYPERVIEW LOOP",
     "loopTitle": "Create.\nClip. Watch.\n[[Earn.]]",
     "loopText": "A continuous cycle where good content finds its audience, and performance creates opportunity for everyone involved.",
-    "loop": [
-      "CREATE",
-      "CAMPAIGN",
-      "CLIP",
-      "WATCH",
-      "VERIFY",
-      "EARN"
-    ],
+    "loop": ["CREATE", "CAMPAIGN", "CLIP", "WATCH", "VERIFY", "EARN"],
     "brandsEyebrow": "FOR BRANDS",
     "brandsTitle": "Your content.\nTheir [[reach.]]",
     "brandsText": "Launch a campaign, bring creators into your story, and see how the workflow comes together as the platform takes shape.",
@@ -1443,20 +1429,11 @@
     "campaign": "Your campaign",
     "preview": "Preview",
     "inDevelopment": "IN DEVELOPMENT",
-    "tabs": [
-      "Overview",
-      "Creators",
-      "Content",
-      "Verification"
-    ],
+    "tabs": ["Overview", "Creators", "Content", "Verification"],
     "workspaceEyebrow": "YOUR NEXT STORY STARTS HERE",
     "workspaceTitle": "Build a campaign around your idea.",
     "workspaceText": "Your brief, creator matches, and campaign activity will come together here.",
-    "workflow": [
-      "Campaign brief",
-      "Creator stories",
-      "View verification"
-    ],
+    "workflow": ["Campaign brief", "Creator stories", "View verification"],
     "workspaceFoot": "Built for transparent campaign tracking",
     "workspaceLabel": "WORKSPACE PREVIEW",
     "clippersEyebrow": "FOR CREATORS",
@@ -1471,20 +1448,12 @@
     "verifiedEyebrow": "THE HEART OF THE PLATFORM",
     "verifiedTitle": "Not just views.\n[[Verified views.]]",
     "verifiedText": "Verification is designed to make campaign activity clear and connected from content to outcome.",
-    "checks": [
-      "Authenticity checks",
-      "Trackable activity",
-      "Campaign-linked"
-    ],
+    "checks": ["Authenticity checks", "Trackable activity", "Campaign-linked"],
     "verification": "VIEW VERIFICATION",
     "status": "IN DEVELOPMENT",
     "statusTitle": "VERIFICATION STATUS",
     "readyActivity": "Ready for campaign activity",
-    "verifySteps": [
-      "Content submitted",
-      "Activity checked",
-      "Views verified"
-    ],
+    "verifySteps": ["Content submitted", "Activity checked", "Views verified"],
     "verifyFoot": "VERIFICATION DETAILS WILL APPEAR WHEN A CAMPAIGN IS ACTIVE",
     "whyEyebrow": "WHY PAYPERVIEW",
     "whyTitle": "Performance\nwith [[purpose.]]",
@@ -1738,6 +1707,323 @@
     "cancel": "Cancel and go back",
     "close": "Close",
     "error": "Couldn't submit the report. Please try again."
+  },
+  "clipManagement": {
+    "title": "Choose a campaign to review delivered videos",
+    "subtitle": "Pick the campaign whose delivered videos from approved creators you want to review and audit before releasing payment.",
+    "currency": "SAR",
+    "stats": {
+      "activeCampaigns": "Total active campaigns",
+      "activeSuffix": "active campaigns",
+      "activeFooter": "{percent}% delivery rate",
+      "activeFooterEnd": "All channels",
+      "pendingClips": "Clips under review",
+      "pendingSuffix": "new clips",
+      "pendingFooter": "Awaiting your decision today",
+      "pendingFooterEnd": "{count} campaigns involved",
+      "approvedClips": "Approved this week",
+      "approvedSuffix": "verified clips",
+      "approvedFooter": "Ready to publish & pay out",
+      "approvedFooterEnd": "+{percent}% growth",
+      "reservedBudget": "Reserved views budgets",
+      "reservedFooter": "Views escrow account",
+      "reservedFooterEnd": "{percent}% secured"
+    },
+    "searchPlaceholder": "Search by campaign name, code or brand...",
+    "sortBy": "Sort:",
+    "sort": {
+      "mostPending": "Most clips awaiting review",
+      "newest": "Newest",
+      "highestBudget": "Highest escrow budget",
+      "mostViews": "Most views"
+    },
+    "viewGrid": "Grid view",
+    "viewList": "List view",
+    "newForReview": "{count} new clips to review",
+    "fullyReviewed": "Fully reviewed",
+    "deliveredClips": "Delivered clips",
+    "verifiedViews": "Verified views",
+    "cpmRate": "CPM rate",
+    "escrowRemaining": "Remaining escrow budget",
+    "reviewClips": "Review campaign clips ({count})",
+    "empty": "No campaigns match your search",
+    "showing": "Showing {shown} of {total} active campaigns",
+    "prev": "Previous page",
+    "next": "Next page"
+  },
+
+  "clipReview": {
+    "crumb": "Delivered clips",
+    "title": "Delivered clips for review & approval",
+    "subtitle": "Browse approved creators' videos, and check the content and Shariah guidelines to approve payouts with ease.",
+    "currency": "SAR",
+    "stats": {
+      "views": "Active verified views",
+      "autoRefresh": "Auto-refresh",
+      "engagement": "Engagement {percent}%",
+      "budget": "Remaining budget",
+      "budgetSuffix": "SAR left",
+      "spent": "Spent {amount} SAR",
+      "total": "Total {amount} SAR",
+      "compliance": "Shariah guidelines compliance",
+      "complianceSuffix": "Certified compliance",
+      "clean": "Free of prohibited content",
+      "smartScan": "Smart scan"
+    },
+    "tabs": {
+      "all": "All clips",
+      "pending": "Under review",
+      "approved": "Approved & live",
+      "needsEdit": "Needs edits",
+      "rejected": "Rejected"
+    },
+    "exportExcel": "Export Excel",
+    "bulkSelect": "Bulk select",
+    "bulkCancel": "Cancel selection",
+    "selectedCount": "{count} clips selected",
+    "approveSelected": "Approve selected",
+    "rejectSelected": "Reject selected",
+    "searchPlaceholder": "Search by creator name, @username, or clip code...",
+    "platforms": {
+      "all": "All",
+      "tiktok": "TikTok",
+      "reels": "Reels",
+      "reelsFull": "Instagram Reels",
+      "shorts": "Shorts"
+    },
+    "sortBy": "Sort:",
+    "sort": {
+      "newest": "Latest delivered",
+      "approved": "Approved clips",
+      "rejected": "Rejected clips",
+      "manual": "Awaiting manual review",
+      "all": "All delivered clips",
+      "reviewing": "Under review"
+    },
+    "card": {
+      "initialViews": "Initial views",
+      "approvedViews": "Approved views",
+      "earnings": "Earnings due",
+      "note": "Note: {note}",
+      "rejectReason": "Rejection reason: {title}",
+      "approve": "Approve",
+      "approved": "Approved",
+      "reject": "Reject",
+      "watch": "Watch video",
+      "details": "Video details",
+      "viewReport": "View review report & rejection reasons",
+      "refunded": "The financial share was returned to the campaign budget"
+    },
+    "toast": {
+      "approvedTitle": "Clip approved",
+      "approvedDesc": "{name}'s earnings will be paid out per the agreement.",
+      "rejectedTitle": "Clip rejected",
+      "rejectedDesc": "The financial share was returned to the campaign budget.",
+      "bulkApproved": "{count} clips approved",
+      "bulkRejected": "{count} clips rejected",
+      "exported": "File exported"
+    },
+    "confirm": {
+      "title": "Reject this clip?",
+      "bulkTitle": "Reject {count} clips?",
+      "body": "The creator will be notified and the financial share returned to the campaign budget.",
+      "confirm": "Confirm rejection",
+      "cancel": "Cancel"
+    },
+    "video": {
+      "noFile": "The video file isn't available in the demo version.",
+      "close": "Close"
+    },
+    "emptyDelivery": {
+      "badge": "In production",
+      "title": "No video clips have been delivered yet",
+      "desc": "No video clips have been delivered for this campaign yet. You'll get an instant notification, an email, and an in-app alert as soon as the first creator delivers their clip.",
+      "notify": "Enable alerts for new clips",
+      "notifyOn": "Alerts enabled",
+      "contact": "Message creators",
+      "details": "View campaign details",
+      "howTitle": "How does the clip delivery stage work?",
+      "howSubtitle": "A step-by-step review and approval journey to protect your rights and give you peace of mind",
+      "howBadge": "Fully automated Shariah & technical check",
+      "steps": {
+        "publish": {
+          "title": "Direct publishing by the creator",
+          "desc": "The approved creator records the ad video and publishes it directly on their accounts (TikTok, Instagram Reels, or YouTube Shorts)."
+        },
+        "scan": {
+          "title": "Instant smart scan",
+          "desc": "The creator submits the link here, and the AI system scans it immediately to make sure it is free of Shariah violations and meets the campaign requirements."
+        },
+        "approve": {
+          "title": "Your approval and payout",
+          "desc": "The clip arrives ready for review on this screen: with one click you approve it or request edits, and no payment is released without your approval."
+        }
+      }
+    },
+    "empty": "No matching clips",
+    "showing": "Showing <m>{shown}</m> of <b>{total} clips</b>",
+    "prev": "Previous page",
+    "next": "Next page"
+  },
+  "clipDetail": {
+    "back": "Back to delivered clips",
+    "title": "Review & verify delivered clip details",
+    "subtitle": "A full check of campaign rules, Shariah standards and live post engagement so you can make the payment decision with ease.",
+    "platforms": {
+      "tiktok": "TikTok",
+      "reels": "Instagram Reels",
+      "shorts": "YouTube Shorts"
+    },
+    "preview": {
+      "title": "Published clip preview",
+      "verified": "Verified & compliant",
+      "audio": "Approved audio and hashtag available",
+      "note": "Frame quality and audio retention were verified automatically with high accuracy",
+      "play": "Play",
+      "pause": "Pause",
+      "fullscreen": "Fullscreen"
+    },
+    "creator": {
+      "rating": "{rating} / 5.0 ({campaigns} campaigns completed, {commitment}% commitment)",
+      "followers": "Total followers:",
+      "followersUnit": "real followers",
+      "geo": "Audience geographic distribution"
+    },
+    "ai": {
+      "title": "Full AI scan results",
+      "match": "{percent}% match",
+      "checks": {
+        "product": {
+          "title": "Product & brand visibility",
+          "desc": "The coffee pack and logo appear clearly in the first seconds."
+        },
+        "hashtags": {
+          "title": "Keywords & hashtags",
+          "desc": "Coffee name, campaign hashtag and store link are mentioned accurately in the caption."
+        },
+        "halal": {
+          "title": "Shariah safety (Halal Guard)",
+          "desc": "Completely free of music or any effects that violate platform policy."
+        },
+        "copyright": {
+          "title": "Copyright & originality",
+          "desc": "Original content shot exclusively for the campaign, with no prior duplicates."
+        }
+      },
+      "recommendation": "System recommendation:",
+      "recommendationBody": "The clip meets all contractual conditions. We recommend accepting it and releasing the payment immediately without edits."
+    },
+    "finance": {
+      "title": "Financial calculation & decision",
+      "subtitle": "Payment based on real views",
+      "escrow": "Escrow wallet",
+      "cpm": "Rate (CPM)",
+      "views": "Approved views",
+      "remaining": "Remaining in escrow",
+      "sar": "SAR",
+      "dueTitle": "Total amount due for release now:",
+      "dueDesc": "Transferred instantly to the creator's wallet once you press approve",
+      "currency": "Saudi riyal",
+      "approveBtn": "Accept & approve clip (release {amount} SAR)",
+      "approveRowDesc": "Approve the clip and transfer the amount to the creator automatically",
+      "rejectBtn": "Reject clip",
+      "approvedState": "Clip approved",
+      "approvedStateDesc": "{amount} SAR was transferred to the creator's account",
+      "rejectedState": "Clip rejected",
+      "rejectedStateDesc": "Nothing was deducted from the escrow wallet",
+      "safety": "Safety note:",
+      "safetyBody": "Nothing is deducted or transferred until you confirm. You can also request a free edit within 24 hours."
+    },
+    "link": {
+      "title": "Direct link to the original post",
+      "updated": "Updated live",
+      "copy": "Copy link",
+      "copied": "Copied",
+      "open": "Open in {platform}",
+      "share": "Share link"
+    },
+    "live": {
+      "title": "Live post statistics",
+      "badge": "LIVE API",
+      "views": "Verified views",
+      "growth": "+{percent}% in the last hour",
+      "likes": "Likes",
+      "engagement": "{percent}% engagement rate",
+      "comments": "Comments",
+      "positive": "{percent}% positive",
+      "shares": "Shares & saves",
+      "fast": "Spreading fast"
+    },
+    "toast": {
+      "approvedTitle": "Clip approved",
+      "approvedDesc": "{amount} SAR was transferred to {name}'s account",
+      "rejectedTitle": "Clip rejected",
+      "rejectedDesc": "Nothing was deducted from the escrow wallet.",
+      "copied": "Link copied",
+      "copyFailed": "Couldn't copy the link",
+      "notifyOnTitle": "Alerts for new clips enabled",
+      "notifyOffTitle": "Alerts turned off"
+    },
+    "confirm": {
+      "title": "Reject this clip?",
+      "body": "The creator will be notified of the rejection and nothing will be deducted from the escrow wallet.",
+      "confirm": "Yes, reject",
+      "cancel": "Cancel"
+    },
+    "approveModal": {
+      "title": "Confirm Clip Approval & Acceptance",
+      "campaign": "Campaign",
+      "clip": "Clip",
+      "question": "Are you sure you want to approve this clip? Verified views will start counting immediately, and the link will be activated in the active campaign system.",
+      "autoTitle": "Automatic actions after approval:",
+      "statusLabel": "Clip status after confirmation",
+      "statusValue": "Accepted · Active",
+      "trackLabel": "Automatic view tracking",
+      "trackValue": "Verified view counter starts",
+      "notifyTitle": "Instant creator notification",
+      "notifyBadge": "App + Email",
+      "notifyMsg": "\"Your ad clip has been accepted successfully! View counting has started.\"",
+      "confirmBtn": "Confirm approval & start view counting (pay {amount} SAR)",
+      "cancelBtn": "Cancel & return to preview"
+    },
+    "rejectModal": {
+      "title": "Reject Clip & Specify Reason",
+      "clip": "Clip",
+      "creator": "Creator",
+      "warnLead": "On rejection:",
+      "warnPrefix": "the clip's views will not be counted, and the escrow amount",
+      "warnSuffix": "will be refunded to your available balance immediately.",
+      "reasonTitle": "Why are you rejecting this clip?",
+      "code": "Code",
+      "reasons": {
+        "r01": {
+          "title": "Violates campaign terms or required idea",
+          "desc": "The content did not follow the campaign's core concept"
+        },
+        "r02": {
+          "title": "Poor video or audio quality",
+          "desc": "Unclear audio, noise, or low video resolution"
+        },
+        "r03": {
+          "title": "Inappropriate or non-compliant content",
+          "desc": "Violates advertising platform policies or general guidelines"
+        },
+        "r04": {
+          "title": "Missing discount code or required hashtags",
+          "desc": "The discount code is not visible or readable in the video"
+        },
+        "r99": {
+          "title": "Other reason (write your own)",
+          "desc": "Specify a custom reason not listed above"
+        }
+      },
+      "noteLabel": "Note to the creator (optional but helpful):",
+      "notePlaceholder": "Write your feedback so the creator can fix it...",
+      "chars": "chars",
+      "noteHint": "This note will be sent to the creator and no views will be counted for the clip",
+      "confirmBtn": "Confirm Clip Rejection",
+      "cancelBtn": "Cancel & return to preview"
+    }
   },
 
   "creatorOrders": {

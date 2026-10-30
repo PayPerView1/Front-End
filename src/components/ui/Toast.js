@@ -169,7 +169,7 @@ export function ToastProvider({ children }) {
 
       {/* Toast Container */}
       <div
-        className="fixed right-3 top-20 end-10 z-[9999] flex w-[min(420px,calc(100vw-1.5rem))] flex-col gap-2 pointer-events-none sm:right-5 sm:top-5"
+        className="fixed right-3 top-20 end-4 z-[9999] flex w-[min(420px,calc(100vw-1.5rem))] flex-col gap-2 pointer-events-none sm:right-5"
         aria-live="polite"
       >
         {toasts.map(t => (

@@ -5,6 +5,6 @@ export const metadata = {
   description: "مراجعة واعتماد مقاطع الحملات الإعلانية",
 };
 
-export default function ClipsPage() {
+export default function ClipManagementPage() {
   return <ClipManagement />;
 }

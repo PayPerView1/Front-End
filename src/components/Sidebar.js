@@ -338,6 +338,7 @@ export default function Sidebar() {
         className={`
           min-[1280px]:hidden fixed top-4
           ${locale === "ar" ? "right-4" : "left-4"}
+
           z-[80] w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
           ${isDark
             ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
@@ -360,6 +361,7 @@ export default function Sidebar() {
       <aside
         dir={locale === "ar" ? "rtl" : "ltr"}
         className={`
+
           fixed ${locale === "ar" ? "right-0" : "left-0"}
           top-0 h-screen w-[260px] flex flex-col z-[90] font-tajawal
           ${t.bg}
