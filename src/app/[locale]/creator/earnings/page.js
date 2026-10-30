@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getReviewStatus } from "@/lib/Payout";
 import { useTheme } from "@/context/ThemeContext";
 import { useLocale } from "next-intl";
@@ -9,6 +9,9 @@ import {
   WITH_EARNINGS_COMPLETED,
   EMPTY,
 } from "@/context/Earningscontext";
+import { useNotifications } from "@/context/NotificationsContext";
+import { useUser } from "@/context/UserContext";
+import { getSavedUser } from "@/lib/axiosInstance";
 import WithdrawBanner from "./components/WithdrawBanner";
 import EarningsSummary from "./components/EarningsSummary";
 import EarningsCards from "./components/EarningsCards";
@@ -20,25 +23,54 @@ import WelcomeCard from "./components/WelcomeCard";
 
 // خيارات التجربة:
 // 1. WITH_EARNINGS           ← رصيد قيد التدقيق (لم تمر 7 أيام بعد)
-// 2. WITH_EARNINGS_COMPLETED ← بعد مرور 7 أيام (يتفعل زر السحب ويظهر البانر)
+// 2. WITH_EARNINGS_COMPLETED ← بعد مرور 7 أيام (يتفعل زر السحب ويظهر البانر والإشعار)
 // 3. EMPTY                   ← الحالة الفارغة (رصيد 0)
-const mock = WITH_EARNINGS;
+const mock = WITH_EARNINGS_COMPLETED;
 
 export default function EarningsPage() {
   const { isDark } = useTheme();
   const locale = useLocale();
+  const isAr = locale === "ar";
   const { setEarningsData } = useEarnings();
+  const { addEarningsNotification } = useNotifications();
+
+  // اسم المستخدم (نفس مصدر الـ Navbar وWelcomeCard وWithdrawBanner)
+  const { user: contextUser } = useUser() || {};
+  const [savedUser, setSavedUser] = useState(null);
+
+  useEffect(() => {
+    setSavedUser(getSavedUser());
+  }, []);
+
+  const user = contextUser || savedUser;
+  const fullName = user?.fullName || user?.name || user?.username || "صهيب";
+  const firstName = fullName.trim().split(" ")[0];
 
   // مزامنة حالة الأرباح المختارة مع الـ Context ليتغير الرقم في النافبار تلقائياً
   useEffect(() => {
     setEarningsData(mock);
-  }, [mock, setEarningsData]);
+  }, [setEarningsData]);
 
   const hasEarnings = mock.total > 0;
   const review = getReviewStatus(mock.reviewStartedAt);
 
-  // البانر + الزر: فقط بعد مرور 7 أيام ووجود رصيد جاهز
+  // البانر + الزر + إرسال الإشعار: عند مرور 7 أيام كاملة ووجود رصيد جاهز
   const canWithdraw = hasEarnings && review.completed && mock.ready > 0;
+
+  // إرسال الإشعار الموجود في التصميم عند مرور 7 أيام
+  useEffect(() => {
+    if (canWithdraw) {
+      addEarningsNotification({
+        name: firstName,
+        amount: "2,753.80",
+        days: 7,
+        clipTitle: "استثمار الذكاء الاصطناعي في ريادة الأعمال",
+        clipTitleEn: "AI Investing in Entrepreneurship",
+        isAr,
+      });
+    }
+  }, [canWithdraw, firstName, isAr, addEarningsNotification]);
+
   const handleWithdraw = () => {
     // استدعاء الـ API (والسيرفر يتحقق من الـ 7 أيام أيضاً)
   };

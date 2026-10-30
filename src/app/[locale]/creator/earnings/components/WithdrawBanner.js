@@ -11,7 +11,7 @@ export default function WithdrawBanner({
   amountSar = 2753.8,
   clipTitle = "استثمار الذكاء الاصطناعي في ريادة الأعمال",
   clipTitleEn = "AI Investing in Entrepreneurship",
-  minutesAgo = 14,
+  minutesAgo = 16,
   onWithdraw,
 }) {
   const { isDark } = useTheme();

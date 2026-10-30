@@ -869,6 +869,7 @@
     "subscriptions": "Subscriptions",
     "disputes": "Dispute center",
     "interests": "Interests",
+    "audience": "My Audience",
     "favorites": "Favorites",
     "linkedAccounts": "Linked accounts",
     "notifications": "Notifications",
@@ -2703,5 +2704,120 @@
         }
       }
     }
+  },
+  "Audience": {
+    "title": "Who is watching you?",
+    "periodFull": "Full period",
+    "period7": "Last 7 days",
+    "period30": "Last 30 days",
+    "exportReport": "Export report",
+
+    "totalViews": "Total verified views",
+    "verifiedBadge": "{percent}% verified",
+    "arabRate": "Targeted Arab audience",
+    "arabRateNote": "Statistical match accuracy",
+    "topCities": "Most engaged cities",
+    "topCitiesNote": "Highest engagement and impact",
+    "weeklyGrowth": "Weekly clip growth",
+    "weeklyGrowthNote": "Steadily rising",
+
+    "rankingTitle": "Viewers by country",
+    "destinations": "{count} destinations",
+    "viewsCount": "{count} views",
+    "viewsUnit": "views",
+    "topCitiesLine": "Top cities: {cities}",
+    "tags": {
+      "biggest": "Largest audience",
+      "fastestGrowth": "Fastest growth",
+      "steady": "Steady performance",
+      "positive": "Positive engagement",
+      "global": "Global"
+    },
+    "countries": {
+      "sa": "Saudi Arabia",
+      "eg": "Egypt",
+      "ae": "United Arab Emirates",
+      "kw": "Kuwait",
+      "other": "Other countries"
+    },
+    "countriesShort": {
+      "sa": "Saudi Arabia",
+      "eg": "Egypt",
+      "ae": "UAE",
+      "kw": "Kuwait",
+      "other": "Other"
+    },
+
+    "mapTitle": "Live viewer distribution map",
+    "mapSubtitle": "Where views concentrate in the Middle East",
+    "mapFocus": "Top focus: {country} {percent}%",
+    "cumulativeTitle": "Cumulative viewer share",
+    "coverage": "{percent}% tracked",
+
+    "tipsTitle": "Simple tips to grow your views",
+    "tipsSubtitle": "Direct steps based on your current audience split",
+    "tipTimeTitle": "Best time to post in {country}",
+    "tipTimeBody": "Since <b>{percent}%</b> of your audience is in {country}, the best time to publish your next clip is between <b>{from}</b> and <b>{to}</b> ({zone} time).",
+    "tipGrowthTitle": "Extra growth opportunity in {country}",
+    "tipGrowthBody": "Viewers in {country} finish your clips <b>{rate}%</b> of the time. Add examples that matter to entrepreneurs in {country} to boost engagement and shares.",
+
+    "selectedCountry": "Selected country",
+    "ofTotal": "{percent}% of total",
+    "peakHours": "Peak active hours: {hours}",
+    "back": "Back to overview",
+    "countryViews": "{country} views",
+    "totalShare": "Share of total views",
+    "ofAll": "{percent}% of all",
+    "countryEarnings": "Earnings from {country}",
+    "cpm": "Estimated CPM",
+    "completionRate": "Clip completion rate",
+    "excellent": "Excellent",
+    "regionalEngagement": "Regional engagement rate",
+    "aboveBenchmark": "{delta}% vs benchmark",
+    "citiesTitle": "Views by city",
+    "citiesSubtitle": "Audience engagement across the main regions of {country}",
+    "citiesCount": "{count} top cities",
+    "interactiveMap": "Interactive map",
+    "interactiveMapSubtitle": "Geographic focus of verified views across platforms.",
+    "liveUpdate": "Live",
+    "reliability": "Approved view reliability",
+    "reliabilityNote": "All views pass quality standards",
+    "ageTitle": "Audience age groups",
+    "ageSubtitle": "Age groups watching your clips most in {country}",
+    "ageNote": "Dominant group: Gen Z and young professionals — {percent}% under 35",
+    "ages": {
+      "young": "18 - 24 (students and young adults)",
+      "mid": "25 - 34 (professionals and entrepreneurs)",
+      "senior": "35+ (families and enthusiasts)"
+    },
+    "platformsTitle": "Platform split in {country}",
+    "platformsSubtitle": "The social channels driving the most reach",
+    "platforms": { "tiktok": "TikTok", "instagram": "Instagram", "youtube": "YouTube" },
+    "bestPlatform": "Most profitable platform: {platform} (CPM {cpm} {currency})",
+
+    "radarLabel": "Listening for signals",
+    "insufficientTitle": "Not enough geographic data yet",
+    "insufficientBody": "The system needs at least {required} verified views to pinpoint your audience location with 99.8% accuracy, unlock the country and city map, and calculate regional CPM.",
+    "processingProgress": "Initial processing progress",
+    "progressOf": "{current} of {required} verified views",
+    "remaining": "{count} views left to unlock the map",
+    "refreshNow": "Refresh data now",
+    "viewPrevReport": "View a previous clip report",
+    "boostTips": "Tips to boost views",
+    "info": {
+      "speed": {
+        "title": "How do I get stats faster?",
+        "body": "Share your promo clip link on your active Telegram channels, on X, or in Instagram stories to bring in the first batch of real, engaged views."
+      },
+      "track": {
+        "title": "Tracking accuracy and compliance",
+        "body": "Every visit goes through approved algorithm filters that exclude fake traffic and VPNs, so geographic checks stay reliable and protect partner earnings."
+      },
+      "notify": {
+        "title": "Automatic activation alert",
+        "body": "No need to keep checking. We will send an instant dashboard notification and an email as soon as you reach {required} views and the heatmap is generated."
+      }
+    }
   }
+
 }

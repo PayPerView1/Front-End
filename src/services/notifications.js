@@ -78,3 +78,25 @@ export const getNotifications = async () => {
     handleError(error);
   }
 };
+
+export const markNotificationRead = async (notificationId) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/api/v1/notifications/${notificationId}/read`
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const markAllNotificationsRead = async () => {
+  try {
+    const response = await axiosInstance.patch(
+      "/api/v1/notifications/read-all"
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
