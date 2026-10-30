@@ -2563,6 +2563,145 @@
         "failed": "Couldn't send, please try again."
       }
     }
+  },
+  "Earnings": {
+    "common": {
+      "sar": "≈ {amount} SAR"
+    },
+    "welcome": {
+      "title": "Welcome back, {name}",
+      "fallbackName": "there",
+      "subtitle": "Track your live earnings and today's view updates."
+    },
+    "summary": {
+      "badge": "Live earnings, fully transparent",
+      "noFees": "No deductions or extra fees",
+      "totalLabel": "Total live earnings from your views",
+      "clipsNote": "Estimated from your counted clips and the current SAR exchange rate.",
+      "countedViews": "Counted views",
+      "viewsFrom": "From {clips} published clips",
+      "avgCpm": "Avg. CPM",
+      "topClip": "Top clip hit ${cpm}",
+      "cycleProgress": "Current cycle progress",
+      "done": "{progress}% done"
+    },
+    "cards": {
+      "ready": {
+        "title": "Ready to withdraw",
+        "desc": "These earnings have cleared review and are ready. New earnings show as \"pending\" ({days}-day hold period)."
+      },
+      "review": {
+        "title": "Under review",
+        "desc": "Subject to a short precautionary hold ({days} days) to automatically confirm the clip is still live and compliant.",
+        "complete": "Review complete",
+        "daysLeft": "{days} days left until available",
+        "availableSoon": "Available soon",
+        "dayOf": "(Day {day} of {total})"
+      },
+      "received": {
+        "title": "Already received",
+        "desc": "Total completed transfers successfully deposited into your bank account in previous periods.",
+        "payouts": "{count} payouts sent successfully"
+      },
+      "withdrawBtn": "Withdraw to my bank account",
+      "withdrawLocked": "Unlocks after the {days}-day security review"
+    },
+    "banner": {
+      "minutesAgo": "{minutes} minutes ago",
+      "fallbackName": "User",
+      "message": "Congrats {name}! The {days}-day security period for <clip>“{clipTitle}”</clip> is complete. <money>{amount} SAR</money> was moved to your withdrawable balance.",
+      "button": "Request withdrawal"
+    },
+    "how": {
+      "title": "How do views turn into money?",
+      "subtitle": "A simple earnings lifecycle: transparent and 100% guaranteed, with no complications.",
+      "badge": "Gharar-free Islamic system",
+      "steps": {
+        "1": {
+          "title": "1. Views recorded",
+          "desc": "Once your clip is live, our system counts real views every 15 minutes from TikTok, Reels and Shorts.",
+          "badge": { "done": "Auto-completed", "active": "Auto-completed", "pending": "Auto-completed" }
+        },
+        "2": {
+          "title": "2. Security review ({days} days)",
+          "desc": "A short review period to protect your earnings, confirm the clip meets the terms and rule out bot manipulation.",
+          "badge": { "done": "Completed", "active": "Active now (Day {day})", "pending": "Soon" }
+        },
+        "3": {
+          "title": "3. Balance available",
+          "desc": "The amount moves automatically to \"Ready to withdraw\", and you can request the full transfer instantly.",
+          "badge": { "done": "Completed", "active": "Available now", "pending": "Within 3 days" }
+        },
+        "4": {
+          "title": "4. Bank deposit",
+          "desc": "The amount reaches your bank account or STC Pay directly, with an official SMS notification.",
+          "badge": { "done": "Completed", "active": "Fast & instant", "pending": "Fast & instant" }
+        }
+      }
+    },
+    "videos": {
+      "title": "My videos & view earnings",
+      "subtitle": "Your clips list with every clip's earnings details and status.",
+      "filters": { "all": "All clips", "ready": "Ready", "review": "In review" },
+      "headers": {
+        "video": "Video",
+        "platform": "Platform",
+        "views": "Approved views",
+        "cpm": "CPM",
+        "earnings": "Earnings",
+        "status": "Payout status",
+        "action": "Action"
+      },
+      "campaignLine": "Campaign: {campaign} · Posted {date}",
+      "viewsWord": "views",
+      "status": {
+        "ready": "Ready",
+        "review": "In review ({days} days left)",
+        "paid": "Paid to your bank"
+      },
+      "actions": {
+        "withdrawNow": "Withdraw now",
+        "autoAvailable": "Auto-available",
+        "viewReceipt": "View receipt"
+      },
+      "empty": "No clips in this filter."
+    },
+    "countries": {
+      "title": "Where do your views come from?",
+      "subtitle": "Views distribution by country (Gulf views earn double)",
+      "percentOf": "{percent}% of",
+      "views": "views",
+      "names": {
+        "SA": "Saudi Arabia",
+        "EG": "Egypt",
+        "AE": "UAE",
+        "OT": "Other"
+      }
+    },
+    "empty": {
+      "title": "No earnings yet",
+      "desc": "Your earnings start showing as soon as you publish your first clip and its views are approved. Everything you earn is 100% yours, with no fees or complicated terms.",
+      "explore": "Explore campaigns to start",
+      "submit": "Submit a posted clip link",
+      "howTitle": "How to start earning? (3 simple steps)",
+      "howSub": "Simple steps designed for every creator",
+      "steps": {
+        "1": {
+          "title": "Step 1: Pick a campaign",
+          "desc": "Choose the product or service that fits you from the approved campaigns, and join in one click.",
+          "foot": "Instant join, no prior approval"
+        },
+        "2": {
+          "title": "Step 2: Publish your clip",
+          "desc": "Download the creative assets, add your own touch, then post on TikTok, Instagram Reels or YouTube Shorts.",
+          "foot": "Full support for all platforms"
+        },
+        "3": {
+          "title": "Step 3: Get paid",
+          "desc": "Paste the clip link here and the system will count your views automatically and deposit your earnings in your wallet.",
+          "foot": "Instant, reliable tracking"
+        }
+      }
+    }
   }
-
 }

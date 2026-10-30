@@ -195,7 +195,7 @@ html:not(.dark) .creator-dashboard-page [class~="hover:border-[#94D3C1]"]:hover 
   border-color: #70b9a5;
 }
 
-@media (min-width: 1280px) and (max-width: 1399px) {
+@media (min-width: 1280px) and (max-width: 1535px) {
   main[data-side-panels-open="true"] .creator-responsive-page .grid {
     grid-template-columns: minmax(0, 1fr) !important;
   }
@@ -203,7 +203,17 @@ html:not(.dark) .creator-dashboard-page [class~="hover:border-[#94D3C1]"]:hover 
   main[data-side-panels-open="true"] .creator-responsive-page [class~="sm:flex-row"],
   main[data-side-panels-open="true"] .creator-responsive-page [class~="md:flex-row"],
   main[data-side-panels-open="true"] .creator-responsive-page [class~="lg:flex-row"] {
-    flex-direction: column;
+    flex-direction: column !important;
+  }
+
+  main[data-side-panels-open="true"] .creator-responsive-page .earnings-summary-col,
+  main[data-side-panels-open="true"] .creator-responsive-page [class*="md:w-1/2"],
+  main[data-side-panels-open="true"] .creator-responsive-page [class*="md:w-[45%]"] {
+    width: 100% !important;
+  }
+
+  main[data-side-panels-open="true"] .creator-responsive-page .earnings-banner-btn {
+    width: 100% !important;
   }
 
   main[data-side-panels-open="true"] .creator-edit-profile-layout:has(.creator-responsive-page) {
@@ -242,7 +252,7 @@ html:not(.dark) .creator-dashboard-page [class~="hover:border-[#94D3C1]"]:hover 
   }
 }
 
-@media (min-width: 1280px) and (max-width: 1399px) {
+@media (min-width: 1280px) and (max-width: 1535px) {
   main[data-side-panels-open="true"] .campaign-card-body {
     flex-direction: column;
   }
