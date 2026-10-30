@@ -6,6 +6,7 @@ import { NotificationsProvider } from "@/context/NotificationsContext";
 import { MessagesProvider } from "@/context/MessagesContext";
 import { UserProvider } from "@/context/UserContext";
 import { useTheme } from "@/context/ThemeContext";
+import { EarningsProvider } from "@/context/Earningscontext";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import DashboardShell from "./DashboardShell";
@@ -25,6 +26,10 @@ export default function MainLayout({ children, locale }) {
     "/reset-password",
     "/done",
     "/logout",
+    "/creator-home",
+    "/account-settings",
+    "/interests-recommendations",
+    "/macbook-190",
   ];
 
   // Check if current path matches or starts with any of the excluded paths
@@ -46,11 +51,13 @@ export default function MainLayout({ children, locale }) {
         <NotificationsProvider>
           <AssistantProvider>
             <MessagesProvider>
-              <Navbar />
-              <Sidebar />
-              <DashboardShell locale={locale}>
-                {children}
-              </DashboardShell>
+              <EarningsProvider>
+                <Navbar />
+                <Sidebar />
+                <DashboardShell locale={locale}>
+                  {children}
+                </DashboardShell>
+              </EarningsProvider>
             </MessagesProvider>
           </AssistantProvider>
         </NotificationsProvider>

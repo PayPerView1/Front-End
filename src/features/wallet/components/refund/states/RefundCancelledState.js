@@ -229,7 +229,7 @@ export default function RefundCancelledState({ onSwitchState, refund }) {
           </p>
           
           <div className="space-y-3">
-            <button onClick={() => onSwitchState('initial')} className="w-full bg-[#E9C349] hover:bg-[#E67E00] text-white text-sm font-bold py-3.5 rounded-xl transition-colors shadow-lg shadow-[#E9C349]/20 flex items-center justify-center gap-2">
+            <button onClick={() => onSwitchState('initial')} className="w-full text-white text-sm font-bold py-3.5 rounded-xl flex items-center justify-center gap-2" style={{ background: "linear-gradient(90deg, #FDA100 0%, #FE5403 100%)" }}>
               العودة إلى لوحة تحكم المحفظة
               <Landmark className="w-4 h-4" />
             </button>

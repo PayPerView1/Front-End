@@ -76,7 +76,7 @@ export async function logout() {
 }
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://payperview-platform.onrender.com";
+  process.env.NEXT_PUBLIC_API_URL || "https://platform.apps.taqat.academy";
 
 /**
  * تسجيل الدخول أو إنشاء حساب عبر Google.

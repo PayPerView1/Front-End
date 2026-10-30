@@ -140,7 +140,7 @@ export default function WalletTopup142Page() {
   return (
     <div
       dir="rtl"
-      className="min-h-screen text-white pb-12"
+      className="wallet-theme-page min-h-screen text-white pb-12"
       style={{
         backgroundColor: T.bg,
         fontFamily: "var(--font-tajawal), 'Tajawal', sans-serif",

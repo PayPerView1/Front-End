@@ -50,8 +50,21 @@ export default async function RootLayout({ children, params }) {
     <html
       lang={locale}
       dir={dir}
-      className={`${geistSans.variable} ${geistMono.variable} ${tajawal.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${tajawal.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
+      <head>
+        {/*
+          تطبيق الثيم فوراً قبل أول render لمنع وميض الألوان (Flash of Unstyled Theme).
+          هذا الـ script يقرأ localStorage ويضيف/يزيل class="dark" على <html>
+          قبل أن يرسم المتصفح أي شيء — لذا لا يحتاج useEffect ولا ينتظر React.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem('theme');if(!s||s==='system'){var d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);}else{document.documentElement.classList.toggle('dark',s==='dark');}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col font-tajawal">
         {children}
       </body>

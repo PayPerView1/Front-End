@@ -27,7 +27,7 @@ const ACTION_ITEMS = [
 // ─── Views ───────────────────────────────────────────────────────────────────
 const VIEW = { HOME: "home", THREADS: "threads", CHAT: "chat" };
 
-export default function AIAssistantPanel({ side = "left" }) {
+export default function AIAssistantPanel({ side = "left", stacked = false, topOffset = 0 }) {
   const { isAssistantOpen, closeAssistant } = useAssistant();
   const { isDark } = useTheme();
   const locale = useLocale();
@@ -354,11 +354,13 @@ export default function AIAssistantPanel({ side = "left" }) {
 
   return (
     <aside
-      className={`ai-panel fixed top-14 h-[calc(100vh-56px)] w-full xl:max-w-[380px] z-40 flex flex-col justify-between overflow-y-auto px-4 sm:px-8 md:px-12 xl:px-4 py-6 border ${
+      className={`ai-panel fixed w-full xl:max-w-[380px] z-40 flex flex-col justify-between overflow-y-auto px-4 sm:px-8 md:px-12 xl:px-4 py-6 border ${
         isDark ? "border-white/10" : "border-[#E5E5E5]"
       } ${sideClass}`}
       data-side={side}
       style={{
+        top: `${56 + (stacked ? topOffset : 0)}px`,
+        height: "calc(100vh - 56px)",
         backgroundColor: isDark ? "#0A0812" : "#FFFFFF",
         boxShadow: "0px 25px 50px -12px rgba(0, 0, 0, 0.25)",
         backgroundImage: panelBg,

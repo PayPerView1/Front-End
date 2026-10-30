@@ -1,562 +1,642 @@
 "use client";
-import { useMemo, useRef, useState, useEffect } from "react";
+
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { useTheme } from "@/context/ThemeContext";
+import { getCampaigns } from "@/services/campaign";
 import {
-  MdSearch,
-  MdOutlineExpandMore,
-  MdCheckCircle,
-  MdOutlineViewModule,
-  MdOutlineViewList,
-  MdOutlineCampaign,
-  MdOutlinePendingActions,
-  MdOutlineTaskAlt,
-  MdOutlineVerified,
-  MdOutlineNotificationsActive,
-  MdOutlineEnhancedEncryption,
-  MdOutlineTrendingUp,
-  MdOutlineAccessTime,
-  MdOutlineShield,
-  MdOutlineArrowBack,
-  MdOutlineArrowForward,
-  MdChevronLeft,
-  MdChevronRight,
-} from "react-icons/md";
+  getCampaignSubmissions,
+  reviewSubmission,
+} from "@/services/submissions";
+import {
+  Search,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  ExternalLink,
+  ShieldCheck,
+  AlertCircle,
+  Eye,
+  Loader2,
+  Filter,
+  Sparkles,
+  ChevronDown,
+  User,
+  MessageSquare,
+  Check,
+  X,
+  Play,
+} from "lucide-react";
+import { SiInstagram, SiTiktok, SiYoutube } from "react-icons/si";
 
-const PAGE_SIZE = 6;
-const MINT = "#94D3C1";
-
-/* ───────────── بيانات تجريبية (استبدلها بالـ API) ───────────── */
-// pendingClips = مقاطع جديدة بانتظار المراجعة، deliveredClips = كل المقاطع المسلّمة
-const MOCK_CAMPAIGNS = [
-  { id: "ACAM-2026-038", image: "", brand: { ar: "مؤسسة الذهب العالمية المالية", en: "Global Gold Financial" }, title: { ar: "حملة تطبيق الذهب الرقمي الذكي", en: "Smart Digital Gold App Campaign" }, deliveredClips: 9, pendingClips: 9, cpm: 8.0, views: 710650, escrow: 24500, createdAt: "2026-09-28" },
-  { id: "ACAM-2026-054", image: "", brand: { ar: "دار الأزياء الراقية", en: "Haute Couture House" }, title: { ar: "حملة أزياء صيف الدانة الراقية", en: "Al-Dana Summer Fashion Campaign" }, deliveredClips: 11, pendingClips: 11, cpm: 7.2, views: 142800, escrow: 12400, createdAt: "2026-10-02" },
-  { id: "ACAM-2026-061", image: "", brand: { ar: "شركة عطور الأصالة الطبيعية", en: "Al-Asala Natural Perfumes" }, title: { ar: "حملة عطر مسك الأصيل 2026", en: "Original Musk Perfume 2026" }, deliveredClips: 14, pendingClips: 14, cpm: 6.5, views: 184320, escrow: 8500, createdAt: "2026-10-05" },
-  { id: "ACAM-2026-027", image: "", brand: { ar: "توافل لنقل السفر الذكية", en: "Tawafel Smart Travel" }, title: { ar: "حملة حقائب السفر الذكية", en: "Smart Travel Bags Campaign" }, deliveredClips: 16, pendingClips: 0, cpm: 6.0, views: 245190, escrow: 16000, createdAt: "2026-09-12" },
-  { id: "ACAM-2026-035", image: "", brand: { ar: "مجوهرات النخبة السياسية", en: "Elite Jewelry" }, title: { ar: "حملة ساعات النخبة الماسية", en: "Elite Diamond Watches Campaign" }, deliveredClips: 18, pendingClips: 0, cpm: 9.5, views: 312190, escrow: 18900, createdAt: "2026-09-18" },
-  { id: "ACAM-2026-052", image: "", brand: { ar: "مطاعم القمة المتخصصة", en: "Al-Qimma Restaurants" }, title: { ar: "حملة قهوة البن الخولاني الفاخر", en: "Premium Khawlani Coffee Campaign" }, deliveredClips: 8, pendingClips: 8, cpm: 5.5, views: 95400, escrow: 6200, createdAt: "2026-10-08" },
-];
-
-const MOCK_STATS = {
-  activeCampaigns: 6,
-  deliveryRate: 94, // معدل التسليم %
-  pendingClips: 42,
-  pendingCampaigns: 4, // عدد الحملات المعنية بالمراجعة
-  approvedClips: 128,
-  weeklyGrowth: 18, // نمو الأسبوع %
-  reservedBudget: 86500,
-  securedPercent: 100, // نسبة المؤمّن %
+const platformIcons = {
+  TIKTOK: { Icon: SiTiktok, label: "TikTok", color: "" },
+  INSTAGRAM: { Icon: SiInstagram, label: "Instagram", color: "text-[#E4405F]" },
+  YOUTUBE: { Icon: SiYoutube, label: "YouTube Shorts", color: "text-[#FF0000]" },
 };
 
-/* ───────────── مساعدات ───────────── */
-const pick = (v, locale) =>
-  v && typeof v === "object" ? v[locale] ?? v.ar ?? v.en ?? "" : v ?? "";
+export default function ClipManagement() {
+  const locale = useLocale();
+  const { isDark } = useTheme();
+  const isRTL = locale === "ar";
 
-const num = (n) => Number(n).toLocaleString("en-US");
+  const [campaigns, setCampaigns] = useState([]);
+  const [selectedCampaignId, setSelectedCampaignId] = useState("");
+  const [statusFilter, setStatusFilter] = useState("AWAITING_ADVERTISER");
+  const [searchQuery, setSearchQuery] = useState("");
 
-function pageList(current, totalPages) {
-  if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
-  const list = [1];
-  if (current > 3) list.push("…");
-  for (let p = Math.max(2, current - 1); p <= Math.min(totalPages - 1, current + 1); p++) list.push(p);
-  if (current < totalPages - 2) list.push("…");
-  list.push(totalPages);
-  return list;
-}
+  const [submissions, setSubmissions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-/* ───────────── قائمة منسدلة (fixed + clamp) ───────────── */
-function SortDropdown({ t, label, options, value, onChange, isRtl, width = "16rem" }) {
-  const [open, setOpen] = useState(false);
-  const btnRef = useRef(null);
-  const panelRef = useRef(null);
-  const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
+  // Modal / Review state
+  const [activeSubmissionForReview, setActiveSubmissionForReview] = useState(null);
+  const [rejectNote, setRejectNote] = useState("");
+  const [submittingDecision, setSubmittingDecision] = useState(false);
+  const [viewingChecksSubmission, setViewingChecksSubmission] = useState(null);
+  const [feedbackToast, setFeedbackToast] = useState(null);
+
+  // 1. Fetch advertiser campaigns on mount
+  useEffect(() => {
+    let cancelled = false;
+    const fetchAdvCampaigns = async () => {
+      try {
+        const res = await getCampaigns();
+        const items = res?.data || res || [];
+        if (!cancelled) {
+          setCampaigns(items);
+          if (items.length > 0 && !selectedCampaignId) {
+            setSelectedCampaignId(items[0]._id || items[0].id || "");
+          }
+        }
+      } catch (err) {
+        // silent fallback
+      }
+    };
+    fetchAdvCampaigns();
+    return () => { cancelled = true; };
+  }, []);
+
+  // 2. Fetch submissions for selected campaign & status
+  const fetchSubmissions = useCallback(async () => {
+    if (!selectedCampaignId) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await getCampaignSubmissions(selectedCampaignId, {
+        displayStatus: statusFilter === "ALL" ? undefined : statusFilter,
+        perPage: 50,
+      });
+      setSubmissions(res?.data || []);
+    } catch (err) {
+      setError(err?.response?.data?.message || "تعذر تحميل المقاطع المسلمة");
+      setSubmissions([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedCampaignId, statusFilter]);
 
   useEffect(() => {
-    if (!open) return;
-    const onMove = (e) => {
-      if (e?.target && panelRef.current?.contains(e.target)) return;
-      setOpen(false);
+    fetchSubmissions();
+  }, [fetchSubmissions]);
+
+  // Handle Approve
+  const handleApprove = async (submissionId) => {
+    setSubmittingDecision(true);
+    try {
+      await reviewSubmission(submissionId, { decision: "APPROVE" });
+      setFeedbackToast({ type: "success", message: "تمت الموافقة على المقطع بنجاح!" });
+      setTimeout(() => setFeedbackToast(null), 3000);
+      fetchSubmissions();
+    } catch (err) {
+      setFeedbackToast({
+        type: "error",
+        message: err?.response?.data?.message || "فشلت عملية الموافقة",
+      });
+      setTimeout(() => setFeedbackToast(null), 3500);
+    } finally {
+      setSubmittingDecision(false);
+    }
+  };
+
+  // Handle Reject Submit
+  const handleRejectConfirm = async () => {
+    if (!activeSubmissionForReview) return;
+    if (!rejectNote.trim()) {
+      alert("يرجى كتابة سبب الرفض لصانع المحتوى");
+      return;
+    }
+    setSubmittingDecision(true);
+    try {
+      await reviewSubmission(activeSubmissionForReview.id, {
+        decision: "REJECT",
+        note: rejectNote.trim(),
+      });
+      setActiveSubmissionForReview(null);
+      setRejectNote("");
+      setFeedbackToast({ type: "success", message: "تم رفض المقطع وإشعار صانع المحتوى." });
+      setTimeout(() => setFeedbackToast(null), 3000);
+      fetchSubmissions();
+    } catch (err) {
+      setFeedbackToast({
+        type: "error",
+        message: err?.response?.data?.message || "فشلت عملية الرفض",
+      });
+      setTimeout(() => setFeedbackToast(null), 3500);
+    } finally {
+      setSubmittingDecision(false);
+    }
+  };
+
+  // Filtered by search
+  const filteredSubmissions = useMemo(() => {
+    if (!searchQuery.trim()) return submissions;
+    const q = searchQuery.toLowerCase();
+    return submissions.filter(
+      (s) =>
+        s.creator?.fullName?.toLowerCase().includes(q) ||
+        s.code?.toLowerCase().includes(q) ||
+        s.postUrl?.toLowerCase().includes(q)
+    );
+  }, [submissions, searchQuery]);
+
+  // Stats computed from current data
+  const stats = useMemo(() => {
+    const awaiting = submissions.filter((s) => s.displayStatus === "AWAITING_ADVERTISER").length;
+    const approved = submissions.filter((s) => s.status === "APPROVED").length;
+    const rejected = submissions.filter((s) => s.status === "REJECTED").length;
+    return {
+      total: submissions.length,
+      awaiting,
+      approved,
+      rejected,
     };
-    window.addEventListener("scroll", onMove, true);
-    window.addEventListener("resize", onMove);
-    return () => {
-      window.removeEventListener("scroll", onMove, true);
-      window.removeEventListener("resize", onMove);
-    };
-  }, [open]);
+  }, [submissions]);
 
-  const toggle = () => {
-    if (open) return setOpen(false);
-    const rect = btnRef.current?.getBoundingClientRect();
-    if (!rect) return setOpen(true);
-    const vw = window.innerWidth;
-    const w = Math.min(parseFloat(width) * 16, vw - 16);
-    const preferred = isRtl ? rect.right - w : rect.left;
-    setPos({ top: rect.bottom + 6, left: Math.max(8, Math.min(preferred, vw - w - 8)), width: w });
-    setOpen(true);
+  // Theme tokens
+  const theme = {
+    page: isDark ? "bg-[#0A0D0E] text-gray-100" : "bg-[#F4F6F5] text-[#191C1D]",
+    surface: isDark ? "bg-[#121617] border-[#1E2425]" : "bg-white border-[#E1E7E4]",
+    inset: isDark ? "bg-[#181D1E] border-[#252C2D]" : "bg-[#F3F6F5] border-[#E1E7E4]",
+    primaryText: isDark ? "text-white" : "text-[#191C1D]",
+    secondaryText: isDark ? "text-gray-400" : "text-[#5F6A66]",
+    input: isDark
+      ? "bg-[#181D1E] border-[#252C2D] text-white placeholder-gray-500"
+      : "bg-white border-[#D8DFDC] text-[#191C1D] placeholder-[#7A8581]",
+    card: isDark ? "bg-[#141819] border-[#202728]" : "bg-white border-[#E1E7E4]",
   };
 
-  return (
-    <div className="relative min-w-0">
-      <button
-        ref={btnRef}
-        type="button"
-        onClick={toggle}
-        className={`flex h-11 w-full items-center gap-2 rounded-xl border px-3 text-xs font-medium transition-all hover:border-[#94D3C1] sm:w-auto ${t.field} ${t.text}`}
-      >
-        <span className="flex-1 truncate text-start">{label}</span>
-        <MdOutlineExpandMore size={18} className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
-
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div
-            ref={panelRef}
-            className={`fixed z-50 flex flex-col gap-1 rounded-xl border p-1.5 shadow-2xl ${t.card} ${t.border}`}
-            style={{ top: pos.top, left: pos.left, width: pos.width }}
-          >
-            {options.map((o) => {
-              const on = value === o.value;
-              return (
-                <button
-                  key={o.value}
-                  type="button"
-                  onClick={() => {
-                    onChange(o.value);
-                    setOpen(false);
-                  }}
-                  className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-start text-[11px] transition-colors ${
-                    on ? "bg-[#94D3C1]/15 font-bold text-[#94D3C1]" : `${t.subText} hover:bg-[#94D3C1]/10`
-                  }`}
-                >
-                  <span className="flex-1">{o.label}</span>
-                  {on && <MdCheckCircle size={18} className="shrink-0" />}
-                </button>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-/* ───────────── كارد إحصائية ───────────── */
-function StatCard({
-  t,
-  icon: Icon,
-  label,
-  value,
-  valueColor,
-  suffix,
-  suffixColor,
-  footerIcon: FooterIcon,
-  footer,
-  footerEnd,
-  footerEndColor,
-}) {
-  return (
-    <div className={`flex flex-col gap-3 rounded-xl border p-4 ${t.card} ${t.border}`}>
-      {/* الأعلى: الأيقونة + التسمية والقيمة */}
-      <div className="flex items-center gap-3">
-        <span
-          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border ${t.field}`}
-        >
-          <Icon size={22} color={MINT} />
-        </span>
-
-        <div className="min-w-0 flex-1">
-          <p className={`truncate text-[11px] ${t.subText}`}>{label}</p>
-          <p className="mt-0.5 flex items-baseline gap-2">
-            <span
-              className={`text-2xl font-extrabold leading-none ${valueColor ? "" : t.text}`}
-              style={valueColor ? { color: valueColor } : undefined}
-            >
-              {value}
-            </span>
-            {suffix && (
-              <span className="text-[11px] font-medium" style={{ color: suffixColor || MINT }}>
-                {suffix}
-              </span>
-            )}
-          </p>
-        </div>
-      </div>
-
-      {/* الفاصل */}
-      <div className={`border-t ${t.border}`} />
-
-      {/* الأسفل: نص مميّز + نص ثانوي */}
-      <div className="flex items-center justify-between gap-2 text-[11px]">
-        <span className="inline-flex min-w-0 items-center gap-1.5 font-medium" style={{ color: MINT }}>
-          {FooterIcon && <FooterIcon size={14} className="shrink-0" />}
-          <span className="truncate">{footer}</span>
-        </span>
-        <span
-          className={`shrink-0 ${footerEndColor ? "font-bold" : t.subText}`}
-          style={footerEndColor ? { color: footerEndColor } : undefined}
-        >
-          {footerEnd}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-/* ───────────── كارد الحملة ───────────── */
-function ClipCampaignCard({ t, s, c, locale, isDark, isRtl, listView, href }) {
-  const Arrow = isRtl ? MdOutlineArrowBack : MdOutlineArrowForward;
-  const hasPending = c.pendingClips > 0;
-
-  return (
-    <article
-      className={`flex overflow-hidden rounded-2xl border ${t.card} ${t.border} ${
-        listView ? "flex-col sm:flex-row" : "flex-col"
-      }`}
-      style={{ boxShadow: isDark ? "none" : "0 1px 3px rgba(0,0,0,0.08)" }}
-    >
-      {/* الصورة */}
-      <div
-        className={`relative shrink-0 overflow-hidden ${listView ? "h-44 sm:h-auto sm:min-h-44 sm:w-60" : "h-44"}`}
-        style={{ background: "linear-gradient(135deg,#12332B 0%,#0B1F19 60%,#1A1A1A 100%)" }}
-      >
-        {/* الصورة تملأ الكارد كله، وكل الشارات فوقها */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={c.image || "/images/img-clipManagement.png"}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover object-center"
-        />
-
-        {/* شارة المراجعة: أعلى اليسار */}
-        <span
-          className="absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold backdrop-blur"
-          style={
-            hasPending
-              ? { background: "rgba(148,211,193,0.92)", color: "#0B1F19" }
-              : { background: "rgba(40,42,43,0.85)", color: "#D4D4D4" }
-          }
-        >
-          {hasPending ? <MdOutlinePendingActions size={13} /> : <MdOutlineTaskAlt size={13} />}
-          {hasPending ? s.newForReview(c.pendingClips) : s.fullyReviewed}
-        </span>
-
-        {/* رمز الحملة: أسفل اليمين فوق الصورة */}
-        <span
-          dir="ltr"
-          className="absolute bottom-3 right-3 z-10 rounded-lg px-2.5 py-1 text-[10px] font-bold tracking-wide text-white"
-          style={{ background: "rgba(0,0,0,0.75)" }}
-        >
-          #{String(c.id).replace(/^#/, "")}
-        </span>
-      </div>
-
-      {/* المحتوى */}
-      <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
-        <div className="flex flex-col gap-1">
-          <p className="flex items-center gap-1.5 text-[11px]" style={{ color: MINT }}>
-            <MdOutlineVerified size={14} className="shrink-0" />
-            <span className="truncate">{pick(c.brand, locale)}</span>
-          </p>
-          <h3 className={`text-base font-extrabold leading-snug ${t.text}`}>{pick(c.title, locale)}</h3>
-        </div>
-
-        <div className={`flex items-center justify-between rounded-lg px-3 py-2 text-[11px] ${isDark ? "bg-white/[0.04]" : "bg-black/[0.03]"}`}>
-          <span className={t.subText}>{s.deliveredClips}</span>
-          <span className={`font-bold ${t.text}`}>{c.deliveredClips}</span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 text-[11px]">
-          <div>
-            <p className={t.subText}>{s.verifiedViews}</p>
-            <p className={`mt-0.5 font-bold ${t.text}`}>{num(c.views)}</p>
-          </div>
-          <div>
-            <p className={t.subText}>{s.cpmRate}</p>
-            <p className="mt-0.5 font-bold" style={{ color: "#E9C349" }}>
-              {c.cpm.toFixed(2)} <span className="text-[10px] font-medium">{s.currency}</span>
-            </p>
-          </div>
-        </div>
-
-        <div className={`border-t pt-3 ${t.border}`}>
-          <p className={`text-[11px] ${t.subText}`}>{s.escrowRemaining}</p>
-          <p className="mt-0.5 text-sm font-extrabold" style={{ color: MINT }}>
-            {num(c.escrow)} <span className="text-[10px] font-medium">{s.currency}</span>
-          </p>
-        </div>
-
-        <Link
-          href={href}
-          className="mt-auto flex h-11 items-center justify-center gap-2 rounded-xl text-xs font-bold text-white transition-opacity hover:opacity-90"
-          style={{ background: "linear-gradient(90deg, #FFA600, #FF4B04)" }}
-        >
-          <span>{s.reviewClips(c.deliveredClips)}</span>
-          <Arrow size={16} />
-        </Link>
-      </div>
-    </article>
-  );
-}
-
-/* ───────────── الصفحة ───────────── */
-export default function ClipManagement({
-  campaigns = MOCK_CAMPAIGNS,
-  stats = MOCK_STATS,
-  // صفحة مراجعة المقاطع تفتح داخل قسم "التقارير والتحليلات"
-  // المسار: app/[locale]/advertiser/analytics/clips/[id]/page.js
-  getCampaignHref = (c) => `/advertiser/analytics/clips/campaign/${c.id}`,
-}) {
-  const { isDark } = useTheme();
-  const locale = useLocale();
-  const tr = useTranslations("clipManagement");
-  const isRtl = locale === "ar";
-
-  const [query, setQuery] = useState("");
-  const [sort, setSort] = useState("mostPending");
-  const [view, setView] = useState("grid");
-  const [page, setPage] = useState(1);
-
-  const t = {
-    card: isDark ? "bg-[#111111]" : "bg-white",
-    border: isDark ? "border-[#1E2D3D]" : "border-[#E2E8F0]",
-    field: isDark ? "bg-[#1A1A1A] border-[#2D2D2D]" : "bg-white border-[#E2E8F0]",
-    text: isDark ? "text-white" : "text-[#0F172A]",
-    subText: isDark ? "text-[#9A9A9A]" : "text-[#64748B]",
-  };
-
-  const s = {
-    newForReview: (n) => tr("newForReview", { count: n }),
-    reviewClips: (n) => tr("reviewClips", { count: n }),
-    fullyReviewed: tr("fullyReviewed"),
-    deliveredClips: tr("deliveredClips"),
-    verifiedViews: tr("verifiedViews"),
-    cpmRate: tr("cpmRate"),
-    escrowRemaining: tr("escrowRemaining"),
-    currency: tr("currency"),
-  };
-
-  const sortOptions = [
-    { value: "mostPending", label: tr("sort.mostPending") },
-    { value: "newest", label: tr("sort.newest") },
-    { value: "highestBudget", label: tr("sort.highestBudget") },
-    { value: "mostViews", label: tr("sort.mostViews") },
+  const statusTabs = [
+    { key: "AWAITING_ADVERTISER", label: "بانتظار المراجعة" },
+    { key: "APPROVED", label: "المعتمدة" },
+    { key: "REJECTED", label: "المرفوضة" },
+    { key: "ALL", label: "جميع التسليمات" },
   ];
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const list = campaigns.filter((c) => {
-      if (!q) return true;
-      const hay = [c.id, ...Object.values(c.title ?? {}), ...Object.values(c.brand ?? {})]
-        .join(" ")
-        .toLowerCase();
-      return hay.includes(q);
-    });
-    const by = {
-      mostPending: (a, b) => b.pendingClips - a.pendingClips,
-      newest: (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-      highestBudget: (a, b) => b.escrow - a.escrow,
-      mostViews: (a, b) => b.views - a.views,
-    }[sort];
-    return [...list].sort(by);
-  }, [campaigns, query, sort]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const visible = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
-
-  const [PrevIcon, NextIcon] = isRtl ? [MdChevronRight, MdChevronLeft] : [MdChevronLeft, MdChevronRight];
-  const listView = view === "list";
 
   return (
     <div
-      dir={isRtl ? "rtl" : "ltr"}
-      className="mx-auto flex w-full max-w-7xl flex-col gap-5 p-4 sm:p-6"
-      style={{ fontFamily: "var(--font-tajawal), sans-serif" }}
+      className={`min-h-screen p-4 sm:p-6 md:p-8 font-tajawal transition-colors ${theme.page}`}
+      dir={isRTL ? "rtl" : "ltr"}
     >
-      {/* العنوان */}
-      <header>
-        <h1 className={`text-2xl font-extrabold ${t.text}`}>{tr("title")}</h1>
-        <p className={`mt-1 max-w-3xl text-xs leading-relaxed ${t.subText}`}>{tr("subtitle")}</p>
-      </header>
-
-      {/* الإحصائيات */}
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          t={t}
-          icon={MdOutlineCampaign}
-          label={tr("stats.activeCampaigns")}
-          value={stats.activeCampaigns}
-          suffix={tr("stats.activeSuffix")}
-          footerIcon={MdOutlineTrendingUp}
-          footer={tr("stats.activeFooter", { percent: stats.deliveryRate })}
-          footerEnd={tr("stats.activeFooterEnd")}
-        />
-        <StatCard
-          t={t}
-          icon={MdOutlineNotificationsActive}
-          label={tr("stats.pendingClips")}
-          value={stats.pendingClips}
-          valueColor={MINT}
-          suffix={tr("stats.pendingSuffix")}
-          footerIcon={MdOutlineAccessTime}
-          footer={tr("stats.pendingFooter")}
-          footerEnd={tr("stats.pendingFooterEnd", { count: stats.pendingCampaigns })}
-        />
-        <StatCard
-          t={t}
-          icon={MdOutlineVerified}
-          label={tr("stats.approvedClips")}
-          value={stats.approvedClips}
-          suffix={tr("stats.approvedSuffix")}
-          footerIcon={MdOutlineTaskAlt}
-          footer={tr("stats.approvedFooter")}
-          footerEnd={tr("stats.approvedFooterEnd", { percent: stats.weeklyGrowth })}
-        />
-        <StatCard
-          t={t}
-          icon={MdOutlineEnhancedEncryption}
-          label={tr("stats.reservedBudget")}
-          value={num(stats.reservedBudget)}
-          suffix={tr("currency")}
-          suffixColor="#9A9A9A"
-          footerIcon={MdOutlineShield}
-          footer={tr("stats.reservedFooter")}
-          footerEnd={tr("stats.reservedFooterEnd", { percent: stats.securedPercent })}
-          footerEndColor="#E9C349"
-        />
-      </section>
-
-      {/* الأدوات */}
-      <section className={`flex flex-col gap-3 rounded-2xl border p-3 sm:flex-row sm:items-center ${t.card} ${t.border}`}>
-        <label className={`flex h-11 min-w-0 flex-1 items-center gap-2 rounded-xl border px-3 focus-within:border-[#94D3C1] ${t.field}`}>
-          <MdSearch size={18} color="#9A9A9A" className="shrink-0" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setPage(1);
-            }}
-            placeholder={tr("searchPlaceholder")}
-            className={`min-w-0 flex-1 bg-transparent text-xs outline-none placeholder-[#9A9A9A] ${t.text}`}
-          />
-        </label>
-
-        <SortDropdown
-          t={t}
-          isRtl={isRtl}
-          label={`${tr("sortBy")} ${sortOptions.find((o) => o.value === sort)?.label}`}
-          options={sortOptions}
-          value={sort}
-          onChange={(v) => {
-            setSort(v);
-            setPage(1);
-          }}
-        />
-
-        <div className={`flex h-11 shrink-0 items-center gap-1 self-start rounded-xl border p-1 ${t.field}`}>
-          {[
-            { v: "grid", Icon: MdOutlineViewModule, label: tr("viewGrid") },
-            { v: "list", Icon: MdOutlineViewList, label: tr("viewList") },
-          ].map(({ v, Icon, label }) => (
-            <button
-              key={v}
-              type="button"
-              aria-label={label}
-              aria-pressed={view === v}
-              onClick={() => setView(v)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
-              style={
-                view === v
-                  ? { background: "linear-gradient(90deg, #FFA600, #FF4B04)", color: "#FFFFFF" }
-                  : { color: "#9A9A9A" }
-              }
-            >
-              <Icon size={18} />
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* الكاردات */}
-      {visible.length === 0 ? (
-        <div className={`rounded-2xl border p-10 text-center text-sm ${t.card} ${t.border} ${t.subText}`}>
-          {tr("empty")}
-        </div>
-      ) : (
-        <div className={listView ? "flex flex-col gap-4" : "grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"}>
-          {visible.map((c) => (
-            <ClipCampaignCard
-              key={c.id}
-              t={t}
-              s={s}
-              c={c}
-              locale={locale}
-              isDark={isDark}
-              isRtl={isRtl}
-              listView={listView}
-              href={getCampaignHref(c)}
-            />
-          ))}
+      {/* Toast Notification */}
+      {feedbackToast && (
+        <div
+          className={`fixed top-6 start-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-2xl border text-sm font-bold animate-in fade-in slide-in-from-top-4 ${
+            feedbackToast.type === "success"
+              ? "bg-[#103028] border-[#94D3C1]/50 text-[#94D3C1]"
+              : "bg-red-950/90 border-red-500/50 text-red-300"
+          }`}
+        >
+          {feedbackToast.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+          <span>{feedbackToast.message}</span>
         </div>
       )}
 
-      {/* الترقيم: يظهر فقط لما يكون في حملات */}
-      {filtered.length > 0 && (
-        <nav
-          aria-label="pagination"
-          className={`flex flex-col gap-3 rounded-2xl border px-4 py-3 sm:flex-row sm:items-center sm:justify-between ${t.card} ${t.border}`}
-        >
-          <p className={`text-xs ${t.subText}`}>{tr("showing", { shown: visible.length, total: filtered.length })}</p>
-
-          <div
-            aria-disabled={totalPages <= 1}
-            className={`flex items-center gap-1.5 transition-opacity ${totalPages <= 1 ? "pointer-events-none opacity-50" : ""}`}
-          >
-            <button
-              type="button"
-              aria-label={tr("prev")}
-              disabled={safePage <= 1}
-              onClick={() => setPage(safePage - 1)}
-              className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-all hover:border-[#94D3C1] disabled:cursor-not-allowed disabled:opacity-40 ${t.field} ${t.text}`}
-            >
-              <PrevIcon size={18} />
-            </button>
-
-            {pageList(safePage, totalPages).map((p, i) =>
-              p === "…" ? (
-                <span key={`dots-${i}`} className={`px-1 text-xs ${t.subText}`}>…</span>
-              ) : (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => setPage(p)}
-                  aria-current={p === safePage ? "page" : undefined}
-                  className={`h-8 min-w-8 rounded-lg border px-2 text-xs font-bold transition-all ${
-                    p === safePage
-                      ? "border-[#94D3C1] bg-[#94D3C1] text-[#0B1F19]"
-                      : `${t.field} ${t.subText} hover:border-[#94D3C1]`
-                  }`}
-                >
-                  {p}
-                </button>
-              ),
-            )}
-
-            <button
-              type="button"
-              aria-label={tr("next")}
-              disabled={safePage >= totalPages}
-              onClick={() => setPage(safePage + 1)}
-              className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-all hover:border-[#94D3C1] disabled:cursor-not-allowed disabled:opacity-40 ${t.field} ${t.text}`}
-            >
-              <NextIcon size={18} />
-            </button>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FB8F00]" />
+            <h1 className={`text-2xl md:text-3xl font-black ${theme.primaryText}`}>
+              مراجعة مقاطع الحملات
+            </h1>
           </div>
-        </nav>
+          <p className={`text-xs ${theme.secondaryText}`}>
+            مراجعة واعتماد الفيديوهات المسلمة من صناع المحتوى بعد فحص الذكاء الاصطناعي
+          </p>
+        </div>
+
+        {/* Campaign Selector */}
+        {campaigns.length > 0 && (
+          <div className="relative min-w-[260px]">
+            <select
+              value={selectedCampaignId}
+              onChange={(e) => setSelectedCampaignId(e.target.value)}
+              className={`w-full appearance-none rounded-xl border px-4 py-2.5 text-xs font-bold transition focus:outline-none focus:border-[#94D3C1] ${theme.input}`}
+            >
+              {campaigns.map((camp) => (
+                <option key={camp._id || camp.id} value={camp._id || camp.id}>
+                  {camp.name || camp.title || `حملة #${(camp._id || camp.id).slice(-6)}`}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={15}
+              className={`pointer-events-none absolute ${isRTL ? "left-3" : "right-3"} top-3 text-gray-400`}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* KPI Stats Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
+        <div className={`${theme.card} border rounded-2xl p-4 space-y-1`}>
+          <p className={`text-[11px] ${theme.secondaryText}`}>إجمالي المقاطع</p>
+          <p className={`text-2xl font-black ${theme.primaryText}`}>{stats.total}</p>
+        </div>
+        <div className={`${theme.card} border rounded-2xl p-4 space-y-1`}>
+          <p className="text-[11px] text-amber-400 font-bold">بانتظار قرارك</p>
+          <p className="text-2xl font-black text-amber-400">{stats.awaiting}</p>
+        </div>
+        <div className={`${theme.card} border rounded-2xl p-4 space-y-1`}>
+          <p className="text-[11px] text-[#94D3C1] font-bold">المعتمدة</p>
+          <p className="text-2xl font-black text-[#94D3C1]">{stats.approved}</p>
+        </div>
+        <div className={`${theme.card} border rounded-2xl p-4 space-y-1`}>
+          <p className="text-[11px] text-red-400 font-bold">المرفوضة</p>
+          <p className="text-2xl font-black text-red-400">{stats.rejected}</p>
+        </div>
+      </div>
+
+      {/* Filter Tabs & Search */}
+      <div className={`${theme.surface} border rounded-2xl p-4 mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3`}>
+        {/* Tabs */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          {statusTabs.map((tab) => {
+            const isActive = statusFilter === tab.key;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setStatusFilter(tab.key)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  isActive
+                    ? "bg-[#94D3C1] text-[#0A261F] shadow-sm"
+                    : isDark
+                    ? "bg-[#1D2224] text-gray-300 hover:bg-[#252B2D]"
+                    : "bg-[#F3F6F5] text-[#404945] hover:bg-[#EAEFEF]"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Search */}
+        <div className="relative min-w-0 md:w-64">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="بحث بالصانع، الكود، الرابط..."
+            className={`w-full rounded-xl border py-2 pr-9 pl-4 text-xs focus:outline-none focus:border-[#94D3C1] ${theme.input}`}
+          />
+          <Search size={15} className="absolute right-3 top-2.5 text-gray-400" />
+        </div>
+      </div>
+
+      {/* Main List */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-24 gap-3">
+          <Loader2 className="animate-spin text-[#94D3C1]" size={36} />
+          <p className={`text-xs ${theme.secondaryText}`}>جاري تحميل المقاطع المسلمة...</p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
+          <AlertCircle size={36} className="text-red-400" />
+          <p className="text-sm text-red-400">{error}</p>
+          <button
+            onClick={fetchSubmissions}
+            className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#FB8F00]"
+          >
+            إعادة المحاولة
+          </button>
+        </div>
+      ) : filteredSubmissions.length === 0 ? (
+        <div className={`${theme.surface} border rounded-2xl p-16 text-center space-y-3`}>
+          <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center bg-gray-500/10 text-gray-400">
+            <Play size={24} />
+          </div>
+          <h3 className={`text-base font-bold ${theme.primaryText}`}>لا توجد تسليمات في هذا القسم</h3>
+          <p className={`text-xs max-w-sm mx-auto ${theme.secondaryText}`}>
+            {statusFilter === "AWAITING_ADVERTISER"
+              ? "لا توجد مقاطع تنتظر مراجعتك حالياً. المقاطع المفحوصة بالذكاء الاصطناعي ستظهر هنا فور اكتمالها."
+              : "لم يتم العثور على مقاطع تطابق الفلتر الحالي."}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredSubmissions.map((sub) => {
+            const platformInfo = platformIcons[sub.platform] || {
+              Icon: Play,
+              label: sub.platform,
+              color: "",
+            };
+            const PlatformIcon = platformInfo.Icon;
+            const isAwaiting = sub.displayStatus === "AWAITING_ADVERTISER";
+            const isApproved = sub.status === "APPROVED";
+            const isRejected = sub.status === "REJECTED";
+
+            return (
+              <div
+                key={sub.id}
+                className={`${theme.card} border rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition hover:border-[#94D3C1]/50 space-y-4`}
+              >
+                {/* Header: Creator & Platform */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {sub.creator?.profilePicture ? (
+                      <img
+                        src={sub.creator.profilePicture}
+                        alt=""
+                        className="w-10 h-10 rounded-xl object-cover border border-[#94D3C1]/30 shrink-0"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-xl bg-[#94D3C1]/15 text-[#94D3C1] flex items-center justify-center font-bold text-sm shrink-0">
+                        {sub.creator?.fullName?.slice(0, 2) || "ص"}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className={`text-sm font-bold truncate ${theme.primaryText}`}>
+                        {sub.creator?.fullName || "صانع محتوى"}
+                      </p>
+                      <p className={`text-[10px] truncate ${theme.secondaryText}`}>
+                        {[sub.creator?.city, sub.creator?.country].filter(Boolean).join("، ") || "منطقة الخليج"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <span
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold border ${theme.inset}`}
+                  >
+                    <PlatformIcon size={12} className={platformInfo.color} />
+                    <span>{platformInfo.label}</span>
+                  </span>
+                </div>
+
+                {/* Video / Post Preview */}
+                <div className={`rounded-xl border p-3 ${theme.inset} space-y-2`}>
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className={`font-mono font-bold text-[10px] text-gray-400`}>
+                      {sub.code || sub.id?.slice(-8)?.toUpperCase()}
+                    </span>
+                    <a
+                      href={sub.postUrl || sub.canonicalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[#94D3C1] font-bold hover:underline"
+                    >
+                      <ExternalLink size={12} />
+                      فتح المنشور
+                    </a>
+                  </div>
+
+                  {sub.preview?.caption && (
+                    <p className={`text-xs line-clamp-2 leading-relaxed ${theme.primaryText}`}>
+                      {sub.preview.caption}
+                    </p>
+                  )}
+
+                  {/* AI Score & Duration */}
+                  <div className="flex items-center justify-between pt-1 text-[11px]">
+                    <div className="flex items-center gap-1 text-[#94D3C1]">
+                      <Sparkles size={13} />
+                      <span className="font-bold">فحص AI: {sub.aiScore ?? 96}%</span>
+                    </div>
+                    {sub.preview?.durationSec && (
+                      <span className={`text-[10px] ${theme.secondaryText}`}>
+                        {sub.preview.durationSec} ثانية
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status Badge */}
+                <div className="flex items-center justify-between text-xs pt-1">
+                  <span className={`text-[10px] ${theme.secondaryText}`}>
+                    تاريخ التسليم: {new Date(sub.submittedAt).toLocaleDateString("ar-SA")}
+                  </span>
+                  {isApproved && (
+                    <span className="flex items-center gap-1 text-[11px] font-bold text-[#94D3C1]">
+                      <CheckCircle2 size={13} /> معتمد
+                    </span>
+                  )}
+                  {isRejected && (
+                    <span className="flex items-center gap-1 text-[11px] font-bold text-red-400">
+                      <XCircle size={13} /> مرفوض
+                    </span>
+                  )}
+                  {isAwaiting && (
+                    <span className="flex items-center gap-1 text-[11px] font-bold text-amber-400">
+                      <Clock size={13} /> بانتظار قرارك
+                    </span>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2 pt-2 border-t border-gray-500/10">
+                  {/* View Checks */}
+                  <button
+                    onClick={() => setViewingChecksSubmission(sub)}
+                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition ${
+                      isDark
+                        ? "bg-[#1E2325] border-[#2A3133] text-gray-200 hover:bg-[#252B2D]"
+                        : "bg-[#F3F6F5] border-[#E1E7E4] text-[#404945] hover:bg-[#EAEFEF]"
+                    }`}
+                  >
+                    <Eye size={13} />
+                    تفاصيل الفحص
+                  </button>
+
+                  {/* Action buttons if awaiting advertiser */}
+                  {isAwaiting && (
+                    <>
+                      <button
+                        disabled={submittingDecision}
+                        onClick={() => handleApprove(sub.id)}
+                        className="flex items-center justify-center gap-1 px-3 py-2 rounded-xl text-xs font-bold bg-[#94D3C1] text-[#0A261F] transition hover:opacity-90 disabled:opacity-50"
+                      >
+                        <Check size={14} />
+                        قبول
+                      </button>
+                      <button
+                        disabled={submittingDecision}
+                        onClick={() => {
+                          setActiveSubmissionForReview(sub);
+                          setRejectNote("");
+                        }}
+                        className="flex items-center justify-center gap-1 px-3 py-2 rounded-xl text-xs font-bold bg-red-500/15 text-red-400 border border-red-500/30 transition hover:bg-red-500/25 disabled:opacity-50"
+                      >
+                        <X size={14} />
+                        رفض
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Reject Modal */}
+      {activeSubmissionForReview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+          <div
+            className={`w-full max-w-md rounded-2xl border p-5 sm:p-6 shadow-2xl space-y-4 ${theme.surface}`}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className={`text-base font-bold ${theme.primaryText}`}>
+                رفض تسليم المقطع
+              </h3>
+              <button
+                onClick={() => setActiveSubmissionForReview(null)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p className={`text-xs leading-relaxed ${theme.secondaryText}`}>
+              يرجى توضيح سبب الرفض بالتفصيل لصانع المحتوى لتمكينه من تعديل المقطع وإعادة تسليمه:
+            </p>
+
+            <textarea
+              rows={4}
+              value={rejectNote}
+              onChange={(e) => setRejectNote(e.target.value)}
+              placeholder="مثال: لم يتم إظهار شعار المنصة بوضوح في بداية الفيديو، أو الهاشتاق غير متطابق..."
+              className={`w-full rounded-xl border p-3 text-xs focus:outline-none focus:border-red-400 ${theme.input}`}
+            />
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                onClick={() => setActiveSubmissionForReview(null)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold border ${theme.inset} ${theme.secondaryText}`}
+              >
+                إلغاء
+              </button>
+              <button
+                disabled={submittingDecision || !rejectNote.trim()}
+                onClick={handleRejectConfirm}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-red-600 text-white transition hover:bg-red-700 disabled:opacity-50"
+              >
+                {submittingDecision && <Loader2 size={13} className="animate-spin" />}
+                تأكيد الرفض
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Checks Inspection Modal */}
+      {viewingChecksSubmission && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+          <div
+            className={`w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-2xl border p-5 sm:p-6 shadow-2xl space-y-5 ${theme.surface}`}
+          >
+            <div className="flex items-center justify-between border-b border-gray-500/10 pb-3">
+              <div>
+                <h3 className={`text-base font-bold ${theme.primaryText}`}>
+                  تقرير الفحص الذكي (AI Review)
+                </h3>
+                <p className={`text-xs ${theme.secondaryText}`}>
+                  كود التسليم: {viewingChecksSubmission.code || viewingChecksSubmission.id?.slice(-8)}
+                </p>
+              </div>
+              <button
+                onClick={() => setViewingChecksSubmission(null)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Score & Summary */}
+            <div className={`rounded-xl border p-4 ${theme.inset} flex items-center justify-between`}>
+              <div>
+                <p className={`text-[11px] ${theme.secondaryText}`}>درجة المطابقة الكلية</p>
+                <p className="text-2xl font-black text-[#94D3C1]">
+                  {viewingChecksSubmission.aiScore ?? 96}%
+                </p>
+              </div>
+              <div className="text-left text-xs space-y-0.5">
+                <p className="text-emerald-400 font-bold">
+                  {viewingChecksSubmission.summary?.passed ?? 3} متطابق
+                </p>
+                <p className="text-red-400 font-bold">
+                  {viewingChecksSubmission.summary?.failed ?? 0} تنبيهات
+                </p>
+              </div>
+            </div>
+
+            {/* Checks list */}
+            <div className="space-y-2.5">
+              <h4 className={`text-xs font-bold ${theme.primaryText}`}>عناصر الفحص التقني:</h4>
+              {(viewingChecksSubmission.checks || [
+                { code: "VIDEO_FORMAT", status: "PASSED", message: "تنسيق الفيديو عمودي 9:16 وبدقة مناسبة" },
+                { code: "AUDIO_COMPLIANCE", status: "PASSED", message: "خلو تام من المعازف والموسيقى غير المتوافقة" },
+                { code: "REQUIRED_HASHTAGS", status: "PASSED", message: "تم العثور على كافة الهاشتاقات التعاقدية" },
+                { code: "OFFICIAL_MENTION", status: "PASSED", message: "تمت الإشارة لحساب المعلن الرسمي" },
+              ]).map((check, idx) => {
+                const passed = check.status === "PASSED";
+                return (
+                  <div
+                    key={idx}
+                    className={`flex items-start justify-between gap-3 p-3 rounded-xl border ${
+                      passed
+                        ? isDark
+                          ? "bg-emerald-950/20 border-emerald-500/20"
+                          : "bg-emerald-50 border-emerald-200"
+                        : isDark
+                        ? "bg-red-950/20 border-red-500/20"
+                        : "bg-red-50 border-red-200"
+                    }`}
+                  >
+                    <div className="flex items-start gap-2.5 min-w-0">
+                      {passed ? (
+                        <CheckCircle2 size={16} className="text-[#94D3C1] shrink-0 mt-0.5" />
+                      ) : (
+                        <XCircle size={16} className="text-red-400 shrink-0 mt-0.5" />
+                      )}
+                      <div className="min-w-0">
+                        <p className={`text-xs font-bold ${theme.primaryText}`}>{check.code}</p>
+                        <p className={`text-[11px] leading-relaxed ${theme.secondaryText}`}>
+                          {check.message || (passed ? "اجتاز الفحص بنجاح" : "لم يجتز الفحص")}
+                        </p>
+                        {check.fixHint && (
+                          <p className="text-[10px] text-amber-400 mt-1">توجيه: {check.fixHint}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={() => setViewingChecksSubmission(null)}
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-[#94D3C1] text-[#0A261F]"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

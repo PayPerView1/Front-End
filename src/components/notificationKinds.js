@@ -7,8 +7,9 @@ import {
   MdErrorOutline,
   MdOutlineCheckCircleOutline,
 } from "react-icons/md";
+import { FiCheckCircle } from "react-icons/fi";
 
-/** الأنواع الأربعة للإشعارات (تُحفظ في الحقل `kind`) */
+/** أنواع الإشعارات (تُحفظ في الحقل `kind`) */
 export const KINDS = {
   DOWNLOAD_READY: "DOWNLOAD_READY",
   DOWNLOAD_FAILED: "DOWNLOAD_FAILED",
@@ -17,8 +18,13 @@ export const KINDS = {
   CAMPAIGN_SUSPENDED: "CAMPAIGN_SUSPENDED",
   APPLICATION_REJECTED: "APPLICATION_REJECTED",
   APPLICATION_ACCEPTED: "APPLICATION_ACCEPTED",
+
+  // Clip Management
   AD_CLIP_SUBMITTED: "AD_CLIP_SUBMITTED",
   CLIP_APPROVED: "CLIP_APPROVED",
+
+  // Earnings
+  EARNINGS_RELEASED: "EARNINGS_RELEASED",
 };
 
 export const KIND_META = {
@@ -106,7 +112,7 @@ export const KIND_META = {
       body: "Your request for \"{campaign}\" was accepted. You now have full access to the ad materials, your tracking links and the creative guide, so you can start producing right away.",
     },
   },
-  [KINDS.AD_CLIP_SUBMITTED]: {
+   [KINDS.AD_CLIP_SUBMITTED]: {
     Icon: MdOutlineSend,
     color: "#94D3C1",
     ar: {
@@ -118,6 +124,7 @@ export const KIND_META = {
       body: "A new advertising video clip has been submitted by the content creator.",
     },
   },
+
   [KINDS.CLIP_APPROVED]: {
     Icon: MdOutlineCheckCircleOutline,
     color: "#4CC96B",
@@ -130,9 +137,22 @@ export const KIND_META = {
       body: "{creator}'s clip for \"{campaign}\" has been approved.",
     },
   },
+
+  [KINDS.EARNINGS_RELEASED]: {
+    Icon: FiCheckCircle,
+    color: "#0FBC5F",
+    ar: {
+      title: "تم تحديث أرباحك بنجاح! + {amount} ر.س",
+      body: "مبارك يا {name}! اكتملت فترة الأمان ({days} أيام) لمقطع «{clipTitle}». تم تحويل مبلغ {amount} ر.س تلقائياً إلى رصيدك المتاح للسحب الآن.",
+    },
+    en: {
+      title: "Earnings updated successfully! + {amount} SAR",
+      body: "Congratulations {name}! The safety review period ({days} days) for \"{clipTitle}\" has ended. An amount of {amount} SAR was automatically moved to your withdrawable balance now.",
+    },
+  },
 };
 
-/** يستبدل {campaign} و{size} ... بقيم params */
+/** يستبدل {campaign} و{size} و{name} و{amount}... بقيم params */
 export function fillText(text, params = {}) {
   return String(text).replace(/\{(\w+)\}/g, (_, k) => params[k] ?? "");
 }
@@ -145,7 +165,7 @@ export function buildNotification(kind, params = {}) {
   return {
     id: `${kind}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     kind,
-    type: "activity", // مو "mention" عشان ما يختلط مع منشن الشات
+    type: "activity",
     params,
     unread: true,
     createdAt: new Date().toISOString(),
@@ -154,7 +174,7 @@ export function buildNotification(kind, params = {}) {
   };
 }
 
-/** بيانات تجريبية لتظهر الأنواع الأربعة مباشرة */
+/** بيانات تجريبية لتظهر الأنواع مباشرة */
 export const SAMPLE_NOTIFICATIONS = [
   buildNotification(KINDS.DOWNLOAD_READY, { size: "1.40" }),
   buildNotification(KINDS.DOWNLOAD_FAILED),

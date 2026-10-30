@@ -96,7 +96,9 @@ function ModalContent({ campaign, onClose, onConfirm }) {
 
   return (
     <div
-      className="fixed inset-0 z-[2147483000] flex items-center justify-center overflow-y-auto p-3 sm:p-6"
+      className={`fixed inset-0 z-[2147483000] flex items-center justify-center overflow-y-auto p-3 sm:p-6 ${
+        isRtl ? "min-[1280px]:right-[260px]" : "min-[1280px]:left-[260px]"
+      }`}
       style={{ background: t.overlay, backdropFilter: "blur(6px)" }}
       onMouseDown={(e) => {
         if (e.target === e.currentTarget && !submitting) onClose?.();
@@ -107,11 +109,7 @@ function ModalContent({ campaign, onClose, onConfirm }) {
         aria-modal="true"
         aria-labelledby="apply-title"
         dir={isRtl ? "rtl" : "ltr"}
-        className={`relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] flex-col gap-3 overflow-y-auto rounded-2xl border p-4 pt-12 sm:p-5 sm:pt-12 ${
-          isRtl
-            ? "min-[1280px]:-translate-x-[130px]"
-            : "min-[1280px]:translate-x-[130px]"
-        }`}
+        className="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] flex-col gap-3 overflow-y-auto rounded-2xl border p-4 pt-12 sm:p-5 sm:pt-12"
         style={{
           background: t.card,
           borderColor: t.border,
@@ -257,7 +255,7 @@ function ModalContent({ campaign, onClose, onConfirm }) {
             type="button"
             onClick={handleConfirm}
             disabled={submitting}
-            className="inline-flex h-10 flex-1 items-center justify-center rounded-xl px-5 text-xs font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-12 min-h-12 w-full shrink-0 items-center justify-center rounded-xl px-5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:h-10 sm:min-h-0 sm:w-auto sm:flex-1 sm:text-xs"
             style={{ background: ORANGE }}
           >
             {submitting ? s("sending") : s("confirm")}
@@ -266,7 +264,7 @@ function ModalContent({ campaign, onClose, onConfirm }) {
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="inline-flex h-10 items-center justify-center rounded-xl px-5 text-xs font-bold transition-opacity hover:opacity-80 disabled:opacity-50"
+            className="inline-flex h-12 min-h-12 w-full shrink-0 items-center justify-center rounded-xl px-5 text-xs font-bold transition-opacity hover:opacity-80 disabled:opacity-50 sm:h-10 sm:min-h-0 sm:w-auto"
             style={{ background: t.secondary, color: t.secondaryText }}
           >
             {s("cancel")}

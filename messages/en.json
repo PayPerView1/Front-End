@@ -1,4 +1,300 @@
 {
+  "advertiserProfile": {
+    "companyName": "Company name",
+    "tabs": {
+      "campaigns": "Campaigns",
+      "stats": "Statistics"
+    },
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "completed": "Completed",
+      "pendingReview": "Under review"
+    },
+    "statuses": {
+      "active": "Active",
+      "completed": "Completed",
+      "pendingReview": "Under review",
+      "cancelled": "Cancelled",
+      "draft": "Draft",
+      "rejected": "Rejected",
+      "archived": "Archived"
+    },
+    "stats": {
+      "totalCampaigns": "Total campaigns",
+      "activeCampaigns": "Active campaigns",
+      "completedCampaigns": "Completed campaigns",
+      "totalSpend": "Total spend"
+    },
+    "uploadError": "Could not update the profile picture.",
+    "uploading": "Updating picture...",
+    "coverImage": "Cover image",
+    "companyLogo": "Company logo",
+    "shareProfile": "Share profile",
+    "shareTitle": "Advertiser profile",
+    "copyLink": "Copy link",
+    "editProfile": "Edit profile",
+    "verifiedBadge": "Verified advertiser",
+    "advertiser": "Advertiser",
+    "listSeparator": ", ",
+    "createCampaign": "Create campaign",
+    "dashboard": "Dashboard",
+    "campaignCount": "{count, plural, =0 {No campaigns} one {# campaign} other {# campaigns}}",
+    "campaignWithoutName": "Untitled campaign",
+    "campaignCategory": "Advertising campaign",
+    "noCampaigns": "There are no campaigns to display.",
+    "campaignStatistics": "Campaign statistics",
+    "accountData": "Current data from your account",
+    "recentCampaigns": "Your recent campaigns"
+  },
+  "creatorDashboard": {
+    "creator": "Creator",
+    "welcome": "Welcome, {name}",
+    "loadingAccount": "Loading your account data…",
+    "activitySummary": "Your account is active and 100% Sharia-compliant.",
+    "exploreCampaigns": "Explore new campaigns",
+    "retry": "Try again",
+    "brand": "Brand",
+    "campaign": "Campaign",
+    "campaignWithoutName": "Untitled campaign",
+    "halalVerified": "Sharia-compliant",
+    "favorited": "Favorited",
+    "listSeparator": ", ",
+    "overview": {
+      "earningsTotal": "Total earnings",
+      "withdrawable": "Ready for instant withdrawal",
+      "instantWithdraw": "Withdraw now",
+      "activeCompleted": "Active & completed campaigns",
+      "activeNow": "in progress",
+      "appliedSuffix": "applications",
+      "acceptRate": "acceptance rate",
+      "avgDelivery": "Average delivery per clip",
+      "approvedViews": "Approved views",
+      "verifiedClips": "Fully verified clips",
+      "workflow": "Live workflow",
+      "workflowSub": "Regular follow-up on orders and earnings",
+      "chipPending": "applications under review",
+      "chipActive": "campaigns in progress",
+      "chipTotal": "applications submitted",
+      "viewAll": "View all",
+      "applyNow": "Apply to this campaign",
+      "budget": "Allocated budget",
+      "cpmReturn": "CPM return",
+      "seats": "Campaign status",
+      "addFav": "Add to favorites",
+      "campaignInfo": "Campaign details",
+      "myCampaigns": "My active campaigns & upcoming deadlines",
+      "myCampaignsSub": "Close follow-up on clip delivery and financial review",
+      "goOrders": "Go to my orders & campaigns",
+      "progress": "Progress",
+      "estEarnings": "Estimated earnings",
+      "uploadClip": "Upload clip",
+      "details": "Details",
+      "startedAt": "Applied on"
+    },
+    "creatorInterests": {
+      "title": "Recommendations & interests",
+      "description": "Customize your interests and target audience to find rewarding, Sharia-compliant campaigns that fit your content style and maximize your return per thousand qualified views.",
+      "save": "Save preferences",
+      "saving": "Saving…",
+      "reset": "Reset",
+      "retry": "Try again",
+      "loading": "Loading your preferences…",
+      "saveSuccess": "Your preferences and recommendation criteria have been updated.",
+      "errors": {
+        "load": "Could not load your preferences right now.",
+        "save": "Could not save your preferences. Please try again.",
+        "countryLimit": "You can select up to {count} countries."
+      },
+      "system": {
+        "title": "Interest and recommendation settings",
+        "description": "Set your matching criteria to filter for Sharia-compliant campaigns, adjust your minimum return per thousand qualified views, and reach the audience you want."
+      },
+      "categories": {
+        "title": "1. Creative content categories",
+        "description": "Choose the content priorities that best fit your channel and creative style.",
+        "enabled": "{count} categories enabled",
+        "priority": "Adjustable priority",
+        "weight": "Recommendation weight:",
+        "customTitle": "Add a custom interest",
+        "customDescription": "Add a category that is not listed above.",
+        "customPlaceholder": "Example: emerging tech apps",
+        "customTag": "Custom category",
+        "add": "Add category",
+        "clipping": "Tech and app clips",
+        "clippingHint": "Priority: technology reviews",
+        "fintech": "Fintech and investing",
+        "fintechHint": "Priority: responsible investing",
+        "ai": "AI and technology tools",
+        "aiHint": "Interest: AI tools",
+        "faith": "Faith and values",
+        "faithHint": "Interest: positive values",
+        "health": "Healthcare and specialists",
+        "healthHint": "Interest: selected products",
+        "documentaries": "Documentaries, history and culture",
+        "documentariesHint": "Interest: educational content",
+        "books": "Books and publishing",
+        "booksHint": "Priority: reviews",
+        "lifestyle": "Nutrition, wellness and lifestyle",
+        "lifestyleHint": "Suggested recommendation weight",
+        "automotive": "Automotive and mechanics",
+        "automotiveHint": "Suggested recommendation weight"
+      },
+      "pillars": {
+        "title": "Smart recommendation criteria",
+        "description": "Set your financial preferences, minimum return, and ethical requirements.",
+        "sharia": "Sharia compliance",
+        "strict": "Strict 100% filter",
+        "shariaDescription": "Automatically exclude campaigns that conflict with Sharia guidelines and community values.",
+        "filterEnabled": "Active filter: excludes prohibited content",
+        "minimumCpm": "Minimum CPM",
+        "cpmDescription": "Campaigns below this return per thousand qualified views will not be shown.",
+        "budget": "Campaign budget",
+        "budgetDescription": "Choose the budget range that suits the campaigns you want to join."
+      },
+      "budgets": {
+        "high": "High",
+        "medium": "Medium",
+        "economical": "Economical"
+      },
+      "regions": {
+        "title": "Audience location and target regions",
+        "description": "Focus on engaged audiences in Gulf and Arab markets.",
+        "active": "{percent}% active",
+        "enabled": "Enabled",
+        "enable": "Enable region",
+        "selectedCountries": "Selected countries: {selected} / {max}",
+        "SA": {
+          "name": "Saudi Arabia",
+          "note": "Riyadh, Jeddah, Eastern Province, and Qassim"
+        },
+        "AE": {
+          "name": "United Arab Emirates",
+          "note": "Dubai, Abu Dhabi, and Sharjah"
+        },
+        "GULF": {
+          "name": "Kuwait, Qatar, and Bahrain",
+          "note": "Gulf capitals and engaged communities"
+        },
+        "REST": {
+          "name": "Egypt and the rest of the Arab world",
+          "note": "A broad audience for viral content"
+        }
+      },
+      "platforms": {
+        "title": "4. Publishing platforms and clip formats",
+        "description": "Supported channels where your content can be published.",
+        "activeCount": "{count} active formats",
+        "instagram": "Strong direct engagement",
+        "tiktok": "Fast viral reach",
+        "youtube": "Long-term view stability",
+        "x": "Focused stories and updates",
+        "podcast": "Full podcast episodes with clipping",
+        "optional": "Optional"
+      }
+    },
+    "nav": {
+      "home": "Home",
+      "orders": "Orders",
+      "discover": "Discover",
+      "startProject": "Start a project",
+      "resources": "Resources",
+      "profile": "Profile",
+      "help": "Help",
+      "blog": "Blog"
+    },
+    "header": {
+      "assistant": "AI assistant",
+      "messages": "Messages",
+      "notifications": "Notifications"
+    },
+    "summary": {
+      "walletBalance": "Wallet balance",
+      "totalApplications": "Total campaign applications",
+      "pendingApplications": "Pending review",
+      "acceptedApplications": "Accepted applications"
+    },
+    "recommendations": {
+      "title": "Recommended Campaigns For You",
+      "subtitle": "Selected based on your audience demographics, your highest-performing video views, and certified ethical standards.",
+      "matchScore": "Match",
+      "refresh": "Refresh recommendations",
+      "viewAll": "View all campaigns",
+      "loading": "Loading recommended campaigns…",
+      "personalizeTitle": "Set your preferences to see suitable campaigns",
+      "emptyTitle": "No recommendations right now. Browse all campaigns",
+      "personalizeDescription": "Choose content types, countries, and a minimum CPM, and we’ll find matching campaigns.",
+      "emptyDescription": "The Halal AI engine checks and audits hundreds of campaigns daily, and there are currently no opportunities that 100% match your current filtering criteria with Sharia guidelines or your precise niche. You can explore all available public campaigns immediately or re-adjust your smart preferences.",
+      "browseCampaigns": "Browse All Available Campaigns",
+      "editPreferences": "Edit Recommendation Preferences",
+      "instantAlertsTitle": "Enable instant alerts when new recommendations are available",
+      "instantAlertsDesc": "Instant notification via your account and verified email when a suitable match is found"
+    },
+    "campaignDetails": {
+      "cpm": "CPM rate",
+      "remainingBudget": "Remaining budget",
+      "targetCountries": "Target countries",
+      "unspecified": "Not specified",
+      "view": "View campaign details"
+    },
+    "recentApplications": {
+      "title": "Recent campaign applications",
+      "subtitle": "Applications submitted from your account",
+      "viewAll": "View all applications",
+      "loading": "Loading your applications…",
+      "empty": "You haven’t applied to any campaigns yet."
+    },
+    "availability": {
+      "available": "Available",
+      "status": "Status: {status}"
+    },
+    "statuses": {
+      "pending": "Pending review",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn",
+      "unknown": "Unknown"
+    },
+    "reasons": {
+      "countryMatch": "Your audience is in {country}",
+      "contentTypeMatch": "Matches {contentType} content",
+      "cpmMatch": "Meets your minimum CPM",
+      "previousParticipation": "Similar to campaigns you’ve joined",
+      "previousParticipationWithType": "Similar to campaigns you’ve joined ({contentType})",
+      "recommended": "Recommended for you"
+    },
+    "contentTypes": {
+      "clipping": "Short clips",
+      "ugc": "User-generated content",
+      "slideshow": "Slideshow",
+      "audio": "Audio content",
+      "logo": "Logo design",
+      "mixed": "Mixed content"
+    },
+    "countries": {
+      "saudiArabia": "Saudi Arabia",
+      "uae": "United Arab Emirates",
+      "kuwait": "Kuwait",
+      "qatar": "Qatar",
+      "bahrain": "Bahrain",
+      "oman": "Oman",
+      "egypt": "Egypt",
+      "jordan": "Jordan",
+      "iraq": "Iraq",
+      "lebanon": "Lebanon",
+      "morocco": "Morocco",
+      "turkey": "Türkiye",
+      "unitedStates": "United States",
+      "unitedKingdom": "United Kingdom"
+    },
+    "errors": {
+      "fetchData": "Could not load data from the server.",
+      "recommendationsLoadFailed": "Could not load recommended campaigns right now.",
+      "invalidWalletBalance": "The server returned an invalid wallet balance.",
+      "walletLoadFailed": "Could not load your wallet balance.",
+      "applicationsLoadFailed": "Could not load campaign applications."
+    }
+  },
   "nav": {
     "orders": "Orders",
     "partners": "Partners",
@@ -406,6 +702,73 @@
       "noCreatedWorks": "No created works yet",
       "noJoinedCampaigns": "No joined campaigns yet"
     },
+    "favorites": {
+      "title": "Favorite Campaigns & Bulk Management",
+      "description": "Track and apply to Sharia-compliant campaigns you have saved. Manage applications individually or in bulk and export records with ease.",
+      "searchPlaceholder": "Search by name or advertiser...",
+      "selectAll": "Select all ({count})",
+      "removeSelected": "Remove selected",
+      "noResults": "No matching results",
+      "changeFilters": "Try changing your search or category.",
+      "removeFromFavorites": "Remove from favorites",
+      "materials": "Materials:",
+      "platforms": "Platforms:",
+      "rateLabel": "Earnings per thousand impressions:",
+      "remaining": "Remaining:",
+      "total": "Total:",
+      "applyNow": "Apply now",
+      "campaignDetails": "Campaign details",
+      "rawClips": "{count} raw 4K clips",
+      "halalAudio": "Halal audio",
+      "sort": {
+        "newest": "Recently added",
+        "cpmHigh": "Highest CPM",
+        "endingSoon": "Ending soon",
+        "aiRecommended": "Best match (AI recommendation)"
+      },
+      "categories": {
+        "all": "All categories",
+        "lifestyle": "Lifestyle",
+        "technology": "Technology",
+        "education": "Education",
+        "entertainment": "Entertainment",
+        "finance": "Finance",
+        "health": "Health"
+      },
+      "countries": {
+        "label": "Countries:",
+        "sa": "Saudi Arabia",
+        "ae": "United Arab Emirates",
+        "eg": "Egypt",
+        "kw": "Kuwait",
+        "qa": "Qatar"
+      },
+      "campaigns": {
+        "emerald": {
+          "title": "Edit and publish educational clips about halal investing",
+          "description": "Create engaging clips from a safe-investing podcast, adding interactive captions and clear, compliant audio effects."
+        },
+        "modestFashion": {
+          "title": "Reviews and Eid outfit styling videos",
+          "description": "Showcase and style elegant abayas and dresses while highlighting the quality of their premium fabrics."
+        },
+        "wafer": {
+          "title": "Design and edit promotional app videos",
+          "description": "Edit app screen recordings and highlight automatic gold and silver savings features in a modern, fast-paced style."
+        }
+      },
+      "alerts": {
+        "title": "Smart favorites monitoring and alerts",
+        "description": "Get instant notifications and emails when a campaign's status changes, its end date approaches, or its budget is updated.",
+        "customize": "Customize alerts"
+      },
+      "empty": {
+        "title": "Your favorites list is currently empty",
+        "description": "You haven't saved any Sharia-compliant ad campaigns yet. Explore the available opportunities and save promising campaigns to revisit or apply with one click.",
+        "explore": "Explore available campaigns",
+        "recommendations": "View suggested smart recommendations"
+      }
+    },
     "campaigns": {
       "arabClips": "Arabic Clips Community",
       "creators": "Creators Platform",
@@ -504,12 +867,38 @@
     "services": "Connected services",
     "security": "Account security",
     "subscriptions": "Subscriptions",
-    "disputes": "Dispute center"
+    "disputes": "Dispute center",
+    "interests": "Interests",
+    "audience": "My Audience",
+    "favorites": "Favorites",
+    "linkedAccounts": "Linked accounts",
+    "notifications": "Notifications",
+    "paymentMethods": "Payment methods",
+    "phone": "Phone number",
+    "choose": "Choose",
+    "phonePlaceholder": "Enter your phone number",
+    "country": "Country",
+    "countryPlaceholder": "Choose a country",
+    "city": "City",
+    "cityPlaceholder": "e.g. Dubai",
+    "interestsTitle": "Interests",
+    "interestOptions": {
+      "lifestyle": "Lifestyle",
+      "technology": "Technology",
+      "education": "Education",
+      "entertainment": "Entertainment",
+      "finance": "Finance",
+      "health": "Health"
+    },
+    "phoneCodeRequired": "Select a country calling code and enter a phone number",
+    "removeProfilePicture": "Remove profile picture",
+    "profilePictureValidation": "Image must be JPEG, JPG, PNG, or WebP and no larger than 5 MB"
   },
   "campaigns": {
     "title": "Campaign Management",
     "subtitle": "Monitor performance, budgets, and active campaign status",
-    "dateFilter": "Date: Last 30 days",
+    "dateFilter": "All dates",
+    "dateClear": "Clear dates",
     "statusLabel": "Status",
     "search": "Search campaigns...",
     "all": "All",
@@ -604,7 +993,7 @@
   "assistant": {
     "close": "Close assistant",
     "title": "How can I help you today?",
-    "description": "I’m your smart assistant. I can help you create content, manage your account, or answer any questions.",
+    "description": "I'm your smart assistant. I can help you create content, manage your account, or answer any questions.",
     "preview": "Preview",
     "placeholder": "Write your message here...",
     "disclaimer": "The assistant may occasionally make mistakes. Please verify important information.",
@@ -990,7 +1379,7 @@
     "includeBankRef": "Include bank reference and detailed tax statement",
     "attachHash": "Attach digital fingerprint (Ledger Hash)",
     "sendEmailCopy": "Send an encrypted copy to email (finance@company.com)",
-    "dataSuccess": "Data compiled successfully (100%)",
+    "dataSuccess": "Data compiled successfully ({percent}%)",
     "fileSize": "Size:",
     "selectFormatFirst": "Select file format first",
     "readyForDownload": "Ready for download",
@@ -1635,5 +2024,1086 @@
       "confirmBtn": "Confirm Clip Rejection",
       "cancelBtn": "Cancel & return to preview"
     }
+  },
+
+  "creatorOrders": {
+    "title": "My Orders",
+    "description": "Manage and track your campaign applications, advertiser approvals, video submissions, and active withdrawals with confidence and transparency.",
+    "exploreCampaigns": "Explore New Campaigns",
+    "stats": {
+      "total": "Total Applications",
+      "registered": "Applications submitted",
+      "pending": "Under Review",
+      "awaitingAdvertiser": "Awaiting advertiser response",
+      "accepted": "Accepted Applications",
+      "acceptanceRate": "75% acceptance rate",
+      "closed": "Completed / Closed",
+      "archived": "Completed or archived"
+    },
+    "notice": {
+      "title": "Withdrawal Guidelines:",
+      "description": "You can withdraw your application at any time while it is still under review and has not been approved by the advertiser, without affecting your creator rating or platform record."
+    },
+    "filters": {
+      "all": "All",
+      "pending": "Under Review",
+      "accepted": "Accepted & Active",
+      "rejected": "Rejected or Withdrawn"
+    },
+    "searchPlaceholder": "Search by campaign name or code...",
+    "sort": {
+      "label": "Sort orders",
+      "newest": "Newest",
+      "highestCost": "Highest Cost",
+      "endingSoon": "Ending Soon"
+    },
+    "order": {
+      "submitted": "Submitted: {date} - {time}",
+      "approved": "Approved: {date}",
+      "closed": "Closed: {date}",
+      "cpm": "View Rate (CPM)",
+      "targetPlatforms": "Target Platforms",
+      "trackingCode": "Tracking code:",
+      "withdraw": "Withdraw Application",
+      "campaignDetails": "View Campaign Details",
+      "contactAdvertiser": "Contact Advertiser",
+      "uploadVideo": "Upload Video",
+      "withdrawReason": "Withdrawal reason:",
+      "rejectionReason": "Advertiser's rejection reason:"
+    },
+    "sampleOrders": {
+      "perfumeTitle": "Al Asalah Luxury Perfume Launch Campaign - Sidra Co.",
+      "sidraCompany": "Sidra Co.",
+      "pendingStatus": "Under Review",
+      "campaignBudget": "Campaign Budget",
+      "pendingNote": "Estimated response time: under 12 hours (you may withdraw while the application is unapproved)",
+      "goldAppTitle": "Smart Gold and Islamic Investment App",
+      "fintechCompany": "Namaa Fintech",
+      "acceptedStatus": "Accepted - Awaiting Video Clip",
+      "maxEarnings": "Maximum Earnings",
+      "acceptedNote": "Your application has been officially approved by the advertiser. You can now produce your video and submit the approved clip link to start tracking views and earnings automatically.",
+      "fashionTitle": "Elegant Arabic Clothing and Fashion",
+      "fashionStore": "Arabic Fashion Store",
+      "rejectedStatus": "Rejected - Creator Capacity Reached",
+      "totalBudget": "Total Budget",
+      "rejectionReason": "The full allocation for fashion creators in this campaign was filled within the first few hours. No additional spots are available; we invite you to apply for the next release in September."
+    },
+    "notifications": {
+      "acceptedTitle": "Application Accepted",
+      "rejectedTitle": "Application Rejected",
+      "acceptedText": "Your application to join the \"{title}\" campaign was accepted.",
+      "rejectedText": "Your application for the \"{title}\" campaign was rejected.",
+      "rejectedWithReason": "Your application for the \"{title}\" campaign was rejected. Reason: {reason}",
+      "withdrawnTitle": "Application Withdrawn",
+      "withdrawnText": "Your application for the \"{title}\" campaign was successfully withdrawn."
+    },
+    "withdrawn": {
+      "status": "Withdrawn by Creator",
+      "busyReason": "Current scheduling constraints",
+      "personalReason": "Personal reasons",
+      "reasonText": "You withdrew this application for the following reason: {reason}."
+    },
+    "withdrawModal": {
+      "title": "Are you sure you want to withdraw your application?",
+      "description": "You can withdraw your application safely and free of charge, with no penalties, as long as it is still under review and has not been officially approved by the campaign team.",
+      "close": "Close",
+      "applicationId": "Application ID:",
+      "pending": "Under Review",
+      "submittedAt": "Submitted At",
+      "cpm": "Cost per 1,000 Impressions (CPM)",
+      "perThousandViews": "per 1,000 views",
+      "fairPolicyTitle": "Our Fair Policy for Creators",
+      "policyBeforeApproval": "Withdrawing before approval",
+      "policyNoImpact": "will not affect",
+      "policyAfterNoImpact": "your account rating, credit score, or ranking in future advertising campaigns. The slot will immediately be returned to other creators.",
+      "reasonTitle": "Reason for Withdrawal",
+      "reasonOptional": "(Optional, helps us improve your experience)",
+      "reasonGroupLabel": "Reason for withdrawing the application",
+      "reasons": {
+        "timeBusy": "I am currently unavailable",
+        "personalReasons": "Personal circumstances or reasons"
+      },
+      "cancel": "Go Back and Keep Application",
+      "confirm": "Confirm Final Withdrawal"
+    },
+    "emptyState": "No orders yet. Explore available campaigns and start applying!",
+    "retry": "Retry"
+  },
+  "startProject": {
+    "title": "Produced your clip? Pick the campaign to submit it and claim your reward",
+    "description": "Choose the campaign you produced your clip for. Once you submit the link, AI will check the requirements and confirm the deposit to your wallet within seconds.",
+    "searchPlaceholder": "Search by campaign or advertiser name...",
+    "empty": "No matching campaigns",
+    "filters": {
+      "all": "All",
+      "ready": "Ready to submit now",
+      "endingSoon": "Ending soon"
+    },
+    "status": {
+      "instant": "Approved for instant submission",
+      "production": "Approved for production & submission"
+    },
+    "card": {
+      "campaignNumber": "Campaign No.",
+      "verifiedCompany": "Sharia-verified account",
+      "requiredHashtag": "Required hashtag",
+      "requiredMention": "Account mention",
+      "shariaRule": "Sharia requirement",
+      "noMusic": "Completely free of music",
+      "submitNow": "Submit this campaign's clip now",
+      "terms": "Campaign terms",
+      "assets": "Campaign assets",
+      "seconds": "sec",
+      "remainingHours": "Only {count} hours left",
+      "remainingDays": "{count} days left"
+    },
+    "paymentTerms": {
+      "bankTransfer": "Bank transfer",
+      "viewsBased": "Based on views",
+      "stepsBased": "Based on steps"
+    },
+    "campaigns": {
+      "wafiTitle": "Wafi Islamic Finance Platform - Smart Murabaha Feature",
+      "wafiCompany": "Wafi Financial Company",
+      "muskTitle": "Musk Luxury Perfume App - Heritage Authenticity Scent",
+      "muskCompany": "Musk International House",
+      "goldTitle": "Gulf Digital Gold Platform - Saving in Pure Gold",
+      "goldCompany": "Gulf Investment Company"
+    },
+    "escrow": {
+      "title": "Your financial rights are 100% protected",
+      "description": "The funds of all these campaigns are pre-frozen in the bank escrow account. As soon as you submit the post link and AI confirms it, the reward is transferred directly to your wallet with no waiting or lengthy reviews."
+    },
+    "support": {
+      "title": "Live support team",
+      "subtitle": "Ready to help you during submission",
+      "chat": "Instant chat with an advisor"
+    },
+    "tips": {
+      "title": "Quick tips to get your clip accepted",
+      "subtitle": "Make sure of these things before submitting your clip",
+      "public": {
+        "title": "Public account",
+        "desc": "Make sure your account is public, not private, so we can verify the post."
+      },
+      "hashtags": {
+        "title": "Add the required hashtags",
+        "desc": "Make sure you add all the campaign's required hashtags before publishing the clip."
+      },
+      "noMusic": {
+        "title": "Clip free of music",
+        "desc": "Make sure the clip has no music or instruments and follows the campaign terms."
+      }
+    },
+    "submit": {
+      "title": "Submit your published clip for review",
+      "description": "Enter your clip link after publishing it on your verified account so it can be checked and your earnings approved right away, quickly and easily.",
+      "formTitle": "Clip submission form",
+      "formSubtitle": "Follow these simple steps to submit your clip without any trouble.",
+      "choosePlatform": "Choose where you published the clip:",
+      "platforms": {
+        "tiktok": "TikTok",
+        "instagram": "Instagram",
+        "youtube": "YouTube"
+      },
+      "pasteLink": "Paste the video link here:",
+      "publicNote": "Make sure your account is public, not private, so the post can be read instantly.",
+      "requiredHashtags": "Required hashtags in the post ({count} hashtags only):",
+      "copyAll": "Copy in one click",
+      "copied": "Copied",
+      "pledgeLabel": "Sharia pledge:",
+      "pledge": "I pledge that the clip is free of music and instruments and complies with the terms and Sharia rules of the Wafi platform.",
+      "submit": "Submit clip for review and approval",
+      "submitting": "Submitting...",
+      "saveLater": "Save for later",
+      "verifiedLink": "Verified account link",
+      "checkLink": "Check link",
+      "linkOk": "The link is valid and can be submitted",
+      "recheck": "Re-check the post",
+      "duplicateNote": "This submission was rejected to prevent duplication and keep independent payment records.",
+      "errors": {
+        "empty": "Please enter the video link",
+        "invalidUrl": "The link is invalid. Make sure you copied it in full from the app",
+        "unsupportedPlatform": "This platform is not supported. Use TikTok, Instagram or YouTube",
+        "platformMismatch": "The link does not match the platform you selected",
+        "noPlatform": "Please choose the platform you published the clip on first"
+      },
+      "badges": {
+        "invalidUrl": "Invalid link",
+        "unsupportedPlatform": "Unsupported platform",
+        "platformMismatch": "Link does not match platform",
+        "duplicate": "Duplicate link, already registered",
+        "missingHashtags": "Missing hashtags"
+      },
+      "formats": {
+        "title": "Accepted and supported {platform} link formats:",
+        "notes": {
+          "tiktok": "Make sure the clip link is from your public account and includes the post number.",
+          "instagram": "Make sure the Reel link is from your public account and includes the Reel ID.",
+          "youtube": "Make sure the Shorts link is from your public channel and includes the video ID."
+        },
+        "supportedOnly": "Sorry! The automatic checker only recognizes links from:"
+      }
+    },
+    "steps": {
+      "submitted": {
+        "title": "Clip submitted",
+        "done": "Ready, with the required quality",
+        "active": "Submitting",
+        "error": "Submission failed",
+        "pending": "Waiting for submission"
+      },
+      "aiCheck": {
+        "title": "AI check",
+        "done": "Passed and meets the requirements",
+        "active": "Checking now",
+        "passed": "Passed 100% and fully compliant",
+        "review": "Audio track needs an expert review",
+        "error": "Clip does not meet the requirements",
+        "pending": "Starts after submission"
+      },
+      "reward": {
+        "title": "Reward deposit",
+        "done": "Deposited into your wallet",
+        "active": "Awaiting final approval",
+        "error": "Deposit failed",
+        "pending": "Within 24 hours"
+      }
+    },
+    "preview": {
+      "title": "Published clip preview",
+      "empty": "The clip preview will appear here after you enter the link",
+      "openOriginal": "Open original link",
+      "withdraw": "Withdraw to edit",
+      "verified": "{platform} verified",
+      "detectedTitle": "Detected post preview",
+      "failedBadge": "Clip unreachable",
+      "failedTitle": "Couldn't fetch the post",
+      "failedDesc": "The video can't be previewed and views can't be verified until a valid link is entered.",
+      "httpError": "HTTP 404 • Not Found"
+    },
+    "deadline": {
+      "label": "Deadline for your reward's final approval",
+      "value": "Within {hours} hours and {minutes} minutes"
+    },
+    "result": {
+      "title": "Your clip was received successfully!",
+      "description": "Your clip is in the smart check queue, and the reward will reach your wallet as soon as it is approved.",
+      "campaignLabel": "Ad campaign",
+      "hashtagsRequired": "Required hashtags in the post ({count} hashtags)",
+      "hashtagsDone": "{done} of {total} completed",
+      "noteTitle": "Important notes",
+      "noteText": "Please make sure all campaign requirements are met before submitting your clip.",
+      "creatorLink": "Submitted and verified clip link",
+      "hashtagsLabel": "Required hashtags in the post ({count} hashtags)",
+      "compatibility": "Your clip is more than 44 seconds at the start. The model evaluates from second 44, taking the smart opening into account.",
+      "backToList": "Back to campaigns list",
+      "linkConfirmed": "Link confirmed",
+      "campaigns": {
+        "wafiTitle": "Wafi Islamic Finance Platform - Smart Murabaha Feature",
+        "muskTitle": "Musk Luxury Perfume App - Heritage Authenticity Scent",
+        "goldTitle": "Gulf Digital Gold Platform - Saving in Pure Gold"
+      },
+      "ai": {
+        "label": "AI check result",
+        "subtitle": "The clip was analyzed and verified against the requirements",
+        "excellent": "Excellent",
+        "items": {
+          "sharia": {
+            "title": "Sharia compliance",
+            "desc": "The content complies with the campaign terms."
+          },
+          "logo": {
+            "title": "Logo visibility",
+            "desc": "The required logo was verified as visible."
+          },
+          "quality": {
+            "title": "Video quality",
+            "desc": "The video quality is suitable for publishing."
+          },
+          "audio": {
+            "title": "Audio",
+            "desc": "The audio was verified as compliant with the requirements."
+          }
+        }
+      }
+    },
+    "approved": {
+      "title": "The clip was checked and automatically approved by AI!",
+      "description": "All campaign criteria and the specified Sharia rules were verified at 100%. Current submission status: awaiting the advertiser's final approval for payout. The amount is protected by escrow and secured for transfer.",
+      "scoreLabel": "Overall match score",
+      "reportTitle": "Full AI check results report",
+      "reportSubtitle": "{passed} of {total} requirements verified successfully",
+      "instant": "Instant check",
+      "checks": {
+        "videoSpecs": {
+          "title": "Video dimensions and resolution",
+          "desc": "Vertical 9:16 clip at 1080p, 42 seconds long",
+          "badge": "100% match"
+        },
+        "audio": {
+          "title": "Sharia audio audit",
+          "desc": "Completely free of music, instruments and unauthorized sound effects",
+          "badge": "100% Sharia compliant"
+        },
+        "mainHashtag": {
+          "title": "Mandatory main hashtag",
+          "desc": "{tag} is present and active in the main caption",
+          "badge": "Present and active"
+        },
+        "secondHashtag": {
+          "title": "Contractual hashtag",
+          "desc": "{tag2} matches the campaign terms",
+          "badge": "Present and active"
+        },
+        "mention": {
+          "title": "Official account mention",
+          "desc": "{account} is a valid mention with a direct account link",
+          "badge": "Included and matching"
+        }
+      }
+    },
+    "review": {
+      "title": "Your clip is under manual audit team review",
+      "description": "Don't worry! You don't need to take any action now. The automatic check referred your clip to the manual audit team to make sure it is reviewed fairly and not wrongly rejected. Your reward is held in full in the escrow vault until the clip is cleared.",
+      "dataTitle": "Submitted clip data and criteria check",
+      "dataSubtitle": "Summary of the mandatory requirements checked automatically",
+      "openInPlatform": "Preview the clip on {platform}",
+      "checks": {
+        "videoSpecs": {
+          "title": "Video dimensions and resolution",
+          "desc": "Vertical 9:16 clip (1080×1920) at 60 fps",
+          "badge": "Matches"
+        },
+        "hashtags": {
+          "title": "Mandatory hashtags",
+          "desc": "{tags} detected in the caption",
+          "badge": "Complete"
+        },
+        "mention": {
+          "title": "Official account mention",
+          "desc": "The mention of the verified account {account} was confirmed",
+          "badge": "Complete"
+        }
+      },
+      "audio": {
+        "title": "Audio",
+        "desc": "The audio track was sent for manual review because of possible sound effects close to music. The expert will confirm it meets the Sharia rules.",
+        "badge": "Manual check"
+      },
+      "whatNowTitle": "What happens now, step by step?",
+      "whatNowSubtitle": "Clear, guaranteed steps so your rights reach you without any extra action from you",
+      "flow": {
+        "received": {
+          "title": "Clip received and given review priority",
+          "desc": "The clip was recorded successfully and added to the check list",
+          "badge": "Done"
+        },
+        "expert": {
+          "title": "Expert listens to the audio track and approves it",
+          "desc": "A specialist reviewer listens to the audio track and confirms it meets the Sharia rules.",
+          "badge": "In progress"
+        },
+        "reward": {
+          "title": "Reward transfer ({amount} USD) to your wallet right away",
+          "desc": "Once the expert approves the clip, the amount is transferred immediately and you are notified.",
+          "badge": "Next step"
+        }
+      },
+      "timelineTitle": "Timeline and rights guarantee",
+      "timelineSubtitle": "Expected time to finish the manual audit",
+      "etaLabel": "Expected time to complete the check",
+      "etaValue": "{min} – {max} hours",
+      "guarantee": "Your reward amount is held in full in the escrow account and won't be touched unless the clip is rejected for a clear violation.",
+      "faqTitle": "Quick questions you may have",
+      "faq": {
+        "edit": {
+          "q": "Do I need to delete or edit the clip on TikTok?",
+          "a": "No, leave the clip published as it is and don't change anything until you receive the review decision."
+        },
+        "reward": {
+          "q": "Is the {amount} USD amount really guaranteed?",
+          "a": "Yes, the amount is held in escrow and transferred to your wallet as soon as the clip is approved."
+        }
+      }
+    },
+    "rejected": {
+      "title": "AI check complete: the clip does not meet the requirements",
+      "description": "Review the reasons for rejection below, fix the clip on your platform, then re-check with one click.",
+      "reportTitle": "Full AI check results report",
+      "reportSubtitle": "{passed} of {total} requirements verified successfully",
+      "instant": "Instant check",
+      "fixesTitle": "Only this needs fixing ({count} required)",
+      "fixesBadge": "{count} need correction",
+      "fixes": {
+        "audio": {
+          "title": "Change the audio track (remove music)",
+          "desc": "Background music effects were detected. Required: replace the audio with a clean track or natural human sounds, or use the approved campaign voiceover."
+        },
+        "hashtag": {
+          "title": "Add the mandatory campaign hashtag to the caption",
+          "desc": "The hashtag {tag} was not found in the video text or pinned comment. Add it to enable the payout."
+        }
+      },
+      "passedTitle": "Accepted and matched successfully ({count} requirements met)",
+      "passedBadge": "{count} requirements met",
+      "passed": {
+        "videoSpecs": {
+          "title": "Clip dimensions and resolution",
+          "tag": "Matches specs",
+          "desc": "Vertical 9:16 clip in high quality at 1080p."
+        },
+        "mainHashtag": {
+          "title": "Main hashtag",
+          "tag": "Present",
+          "desc": "The hashtag {tag} was verified in the caption successfully."
+        },
+        "mention": {
+          "title": "Official account mention",
+          "tag": "Verified",
+          "desc": "The mention of {account} and the link were verified."
+        }
+      }
+    },
+    "errorBanner": {
+      "invalidUrl": {
+        "title": "Invalid link • Don't worry, you can fix it easily now",
+        "desc": "The link you entered looks incomplete or isn't a direct link to a TikTok post. Follow the three simple steps below to copy the right link and the system will recognize it right away."
+      },
+      "unsupportedPlatform": {
+        "title": "Link from an unsupported platform{platformName} • Don't worry, you can fix this in seconds!",
+        "desc": "This campaign only accepts vertical videos on TikTok, Instagram Reels or YouTube Shorts. All you need to do is publish the same video on one of the supported platforms and paste the link here!"
+      },
+      "platformMismatch": {
+        "title": "The link does not match the platform you selected",
+        "desc": "You selected a different platform from the link's platform. Change the platform above to match the link, or paste a link from the selected platform."
+      },
+      "missingHashtags": {
+        "title": "Your post is missing the campaign's required hashtags!",
+        "desc": "The smart checker verified the video quality and that it is free of music, but it didn't find the contractual hashtags in the post caption. All you need to do is copy the hashtags below and paste them into the video caption in the TikTok app."
+      },
+      "duplicateLink": {
+        "title": "This link has already been submitted in the system!",
+        "desc": "The smart checker matched the link and noticed it is already tied to a previous approved submission. The same video link can't be submitted twice to earn double profits for the same post. If you published a new clip for the campaign, please copy its unique link and paste it here."
+      }
+    },
+    "linkGuide": {
+      "title": "How to copy the right link in 3 simple steps",
+      "steps": {
+        "open": {
+          "title": "Open the TikTok app",
+          "desc": "Go to your profile and open the published Wafi ad clip."
+        },
+        "share": {
+          "title": "Tap the Share button",
+          "desc": "You'll find it at the bottom left of the video (the curved arrow icon)."
+        },
+        "copy": {
+          "title": "Choose \"Copy Link\"",
+          "desc": "Paste the link in the field above and tap \"Re-check\"."
+        }
+      }
+    },
+    "editGuide": {
+      "title": "Edit your post in one minute",
+      "steps": {
+        "open": {
+          "title": "Open the TikTok app",
+          "desc": "Go to your profile and open this video."
+        },
+        "share": {
+          "title": "Tap the three dots (⋯) then choose Edit post",
+          "desc": "Choose \"Edit post / caption\"."
+        },
+        "copy": {
+          "title": "Paste the hashtags and save",
+          "desc": "Paste the copied hashtags into the caption, save the post, then tap \"Re-check the post\"."
+        }
+      }
+    },
+    "duplicateTips": {
+      "title": "How to make sure you copied a different clip's link?",
+      "id": "Check the last 13 digits of the TikTok link. This number is a unique ID for each separate clip.",
+      "wait": "If you just published the video, wait one minute until TikTok finishes processing it, then copy the direct link.",
+      "noShort": "Make sure you aren't using promotional shortened links."
+    },
+    "previousSubmission": {
+      "title": "Data of the clip previously submitted with this link",
+      "subtitle": "Archived system record to protect your rights",
+      "badge": "Approved and paid to wallet",
+      "reference": "Previous reference number",
+      "reward": "Previously paid reward",
+      "paid": "Deposited",
+      "campaign": "Campaign it was registered under",
+      "firstDate": "Date and time of first submission",
+      "whyTitle": "Why does the system block link reuse?",
+      "whyDesc": "Because the platform calculates earnings based on the unique views of each new clip published independently. A video that has already been rewarded can't be submitted again."
+    }
+  },
+  "contentPerformance": {
+    "title": "My Published Clips Views",
+    "subtitle": "Track the live views your approved clips are getting, clearly and in real time",
+    "downloadReport": "Download report (Excel)",
+    "stats": {
+      "liveViews": {
+        "label": "Total live views",
+        "unit": "views",
+        "note": "Growth this week"
+      },
+      "activeClips": {
+        "label": "Active clips",
+        "unit": "videos",
+        "note": "Earning active, live revenue"
+      },
+      "verifiedViews": {
+        "label": "Verified views",
+        "unit": "views",
+        "note": "100% real human visits"
+      },
+      "flowSpeed": {
+        "label": "Current flow rate",
+        "unit": "views / second",
+        "note": "During current peak hours",
+        "badge": "Excellent flow"
+      }
+    },
+    "tabs": {
+      "all": "All clips",
+      "tiktok": "TikTok",
+      "shorts": "YouTube Shorts",
+      "reels": "Instagram Reels"
+    },
+    "searchPlaceholder": "Search by clip or campaign name...",
+    "listTitle": "Approved clips and current view rate",
+    "liveNow": "Live now",
+    "showing": "Showing {count} active clips earning revenue",
+    "noResults": "No clips match your search",
+    "info": {
+      "title": "How are your views and earnings updated?",
+      "text": "The system updates the view counter and calculates your earnings automatically every 10 to 15 minutes through a direct connection to the platforms, with no need to refresh the page manually. All views go through automated verification to protect your financial rights with the highest Sharia-compliance integrity standards."
+    },
+    "card": {
+      "platform": {
+        "tiktok": "TikTok",
+        "shorts": "Shorts",
+        "reels": "Reels"
+      },
+      "campaign": "{name} campaign",
+      "published": "Published: {time} ago",
+      "completion": "Completion rate:",
+      "earnings": "Estimated earnings:",
+      "currency": "SAR",
+      "verifiedViews": "Current verified views",
+      "views": "views",
+      "details": "Stats details",
+      "openClip": "Open clip"
+    },
+    "export": {
+      "sheetName": "Clip views",
+      "fileName": "clips-report",
+      "total": "Total",
+      "columns": {
+        "clip": "Clip",
+        "platform": "Platform",
+        "campaign": "Campaign",
+        "published": "Publish date",
+        "completion": "Completion rate %",
+        "earnings": "Estimated earnings (SAR)",
+        "views": "Verified views",
+        "url": "Clip URL"
+      }
+    },
+    "details": {
+      "back": "Back",
+      "backToList": "Back to clips list",
+      "header": {
+        "platform": {
+          "tiktok": "TikTok",
+          "shorts": "YouTube Shorts",
+          "reels": "Instagram • Reels"
+        },
+        "verifiedLink": "Link and hashtags verified successfully",
+        "campaign": "Official campaign:",
+        "publisher": "Publisher:",
+        "updating": "Updating",
+        "openOriginal": "Open original clip",
+        "downloadReport": "Download report",
+        "stats": {
+          "views": {
+            "label": "Approved views",
+            "labelEmpty": "Recorded views",
+            "unit": "views",
+            "note": "100% verified real visits",
+            "noteEmpty": "The counter starts as soon as the first viewer arrives"
+          },
+          "earnings": {
+            "label": "Net earnings calculated",
+            "unit": "SAR",
+            "note": "Ready for automatic transfer to your wallet",
+            "noteEmpty": "Calculation starts: {rate} SAR per 1,000 views"
+          },
+          "watch": {
+            "label": "Average watch time",
+            "unit": "seconds of {total}",
+            "unitEmpty": "seconds",
+            "noteUp": "{percent}% above the platform average",
+            "noteDown": "{percent}% below the platform average",
+            "noteEmpty": "Will be measured automatically once it starts"
+          },
+          "engagement": {
+            "label": "Engagement rate",
+            "unit": "({count} interactions)",
+            "note": "Very high likes and shares",
+            "noteEmpty": "Based on likes, shares and comments"
+          }
+        }
+      },
+      "status": {
+        "publishTime": "Clip publish time:",
+        "anomaly": {
+          "title": "Unusual view activity detected. The clip is under precautionary review and audit.",
+          "desc": "The AI engine detected a sudden, abnormal burst in view flow within a very short period. Only these suspicious views have been put on hold for auditing, while all previous views and approved earnings remain safe and fully preserved in your wallet, unaffected.",
+          "cta": "Submit an explanation or report",
+          "tag": "AI protection security alert",
+          "meta": {
+            "eta": "Expected audit time:",
+            "etaValue": "< 2 hours",
+            "detectedAt": "Detected at:",
+            "patternLabel": "Pattern type:",
+            "patternValue": "Sharp spike inconsistent with human engagement"
+          }
+        },
+        "waiting": {
+          "title": "No views recorded yet. Please wait a moment",
+          "desc": "Your clip was linked successfully and views are being verified automatically. The first views usually appear within 5 to 15 minutes of posting on TikTok, and the system will update everything instantly with no effort from you."
+        },
+        "error": {
+          "title": "Unable to fetch views right now. Retrying automatically",
+          "desc": "A temporary connection interruption occurred with TikTok. Don't worry, your clip is registered and your previously confirmed earnings are completely safe. The system retries the connection automatically every minute to fetch the latest approved update."
+        }
+      },
+      "chart": {
+        "title": "Daily views activity (last 7 days)",
+        "subtitle": "Precise, powerful tracking of daily traffic volume and spread pace analysis",
+        "ranges": {
+          "24h": "Last 24 hours",
+          "7d": "Last 7 days",
+          "30d": "Last 30 days"
+        },
+        "legend": {
+          "views": "Total daily views",
+          "earnings": "Views approved for earnings"
+        },
+        "peakBadge": "Top day: {day} ({views} views)",
+        "today": "(Today)",
+        "peakTag": "(Peak)",
+        "refresh": "Continuous automatic refresh every 15 minutes directly from the platform",
+        "average": "Daily average views: {value} views",
+        "days": {
+          "sat": "Sat",
+          "sun": "Sun",
+          "mon": "Mon",
+          "tue": "Tue",
+          "wed": "Wed",
+          "thu": "Thu",
+          "fri": "Fri"
+        }
+      },
+      "insights": {
+        "retention": {
+          "title": "Where did viewers get to in the video?",
+          "subtitle": "Viewer retention up to the end of the clip",
+          "excellent": "Excellent",
+          "rows": {
+            "start": {
+              "label": "First 5 seconds (clip start)",
+              "suffix": "stayed"
+            },
+            "middle": {
+              "label": "Mid-video (the preparation secret)",
+              "suffix": "stayed"
+            },
+            "end": {
+              "label": "Watched the video to the end",
+              "suffix": "finished watching"
+            }
+          },
+          "completion": "Views completion rate:",
+          "average": "Average viewers:"
+        },
+        "integrity": {
+          "title": "Integrity and financial safety check",
+          "subtitle": "Ensuring protection of earnings and legitimate views",
+          "rows": {
+            "human": {
+              "label": "Views from real human sources",
+              "badge": "100% confirmed"
+            },
+            "bots": {
+              "label": "Blocked bots or fake visits",
+              "badge": "0 visits (clean)",
+              "badgeFound": "{count} visits blocked"
+            },
+            "sharia": {
+              "label": "Compliance with Sharia integrity standards",
+              "badge": "Approved and certified"
+            }
+          },
+          "ledger": "Recorded and protected in the accounting system (Ledger {id})"
+        }
+      },
+      "waiting": {
+        "title": "We're now monitoring your clip on TikTok to capture views as they happen",
+        "desc": "Everything is set up successfully, you don't need to do anything. As soon as anyone opens your clip on TikTok, it will show up here instantly.",
+        "cta": "Refresh now and check views",
+        "stepsTitle": "Your clip's progress",
+        "stepOf": "Step {current} of {total}",
+        "steps": [
+          {
+            "title": "Clip published and link confirmed",
+            "note": "Link is valid and meets the requirements"
+          },
+          {
+            "title": "Waiting for the first views from TikTok",
+            "note": "Tracking and monitoring automatically"
+          },
+          {
+            "title": "Calculating earnings and adding them to your wallet",
+            "note": "Earnings are added automatically as views grow"
+          }
+        ]
+      },
+      "error": {
+        "title": "System status and operational guarantees",
+        "visualCaption": "TikTok servers are running at 100% efficiency",
+        "visualSub": "Waiting for TikTok's external servers to respond to complete the connection",
+        "handshake": "Handshake pending...",
+        "tiktok": {
+          "title": "TikTok external platform servers",
+          "desc": "Connection failed, we're sending a new request automatically every minute.",
+          "badge": "Temporarily unresponsive (HTTP 504)"
+        },
+        "funds": {
+          "title": "Protection of your earnings and wallet",
+          "desc": "{amount} SAR is held in the approved account vault and is unaffected by any update.",
+          "badge": "100% secured and confirmed"
+        },
+        "retry": {
+          "title": "Automatic retry (Auto-Retry)",
+          "desc": "The system retries automatically without any action from you.",
+          "badge": "In progress (attempt 2/5)"
+        },
+        "recheck": "Re-check now",
+        "statusPage": "Public platform status log (Status Page)"
+      },
+      "tips": {
+        "waiting": {
+          "title": "How to boost your clip's views fast? (easy, proven tips)",
+          "items": [
+            {
+              "title": "Check the clip's privacy",
+              "text": "Make sure the clip on TikTok is set to \"Public\", not \"Private\" or \"Friends only\", so everyone can see it."
+            },
+            {
+              "title": "Share the link for a strong start",
+              "text": "Share the clip link in WhatsApp or Telegram groups to get the first views quickly and kick-start the algorithm."
+            },
+            {
+              "title": "Engage with the first comments",
+              "text": "Replying to the first comments boosts engagement and pushes the platform to show your clip to a wider audience."
+            }
+          ]
+        },
+        "error": {
+          "title": "Simple guidance for content creators",
+          "items": [
+            {
+              "title": "What does this error mean?",
+              "text": "This is a temporary interruption on TikTok's side, not from your clip or account. It happens occasionally and is usually resolved within minutes.",
+              "footer": "Clip is published and publicly available as normal"
+            },
+            {
+              "title": "Will I lose my views or earnings?",
+              "text": "No, never. All previous views and earnings are saved, and the system will update the counter as soon as the connection returns.",
+              "footer": "Cumulative total saved instantly"
+            },
+            {
+              "title": "What should I do now?",
+              "text": "Nothing. You can close the page and come back later, automatic retries continue on your behalf.",
+              "footer": "Processing runs fully automatically in the background"
+            }
+          ]
+        }
+      },
+      "explain": {
+        "title": "Submit an explanation or report",
+        "desc": "Tell us what caused this spike in views (e.g. a paid ad, a share from a large account) and the audit team will review it.",
+        "placeholder": "Write your explanation here...",
+        "attach": "Attach an image or PDF (optional)",
+        "send": "Send",
+        "sending": "Sending...",
+        "cancel": "Cancel",
+        "close": "Close",
+        "success": "Your explanation was sent successfully. The audit team will review it soon.",
+        "tooShort": "Please write at least 10 characters.",
+        "fileTooBig": "File size exceeds {size} MB.",
+        "failed": "Couldn't send, please try again."
+      }
+    }
+  },
+  "Earnings": {
+    "common": {
+      "sar": "≈ {amount} SAR"
+    },
+    "welcome": {
+      "title": "Welcome back, {name}",
+      "fallbackName": "there",
+      "subtitle": "Track your live earnings and today's view updates."
+    },
+    "summary": {
+      "badge": "Live earnings, fully transparent",
+      "noFees": "No deductions or extra fees",
+      "totalLabel": "Total live earnings from your views",
+      "clipsNote": "Estimated from your counted clips and the current SAR exchange rate.",
+      "countedViews": "Counted views",
+      "viewsFrom": "From {clips} published clips",
+      "avgCpm": "Avg. CPM",
+      "topClip": "Top clip hit ${cpm}",
+      "cycleProgress": "Current cycle progress",
+      "done": "{progress}% done"
+    },
+    "cards": {
+      "ready": {
+        "title": "Ready to withdraw",
+        "desc": "These earnings have cleared review and are ready. New earnings show as \"pending\" ({days}-day hold period)."
+      },
+      "review": {
+        "title": "Under review",
+        "desc": "Subject to a short precautionary hold ({days} days) to automatically confirm the clip is still live and compliant.",
+        "complete": "Review complete",
+        "daysLeft": "{days} days left until available",
+        "availableSoon": "Available soon",
+        "dayOf": "(Day {day} of {total})"
+      },
+      "received": {
+        "title": "Already received",
+        "desc": "Total completed transfers successfully deposited into your bank account in previous periods.",
+        "payouts": "{count} payouts sent successfully"
+      },
+      "withdrawBtn": "Withdraw to my bank account",
+      "withdrawLocked": "Unlocks after the {days}-day security review"
+    },
+    "banner": {
+      "minutesAgo": "{minutes} minutes ago",
+      "fallbackName": "User",
+      "message": "Congrats {name}! The {days}-day security period for <clip>“{clipTitle}”</clip> is complete. <money>{amount} SAR</money> was moved to your withdrawable balance.",
+      "button": "Request withdrawal"
+    },
+    "how": {
+      "title": "How do views turn into money?",
+      "subtitle": "A simple earnings lifecycle: transparent and 100% guaranteed, with no complications.",
+      "badge": "Gharar-free Islamic system",
+      "steps": {
+        "1": {
+          "title": "1. Views recorded",
+          "desc": "Once your clip is live, our system counts real views every 15 minutes from TikTok, Reels and Shorts.",
+          "badge": { "done": "Auto-completed", "active": "Auto-completed", "pending": "Auto-completed" }
+        },
+        "2": {
+          "title": "2. Security review ({days} days)",
+          "desc": "A short review period to protect your earnings, confirm the clip meets the terms and rule out bot manipulation.",
+          "badge": { "done": "Completed", "active": "Active now (Day {day})", "pending": "Soon" }
+        },
+        "3": {
+          "title": "3. Balance available",
+          "desc": "The amount moves automatically to \"Ready to withdraw\", and you can request the full transfer instantly.",
+          "badge": { "done": "Completed", "active": "Available now", "pending": "Within 3 days" }
+        },
+        "4": {
+          "title": "4. Bank deposit",
+          "desc": "The amount reaches your bank account or STC Pay directly, with an official SMS notification.",
+          "badge": { "done": "Completed", "active": "Fast & instant", "pending": "Fast & instant" }
+        }
+      }
+    },
+    "videos": {
+      "title": "My videos & view earnings",
+      "subtitle": "Your clips list with every clip's earnings details and status.",
+      "filters": { "all": "All clips", "ready": "Ready", "review": "In review" },
+      "headers": {
+        "video": "Video",
+        "platform": "Platform",
+        "views": "Approved views",
+        "cpm": "CPM",
+        "earnings": "Earnings",
+        "status": "Payout status",
+        "action": "Action"
+      },
+      "campaignLine": "Campaign: {campaign} · Posted {date}",
+      "viewsWord": "views",
+      "status": {
+        "ready": "Ready",
+        "review": "In review ({days} days left)",
+        "paid": "Paid to your bank"
+      },
+      "actions": {
+        "withdrawNow": "Withdraw now",
+        "autoAvailable": "Auto-available",
+        "viewReceipt": "View receipt"
+      },
+      "empty": "No clips in this filter."
+    },
+    "countries": {
+      "title": "Where do your views come from?",
+      "subtitle": "Views distribution by country (Gulf views earn double)",
+      "percentOf": "{percent}% of",
+      "views": "views",
+      "names": {
+        "SA": "Saudi Arabia",
+        "EG": "Egypt",
+        "AE": "UAE",
+        "OT": "Other"
+      }
+    },
+    "empty": {
+      "title": "No earnings yet",
+      "desc": "Your earnings start showing as soon as you publish your first clip and its views are approved. Everything you earn is 100% yours, with no fees or complicated terms.",
+      "explore": "Explore campaigns to start",
+      "submit": "Submit a posted clip link",
+      "howTitle": "How to start earning? (3 simple steps)",
+      "howSub": "Simple steps designed for every creator",
+      "steps": {
+        "1": {
+          "title": "Step 1: Pick a campaign",
+          "desc": "Choose the product or service that fits you from the approved campaigns, and join in one click.",
+          "foot": "Instant join, no prior approval"
+        },
+        "2": {
+          "title": "Step 2: Publish your clip",
+          "desc": "Download the creative assets, add your own touch, then post on TikTok, Instagram Reels or YouTube Shorts.",
+          "foot": "Full support for all platforms"
+        },
+        "3": {
+          "title": "Step 3: Get paid",
+          "desc": "Paste the clip link here and the system will count your views automatically and deposit your earnings in your wallet.",
+          "foot": "Instant, reliable tracking"
+        }
+      }
+    }
+  },
+  "Audience": {
+    "title": "Who is watching you?",
+    "periodFull": "Full period",
+    "period7": "Last 7 days",
+    "period30": "Last 30 days",
+    "exportReport": "Export report",
+
+    "totalViews": "Total verified views",
+    "verifiedBadge": "{percent}% verified",
+    "arabRate": "Targeted Arab audience",
+    "arabRateNote": "Statistical match accuracy",
+    "topCities": "Most engaged cities",
+    "topCitiesNote": "Highest engagement and impact",
+    "weeklyGrowth": "Weekly clip growth",
+    "weeklyGrowthNote": "Steadily rising",
+
+    "rankingTitle": "Viewers by country",
+    "destinations": "{count} destinations",
+    "viewsCount": "{count} views",
+    "viewsUnit": "views",
+    "topCitiesLine": "Top cities: {cities}",
+    "tags": {
+      "biggest": "Largest audience",
+      "fastestGrowth": "Fastest growth",
+      "steady": "Steady performance",
+      "positive": "Positive engagement",
+      "global": "Global"
+    },
+    "countries": {
+      "sa": "Saudi Arabia",
+      "eg": "Egypt",
+      "ae": "United Arab Emirates",
+      "kw": "Kuwait",
+      "other": "Other countries"
+    },
+    "countriesShort": {
+      "sa": "Saudi Arabia",
+      "eg": "Egypt",
+      "ae": "UAE",
+      "kw": "Kuwait",
+      "other": "Other"
+    },
+
+    "mapTitle": "Live viewer distribution map",
+    "mapSubtitle": "Where views concentrate in the Middle East",
+    "mapFocus": "Top focus: {country} {percent}%",
+    "cumulativeTitle": "Cumulative viewer share",
+    "coverage": "{percent}% tracked",
+
+    "tipsTitle": "Simple tips to grow your views",
+    "tipsSubtitle": "Direct steps based on your current audience split",
+    "tipTimeTitle": "Best time to post in {country}",
+    "tipTimeBody": "Since <b>{percent}%</b> of your audience is in {country}, the best time to publish your next clip is between <b>{from}</b> and <b>{to}</b> ({zone} time).",
+    "tipGrowthTitle": "Extra growth opportunity in {country}",
+    "tipGrowthBody": "Viewers in {country} finish your clips <b>{rate}%</b> of the time. Add examples that matter to entrepreneurs in {country} to boost engagement and shares.",
+
+    "selectedCountry": "Selected country",
+    "ofTotal": "{percent}% of total",
+    "peakHours": "Peak active hours: {hours}",
+    "back": "Back to overview",
+    "countryViews": "{country} views",
+    "totalShare": "Share of total views",
+    "ofAll": "{percent}% of all",
+    "countryEarnings": "Earnings from {country}",
+    "cpm": "Estimated CPM",
+    "completionRate": "Clip completion rate",
+    "excellent": "Excellent",
+    "regionalEngagement": "Regional engagement rate",
+    "aboveBenchmark": "{delta}% vs benchmark",
+    "citiesTitle": "Views by city",
+    "citiesSubtitle": "Audience engagement across the main regions of {country}",
+    "citiesCount": "{count} top cities",
+    "interactiveMap": "Interactive map",
+    "interactiveMapSubtitle": "Geographic focus of verified views across platforms.",
+    "liveUpdate": "Live",
+    "reliability": "Approved view reliability",
+    "reliabilityNote": "All views pass quality standards",
+    "ageTitle": "Audience age groups",
+    "ageSubtitle": "Age groups watching your clips most in {country}",
+    "ageNote": "Dominant group: Gen Z and young professionals — {percent}% under 35",
+    "ages": {
+      "young": "18 - 24 (students and young adults)",
+      "mid": "25 - 34 (professionals and entrepreneurs)",
+      "senior": "35+ (families and enthusiasts)"
+    },
+    "platformsTitle": "Platform split in {country}",
+    "platformsSubtitle": "The social channels driving the most reach",
+    "platforms": { "tiktok": "TikTok", "instagram": "Instagram", "youtube": "YouTube" },
+    "bestPlatform": "Most profitable platform: {platform} (CPM {cpm} {currency})",
+
+    "radarLabel": "Listening for signals",
+    "insufficientTitle": "Not enough geographic data yet",
+    "insufficientBody": "The system needs at least {required} verified views to pinpoint your audience location with 99.8% accuracy, unlock the country and city map, and calculate regional CPM.",
+    "processingProgress": "Initial processing progress",
+    "progressOf": "{current} of {required} verified views",
+    "remaining": "{count} views left to unlock the map",
+    "refreshNow": "Refresh data now",
+    "viewPrevReport": "View a previous clip report",
+    "boostTips": "Tips to boost views",
+    "info": {
+      "speed": {
+        "title": "How do I get stats faster?",
+        "body": "Share your promo clip link on your active Telegram channels, on X, or in Instagram stories to bring in the first batch of real, engaged views."
+      },
+      "track": {
+        "title": "Tracking accuracy and compliance",
+        "body": "Every visit goes through approved algorithm filters that exclude fake traffic and VPNs, so geographic checks stay reliable and protect partner earnings."
+      },
+      "notify": {
+        "title": "Automatic activation alert",
+        "body": "No need to keep checking. We will send an instant dashboard notification and an email as soon as you reach {required} views and the heatmap is generated."
+      }
+    }
   }
+
 }

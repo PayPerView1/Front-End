@@ -9,12 +9,14 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import { useWallet } from "@/features/wallet/WalletProvider";
+import PageLoader from "@/components/PageLoader";
 
 // Services
 import {
   getTransactions,
   getTransactionById,
   exportTransactions,
+  exportTransactionsPdf,
 } from "@/features/wallet/services/walletService";
 
 // Components
@@ -38,6 +40,7 @@ export default function AnalyticsPage() {
   const [pagination, setPagination] = useState({ page: 1, perPage: 20, total: 0, totalPages: 1 });
   const [filters, setFilters] = useState({ type: "", status: "", page: 1, perPage: 20 });
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [transactionsError, setTransactionsError] = useState("");
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
@@ -52,8 +55,9 @@ export default function AnalyticsPage() {
     setTransactionsError("");
     try {
       const res = await getTransactions({ ...filters, ...params });
-      if (res?.success) {
-        setTransactions(Array.isArray(res.data) ? res.data : []);
+      if (res && res.success !== false) {
+        const list = Array.isArray(res.data) ? res.data : Array.isArray(res) ? res : [];
+        setTransactions(list);
         if (res.pagination) setPagination(res.pagination);
       } else {
         throw new Error(res?.message || "Unable to load transactions.");
@@ -62,6 +66,7 @@ export default function AnalyticsPage() {
       setTransactionsError(cause?.message || "Unable to load transactions.");
     } finally {
       setIsLoading(false);
+      setIsInitialLoad(false);
     }
   }, [filters]);
 
@@ -77,14 +82,19 @@ export default function AnalyticsPage() {
     if (tx?.id) {
       setIsLoadingDetail(true);
       setView("detail");
-      const res = await getTransactionById(tx.id);
-      if (res?.success) {
-        setSelectedTx(res.data);
-      } else {
-        // في حال الفشل نعرض البيانات الموجودة مسبقاً
+      try {
+        const res = await getTransactionById(tx.id);
+        const detail = res?.data ?? res;
+        if (detail && typeof detail === "object") {
+          setSelectedTx(detail);
+        } else {
+          setSelectedTx(tx);
+        }
+      } catch {
         setSelectedTx(tx);
+      } finally {
+        setIsLoadingDetail(false);
       }
-      setIsLoadingDetail(false);
     } else {
       setSelectedTx(tx);
       setView("detail");
@@ -108,13 +118,19 @@ export default function AnalyticsPage() {
 
   // ─── Export ──────────────────────────────────────────────────────────────────
   const handleExport = useCallback(async (params = {}) => {
-    await exportTransactions({ ...exportFilters, ...params });
+    if (params?.format === "pdf") {
+      await exportTransactionsPdf({ ...exportFilters, ...params });
+    } else {
+      await exportTransactions({ ...exportFilters, ...params });
+    }
   }, [exportFilters]);
+
+  if (isInitialLoad) return <PageLoader />;
 
   return (
     <div
       dir={isRtl ? "rtl" : "ltr"}
-      className={`min-h-screen p-6 ${dark ? "bg-[#0A0A0A]" : "bg-[#F4F5F7]"}`}
+      className={`min-h-screen p-3 sm:p-4 md:p-6 ${dark ? "bg-[#0A0A0A]" : "bg-[#F1F4F3]"}`}
       style={{ fontFamily: "var(--font-tajawal,inherit)" }}
     >
 

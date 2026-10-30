@@ -9,35 +9,37 @@ import MessagesPanel from "@/components/MessagesPanel";
 
 export default function DashboardShell({ children, locale }) {
   const { isAssistantOpen } = useAssistant();
-const { isMessagesOpen, isMaximized, selectedConversation } = useMessages();
-const { isNotificationsOpen } = useNotifications();
+  const { isMessagesOpen, isMaximized } = useMessages();
+  const { isNotificationsOpen } = useNotifications();
 
-const isRtl = locale === "ar";
-const messagesMargin =
-  isMessagesOpen && !isMaximized
-    ? isRtl ? "sm:ml-[380px]" : "sm:mr-[380px]"   
-    : "";
+  const isRtl = locale === "ar";
+  const sidePanelsOpen = [
+    isAssistantOpen,
+    isNotificationsOpen,
+    isMessagesOpen && !isMaximized,
+  ].filter(Boolean).length;
 
-const notificationsMargin =
-  isNotificationsOpen
-    ? isRtl ? "sm:ml-[380px]" : "sm:mr-[380px]"   
-    : "";
+  const mainMargin = isRtl
+    ? `xl:mr-[260px] ${sidePanelsOpen ? "xl:ml-[380px]" : ""}`
+    : `xl:ml-[260px] ${sidePanelsOpen ? "xl:mr-[380px]" : ""}`;
 
-const mainMargin = isRtl
-  ? `xl:mr-[260px] ${isAssistantOpen ? "xl:ml-[380px]" : ""} ${messagesMargin} ${notificationsMargin}`
-  : `xl:ml-[260px] ${isAssistantOpen ? "xl:mr-[380px]" : ""} ${messagesMargin} ${notificationsMargin}`;
+  const stackedPanels = sidePanelsOpen > 1;
+
   return (
     <>
       {/* بانل المساعد */}
-      <AIAssistantPanel side={isRtl ? "left" : "right"} />
+      <AIAssistantPanel side={isRtl ? "left" : "right"} stacked={stackedPanels} topOffset={0} />
 
       {/* بانل الإشعارات */}
-      <NotificationsPanel side={isRtl ? "left" : "right"} />
+      <NotificationsPanel side={isRtl ? "left" : "right"} stacked={stackedPanels} topOffset={88} />
 
       {/* بانل الرسائل */}
-      <MessagesPanel side={isRtl ? "left" : "right"} />
+      <MessagesPanel side={isRtl ? "left" : "right"} stacked={stackedPanels} topOffset={176} />
 
-      <main className={`transition-all duration-300 ${mainMargin}`}>
+      <main
+        data-side-panels-open={sidePanelsOpen > 0 ? "true" : "false"}
+        className={`min-w-0 transition-all duration-300 ${mainMargin}`}
+      >
         {children}
       </main>
     </>

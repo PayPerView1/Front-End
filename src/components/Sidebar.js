@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
- import {
+import {
   Home,
   Discovery,
   Plus,
@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
   User,
   MoreCircle,
   Document,
+  Chart,
 } from "react-iconly";
 import {
   MdOutlineDashboard,
@@ -31,11 +32,12 @@ const creatorNavItems = [
   { label: "home", href: "/creator/dashboard", icon: Home },
   { label: "orders", href: "/creator/orders", icon: Bag }, // عدّل الرابط حسب مشروعك
   { label: "discover", href: "/creator/discover", icon: Discovery },
-  { label: "startProject", href: "/new", icon: Plus },
+  { label: "startProject", href: "/creator/start-project", icon: Plus },
+  {label: "contentPerformance",href: "/creator/content-performance",icon: Chart,},
 ];
 
 const creatorResourceItems = [
-  { label: "profile", href: "/profile", icon: User },
+  { label: "profile", href: "/creator/profile", icon: User },
   { label: "help", href: "/help", icon: MoreCircle },
   { label: "blog", href: "/blog", icon: Document },
 ];
@@ -86,8 +88,10 @@ const advertiserResourceItems = [];
 const sidebarFallbacksEn = {
   home: "Home",
   orders: "My Orders",
+
   discover: "Discover",
   startProject: "Start a project",
+  contentPerformance: "Content Performance",
 
   resources: "Resources",
   profile: "Profile",
@@ -108,11 +112,12 @@ const sidebarFallbacksAr = {
   orders: "طلباتي",
   discover: "اكتشف",
   startProject: "ابدأ مشروعًا",
-
+  contentPerformance: "أداء المحتوى",
   resources: "موارد",
   profile: "الملف الشخصي",
   help: "يساعد",
   blog: "مدونة",
+
 
   dashboard: "لوحة التحكم الرئيسية",
   manageCampaigns: "إدارة الحملات",
@@ -151,16 +156,18 @@ export default function Sidebar() {
   }, []);
 
   const fallbacks = locale === "ar" ? sidebarFallbacksAr : sidebarFallbacksEn;
-  const sidebar = (key) => messages?.sidebar?.[key] || fallbacks[key] || key;
+  const sidebar = (key) =>
+    messages?.sidebar?.[key] ||
+    (key === "orders" ? messages?.nav?.orders : null) ||
+    fallbacks[key] ||
+    key;
 
   const { isDark } = useTheme();
 
   const t = {
-    bg: isDark ? "bg-[#0D0D0D] border-[#2D2D2D]" : "bg-white border-[#E5E5E5]",
+    bg: isDark ? "bg-[#0D0D0D]" : "bg-white",
     text: isDark ? "text-white" : "text-[#1A1A1A]",
     subText: isDark ? "text-[#9A9A9A]" : "text-[#666666]",
-    activeLink: isDark ? "bg-[#151A1A]" : "bg-[#F0F0F0]",
-    hoverLink: isDark ? "hover:bg-white/5" : "hover:bg-[#F5F5F5]",
     logoText: isDark ? "text-white" : "text-black",
   };
 
@@ -174,17 +181,28 @@ export default function Sidebar() {
         ? "#9A9A9A"
         : "#666666";
 
-  // ─── كلاس الرابط (مشترك بين القائمتين) ────────────────────
-  const linkClass = (isActive) => `
-    flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-base
-    ${isActive ? t.activeLink : `bg-transparent ${t.hoverLink}`}
-  `;
-
   // ─── رندر رابط واحد ───────────────────────────────────────
+  const isItemActive = (item) => {
+    if (pathname === item.href) return true;
+    if (item.label === "startProject" && pathname?.startsWith(`${item.href}/`)) return true;
+    if (item.label === "discover" && pathname?.startsWith(`${item.href}/`)) return true;
+    if (item.label === "contentPerformance" && pathname?.startsWith(`${item.href}/`)) return true;
+    if (item.label === "billing" && pathname?.startsWith("/advertiser/wallet")) return true;
+    if (
+      item.label === "profile" &&
+      (pathname?.startsWith("/creator/edit-profile") ||
+        pathname?.startsWith("/advertiser/edit-profile") ||
+        pathname?.startsWith("/creator/profile") ||
+        pathname?.startsWith("/advertiser/profile") ||
+        pathname?.startsWith(`${item.href}/`))
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   const renderLink = (item) => {
-    const isActive =
-      pathname === item.href ||
-      (item.label === "billing" && pathname?.startsWith("/advertiser/wallet"));
+    const isActive = isItemActive(item);
     const Icon = item.icon;
 
     return (
@@ -192,7 +210,10 @@ export default function Sidebar() {
         key={item.href}
         href={item.href}
         onClick={() => setSidebarOpen(false)}
-        className={linkClass(isActive)}
+        className={`
+          flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm
+          ${isActive ? "bg-[#94D3C142]" : "bg-transparent hover:bg-[#94D3C142]"}
+        `}
       >
         {/* أيقونة react-icons/md */}
         {item.useMd ? (
@@ -245,10 +266,9 @@ export default function Sidebar() {
             min-[1280px]:hidden absolute top-1/2 -translate-y-1/2
             ${locale === "ar" ? "left-4" : "right-4"}
             w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
-            ${
-              isDark
-                ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-                : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+            ${isDark
+              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
             }
           `}
         >
@@ -263,13 +283,13 @@ export default function Sidebar() {
 
       {/* الموارد — تُعرض فقط إذا كانت القائمة غير فارغة */}
       {resourceItems.length > 0 && (
-        <div className="px-4 mt-2">
-          <p className={`text-xs font-bold px-3 mb-1 ${t.subText}`}>
+        <div className="px-4 mt-6">
+          <p className={`text-xs px-3 mb-2 ${t.subText}`}>
             {sidebar("resources")}
           </p>
           <nav className="flex flex-col gap-1">
             {resourceItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = isItemActive(item);
               const Icon = item.icon;
 
               return (
@@ -277,7 +297,10 @@ export default function Sidebar() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={`${linkClass(isActive)} justify-between w-full`}
+                  className={`
+                    flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg transition-all text-sm
+                    ${isActive ? "bg-[#94D3C142]" : "bg-transparent hover:bg-[#94D3C142]"}
+                  `}
                 >
                   <div className="flex items-center gap-3">
                     <Icon
@@ -315,11 +338,11 @@ export default function Sidebar() {
         className={`
           min-[1280px]:hidden fixed top-4
           ${locale === "ar" ? "right-4" : "left-4"}
-          z-[90] w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
-          ${
-            isDark
-              ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
-              : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
+
+          z-[80] w-7 h-7 rounded-lg flex items-center justify-center border cursor-pointer transition-colors
+          ${isDark
+            ? "bg-[#1A1A1A] border-[#2D2D2D] text-white hover:bg-white/10"
+            : "bg-white border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5]"
           }
         `}
       >
@@ -338,17 +361,17 @@ export default function Sidebar() {
       <aside
         dir={locale === "ar" ? "rtl" : "ltr"}
         className={`
-          fixed ${locale === "ar" ? "right-0 border-l" : "left-0 border-r"}
-          top-0 h-screen w-[260px] flex flex-col z-[80]
+
+          fixed ${locale === "ar" ? "right-0" : "left-0"}
+          top-0 h-screen w-[260px] flex flex-col z-[90] font-tajawal
           ${t.bg}
           transition-transform duration-300 ease-in-out
           min-[1280px]:translate-x-0
-          ${
-            sidebarOpen
-              ? "translate-x-0"
-              : locale === "ar"
-                ? "translate-x-full"
-                : "-translate-x-full"
+          ${sidebarOpen
+            ? "translate-x-0"
+            : locale === "ar"
+              ? "translate-x-full"
+              : "-translate-x-full"
           }
         `}
       >

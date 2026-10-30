@@ -118,6 +118,22 @@ function mapCampaignDetails(data, id) {
     acceptance: Number(campaign.acceptanceRate ?? campaign.acceptance ?? 0),
     filesCount: Number(campaign.filesCount ?? 0),
     packSize: campaign.packSize ?? "0 GB",
+    // ── الحقول الجديدة ──
+    requiredHashtags: Array.isArray(campaign.requiredHashtags)
+      ? campaign.requiredHashtags
+      : campaign.requiredHashtags ? String(campaign.requiredHashtags).split(/[\s,]+/).filter(Boolean) : [],
+    requiredKeywords: Array.isArray(campaign.requiredKeywords)
+      ? campaign.requiredKeywords
+      : campaign.requiredKeywords ? String(campaign.requiredKeywords).split(/[,،]+/).map((k) => k.trim()).filter(Boolean) : [],
+    requiredMentions: Array.isArray(campaign.requiredMentions)
+      ? campaign.requiredMentions
+      : campaign.requiredMentions ? String(campaign.requiredMentions).split(/\s+/).filter(Boolean) : [],
+    aspectRatio: campaign.aspectRatio ?? "",
+    minDurationSec: campaign.minDurationSec ?? null,
+    maxDurationSec: campaign.maxDurationSec ?? null,
+    shariaNote: campaign.shariaNote ?? "",
+    offerCondition: campaign.offerCondition ?? "",
+    clipIdea: campaign.clipIdea ?? "",
   };
 }
 
@@ -372,6 +388,45 @@ function buildCampaignBriefHtml(campaign, isRtl) {
     [
       sectionLabels.halalDeclaration,
       campaign.halalDeclaration ?? campaign.shariahRules ?? campaign.compliance,
+    ],
+    // ── الحقول الجديدة ──
+    [
+      isRtl ? "الملاحظة الشرعية" : "Sharia Note",
+      campaign.shariaNote ?? brief.shariaNote,
+    ],
+    [
+      isRtl ? "شرط العرض" : "Offer Condition",
+      campaign.offerCondition ?? brief.offerCondition,
+    ],
+    [
+      isRtl ? "فكرة الكليب" : "Clip Idea",
+      campaign.clipIdea ?? brief.clipIdea,
+    ],
+    [
+      isRtl ? "الهاشتاغات المطلوبة" : "Required Hashtags",
+      Array.isArray(campaign.requiredHashtags) && campaign.requiredHashtags.length > 0
+        ? campaign.requiredHashtags.map((h) => h.startsWith('#') ? h : `#${h}`).join('  ')
+        : (campaign.requiredHashtags || null),
+    ],
+    [
+      isRtl ? "الكلمات المفتاحية المطلوبة" : "Required Keywords",
+      Array.isArray(campaign.requiredKeywords) && campaign.requiredKeywords.length > 0
+        ? campaign.requiredKeywords.join(', ')
+        : (campaign.requiredKeywords || null),
+    ],
+    [
+      isRtl ? "المنشنات المطلوبة" : "Required Mentions",
+      Array.isArray(campaign.requiredMentions) && campaign.requiredMentions.length > 0
+        ? campaign.requiredMentions.map((m) => m.startsWith('@') ? m : `@${m}`).join('  ')
+        : (campaign.requiredMentions || null),
+    ],
+    [
+      isRtl ? "مواصفات الفيديو" : "Video Specifications",
+      [
+        campaign.aspectRatio ? `${isRtl ? 'نسبة الأبعاد' : 'Aspect Ratio'}: ${campaign.aspectRatio}` : null,
+        campaign.minDurationSec != null ? `${isRtl ? 'الحد الأدنى' : 'Min Duration'}: ${campaign.minDurationSec}s` : null,
+        campaign.maxDurationSec != null ? `${isRtl ? 'الحد الأقصى' : 'Max Duration'}: ${campaign.maxDurationSec}s` : null,
+      ].filter(Boolean).join(' | ') || null,
     ],
     ...Object.entries(brief)
       .filter(([key, value]) => !knownFields.has(key) && formatBriefValue(value, isRtl))
@@ -817,7 +872,7 @@ export default function CampaignDetails({ id, campaign }) {
             type="button"
             onClick={handleApply}
             disabled={isMockCampaign}
-            className="inline-flex h-11 flex-1 items-center justify-center rounded-xl text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-12 min-h-12 w-full shrink-0 items-center justify-center rounded-xl px-4 text-base font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:flex-1 sm:text-sm"
             style={{ background: ORANGE }}
           >
             {hasApplied ? s("applied") : s("apply")}

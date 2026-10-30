@@ -99,7 +99,9 @@ function ModalContent({
 
   return (
     <div
-      className="fixed inset-0 z-[2147483000] flex items-center justify-center overflow-y-auto p-3 sm:p-6"
+      className={`fixed inset-0 z-[2147483000] flex items-center justify-center overflow-y-auto p-3 sm:p-6 ${
+        isRtl ? "min-[1280px]:right-[260px]" : "min-[1280px]:left-[260px]"
+      }`}
       style={{ background: t.overlay, backdropFilter: "blur(6px)" }}
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose?.();
@@ -110,11 +112,7 @@ function ModalContent({
         aria-modal="true"
         aria-labelledby="report-success-title"
         dir={isRtl ? "rtl" : "ltr"}
-        className={`relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[560px] flex-col items-center gap-3 overflow-y-auto rounded-2xl border p-4 pt-8 text-center sm:p-6 sm:pt-10 ${
-          isRtl
-            ? "min-[1280px]:-translate-x-[130px]"
-            : "min-[1280px]:translate-x-[130px]"
-        }`}
+        className="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[560px] flex-col items-center gap-3 overflow-y-auto rounded-2xl border p-4 pt-8 text-center sm:p-6 sm:pt-10"
         style={{
           background: t.card,
           borderColor: t.border,

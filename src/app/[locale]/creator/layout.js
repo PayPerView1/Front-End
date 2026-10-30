@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import axiosInstance, { getSavedUser, getToken, saveAuthData } from "@/lib/axiosInstance";
+import PageLoader from "@/components/PageLoader";
 
 /**
  * Creator layout - only allows users with role CLIPPER.
@@ -60,7 +61,7 @@ export default function CreatorLayout({ children }) {
     };
   }, [router, locale]);
 
-  if (!allowed) return null;
+  if (!allowed) return <PageLoader />;
   return children;
 }
 

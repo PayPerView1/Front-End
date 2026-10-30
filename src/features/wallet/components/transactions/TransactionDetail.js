@@ -4,7 +4,7 @@
 
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   MdOutlineShield,
   MdHelpOutline,
@@ -50,37 +50,75 @@ function Row({ label, children, dark = true }) {
   );
 }
 
-export default function TransactionDetail({ t, dark = true, isRtl = true, tx = null, onBack }) {
+export default function TransactionDetail({ t, dark = true, isRtl = true, tx = null, onBack, isLoading = false }) {
+  const [isCopied, setIsCopied] = useState(false);
+
   const mutedText = dark ? "text-gray-400" : "text-gray-600";
   const warningText = dark ? "text-amber-400" : "text-amber-700";
-  const successText = dark ? "#94D3C1" : "text-emerald-700";
+  const successText = dark ? "text-[#94D3C1]" : "text-emerald-700";
+  const errorText = dark ? "text-red-400" : "text-red-600";
   const accentText = dark ? "text-[#94D3C1]" : "text-[#00695C]";
   const footBox = `flex items-center justify-between gap-2 text-[0.65rem] p-2.5 rounded-xl border ${
     dark ? "text-gray-400 bg-[#1A1F24] border-gray-800/80" : "text-gray-600 bg-gray-50 border-gray-200"
   }`;
 
   const txnId = tx?.id || "TXN-2026-08940";
-  const amount = tx?.amount || "$3,200.00";
-  const sarLabel = t("sarLabel");
-  const receiptTimestamp = new Date(2026, 2, 28, 21, 15, 30);
+  const amountVal = tx?.grossAmount ?? tx?.netAmount ?? tx?.amount ?? 3200;
+  const currency = tx?.currency || "USD";
+  const amount = new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amountVal);
+  const sarLabel = t("sarLabel") || "ر.س";
+  const receiptTimestamp = tx?.createdAt ? new Date(tx.createdAt) : new Date(2026, 2, 28, 21, 15, 30);
   const receiptDate = new Intl.DateTimeFormat(isRtl ? "ar-SA" : "en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
   }).format(receiptTimestamp);
-  const amountSar = tx?.amountSar || `(-12,000.00 ${sarLabel})`;
-  const time = tx?.time || new Intl.DateTimeFormat(isRtl ? "ar-SA" : "en-US", {
+  const amountSarVal = amountVal * 3.75;
+  const formattedSarVal = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amountSarVal);
+  const amountSar = `(${formattedSarVal} ${sarLabel})`;
+  const time = new Intl.DateTimeFormat(isRtl ? "ar-SA" : "en-US", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
   }).format(receiptTimestamp);
-  const paymentMethod = tx?.paymentMethod || t("internalWallet");
+  const paymentMethod = tx?.paymentMethod || t("internalWallet") || "Internal Wallet";
+  const note = tx?.note || tx?.comment || tx?.rejectionReason || tx?.rejectionNote || null;
+  const status = tx?.status || "COMPLETED";
+
+  const handleExportCsv = () => {
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
+      + ["Transaction ID,Date,Amount,Currency,Payment Method,Status",
+        `"${txnId}","${receiptDate}","${amountVal}","${currency}","${paymentMethod}","${status}"`
+      ].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `receipt_${txnId}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className={`flex items-center justify-center p-10 ${dark ? "text-gray-200" : "text-gray-800"}`}>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#94D3C1]"></div>
+      </div>
+    );
+  }
 
   return (
     <div dir={isRtl ? "rtl" : "ltr"} className={`space-y-4 w-full text-start font-sans ${dark ? "text-gray-200" : "text-gray-800"}`}>
       {/* زر الرجوع */}
       {onBack && (
-        <div className="flex items-center justify-start">
+        <div className="flex items-center justify-start print:hidden">
           <button
             onClick={onBack}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
@@ -96,7 +134,7 @@ export default function TransactionDetail({ t, dark = true, isRtl = true, tx = n
       )}
 
       {/* 1. الهيدر الرئيسي للمعاملة */}
-      <section className={`relative overflow-hidden rounded-2xl border p-5 lg:p-6 shadow-2xl ${
+      <section className={`relative overflow-hidden rounded-2xl border p-5 lg:p-6 shadow-2xl print:hidden ${
         dark 
           ? "bg-gradient-to-br from-[#14191E] via-[#12161A] to-[#0E1114] border-gray-800" 
           : "bg-gradient-to-br from-white via-gray-50 to-gray-100 border-gray-200"
@@ -131,8 +169,9 @@ export default function TransactionDetail({ t, dark = true, isRtl = true, tx = n
           </div>
 
           <button 
+            onClick={() => window.print()}
             style={{ background: "linear-gradient(270deg, #FE9701 0%, #FE5D04 100%)" }}
-            className="shrink-0 w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-white font-bold text-xs shadow-lg transition-all hover:brightness-110 cursor-pointer"
+            className="shrink-0 w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-white font-bold text-xs shadow-lg transition-all hover:brightness-110 cursor-pointer print:hidden"
           >
             <FiDownload size={16} />
             <span>{t("downloadInvoice")}</span>
@@ -156,7 +195,7 @@ export default function TransactionDetail({ t, dark = true, isRtl = true, tx = n
       </section>
 
       {/* 2. شبكة الكروت (2x2) */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:hidden">
         {/* Card 1: البيانات الأساسية للمعاملة */}
         <Card
           dark={dark}
@@ -179,12 +218,20 @@ export default function TransactionDetail({ t, dark = true, isRtl = true, tx = n
           <Row dark={dark} label={t("txnType")}>
             <span className={warningText}>{t("txnTypeVal")}</span>
           </Row>
-          <Row dark={dark} label={t("currentStatus")}>
-            <span className={`${successText} flex items-center gap-1`}>
-              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#94D3C1" }} />
-              {t("statusCleared")}
+          <Row dark={dark} label={t("currentStatus") || "الحالة"}>
+            <span className={`${status === 'REJECTED' || status === 'FAILED' ? errorText : status === 'PENDING' ? warningText : successText} flex items-center gap-1 uppercase font-bold`}>
+              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: status === 'REJECTED' || status === 'FAILED' ? "#ef4444" : status === 'PENDING' ? "#fbbf24" : "#94D3C1" }} />
+              {status}
             </span>
           </Row>
+          {note && (
+            <div className={`p-3 mt-2 rounded-xl border ${dark ? "bg-red-950/30 border-red-900/50" : "bg-red-50 border-red-200"}`}>
+              <div className={`text-xs font-bold mb-1 ${errorText}`}>{isRtl ? "تعليق / سبب الرفض" : "Rejection Note / Comment"}</div>
+              <div className={`text-[0.7rem] leading-relaxed ${dark ? "text-red-200" : "text-red-700"}`}>
+                {note}
+              </div>
+            </div>
+          )}
           <Row dark={dark} label={t("shariaCompliance")}>
             <span className={successText}>{t("shariaVal")}</span>
           </Row>
@@ -214,7 +261,7 @@ export default function TransactionDetail({ t, dark = true, isRtl = true, tx = n
           </Row>
           <Row dark={dark} label={t("balanceAfter")}>
             <span className="font-mono">
-                $24,500.00 <span className="text-[#94D3C1]/70">(91,875.00 ر.س)</span>
+                $24,500.00 <span className={dark ? "text-[#94D3C1]/70" : "text-[#00695C]"}>(91,875.00 ر.س)</span>
             </span>
           </Row>
           <Row dark={dark} label={t("processingChannel")}>{t("emeraldSecure")}</Row>
@@ -229,7 +276,7 @@ export default function TransactionDetail({ t, dark = true, isRtl = true, tx = n
           icon={<HiOutlineSparkles size={18} />}
           title={t("linkedCampaignTitle")}
           tag={t("activeNow")}
-          tagClass={dark ? "bg-emerald-950 #94D3C1 font-semibold border border-emerald-800/50" : "bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200"}
+          tagClass={dark ? "bg-emerald-950 text-[#94D3C1] font-semibold border border-emerald-800/50" : "bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200"}
           foot={
             <div className="space-y-1.5 pt-1">
               <div className="flex justify-between text-[0.65rem]">
@@ -249,7 +296,7 @@ export default function TransactionDetail({ t, dark = true, isRtl = true, tx = n
             <span className={`font-bold ${dark ? "text-white" : "text-gray-900"}`}>{t("itemDesc")}</span>
           </Row>
           <Row dark={dark} label={t("campaignId")}>
-            <span className={`font-mono ${accentText}`}>#CAMP-8821</span>
+            <span className={`font-mono ${accentText}`}>{tx?.campaignId || "#CAMP-8821"}</span>
           </Row>
           <Row dark={dark} label={t("promoType")}>{t("promoTypeVal")}</Row>
           <Row dark={dark} label={t("totalApprovedBudget")}>
@@ -279,7 +326,7 @@ export default function TransactionDetail({ t, dark = true, isRtl = true, tx = n
               <p className={`p-2 rounded-lg border leading-relaxed text-[0.7rem] ${
                 dark ? "text-gray-300 bg-[#1A1F24] border-gray-800/80" : "text-gray-700 bg-gray-50 border-gray-200"
               }`}>
-                {tx?.description || t("detailedDescVal")}
+                {tx?.description || t("detailedDescVal") || "No description provided"}
               </p>
             </div>
 
@@ -343,14 +390,15 @@ export default function TransactionDetail({ t, dark = true, isRtl = true, tx = n
             {/* الأزرار العلوية الثلاثة */}
             <div className="flex w-full flex-wrap items-center justify-start gap-2 md:w-auto">
               {[
-                [BsFiletypePdf, dark ? "text-red-400" : "text-red-600", t("exportPdf")],
-                [BsFiletypeCsv, dark ? "text-[#94D3C1]" : "text-[#00695C]", t("exportCsv")],
-                [MdOutlineContentCopy, dark ? "text-gray-300" : "text-gray-600", t("copyEncryptedLink")],
-              ].map(([Icon, color, label]) => (
+                [BsFiletypePdf, dark ? "text-red-400" : "text-red-600", t("exportPdf"), () => window.print()],
+                [BsFiletypeCsv, dark ? "text-[#94D3C1]" : "text-[#00695C]", t("exportCsv"), handleExportCsv],
+                [isCopied ? FiCheckCircle : MdOutlineContentCopy, dark ? (isCopied ? "text-emerald-400" : "text-gray-300") : (isCopied ? "text-emerald-600" : "text-gray-600"), isCopied ? (isRtl ? "تم النسخ" : "Copied!") : t("copyEncryptedLink"), handleCopyLink],
+              ].map(([Icon, color, label, action]) => (
                 <button
                   key={label}
+                  onClick={action}
                   dir={isRtl ? "rtl" : "ltr"}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.62rem] font-semibold border transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.62rem] font-semibold border transition-all cursor-pointer print:hidden ${
                     dark
                       ? "bg-[#1A2024] hover:bg-[#232B31] text-gray-300 border-gray-700/60"
                       : "bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
@@ -452,7 +500,7 @@ export default function TransactionDetail({ t, dark = true, isRtl = true, tx = n
                   <div className={`p-3 rounded-xl border flex items-center gap-3 ${
                     dark ? "bg-[#191D1C] border-gray-800 text-gray-300" : "bg-white border-gray-200 text-gray-700"
                   }`}>
-                    <FiLock className={`${dark ? 'text-[#94D3C1]]' : 'text-[#00695c]'} shrink-0`} size={26} />
+                    <FiLock className={`${dark ? 'text-[#94D3C1]' : 'text-[#00695c]'} shrink-0`} size={26} />
                     <div className="flex flex-col text-start">
                       <span className={`text-[0.6rem] ${mutedText}`}>{t("encryptedTimestamp")}</span>
                       <span className={`text-[0.65rem] font-mono ${dark ? "text-white" : "text-gray-900"}`} dir="ltr">2026-03-28 21:15:30Z</span>
@@ -509,7 +557,7 @@ export default function TransactionDetail({ t, dark = true, isRtl = true, tx = n
       </section>
 
       {/* 4. شريط الدعم */}
-      <footer className={`flex flex-col sm:flex-row items-center justify-between p-3 rounded-xl border text-[0.68rem] gap-2 ${
+      <footer className={`flex flex-col sm:flex-row items-center justify-between p-3 rounded-xl border text-[0.68rem] gap-2 print:hidden ${
         dark ? "bg-[#121619] border-gray-800/80 text-gray-400" : "bg-white border-gray-200 text-gray-600"
       }`}>
         <div className="flex items-center gap-2">

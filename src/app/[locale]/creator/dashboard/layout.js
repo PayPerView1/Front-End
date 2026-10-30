@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import TokenHandler from "@/app/[locale]/creator/dashboard/components/TokenHandler";
+import TokenHandler from "@/app/[locale]/creator/profile/components/TokenHandler";
 
 export default async function DashboardLayout({ children }) {
   return (

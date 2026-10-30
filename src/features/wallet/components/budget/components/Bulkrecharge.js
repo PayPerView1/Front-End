@@ -481,7 +481,7 @@ export default function BulkRecharge({
                   .getElementById("audit-log")
                   ?.scrollIntoView({ behavior: "smooth", block: "start" })
               }
-              className="inline-flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-[12px] font-bold text-white transition-opacity hover:opacity-90"
+              className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[12px] font-bold text-white transition-opacity hover:opacity-90 sm:w-auto"
               style={{ background: ORANGE }}
             >
               <MdOutlineReceiptLong size={15} />
@@ -490,7 +490,7 @@ export default function BulkRecharge({
           </div>
         )}
 
-        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
           {/* ═══ العمود الرئيسي: الحملات ═══ */}
           <div className="flex min-w-0 flex-col gap-4">
             <Card t={t} className="flex flex-col gap-4 p-4 sm:p-5">
