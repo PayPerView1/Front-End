@@ -3,8 +3,147 @@
 // API Contract — Wallet, Funding (PayPal, Bank Transfer, Moyasar), Transactions & Refunds
 // ============================================================
 
-import axiosInstance, { handleError } from "@/lib/axiosInstance";
+import axiosInstance, {
+  AI_REQUEST_TIMEOUT_MS,
+  handleError,
+} from "@/lib/axiosInstance";
 import { normalizeTransaction } from "../utils/normalizeTransaction";
+
+const unwrapCreatorData = (response) => {
+  const payload = response?.data;
+  if (payload?.success !== true) {
+    throw new Error(payload?.message || "The creator finance API returned an unsuccessful response.");
+  }
+  return payload.data;
+};
+
+// ─── Creator earnings & withdrawals ─────────────────────────────────────────
+
+export const getCreatorEarnings = async () => {
+  try {
+    const response = await axiosInstance.get("/api/v1/creator/earnings");
+    const summary = unwrapCreatorData(response);
+    const numericFields = [
+      "availableBalance", "pendingBalance", "reservedBalance", "totalEarnings",
+      "totalWithdrawn", "totalViews", "earningRecords", "earningSubmissions",
+    ];
+    if (!summary || typeof summary !== "object" || numericFields.some((field) =>
+      typeof summary[field] !== "number" || !Number.isFinite(summary[field])
+    )) {
+      throw new Error("The creator earnings summary is invalid.");
+    }
+    return summary;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getCreatorEarningsPrediction = async () => {
+  try {
+    const response = await axiosInstance.get("/api/v1/creator/earnings/prediction", {
+      timeout: AI_REQUEST_TIMEOUT_MS,
+    });
+    const data = unwrapCreatorData(response);
+    const validStatus = ["ESTIMATED", "INSUFFICIENT_DATA"].includes(data?.status);
+    const validEstimate = data?.status === "INSUFFICIENT_DATA" || (
+      Number.isFinite(data?.estimatedCreatorNetAmountCents) &&
+      data.estimatedCreatorNetAmountCents >= 0 &&
+      Number.isFinite(data?.predictedNext7DaysViews) &&
+      data.predictedNext7DaysViews >= 0
+    );
+    if (!validStatus || !validEstimate || !Array.isArray(data?.campaigns)) {
+      throw new Error("The creator earnings prediction response is invalid.");
+    }
+    return data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getCreatorEarningsTransactions = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/api/v1/creator/earnings/transactions", { params });
+    const payload = response?.data;
+    if (payload?.success !== true || !Array.isArray(payload.data)) {
+      throw new Error(payload?.message || "The creator earnings response is invalid.");
+    }
+    return { data: payload.data, pagination: payload.pagination || null };
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getCreatorPaymentMethods = async () => {
+  try {
+    const response = await axiosInstance.get("/api/v1/creator/payment-methods");
+    const data = unwrapCreatorData(response);
+    if (!Array.isArray(data)) throw new Error("The payment methods response is invalid.");
+    return data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const addCreatorPaymentMethod = async (payload) => {
+  try {
+    const response = await axiosInstance.post("/api/v1/creator/payment-methods", payload);
+    return unwrapCreatorData(response);
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const requestCreatorWithdrawal = async (payload) => {
+  try {
+    const response = await axiosInstance.post("/api/v1/creator/withdrawals", payload);
+    return unwrapCreatorData(response);
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getCreatorWithdrawalIntelligence = async (payload = {}) => {
+  try {
+    const response = await axiosInstance.post(
+      "/api/v1/creator/withdrawals/intelligence",
+      payload,
+      { timeout: AI_REQUEST_TIMEOUT_MS }
+    );
+    const data = unwrapCreatorData(response);
+    if (!data || !["ASSESSED", "INSUFFICIENT_DATA"].includes(data.status) || !Array.isArray(data.signals)) {
+      throw new Error("The withdrawal intelligence response is invalid.");
+    }
+    return data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getAdvertiserWalletIntelligence = async (payload = {}) => {
+  try {
+    const response = await axiosInstance.post(
+      "/api/v1/ai/wallet/intelligence",
+      payload,
+      { timeout: AI_REQUEST_TIMEOUT_MS }
+    );
+    const data = unwrapCreatorData(response);
+    const statusesValid = data && [
+      data.paymentFraud?.status,
+      data.paymentMethodRecommendation?.status,
+      data.depositAmountPrediction?.status,
+      data.dailyBudgetRecommendation?.status,
+      data.budgetExhaustionPrediction?.status,
+      data.spendingAnomaly?.status,
+      data.refundFraud?.status,
+      data.refundMethodRecommendation?.status,
+      data.refundLikelihoodPrediction?.status,
+    ].every((status) => typeof status === "string");
+    if (!statusesValid) throw new Error("The advertiser wallet intelligence response is invalid.");
+    return data;
+  } catch (error) {
+    handleError(error);
+  }
+};
 
 /**
  * تحويل الفلاتر من واجهة المستخدم لفرمز الـ API
