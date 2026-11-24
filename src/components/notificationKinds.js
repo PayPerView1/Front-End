@@ -173,12 +173,3 @@ export function buildNotification(kind, params = {}) {
     dateGroupEn: "Today",
   };
 }
-
-/** بيانات تجريبية لتظهر الأنواع مباشرة */
-export const SAMPLE_NOTIFICATIONS = [
-  buildNotification(KINDS.DOWNLOAD_READY, { size: "1.40" }),
-  buildNotification(KINDS.DOWNLOAD_FAILED),
-  buildNotification(KINDS.CAMPAIGN_SUSPENDED, { campaign: "تطبيق ثروة الاستثماري" }),
-  buildNotification(KINDS.APPLICATION_REJECTED, { campaign: "ملابس وأزياء عربية راقية" }),
-  buildNotification(KINDS.APPLICATION_ACCEPTED, { campaign: "عطور الأصالة الفاخرة" }),
-].map((n, i) => ({ ...n, id: `sample-${i}` }));

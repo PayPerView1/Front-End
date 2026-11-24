@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useCallback, useContext, useState } from "react";
-import { mockConversations } from "@/components/ConversationList";
 
 const MessagesContext = createContext(null);
 
@@ -10,7 +9,7 @@ export function MessagesProvider({ children }) {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [isMaximized, setIsMaximized] = useState(false);
   const [readIds, setReadIds] = useState([]);
-  const [conversations, setConversations] = useState(mockConversations);
+  const [conversations, setConversations] = useState([]);
 
   const addSystemNotification = useCallback(
     ({ title, text, orderId, status }) => {

@@ -7,45 +7,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { useMessages } from "@/context/MessagesContext";
 import { useTheme } from "@/context/ThemeContext";
 
-export const mockConversations = [
-  {
-    id: 1,
-    name: "دعم مجتمع كليبات كوبي",
-    avatar: null,
-    lastMessage: "أحمد محمد: مرحباً بك في دعم المشتركين...",
-    unread: true,
-    isOrder: false,
-    color: "#8B5CF6",
-    messages: [
-      {
-        id: 1,
-        sender: "Niko Lamberson",
-        text: "مرحباً بك في مجتمع Copy Clips",
-        isMe: false,
-        color: "#8B5CF6",
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "دعم قصاصات عربي",
-    avatar: null,
-    lastMessage: "🍪 الخطوة الأولى التي يجب أن تقوم بها تجدها هنا...",
-    unread: true,
-    isOrder: true,
-    color: "#F59E0B",
-    messages: [
-      {
-        id: 1,
-        sender: "دعم قصاصات عربي",
-        text: "🍪 الخطوة الأولى التي يجب أن تقوم بها تجدها هنا...",
-        isMe: false,
-        color: "#F59E0B",
-      },
-    ],
-  },
-];
-
 export default function ConversationList({
   onSelectConversation,
   selectedId,
