@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { BsStars } from "react-icons/bs";
-import { FiUsers, FiMic, FiSend, FiPlus, FiX, FiTrash2, FiArrowLeft } from "react-icons/fi";
+import { FiUsers, FiMic, FiSend, FiPlus, FiX, FiTrash2, FiArrowLeft, FiThumbsUp, FiThumbsDown } from "react-icons/fi";
 import { MdCampaign, MdLiveTv, MdReceiptLong } from "react-icons/md";
 import { useAssistant } from "@/context/AssistantContext";
 import { toast } from "@/components/ui/Toast";
@@ -14,6 +14,7 @@ import {
   getThreads,
   getMessages,
   sendMessage,
+  submitMessageFeedback,
   deleteThread,
 } from "@/services/Chatservice";
 
@@ -42,6 +43,8 @@ export default function AIAssistantPanel({ side = "left", stacked = false, topOf
 
   // ── Threads ──
   const [threads, setThreads] = useState([]);
+  const [threadsLoading, setThreadsLoading] = useState(false);
+  const [threadsError, setThreadsError] = useState("");
   const [activeThread, setActiveThread] = useState(null);
 
   // ── Messages ──
@@ -59,13 +62,18 @@ export default function AIAssistantPanel({ side = "left", stacked = false, topOf
 
   // 1. جلب المحادثات
   const fetchThreads = useCallback(async () => {
+    setThreadsLoading(true);
+    setThreadsError("");
     try {
       const data = await getThreads();
       setThreads(data);
-    } catch {
-      // non-blocking
+    } catch (requestError) {
+      setThreads([]);
+      setThreadsError(requestError?.response?.data?.message || requestError?.message || t("errors.loadThreads"));
+    } finally {
+      setThreadsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   // 2. إرسال الرسالة
   const dispatchMessage = useCallback(async (threadId, content) => {
@@ -76,7 +84,7 @@ export default function AIAssistantPanel({ side = "left", stacked = false, topOf
       const aiMsg = await sendMessage(threadId, content);
       setMessages((prev) => [
         ...prev,
-        { _id: aiMsg.id, role: "assistant", content: aiMsg.content, created_at: aiMsg.createdAt },
+        { _id: aiMsg.id, role: "assistant", content: aiMsg.content, created_at: aiMsg.createdAt, language: aiMsg.language, suggestedActions: aiMsg.suggestedActions || [] },
       ]);
     } catch {
       setError(t("errors.sendMessage"));
@@ -84,6 +92,16 @@ export default function AIAssistantPanel({ side = "left", stacked = false, topOf
       setIsSending(false);
     }
   }, [t]);
+
+  const handleFeedback = async (messageId, rating) => {
+    if (!activeThread || !messageId) return;
+    try {
+      await submitMessageFeedback(activeThread.id, messageId, rating);
+      setMessages((prev) => prev.map((item) => item._id === messageId ? { ...item, feedback: { rating } } : item));
+    } catch {
+      setError(t("errors.sendMessage"));
+    }
+  };
 
   // 3. فتح محادثة قديمة
   const openThread = useCallback(async (thread) => {
@@ -149,7 +167,8 @@ export default function AIAssistantPanel({ side = "left", stacked = false, topOf
 
   useEffect(() => {
     if (!isAssistantOpen) return;
-    fetchThreads();
+    const timer = setTimeout(fetchThreads, 0);
+    return () => clearTimeout(timer);
   }, [isAssistantOpen, fetchThreads]);
 
   // ─── Handlers ────────────────────────────────────────────────────────────
@@ -216,7 +235,7 @@ export default function AIAssistantPanel({ side = "left", stacked = false, topOf
       </p>
 
       {/* زر عرض المحادثات */}
-      {threads.length > 0 && (
+      {(threads.length > 0 || threadsError) && (
         <button
           type="button"
           onClick={() => setView(VIEW.THREADS)}
@@ -285,6 +304,10 @@ export default function AIAssistantPanel({ side = "left", stacked = false, topOf
         </div>
       ))}
 
+      {threadsLoading && <p role="status" className={`py-3 text-center text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>{t("loading")}</p>}
+      {threadsError && <div role="alert" className="rounded-xl border border-red-400/30 bg-red-500/5 p-3 text-xs text-red-400"><p>{threadsError}</p><button type="button" onClick={() => fetchThreads()} className="mt-2 underline">{t("retry")}</button></div>}
+      {!threadsLoading && !threadsError && threads.length === 0 && <p role="status" className={`py-3 text-center text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>{t("emptyConversations")}</p>}
+
       <button
         type="button"
         onClick={() => startNewChat()}
@@ -312,7 +335,7 @@ export default function AIAssistantPanel({ side = "left", stacked = false, topOf
         )}
 
         {messages.map((msg) => (
-          <div key={msg._id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div key={msg._id || msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             {msg.role === "assistant" && (
               <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mr-2 mt-0.5 ${isDark ? "bg-white/10" : "bg-[#94D3C1]/30"}`}>
                 <BsStars className={`w-3 h-3 ${isDark ? "text-purple-400" : "text-[#2A9D8F]"}`} />
@@ -326,6 +349,13 @@ export default function AIAssistantPanel({ side = "left", stacked = false, topOf
                   : "bg-[#F5F5F5] text-[#1A1A1A] rounded-tl-sm"
             }`}>
               {msg.content}
+              {msg.role === "assistant" && msg.suggestedActions?.length > 0 && <div className="mt-2 flex flex-wrap gap-1.5">
+                {msg.suggestedActions.slice(0, 3).map((action) => <button key={action} type="button" disabled={isSending} onClick={() => activeThread && dispatchMessage(activeThread.id, action)} className="rounded-full border border-current/20 px-2 py-1 text-[10px] underline-offset-2 hover:underline disabled:opacity-50">{action}</button>)}
+              </div>}
+              {msg.role === "assistant" && msg._id && <div className="mt-2 flex gap-2 opacity-70" aria-label={isAr ? "تقييم الإجابة" : "Rate this answer"}>
+                <button type="button" disabled={Boolean(msg.feedback)} onClick={() => handleFeedback(msg._id, "HELPFUL")} aria-label={isAr ? "إجابة مفيدة" : "Helpful answer"} title={isAr ? "مفيد" : "Helpful"} className="disabled:opacity-40"><FiThumbsUp className="h-3 w-3" /></button>
+                <button type="button" disabled={Boolean(msg.feedback)} onClick={() => handleFeedback(msg._id, "NOT_HELPFUL")} aria-label={isAr ? "إجابة غير مفيدة" : "Unhelpful answer"} title={isAr ? "غير مفيد" : "Not helpful"} className="disabled:opacity-40"><FiThumbsDown className="h-3 w-3" /></button>
+              </div>}
             </div>
           </div>
         ))}
@@ -383,6 +413,7 @@ export default function AIAssistantPanel({ side = "left", stacked = false, topOf
         {error && (
           <p className="text-[10px] text-red-400 text-center mb-2 px-2">{error}</p>
         )}
+        {view === VIEW.HOME && threadsError && <p role="alert" className="text-[10px] text-red-400 text-center mb-2 px-2">{threadsError}</p>}
         {view === VIEW.HOME && renderHome()}
         {view === VIEW.THREADS && renderThreads()}
         {view === VIEW.CHAT && renderChat()}

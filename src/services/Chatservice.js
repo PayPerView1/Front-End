@@ -1,4 +1,4 @@
-import axiosInstance from "@/lib/axiosInstance";
+import axiosInstance, { AI_REQUEST_TIMEOUT_MS } from "@/lib/axiosInstance";
 
 const BASE = "/api/v1/chat/threads";
 
@@ -18,6 +18,9 @@ export const createThread = async (title = "") => {
 /** جلب قائمة المحادثات */
 export const getThreads = async () => {
   const { data } = await axiosInstance.get(BASE);
+  if (data?.success !== true || !Array.isArray(data.data)) {
+    throw new Error(data?.message || "The conversation list response is invalid.");
+  }
   return data.data; // [{ id, title, updatedAt, lastMessage }]
 };
 
@@ -32,14 +35,27 @@ export const deleteThread = async (threadId) => {
 /** جلب رسائل محادثة */
 export const getMessages = async (threadId) => {
   const { data } = await axiosInstance.get(`${BASE}/${threadId}/messages`);
-  return data.data; // [{ _id, role, content, created_at }]
+  return (data.data || []).map((message) => ({
+    ...message,
+    _id: message.id || message._id,
+    created_at: message.createdAt || message.created_at,
+  }));
 };
 
 /** إرسال رسالة والحصول على رد الـ AI */
 export const sendMessage = async (threadId, content) => {
   const { data } = await axiosInstance.post(
     `${BASE}/${threadId}/messages`,
-    { content }
+    { content },
+    { timeout: AI_REQUEST_TIMEOUT_MS }
   );
-  return data.data.message; // { id, role, content, createdAt }
+  return data.data.message; // { id, role, content, createdAt, language, suggestedActions }
+};
+
+export const submitMessageFeedback = async (threadId, messageId, rating) => {
+  const { data } = await axiosInstance.patch(
+    `${BASE}/${threadId}/messages/${messageId}/feedback`,
+    { rating }
+  );
+  return data.data;
 };
