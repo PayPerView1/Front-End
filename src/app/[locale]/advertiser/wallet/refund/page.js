@@ -1,11 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import RefundTopCards from '@/features/wallet/components/refund/states/RefundTopCards';
 import RefundInitialState from '@/features/wallet/components/refund/states/RefundInitialState';
 import RefundSuccessState from '@/features/wallet/components/refund/states/RefundSuccessState';
-import RefundErrorMinState from '@/features/wallet/components/refund/states/RefundErrorMinState';
-import RefundErrorMaxState from '@/features/wallet/components/refund/states/RefundErrorMaxState';
 import RefundRejectedState from '@/features/wallet/components/refund/states/RefundRejectedState';
 import RefundCancelledState from '@/features/wallet/components/refund/states/RefundCancelledState';
 import { cancelRefund, getRefundRequests, requestRefund } from '@/features/wallet/services/walletService';
@@ -21,6 +19,7 @@ export default function RefundPage() {
   const [reservedBalance, setReservedBalance] = useState(null);
   const [availabilityError, setAvailabilityError] = useState(false);
   const [loadingRequest, setLoadingRequest] = useState(true);
+  const actionInProgress = useRef(false);
   const { balance, setBalance, refresh } = useWallet();
   const availableBalance = reservedBalance == null || balance == null ? null : Math.max(Number(balance) - reservedBalance, 0);
 
@@ -64,13 +63,15 @@ export default function RefundPage() {
   }, []);
 
   const submitRefund = async (amount) => {
+    if (actionInProgress.current) return;
+    actionInProgress.current = true;
     setSubmitting(true);
     setError('');
     try {
       const response = await requestRefund({ amount });
       if (response?.success === false) throw new Error(response.message || 'تعذر إرسال طلب الاسترداد.');
       const data = response?.data ?? response;
-      setRefund(data);
+      setRefund({ ...data, refundRequestId: data.refundRequestId || data.id });
       if (Number.isFinite(Number(data.walletBalanceAfter))) setBalance(Number(data.walletBalanceAfter));
       else await refresh();
       setState('success');
@@ -78,11 +79,13 @@ export default function RefundPage() {
       setError(cause?.message || 'تعذر إرسال طلب الاسترداد.');
     } finally {
       setSubmitting(false);
+      actionInProgress.current = false;
     }
   };
 
   const cancelRequest = async () => {
-    if (!refund?.refundRequestId) return;
+    if (!refund?.refundRequestId || actionInProgress.current) return;
+    actionInProgress.current = true;
     setCancelling(true);
     setError('');
     try {
@@ -91,11 +94,13 @@ export default function RefundPage() {
       const data = response?.data ?? response;
       if (Number.isFinite(Number(data.walletBalanceAfter))) setBalance(Number(data.walletBalanceAfter));
       else await refresh();
+      setRefund((current) => ({ ...current, ...data, refundRequestId: current?.refundRequestId || data.refundRequestId || data.id }));
       setState('cancelled');
     } catch (cause) {
       setError(cause?.message || 'تعذر إلغاء الطلب.');
     } finally {
       setCancelling(false);
+      actionInProgress.current = false;
     }
   };
 
@@ -111,7 +116,7 @@ export default function RefundPage() {
             استرداد الرصيد المالي غير المستخدم
           </h1>
           <p className="text-[#8A9490] text-sm">
-            يمكنك استرداد المبالغ غير المستهلكة في ميزانيتك الإعلانية لحسابك المصرفي أو بطاقتك الأصلية بكل أمان وشفافية ودون تعقيد.
+            أرسل طلباً لاسترداد الرصيد المتاح. سيعيد الخادم حالة الطلب وأي رسوم أو صافي مبلغ متاح.
           </p>
         </div>
       )}
@@ -123,8 +128,6 @@ export default function RefundPage() {
       {error && <p role="alert" className="mb-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">{error}</p>}
       {state === 'initial'   && <RefundInitialState   onSwitchState={setState} onSubmit={submitRefund} submitting={submitting} balance={availableBalance} />}
       {state === 'success'   && <RefundSuccessState   onSwitchState={setState} refund={refund} onCancel={cancelRequest} cancelling={cancelling} />}
-      {state === 'error_min' && <RefundErrorMinState  onSwitchState={setState} />}
-      {state === 'error_max' && <RefundErrorMaxState  onSwitchState={setState} />}
       {state === 'rejected'  && <RefundRejectedState  onSwitchState={setState} refund={refund} walletBalance={balance} />}
       {state === 'cancelled' && <RefundCancelledState onSwitchState={setState} refund={refund} />}
     </div>

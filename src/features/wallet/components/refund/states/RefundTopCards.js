@@ -1,87 +1,49 @@
 'use client';
-import React from 'react';
-import { Wallet, CreditCard, Shield, CheckCircle } from 'lucide-react';
 
-export default function RefundTopCards({ walletBalance = 0, reservedBalance = 0, availableBalance = 0 }) {
-  const format = (amount) => amount == null ? "—" : Number(amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+import { useLocale } from 'next-intl';
+import { Wallet, CreditCard, Shield } from 'lucide-react';
+
+const format = (amount, locale) => {
+  const value = Number(amount);
+  return amount === null || amount === undefined || !Number.isFinite(value)
+    ? '—'
+    : value.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+
+export default function RefundTopCards({ walletBalance = null, reservedBalance = null, availableBalance = null }) {
+  const locale = useLocale();
+  const isArabic = locale === 'ar';
+  const wallet = Number(walletBalance);
+  const available = Number(availableBalance);
+  const liquidity = Number.isFinite(wallet) && wallet > 0 && Number.isFinite(available)
+    ? Math.min(100, Math.max(0, Math.round((available / wallet) * 100)))
+    : null;
+  const cards = [
+    { icon: Wallet, title: isArabic ? 'الرصيد المتاح للطلب' : 'Balance available for a request', value: availableBalance, color: 'text-[#94D3C1]' },
+    { icon: CreditCard, title: isArabic ? 'الرصيد المحجوز للحملات النشطة' : 'Reserved by active campaigns', value: reservedBalance, color: 'text-[#E9C349]' },
+    { icon: Shield, title: isArabic ? 'رصيد المحفظة' : 'Wallet balance', value: walletBalance, color: 'text-white' },
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      {/* Card 1 */}
-      <div className="bg-[#151819] rounded-2xl p-5 border border-white/[.08] flex flex-col justify-between">
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex items-center gap-3">
-            <div className="bg-white/[.08] p-2 rounded-lg">
-              <Wallet className="w-5 h-5 text-white" />
+    <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+      {cards.map(({ icon: Icon, title, value, color }, index) => (
+        <section key={title} className="rounded-2xl border border-white/[.08] bg-[#151819] p-5">
+          <div className="mb-4 flex items-center gap-3">
+            <span className="rounded-lg bg-white/[.08] p-2"><Icon className="h-5 w-5 text-white" /></span>
+            <h3 className="m-0 text-sm font-medium text-white">{title}</h3>
+          </div>
+          <div className={`text-end text-3xl font-bold ${color}`}>{value == null ? '—' : `$${format(value, locale)}`}</div>
+          {index === 0 && <p className="mt-2 text-end text-[11px] text-[#8A9490]">{isArabic ? 'تقدير من رصيد المحفظة وميزانيات الحملات؛ يظل قرار الخادم نهائياً.' : 'Estimated from wallet and campaign budgets; the backend makes the final eligibility decision.'}</p>}
+          {index === 2 && (
+            <div className="mt-4">
+              <div className="h-1.5 w-full rounded-full bg-white/[.08]">
+                <div className="h-1.5 rounded-full bg-teal-400" style={{ width: `${liquidity ?? 0}%` }} />
+              </div>
+              <p className="mt-2 text-center text-[11px] text-[#8A9490]">{liquidity == null ? '—' : `${liquidity}%`}</p>
             </div>
-            <div>
-              <h3 className="text-sm text-white font-medium">الرصيد المتاح للاسترداد الفوري</h3>
-              <span className="text-[10px] text-[#8A9490]">قابل للتحويل الخارجي</span>
-            </div>
-          </div>
-          <span className="bg-white/[.08] text-white text-[10px] px-2 py-1 rounded">متاح الآن</span>
-        </div>
-        
-        <div className="mb-4">
-          <div className="flex items-baseline gap-1 justify-end">
-            <span className="text-sm text-[#8A9490]">USD</span>
-            <span className="text-3xl font-bold text-[#94D3C1]">${format(availableBalance)}</span>
-          </div>
-          <p className="text-[11px] text-[#8A9490] text-end mt-1">ما يعادل تقريباً: {format(availableBalance * 3.75)} ر.س (سعر الصرف البنكي 3.75)</p>
-        </div>
-        
-        <div className="flex items-center gap-2 text-[#94D3C1] text-[11px] bg-[rgba(148,211,193,0.1)] p-2 rounded-lg mt-auto">
-          <CheckCircle className="w-3 h-3 shrink-0" />
-          <span>تم التحقق من ملكية الحساب ومصدر الأموال</span>
-          <span className="mr-auto text-[#8A9490]">ID: ACC-7729-EM</span>
-        </div>
-      </div>
-
-      {/* Card 2 */}
-      <div className="bg-[#151819] rounded-2xl p-5 border border-white/[.08] flex flex-col justify-between">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="bg-white/[.08] p-2 rounded-lg">
-            <CreditCard className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h3 className="text-sm text-white font-medium">الرصيد المحجوز لحملات نشطة</h3>
-          </div>
-        </div>
-        
-        <div className="mb-4 text-end">
-          <div className="text-3xl font-bold text-[#E9C349]">${format(reservedBalance)}</div>
-          <p className="text-[11px] text-[#8A9490] mt-1">الرصيد المرتبط بميزانيات الحملات النشطة</p>
-        </div>
-        
-        <div className="text-[11px] text-[#8A9490] bg-[#101213] p-2 rounded-lg text-center border-t border-white/[.08] mt-auto">
-          لا يمكن استرداده حتى إيقاف الحملات
-        </div>
-      </div>
-
-      {/* Card 3 */}
-      <div className="bg-[#151819] rounded-2xl p-5 border border-white/[.08] flex flex-col justify-between">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="bg-white/[.08] p-2 rounded-lg">
-            <Shield className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h3 className="text-sm text-white font-medium">ميزانية خالية من الالتزامات</h3>
-          </div>
-        </div>
-        
-        <div className="mb-4 text-end">
-          <div className="text-3xl font-bold text-white">${format(walletBalance)}</div>
-          <p className="text-[11px] text-[#8A9490] mt-1">الرصيد الحالي في المحفظة</p>
-        </div>
-        
-        <div className="mt-auto">
-          <div className="w-full bg-white/[.08] rounded-full h-1.5 mb-2">
-            <div className="bg-teal-400 h-1.5 rounded-full" style={{ width: `${walletBalance > 0 && availableBalance != null ? Math.min(100, (availableBalance / walletBalance) * 100) : 0}%` }}></div>
-          </div>
-          <div className="text-[11px] text-[#8A9490] text-center">
-            نسبة السيولة المتاحة {walletBalance > 0 && availableBalance != null ? Math.round((availableBalance / walletBalance) * 100) : '—'}%
-          </div>
-        </div>
-      </div>
+          )}
+        </section>
+      ))}
     </div>
   );
 }

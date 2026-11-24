@@ -1,7 +1,8 @@
 const typeMap = { CREDIT: "deposit", DEBIT: "adSpend", REFUND: "refund" };
 
 export function normalizeTransaction(transaction = {}) {
-  const type = typeMap[String(transaction.type || "").toUpperCase()] || "deposit";
+  const rawType = String(transaction.type || "").toUpperCase();
+  const type = typeMap[rawType] || "unknown";
   const rawStatus = String(transaction.status || "").toUpperCase();
   const status = ["COMPLETED", "VERIFIED"].includes(rawStatus)
     ? "verified"
@@ -9,18 +10,26 @@ export function normalizeTransaction(transaction = {}) {
       ? "failed"
       : ["CANCELLED", "CANCELED", "PAYMENT_CANCELLED"].includes(rawStatus)
         ? "cancelled"
-        : "pending";
-  const amount = Number(transaction.netAmount ?? transaction.grossAmount ?? 0);
-  const positive = type !== "adSpend";
+        : ["PENDING", "PROCESSING", "UNDER_REVIEW", "SUBMITTED"].includes(rawStatus)
+          ? "pending"
+          : "unknown";
+  const amount = Number(transaction.netAmount ?? transaction.grossAmount ?? transaction.amount);
+  const sign = type === "adSpend" ? "-" : type === "deposit" || type === "refund" ? "+" : "";
   const createdAt = transaction.createdAt ? new Date(transaction.createdAt) : null;
   const validDate = createdAt && !Number.isNaN(createdAt.valueOf());
-  const currency = transaction.currency || "USD";
-  const signedAmount = `${positive ? "+" : "-"}${currency === "USD" ? "$" : `${currency} `}${Math.abs(amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const currency = transaction.currency || "";
+  const formattedAmount = Number.isFinite(amount)
+    ? Math.abs(amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : "—";
+  const signedAmount = `${sign}${currency ? `${currency === "USD" ? "$" : `${currency} `}` : ""}${formattedAmount}`;
 
   return {
     ...transaction,
     id: String(transaction.id || transaction.transactionId || ""),
+    rawType,
+    rawStatus,
     type,
+    amountValue: Number.isFinite(amount) ? amount : null,
     dateISO: validDate ? createdAt.toISOString().slice(0, 10) : "",
     time: validDate ? createdAt.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : "—",
     typeLabel: type,
@@ -29,9 +38,9 @@ export function normalizeTransaction(transaction = {}) {
     paymentMethod: transaction.paymentMethod || "—",
     paymentSub: "",
     paymentIcon: transaction.paymentMethod === "BANK_TRANSFER" ? "bank" : transaction.paymentMethod ? "card" : "wallet",
-    amount: signedAmount,
-    amountSar: `${positive ? "+" : "-"}${(Math.abs(amount) * 3.75).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ر.س`,
-    amountUp: positive,
+    amount: Number.isFinite(amount) ? signedAmount : "—",
+    amountSar: transaction.amountSar || "",
+    amountUp: type === "deposit" || type === "refund",
     status,
   };
 }

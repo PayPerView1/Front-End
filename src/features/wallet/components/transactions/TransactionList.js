@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import EmptyState from "./EmptyState";
 import {
-  MdOutlineReceiptLong,
   MdOutlineSearch,
   MdOutlineCalendarToday,
   MdOutlineFileDownload,
@@ -20,204 +19,7 @@ import {
   MdOutlineAddCircleOutline,
   MdOutlineRemoveCircleOutline,
   MdOutlineCheckCircle,
-  MdOutlineVerifiedUser,
 } from "react-icons/md";
-
-// ─── البيانات التجريبية (مع تنويع التواريخ لتجربة النطاق الزمني) ─────────────
-export const MOCK_TRANSACTIONS = [
-  {
-    id: "TXN-2026-08941",
-    dateISO: "2026-03-29",
-    time: "16:45:10 مكة",
-    type: "deposit",
-    typeLabel: "إيداع رصيد",
-    description: "إيداع سيولة مصرفية مباشرة لحساب الإعلانات",
-    ref: "REF : ALRAJHI-CORP-932104",
-    paymentMethod: "مصرف الراجحي",
-    paymentSub: "(حساب تجاري)",
-    paymentIcon: "bank",
-    amount: "+$10,000.00",
-    amountSar: "+37,500.00 ر.س",
-    amountUp: true,
-    status: "verified",
-  },
-  {
-    id: "TXN-2026-08940",
-    dateISO: "2026-03-25",
-    time: "15:22:15 مكة",
-    type: "adSpend",
-    typeLabel: "خصم ميزانية",
-    description: "خصم مسبق لمرحلة الإطلاق - حملة رمضان 2026...",
-    ref: "CMP-RAMADAN-GULF-V2",
-    paymentMethod: "المحفظة الداخلية",
-    paymentSub: "",
-    paymentIcon: "wallet",
-    amount: "-$3,200.00",
-    amountSar: "-12,000.00 ر.س",
-    amountUp: false,
-    status: "verified",
-  },
-  {
-    id: "TXN-2026-08939",
-    dateISO: "2026-03-20",
-    time: "11:10:00 مكة",
-    type: "deposit",
-    typeLabel: "إيداع رصيد",
-    description: "تغذية المحفظة عبر بوابة الدفع الوطنية مدى",
-    ref: "GATEWAY : MADA-ECOM-6811",
-    paymentMethod: "بطاقة مدى",
-    paymentSub: "(آبل)",
-    paymentIcon: "card",
-    amount: "+$5,450.00",
-    amountSar: "+20,437.50 ر.س",
-    amountUp: true,
-    status: "verified",
-  },
-  {
-    id: "TXN-2026-08938",
-    dateISO: "2026-03-15",
-    time: "09:30:45 مكة",
-    type: "refund",
-    typeLabel: "استرداد / فائض",
-    description: "إعادة الرصيد المتبقي بعد انتهاء مدة البث",
-    ref: "REFUND-AUTOCLOSE-7701",
-    paymentMethod: "المحفظة الداخلية",
-    paymentSub: "",
-    paymentIcon: "wallet",
-    amount: "+$1,450.00",
-    amountSar: "+5,437.50 ر.س",
-    amountUp: true,
-    status: "verified",
-  },
-  {
-    id: "TXN-2026-08937",
-    dateISO: "2026-03-10",
-    time: "14:15:20 مكة",
-    type: "audit",
-    typeLabel: "رسوم فحص",
-    description: "رسوم الاعتماد الأخلاقي والشرعي لـ 4 مقاطع",
-    ref: "SHARIA-AUDIT-BOARD-44",
-    paymentMethod: "المحفظة الداخلية",
-    paymentSub: "",
-    paymentIcon: "wallet",
-    amount: "-$120.00",
-    amountSar: "-450.00 ر.س",
-    amountUp: false,
-    status: "verified",
-  },
-  {
-    id: "TXN-2026-08936",
-    dateISO: "2026-03-05",
-    time: "18:00:00 مكة",
-    type: "adSpend",
-    typeLabel: "خصم ميزانية",
-    description: "حملة النشر الذكي والتوزيع على المؤثرين",
-    ref: "CMP-INFLUENCER-TIKTOK-SNAP",
-    paymentMethod: "Visa Infinite",
-    paymentSub: "(**9012)",
-    paymentIcon: "card",
-    amount: "-$5,000.00",
-    amountSar: "-18,750.00 ر.س",
-    amountUp: false,
-    status: "verified",
-  },
-  {
-    id: "TXN-2026-08935",
-    dateISO: "2026-03-01",
-    time: "12:40:10 مكة",
-    type: "deposit",
-    typeLabel: "إيداع رصيد",
-    description: "تغذية المحفظة عبر تحويل بنكي سريع",
-    ref: "REF : SNB-CORP-481902",
-    paymentMethod: "البنك الأهلي",
-    paymentSub: "(حساب تجاري)",
-    paymentIcon: "bank",
-    amount: "+$8,000.00",
-    amountSar: "+30,000.00 ر.س",
-    amountUp: true,
-    status: "verified",
-  },
-  {
-    id: "TXN-2026-08934",
-    dateISO: "2026-02-28",
-    time: "20:15:00 مكة",
-    type: "adSpend",
-    typeLabel: "خصم ميزانية",
-    description: "حملة الترويج الموسمي - العودة للمدارس",
-    ref: "CMP-BACK2SCHOOL-2026",
-    paymentMethod: "المحفظة الداخلية",
-    paymentSub: "",
-    paymentIcon: "wallet",
-    amount: "-$2,100.00",
-    amountSar: "-7,875.00 ر.س",
-    amountUp: false,
-    status: "verified",
-  },
-  {
-    id: "TXN-2026-08933",
-    dateISO: "2026-02-20",
-    time: "10:05:30 مكة",
-    type: "refund",
-    typeLabel: "استرداد / فائض",
-    description: "فائض ميزانية حملة الاستطلاع الميداني",
-    ref: "REFUND-SURVEY-3901",
-    paymentMethod: "المحفظة الداخلية",
-    paymentSub: "",
-    paymentIcon: "wallet",
-    amount: "+$650.00",
-    amountSar: "+2,437.50 ر.س",
-    amountUp: true,
-    status: "verified",
-  },
-  {
-    id: "TXN-2026-08932",
-    dateISO: "2026-02-15",
-    time: "17:50:22 مكة",
-    type: "deposit",
-    typeLabel: "إيداع رصيد",
-    description: "إيداع بطاقة ائتمانية مباشرة",
-    ref: "GATEWAY : STRIPE-CARD-9921",
-    paymentMethod: "Mastercard",
-    paymentSub: "(**4431)",
-    paymentIcon: "card",
-    amount: "+$3,000.00",
-    amountSar: "+11,250.00 ر.س",
-    amountUp: true,
-    status: "verified",
-  },
-  {
-    id: "TXN-2026-08931",
-    dateISO: "2026-02-10",
-    time: "14:00:00 مكة",
-    type: "audit",
-    typeLabel: "رسوم فحص",
-    description: "فحص وتوثيق المحتوى الإعلاني الجديد",
-    ref: "SHARIA-AUDIT-BOARD-12",
-    paymentMethod: "المحفظة الداخلية",
-    paymentSub: "",
-    paymentIcon: "wallet",
-    amount: "-$150.00",
-    amountSar: "-562.50 ر.س",
-    amountUp: false,
-    status: "verified",
-  },
-  {
-    id: "TXN-2026-08930",
-    dateISO: "2026-02-01",
-    time: "11:30:00 مكة",
-    type: "adSpend",
-    typeLabel: "خصم ميزانية",
-    description: "حملة التسويق عبر الشبكات الاجتماعية",
-    ref: "CMP-SOCIAL-BOOST-Q1",
-    paymentMethod: "المحفظة الداخلية",
-    paymentSub: "",
-    paymentIcon: "wallet",
-    amount: "-$4,500.00",
-    amountSar: "-16,875.00 ر.س",
-    amountUp: false,
-    status: "verified",
-  },
-];
 
 // ─── إعدادات الألوان والشارات ──────────────────────────────────
 const TYPE_CONFIG = {
@@ -245,6 +47,12 @@ const TYPE_CONFIG = {
     border: "rgba(255,255,255,0.15)",
     icon: MdOutlineCheckCircle,
   },
+  unknown: {
+    bg: "rgba(255,255,255,0.06)",
+    text: "#CCCCCC",
+    border: "rgba(255,255,255,0.15)",
+    icon: MdOutlineSync,
+  },
 };
 
 const STATUS_CONFIG = {
@@ -271,6 +79,12 @@ const STATUS_CONFIG = {
     bg: "rgba(154,154,154,0.1)",
     border: "rgba(154,154,154,0.2)",
     defaultLabel: "أُلغيت العملية",
+  },
+  unknown: {
+    color: "#9A9A9A",
+    bg: "rgba(154,154,154,0.1)",
+    border: "rgba(154,154,154,0.2)",
+    defaultLabel: "غير محددة",
   },
 };
 
@@ -301,7 +115,7 @@ function PaymentIcon({ type, dark }) {
 
 // ─── المكوّن الرئيسي ──────────────────────────────────────────
 export default function TransactionList({
-  transactions = MOCK_TRANSACTIONS,
+  transactions = [],
   t = (key) => key,
   dark = true,
   isRtl = true,
@@ -890,9 +704,9 @@ export default function TransactionList({
               )}
               {paginatedTransactions.map((tx) => {
                 const typeCfg =
-                  TYPE_CONFIG[tx.type] || TYPE_CONFIG.deposit;
+                  TYPE_CONFIG[tx.type] || TYPE_CONFIG.unknown;
                 const statusCfg =
-                  STATUS_CONFIG[tx.status] || STATUS_CONFIG.pending;
+                  STATUS_CONFIG[tx.status] || STATUS_CONFIG.unknown;
                 const TypeIcon = typeCfg.icon;
 
                 return (
@@ -929,9 +743,9 @@ export default function TransactionList({
                         className={`font-medium text-xs ${dark ? "text-white" : "text-[#111]"
                           }`}
                       >
-                        {dateFormatter.format(
-                          new Date(`${tx.dateISO}T00:00:00`)
-                        )}
+                        {tx.dateISO && !Number.isNaN(new Date(`${tx.dateISO}T00:00:00`).valueOf())
+                          ? dateFormatter.format(new Date(`${tx.dateISO}T00:00:00`))
+                          : "—"}
                       </div>
                       <div className="text-[0.6rem] text-[#666] mt-0.5">
                         {tx.time}
@@ -991,9 +805,9 @@ export default function TransactionList({
                       <div className={`font-bold text-sm ${dark ? "text-[#FFB800]" : "text-[#8A6100]"}`}>
                         {tx.amount}
                       </div>
-                      <div className="text-[0.6rem] text-[#666] mt-0.5">
-                        {tx.amountSar}
-                      </div>
+                      {tx.amountSar && (
+                        <div className="text-[0.6rem] text-[#666] mt-0.5">{tx.amountSar}</div>
+                      )}
                     </td>
 
                     {/* الحالة */}
@@ -1029,15 +843,6 @@ export default function TransactionList({
                             }`}
                         >
                           <MdRemoveRedEye size={13} />
-                        </button>
-                        <button
-                          title={t("transactions.printInvoice")}
-                          className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${dark
-                            ? "bg-[#1A1A1A] border-[#2A2A2A] text-[#888] hover:text-white"
-                            : "bg-[#F3F4F6] border-[#E5E5E5] text-[#666] hover:text-[#111]"
-                            }`}
-                        >
-                          <MdOutlineReceiptLong size={13} />
                         </button>
                       </div>
                     </td>
@@ -1111,29 +916,6 @@ export default function TransactionList({
         </div>
       </div>
 
-      {/* ─── شريط التدقيق الشرعي ─────────────────────────── */}
-      <div
-        className={`border rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-2 text-[0.65rem] ${dark
-          ? "bg-[#121212] border-[#1E2E2B]"
-          : "bg-[#F4FBF9] border-[#D1EBE5]"
-          }`}
-      >
-        <div className="flex items-center gap-2 text-[#2A9D8F]">
-          <MdOutlineVerifiedUser size={15} className="flex-shrink-0" />
-          <span>
-            <strong
-              className={`font-semibold ${dark ? "text-white" : "text-[#111]"
-                }`}
-            >
-              {t("transactions.auditTitle")}
-            </strong>{" "}
-            {t("transactions.auditDescription")}
-          </span>
-        </div>
-        <div className="font-mono text-[#555] text-[0.6rem]">
-          {t("transactions.auditHash")}
-        </div>
-      </div>
     </div>
   );
 }
