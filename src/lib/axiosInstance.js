@@ -1,148 +1,195 @@
 import axios from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://platform.apps.taqat.academy";
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+const developmentDefault =
+  process.env.NODE_ENV === "development" ? "http://localhost:5000" : "";
+
+function normalizeApiBaseUrl(value) {
+  if (!value) return "";
+
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error("NEXT_PUBLIC_API_URL must be an absolute HTTP(S) origin.");
+  }
+
+  if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) {
+    throw new Error("NEXT_PUBLIC_API_URL must be an HTTP(S) origin without credentials.");
+  }
+  if (url.pathname !== "/" || url.search || url.hash) {
+    throw new Error("NEXT_PUBLIC_API_URL must contain only the Main Backend origin, without an API path.");
+  }
+
+  return url.origin.replace(/\/$/, "");
+}
+
+export const API_BASE_URL = normalizeApiBaseUrl(configuredApiUrl || developmentDefault);
+export const API_BASE_URL_CONFIGURED = Boolean(API_BASE_URL);
+export const AI_REQUEST_TIMEOUT_MS = 100_000;
 
 const axiosInstance = axios.create({
-  baseURL: BASE_URL,
+  baseURL: API_BASE_URL || undefined,
+  timeout: 30_000,
+  headers: { Accept: "application/json" },
 });
 
 // ─── Auth Helpers ─────────────────────────────────────────────────────────────
 
-export function getToken() {
-  if (typeof window !== "undefined") {
-    return getCookie("authToken") || localStorage.getItem("token") || localStorage.getItem("authToken");
+function getJwtExpiration(token) {
+  try {
+    const payloadPart = token.split(".")[1];
+    if (!payloadPart || typeof atob !== "function") return null;
+
+    const base64 = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
+    const binary = atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, "="));
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    const payload = JSON.parse(new TextDecoder().decode(bytes));
+    return Number.isFinite(payload?.exp) ? payload.exp * 1000 : null;
+  } catch {
+    return null;
   }
-  return null;
+}
+
+export function getToken() {
+  if (typeof window === "undefined") return null;
+
+  const token =
+    getCookie("authToken") ||
+    localStorage.getItem("authToken") ||
+    localStorage.getItem("token");
+
+  if (!token) return null;
+
+  const expiresAt = getJwtExpiration(token);
+  if (expiresAt !== null && expiresAt <= Date.now()) {
+    clearAuthData();
+    return null;
+  }
+
+  return token;
 }
 
 export function saveAuthData(token, user) {
-  if (typeof window !== "undefined") {
-    setCookie("authToken", token);
-    setCookie("user", JSON.stringify(user));
-    localStorage.setItem("token", token);
-    localStorage.setItem("authToken", token);
-    localStorage.setItem("user", JSON.stringify(user));
-  }
+  if (typeof window === "undefined" || !token) return;
+
+  const expiresAt = getJwtExpiration(token);
+  const maxAge = expiresAt
+    ? Math.max(0, Math.floor((expiresAt - Date.now()) / 1000))
+    : 7 * 24 * 60 * 60;
+
+  setCookie("authToken", token, maxAge);
+  // The cookie is kept for the page gate. Remove the legacy duplicate JWT
+  // entries from localStorage while retaining a fallback for old sessions.
+  deleteCookie("user");
+  localStorage.removeItem("token");
+  localStorage.removeItem("authToken");
+  localStorage.setItem("user", JSON.stringify(user || {}));
 }
 
 export function getSavedUser() {
-  if (typeof window !== "undefined") {
+  if (typeof window === "undefined") return null;
+
+  for (const raw of [localStorage.getItem("user"), getCookie("user")]) {
+    if (!raw || raw === "undefined" || raw === "null") continue;
     try {
-      const cookieRaw = getCookie("user");
-      if (cookieRaw && cookieRaw !== "undefined" && cookieRaw !== "null") {
-        let parsed = JSON.parse(cookieRaw);
-        if (typeof parsed === "string") {
-          parsed = JSON.parse(parsed);
-        }
-        if (parsed && typeof parsed === "object") return parsed;
-      }
-      const localRaw = localStorage.getItem("user");
-      if (localRaw && localRaw !== "undefined" && localRaw !== "null") {
-        let parsed = JSON.parse(localRaw);
-        if (typeof parsed === "string") {
-          parsed = JSON.parse(parsed);
-        }
-        if (parsed && typeof parsed === "object") return parsed;
-      }
+      const parsed = JSON.parse(raw);
+      const user = typeof parsed === "string" ? JSON.parse(parsed) : parsed;
+      if (user && typeof user === "object") return user;
     } catch {
-      return null;
+      // A malformed cached profile is ignored; the next protected layout can refetch it.
     }
   }
   return null;
 }
 
 export function clearAuthData() {
-  if (typeof window !== "undefined") {
-    deleteCookie("authToken");
-    deleteCookie("user");
-    localStorage.removeItem("token");
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
-  }
+  if (typeof window === "undefined") return;
+
+  deleteCookie("authToken");
+  deleteCookie("user");
+  localStorage.removeItem("token");
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("user");
 }
 
 function getCookie(name) {
   if (typeof document === "undefined") return null;
-  const value = document.cookie
+  const cookie = document.cookie
     .split("; ")
-    .find((cookie) => cookie.startsWith(`${name}=`))
-    ?.split("=")
-    .slice(1)
-    .join("=");
-  return value ? decodeURIComponent(value) : null;
+    .find((item) => item.startsWith(`${name}=`));
+  if (!cookie) return null;
+
+  const value = cookie.slice(name.length + 1);
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
 }
 
-function setCookie(name, value) {
+function setCookie(name, value, maxAge) {
   if (typeof document === "undefined") return;
-  document.cookie = `${name}=${encodeURIComponent(
-    typeof value === "string" ? value : JSON.stringify(value),
-  )}; Path=/; Max-Age=604800; SameSite=Lax`;
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`;
 }
 
 function deleteCookie(name) {
   if (typeof document === "undefined") return;
-  document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax`;
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax${secure}`;
 }
 
 export function isAuthenticated() {
-  return getToken() !== null;
+  return Boolean(getToken());
 }
 
-// ─── Request Interceptor (Attach Token) ───────────────────────────────────────
+function configurationError() {
+  const error = new Error(
+    "The Main Backend URL is not configured. Set NEXT_PUBLIC_API_URL to the backend origin before building the app."
+  );
+  error.code = "API_CONFIGURATION_ERROR";
+  return error;
+}
 
+// Attach the current JWT to all authenticated requests.
 axiosInstance.interceptors.request.use(
   (config) => {
+    if (!API_BASE_URL_CONFIGURED) throw configurationError();
+
     const token = getToken();
     if (token) {
+      config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
-// ─── Response Interceptor (Redirect on Unauth) ───────────────────────────────
-
+// Clear expired/invalid sessions and return the user to the localized login page.
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    const isHtmlResponse =
-      typeof error.response?.data === "string" &&
-      error.response.data.includes("<html");
-
-    if (!error.config?._suppressInterceptorErrorLog && error.response?.data && !isHtmlResponse) {
-      console.error("[Axios Response Error]:", error.config?.url, error.response.status, error.response.data);
-    } else if (isHtmlResponse) {
-      console.warn(`[Axios Response Warning]: ${error.config?.url} returned ${error.response.status} HTML response`);
-    }
-
-    const skipRedirect = error.config?._skipAuthRedirect;
-    const isLoginRequest =
-      error.config &&
-      error.config.url &&
-      error.config.url.includes("/api/v1/auth/login");
-
+    const isLoginRequest = error.config?.url?.includes("/api/v1/auth/login");
     if (
-      !skipRedirect &&
+      error.response?.status === 401 &&
+      !error.config?._skipAuthRedirect &&
       !isLoginRequest &&
-      error.response &&
-      error.response.status === 401
+      typeof window !== "undefined"
     ) {
-      if (typeof window !== "undefined") {
-        clearAuthData();
-        const locale = document.documentElement.lang || "ar";
-        window.location.href = `/${locale}/login`;
-      }
+      clearAuthData();
+      const locale = document.documentElement.lang || "ar";
+      window.location.assign(`/${locale}/login`);
     }
     return Promise.reject(error);
   }
 );
 
-// ─── Error Handler ────────────────────────────────────────────────────────────
-
 function parseErrorResponseData(data) {
   if (data && typeof data === "object") return data;
   if (typeof data !== "string") return {};
+  if (/^\s*(?:<!doctype html|<html)/i.test(data)) return {};
 
   try {
     const parsed = JSON.parse(data);
@@ -153,47 +200,48 @@ function parseErrorResponseData(data) {
 }
 
 export function handleError(error) {
-  const isHtml =
-    typeof error.response?.data === "string" &&
-    error.response.data.includes("<html");
-  const responseData = isHtml ? {} : parseErrorResponseData(error.response?.data);
-
-  if (error.response?.data && !isHtml) {
-    console.error(
-      "API Error Response Data:",
-      JSON.stringify(responseData, null, 2)
-    );
-  }
+  const responseData = parseErrorResponseData(error?.response?.data);
   const validationMessages = Array.isArray(responseData.errors)
     ? responseData.errors.map((item) => item?.message).filter(Boolean)
     : [];
 
+  const status = error?.response?.status;
   let message =
     validationMessages.join("\n") ||
-    (typeof responseData.message === "string" ? responseData.message : null);
+    (typeof responseData.message === "string" ? responseData.message : "");
 
-  if (!message) {
-    if (error.response?.status === 404) {
-      message = "الخدمة المطلوبة غير متوفرة حالياً على الخادم (404 Not Found)";
-    } else if (error.response?.status === 403) {
-      message = "لا يملك هذا الحساب الصلاحية اللازمة لتنفيذ هذا الإجراء.";
-    } else if (typeof error.response?.data === "string" && error.response.data.includes("<html")) {
-      message = "حدث خطأ غير متوقع في الخادم";
-    } else {
-      message = error.message || "حدث خطأ في الطلب";
-    }
+  if (!message && error?.code === "API_CONFIGURATION_ERROR") {
+    message = error.message;
+  } else if (!message && ["ECONNABORTED", "ETIMEDOUT"].includes(error?.code)) {
+    message = "The request timed out. Please try again.";
+  } else if (!message && !error?.response) {
+    message = "Could not reach the Main Backend. Check your connection and try again.";
+  } else if (!message && status === 401) {
+    message = "Your session has expired. Please sign in again.";
+  } else if (!message && status === 403) {
+    message = "This account is not allowed to perform this action.";
+  } else if (!message && status === 404) {
+    message = "The requested service is not available.";
+  } else if (!message && status >= 500) {
+    message = "The Main Backend could not complete the request. Please try again.";
+  } else if (!message) {
+    message = error?.message || "The request failed.";
   }
 
-  const err = new Error(message);
-  err.code =
+  const normalized = new Error(message);
+  normalized.code =
     responseData.code ||
-    (error.response?.status === 403 ? "FORBIDDEN" : undefined) ||
-    (error.response ? undefined : "NETWORK_ERROR");
-  err.status = error.response?.status;
-  err.response = error.response;
-  err.details = responseData?.details;
-  err.data = responseData;
-  throw err;
+    (status === 401 ? "UNAUTHORIZED" : undefined) ||
+    (status === 403 ? "FORBIDDEN" : undefined) ||
+    (error?.code === "ECONNABORTED" || error?.code === "ETIMEDOUT"
+      ? "TIMEOUT"
+      : undefined) ||
+    (!error?.response ? "NETWORK_ERROR" : undefined);
+  normalized.status = status;
+  normalized.response = error?.response;
+  normalized.details = responseData.details;
+  normalized.data = responseData;
+  throw normalized;
 }
 
 export default axiosInstance;
