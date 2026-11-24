@@ -2,5 +2,5 @@ export {
   saveDraft,
   autoSaveDraft,
   submitDraft,
-  createCampaign,
 } from "@/services/drafts";
+export { createCampaign } from "@/services/campaignApi";

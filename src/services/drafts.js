@@ -1,268 +1,79 @@
-/**
- * src/services/drafts.js
- *
- * خدمات المسودات والتفاعل مع الـ API وقاعدة البيانات
- * مع دعم Fallback محلي لتجنب توقف التفاعل عند حدوث 404 من السيرفر.
- */
-
 import axiosInstance from "@/lib/axiosInstance";
+import { toCampaignFormData } from "@/services/campaignApi";
 
-const STORAGE_KEY = "ppv_local_drafts";
-
-// ─── Local Storage Helpers ────────────────────────────────────────────────────
-
-export function getLocalDrafts() {
-  try {
-    const raw1 = localStorage.getItem(STORAGE_KEY);
-    const raw2 = localStorage.getItem("ppv_drafts");
-    const d1 = raw1 ? JSON.parse(raw1) : [];
-    const d2 = raw2 ? JSON.parse(raw2) : [];
-    // دمج وتصفية المكررات
-    const map = new Map();
-    [...d1, ...d2].forEach((item) => {
-      const id = item._id || item.id;
-      if (id && !map.has(id)) map.set(id, item);
-    });
-    return Array.from(map.values());
-  } catch {
-    return [];
+const unwrapEnvelope = (response) => {
+  const body = response?.data;
+  if (body?.success !== true) {
+    throw new Error(body?.message || "The draft request did not succeed.");
   }
-}
+  return body;
+};
 
-export function saveLocalDraft(data) {
-  const drafts = getLocalDrafts();
-  const newDraft = {
-    _id: `local_${Date.now()}`,
-    ...data,
-    status: "DRAFT",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isLocal: true,
-  };
-  drafts.unshift(newDraft);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(drafts));
-  return newDraft;
-}
+const unwrapDraft = (body) => {
+  const draft = body.draft ?? body.data?.draft ?? body.data;
+  if (!draft || typeof draft !== "object" || !(draft._id || draft.id)) {
+    throw new Error(body.message || "The draft response did not include a valid draft.");
+  }
+  return draft;
+};
 
-export function updateLocalDraft(draftId, data) {
-  const drafts = getLocalDrafts();
-  const idx = drafts.findIndex((d) => d._id === draftId || d.id === draftId);
-  if (idx === -1) return null;
-  drafts[idx] = { ...drafts[idx], ...data, updatedAt: new Date().toISOString() };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(drafts));
-  return drafts[idx];
-}
-
-export function removeLocalDraft(draftId) {
-  const drafts = getLocalDrafts();
-  const filtered = drafts.filter((d) => d._id !== draftId && d.id !== draftId);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
-}
-
-
-
-// ─── GET Active Drafts ────────────────────────────────────────────────────────
 export async function getDrafts(params = {}) {
-  let apiCampaigns = [];
-  try {
-    let response;
-    try {
-      response = await axiosInstance.get("/api/v1/campaigns/drafts", { params });
-    } catch {
-      response = await axiosInstance.get("/api/v1/campaigns", {
-        params: {
-          status: "DRAFT",
-          limit: 50,
-          sortBy: "createdAt",
-          sortOrder: "desc",
-          ...params,
-        },
-      });
-    }
-    const resData = response?.data;
-    const d = resData?.data || resData;
-    apiCampaigns =
-      d?.drafts ||
-      d?.campaigns ||
-      resData?.drafts ||
-      resData?.campaigns ||
-      (Array.isArray(d) ? d : Array.isArray(resData) ? resData : []);
-  } catch (error) {
-    console.warn("API getDrafts Error, loading local drafts fallback:", error.message);
-  }
-
-  const local = getLocalDrafts().filter((d) => d.status !== "EXPIRED");
-  const existingIds = new Set(apiCampaigns.map((c) => c._id || c.id));
-  const merged = [
-    ...local.filter((l) => !existingIds.has(l._id) && !existingIds.has(l.id)),
-    ...apiCampaigns,
-  ];
-
-  return { campaigns: merged, drafts: merged };
+  const response = await axiosInstance.get("/api/v1/campaigns/drafts", { params });
+  return response.data;
 }
 
-// ─── GET Expired Drafts ───────────────────────────────────────────────────────
 export async function getExpiredDrafts(params = {}) {
-  let apiExpired = [];
-  try {
-    const response = await axiosInstance.get("/api/v1/campaigns/drafts/expired", { params });
-    const resData = response?.data;
-    apiExpired = resData?.drafts || resData?.data?.drafts || (Array.isArray(resData?.data) ? resData.data : []);
-  } catch (error) {
-    console.warn("API getExpiredDrafts Error:", error.message);
-  }
-
-  const localExpired = getLocalDrafts().filter(
-    (d) => d.status === "EXPIRED"
-  );
-  const existingIds = new Set(apiExpired.map((c) => c._id || c.id));
-  const merged = [
-    ...localExpired.filter((l) => !existingIds.has(l._id || l.id)),
-    ...apiExpired,
-  ];
-
-  return { drafts: merged, campaigns: merged };
+  const response = await axiosInstance.get("/api/v1/campaigns/drafts/expired", { params });
+  return response.data;
 }
 
-// ─── GET Draft By ID ──────────────────────────────────────────────────────────
 export async function getDraftById(draftId) {
-  const local = getLocalDrafts().find(
-    (d) => d._id === draftId || d.id === draftId
+  const response = await axiosInstance.get(`/api/v1/campaigns/drafts/${encodeURIComponent(draftId)}`);
+  const body = response.data;
+  if (body?.success !== true) {
+    throw new Error(body?.message || "The draft response is invalid.");
+  }
+  const draft = unwrapDraft(body);
+  return { ...body, draft };
+}
+
+export async function saveDraft(data, assets = {}) {
+  const response = await axiosInstance.post(
+    "/api/v1/campaigns/drafts",
+    toCampaignFormData(data, assets),
   );
-
-  if (local) return { draft: local };
-
-  try {
-    const response = await axiosInstance.get(
-      `/api/v1/campaigns/drafts/${draftId}`
-    );
-    const resData = response?.data;
-    const d = resData?.data || resData;
-    return { draft: d?.draft || d?.campaign || d };
-  } catch (error) {
-    try {
-      const response2 = await axiosInstance.get(`/api/v1/campaigns/${draftId}`);
-      const resData2 = response2?.data;
-      const d2 = resData2?.data || resData2;
-      return { draft: d2?.campaign || d2?.draft || d2 };
-    } catch {
-      if (local) return { draft: local };
-      throw error;
-    }
-  }
+  const body = unwrapEnvelope(response);
+  const draft = unwrapDraft(body);
+  return { ...body, draft };
 }
 
-// ─── SAVE New Draft ───────────────────────────────────────────────────────────
-export async function saveDraft(data) {
-  try {
-    const response = await axiosInstance.post(
-      "/api/v1/campaigns/drafts",
-      data
-    );
-    return response.data;
-  } catch (error) {
-    console.warn(
-      "API saveDraft error, fallback to local storage:",
-      error.message
-    );
-
-    const localDraft = saveLocalDraft(data);
-
-    return {
-      success: "true",
-      message: "تم حفظ المسودة بنجاح",
-      data: { draft: localDraft },
-    };
-  }
+export async function autoSaveDraft(draftId, data, assets = {}) {
+  const response = await axiosInstance.patch(
+    `/api/v1/campaigns/drafts/${encodeURIComponent(draftId)}/auto-save`,
+    toCampaignFormData(data, assets),
+  );
+  const body = unwrapEnvelope(response);
+  const draft = unwrapDraft(body);
+  return { ...body, draft };
 }
 
-// ─── AUTO-SAVE Draft ──────────────────────────────────────────────────────────
-export async function autoSaveDraft(draftId, data) {
-  try {
-    const response = await axiosInstance.patch(
-      `/api/v1/campaigns/drafts/${draftId}/auto-save`,
-      data
-    );
-    return response.data;
-  } catch (error) {
-    console.warn(
-      "API autoSaveDraft error, fallback to local storage:",
-      error.message
-    );
-
-    const updated = updateLocalDraft(draftId, data);
-
-    return {
-      success: "true",
-      message: "تم حفظ التعديلات تلقائياً",
-      data: { draft: updated || { _id: draftId, ...data } },
-    };
+export async function submitDraft(draftId, data = {}, assets = {}) {
+  if (!data?.halalDeclaration || typeof data.halalDeclaration !== "object") {
+    throw new Error("A completed halal declaration is required to submit the campaign draft.");
   }
+  const response = await axiosInstance.post(
+    `/api/v1/campaigns/drafts/${encodeURIComponent(draftId)}/submit`,
+    toCampaignFormData(data, assets),
+  );
+  const body = unwrapEnvelope(response);
+  const campaign = body.campaign ?? body.data?.campaign;
+  if (!campaign || typeof campaign !== "object") {
+    throw new Error(body.message || "The draft submission response did not include a campaign.");
+  }
+  return { ...body, campaign };
 }
 
-// ─── SUBMIT Draft ─────────────────────────────────────────────────────────────
-export async function submitDraft(draftId) {
-  try {
-    const response = await axiosInstance.post(
-      `/api/v1/campaigns/drafts/${draftId}/submit`
-    );
-
-    removeLocalDraft(draftId);
-    return response.data;
-  } catch (error) {
-    console.warn("API submitDraft error:", error.message);
-
-    removeLocalDraft(draftId);
-
-    return {
-      success: "true",
-      message: "تم إرسال الحملة للمراجعة بنجاح",
-    };
-  }
-}
-
-// ─── CREATE Campaign Directly ────────────────────────────────────────────────
-export async function createCampaign(formData) {
-  try {
-    const response = await axiosInstance.post(
-      "/api/v1/campaigns",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error) {
-    console.warn("API createCampaign error:", error.message);
-
-    return {
-      success: "true",
-      message: "تم إرسال الحملة بنجاح",
-    };
-  }
-}
-
-// ─── DELETE Draft ─────────────────────────────────────────────────────────────
 export async function deleteDraft(draftId) {
-  removeLocalDraft(draftId);
-
-  try {
-    const response = await axiosInstance.delete(
-      `/api/v1/campaigns/drafts/${draftId}`
-    );
-    return response.data;
-  } catch (error) {
-    console.warn(
-      "API deleteDraft error, draft removed locally:",
-      error.message
-    );
-
-    return {
-      success: "true",
-      message: "تم حذف المسودة",
-    };
-  }
+  const response = await axiosInstance.delete(`/api/v1/campaigns/drafts/${encodeURIComponent(draftId)}`);
+  return unwrapEnvelope(response);
 }

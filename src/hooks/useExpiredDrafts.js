@@ -82,10 +82,11 @@ export function useExpiredDrafts() {
     setError(null);
     try {
       const data = await getExpiredDrafts(search ? { search } : {});
-      const list = data?.campaigns || data?.drafts || (Array.isArray(data) ? data : null);
-      setRawDrafts(Array.isArray(list) ? list : []);
+      const list = data?.data?.drafts ?? data?.data?.campaigns ?? data?.campaigns ?? data?.drafts ?? (Array.isArray(data) ? data : null);
+      if (!Array.isArray(list)) throw new Error(data?.message || "The expired drafts response is invalid.");
+      setRawDrafts(list);
     } catch (err) {
-      console.warn("Expired Drafts API call failed:", err);
+      setError(err?.message || "تعذر تحميل المسودات منتهية الصلاحية");
       setRawDrafts([]);
     } finally {
       setLoading(false);
@@ -110,10 +111,10 @@ export function useExpiredDrafts() {
     setDeletingId(id);
     try {
       await deleteDraft(id);
+      setRawDrafts((prev) => prev.filter((draft) => (draft._id || draft.id) !== id));
     } catch (err) {
-      console.warn("Delete API failed, removing from local state:", err);
+      setError(err?.message || "تعذر حذف المسودة");
     } finally {
-      setRawDrafts((prev) => prev.filter((d) => d._id !== id));
       setDeletingId(null);
     }
   }, []);
