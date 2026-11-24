@@ -11,7 +11,8 @@ import {
   removeCampaignFavorite,
 } from "@/lib/creatorCampaignApi";
 import { getProfile } from "@/services/profile";
-import { getWalletBalance } from "@/services/wallet";
+import { getCreatorEarnings } from "@/services/wallet";
+import { API_BASE_URL } from "@/lib/axiosInstance";
 import { toast } from "@/components/ui/Toast";
 import {
   FiCompass,
@@ -168,8 +169,7 @@ function getProfileImageUrl(profilePicture) {
     return null;
   }
   if (profilePicture.startsWith("http")) return profilePicture;
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://payperview-platform.onrender.com";
-  return `${baseUrl.replace(/\/$/, "")}/${profilePicture.replace(/^\//, "")}`;
+  return `${API_BASE_URL}/${profilePicture.replace(/^\//, "")}`;
 }
 
 export default function CreatorDashboard({ locale: localeOverride }) {
@@ -310,7 +310,7 @@ export default function CreatorDashboard({ locale: localeOverride }) {
     const [profileResult, walletResult, applicationsResult, pendingResult, acceptedResult] =
       await Promise.allSettled([
         getProfile(),
-        getWalletBalance(),
+        getCreatorEarnings(),
         getMyCampaignApplications({ page: 1, perPage: 5 }),
         getMyCampaignApplications({ status: "PENDING", page: 1, perPage: 1 }),
         getMyCampaignApplications({ status: "ACCEPTED", page: 1, perPage: 1 }),
@@ -329,12 +329,11 @@ export default function CreatorDashboard({ locale: localeOverride }) {
     if (walletResult.status === "fulfilled") {
       try {
         const walletData = getResponseData(walletResult.value, t("errors.fetchData"));
-        const hasBalance =
-          walletData?.balance !== null &&
-          walletData?.balance !== undefined &&
-          Number.isFinite(Number(walletData.balance));
-        setWallet(hasBalance ? walletData : null);
-        if (!hasBalance) {
+        const hasEarningsSummary =
+          Number.isFinite(Number(walletData?.availableBalance)) &&
+          Number.isFinite(Number(walletData?.totalEarnings));
+        setWallet(hasEarningsSummary ? walletData : null);
+        if (!hasEarningsSummary) {
           setWalletError(t("errors.invalidWalletBalance"));
         }
       } catch (error) {

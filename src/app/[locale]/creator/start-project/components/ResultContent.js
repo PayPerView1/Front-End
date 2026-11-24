@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useLocale } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import PageLoader from "@/components/PageLoader";
-import { mockCampaigns } from "./campaignsData";
 import { getSubmission } from "./submissionsApi";
 import ReceivedView from "./ReceivedView";
 import ReviewView from "./ReviewView";
@@ -15,32 +14,15 @@ import ApprovedView from "./ApprovedView";
 export default function ResultContent() {
   const locale = useLocale();
   const { isDark } = useTheme();
-  const { campaignId } = useParams();
   const searchParams = useSearchParams();
   const submissionId = searchParams.get("submissionId");
-  const mockStatus = searchParams.get("status"); // للتجربة فقط
 
   const [submission, setSubmission] = useState(null);
   const [error, setError] = useState(false);
   const pollTimerRef = useRef(null);
 
-  const campaign = mockCampaigns.find((c) => c.id === campaignId);
-
   useEffect(() => {
-    if (!submissionId) {
-      // إذا لم يكن هناك submissionId وكان mockStatus موجوداً للتجربة
-      if (mockStatus) {
-        setSubmission({
-          id: "mock",
-          displayStatus: mockStatus.toUpperCase(),
-          status: mockStatus.toUpperCase(),
-          platform: "TIKTOK",
-          link: "https://www.tiktok.com/@example/video/1234567890",
-          aiScore: 96,
-        });
-      }
-      return;
-    }
+    if (!submissionId) return;
 
     let isMounted = true;
     let pollCount = 0;
@@ -48,7 +30,7 @@ export default function ResultContent() {
 
     const fetchCurrentSubmission = async () => {
       try {
-        const data = await getSubmission(submissionId, mockStatus);
+        const data = await getSubmission(submissionId);
         if (!isMounted) return;
         setSubmission(data);
 
@@ -68,11 +50,11 @@ export default function ResultContent() {
       isMounted = false;
       if (pollTimerRef.current) clearTimeout(pollTimerRef.current);
     };
-  }, [submissionId, mockStatus]);
+  }, [submissionId]);
 
   const page = isDark ? "bg-[#050505] text-gray-100" : "bg-[#f4f6f5] text-[#191c1d]";
 
-  if (error) {
+  if (error || !submissionId) {
     return (
       <div className={`min-h-screen p-6 text-sm text-red-400 font-tajawal ${page}`}>
         تعذر تحميل حالة التسليم
@@ -82,8 +64,8 @@ export default function ResultContent() {
 
   if (!submission) return <PageLoader />;
 
-  // §2: استخدام displayStatus لتحديد الشاشة المناسبة (مع دعم mockStatus وstatus كـ fallback)
-  const statusKey = (mockStatus || submission.displayStatus || submission.status || "").toUpperCase();
+  // The backend record is authoritative; AI scores are advisory and never change this lifecycle state.
+  const statusKey = String(submission.displayStatus || submission.status || "").toUpperCase();
 
   const views = {
     APPROVED: ApprovedView,
@@ -96,22 +78,20 @@ export default function ResultContent() {
   };
   const View = views[statusKey] || ReceivedView;
 
-  // توفير بيانات الحملة (من mockCampaigns أو من كائن submission.campaign القادم من الـ API)
-  const campaignData = campaign || {
-    id: submission.campaign?.id || campaignId,
-    title: submission.campaign?.name || "حملة إعلانية",
-    company: submission.campaign?.brand?.name || "المعلن",
-    image: submission.campaign?.brand?.logo || "/images/parthiom.webp",
-    hashtags: submission.hashtags || [],
-    account: submission.preview?.authorHandle || "@BrandAccount",
-  };
+  const campaignData = submission.campaign?.id || submission.campaign?.name ? {
+    id: submission.campaign.id,
+    title: submission.campaign.name || "",
+    company: submission.campaign.brand?.name || "",
+    image: submission.campaign.brand?.logo || "",
+    hashtags: Array.isArray(submission.hashtags) ? submission.hashtags : [],
+  } : null;
 
   // توحيد الحقول للتوافق التام مع الشاشات المشتركة
   const normalizedSubmission = {
     ...submission,
     link: submission.link || submission.postUrl || submission.canonicalUrl || "",
     platform: (submission.platform || "tiktok").toLowerCase(),
-    aiScore: submission.aiScore ?? 96,
+    aiScore: Number.isFinite(submission.aiScore) ? submission.aiScore : null,
     reference: submission.code || submission.id?.slice(-8)?.toUpperCase(),
   };
 

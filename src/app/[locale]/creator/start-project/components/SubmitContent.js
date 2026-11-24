@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Lightbulb } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
-import { mockCampaigns } from "./campaignsData";
 import { getSubmissionRequirements } from "./submissionsApi";
 import ProgressSteps from "./ProgressSteps";
 import VideoPreview from "./VideoPreview";
@@ -23,32 +22,50 @@ export default function SubmitContent() {
   const { isDark } = useTheme();
   const { campaignId } = useParams();
 
-  const mockCampaign = mockCampaigns.find((c) => c.id === campaignId);
   const [realCampaign, setRealCampaign] = useState(null);
+  const [requirementsLoading, setRequirementsLoading] = useState(true);
+  const [requirementsError, setRequirementsError] = useState("");
 
   useEffect(() => {
-    if (!campaignId || mockCampaign) return;
+    if (!campaignId) {
+      setRequirementsError(locale === "ar" ? "معرّف الحملة غير صالح." : "The campaign ID is invalid.");
+      setRequirementsLoading(false);
+      return;
+    }
+    let active = true;
     getSubmissionRequirements(campaignId)
       .then((data) => {
-        if (data) {
-          setRealCampaign({
-            id: data.campaignId,
-            code: data.code || data.campaignId?.slice(-8)?.toUpperCase(),
-            title: data.name,
-            account: data.requirements?.requiredMentions?.[0] || "",
-            hashtag: data.requirements?.requiredHashtags?.[0] || "",
-            hashtags: data.requirements?.requiredHashtags || [],
-            image: "/images/parthiom.webp",
-            duration: data.requirements?.durationRange
-              ? `${data.requirements.durationRange.min} - ${data.requirements.durationRange.max}`
-              : "30 - 60",
-          });
+        if (!active) return;
+        if (!data || typeof data !== "object" || !data.campaignId) {
+          throw new Error(locale === "ar" ? "لم يعثر الخادم على متطلبات هذه الحملة." : "The Main Backend did not return campaign requirements.");
         }
+        return data;
       })
-      .catch(() => {});
-  }, [campaignId, mockCampaign]);
+      .then((data) => {
+        if (!active || !data) return;
+        setRealCampaign({
+          id: data.campaignId,
+          code: data.code || data.campaignId.slice(-8).toUpperCase(),
+          title: data.name,
+          account: data.requirements?.requiredMentions?.[0] || "",
+          hashtag: data.requirements?.requiredHashtags?.[0] || "",
+          hashtags: data.requirements?.requiredHashtags || [],
+          image: data.coverImage || null,
+          duration: data.requirements?.durationRange
+            ? `${data.requirements.durationRange.min} - ${data.requirements.durationRange.max}`
+            : null,
+        });
+      })
+      .catch((error) => {
+        if (active) setRequirementsError(error?.message || (locale === "ar" ? "تعذر تحميل متطلبات الحملة." : "Could not load campaign requirements."));
+      })
+      .finally(() => {
+        if (active) setRequirementsLoading(false);
+      });
+    return () => { active = false; };
+  }, [campaignId, locale]);
 
-  const campaign = mockCampaign || realCampaign;
+  const campaign = realCampaign;
 
   // الرابط والمنصة بتجي من النموذج لمعاينة الفيديو
   const [draft, setDraft] = useState({ link: "", platform: null });
@@ -70,6 +87,28 @@ export default function SubmitContent() {
     primaryText: isDark ? "text-white" : "text-[#191c1d]",
     secondaryText: isDark ? "text-gray-400" : "text-[#5f6a66]",
   };
+
+  if (requirementsLoading || requirementsError || !campaign) {
+    return (
+      <div
+        className={`creator-responsive-page min-h-screen w-full p-3 sm:p-4 md:p-6 ${theme.page}`}
+        dir={locale === "ar" ? "rtl" : "ltr"}
+      >
+        <div className={`${theme.surface} mx-auto max-w-3xl rounded-2xl border p-6`}>
+          <h1 className={`text-xl font-black ${theme.primaryText}`}>{t("title")}</h1>
+          {requirementsLoading ? (
+            <p role="status" className={`mt-3 text-sm ${theme.secondaryText}`}>
+              {locale === "ar" ? "جارٍ تحميل متطلبات الحملة…" : "Loading campaign requirements…"}
+            </p>
+          ) : (
+            <p role="alert" className="mt-3 text-sm text-red-400">
+              {requirementsError || (locale === "ar" ? "متطلبات الحملة غير متاحة." : "Campaign requirements are unavailable.")}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

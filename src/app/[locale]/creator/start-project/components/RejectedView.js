@@ -1,37 +1,28 @@
 "use client";
 import SubmitForm from "./SubmitForm";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import {
   ClipboardCheck,
   AlertTriangle,
   CheckCircle2,
   XCircle,
-  Music,
-  Hash,
-  MonitorPlay,
-  AtSign,
 } from "lucide-react";
 import ResultShell from "./ResultShell";
+import AiResultCard from "./AiResultCard";
 
-const fixIcons = { audio: Music, hashtag: Hash };
-
-const passedChecks = [
-  { key: "videoSpecs", icon: MonitorPlay },
-  { key: "mainHashtag", icon: Hash },
-  { key: "mention", icon: AtSign },
-];
 
 export default function RejectedView({ submission, campaign }) {
   const t = useTranslations("startProject.rejected");
   const tc = useTranslations("startProject");
   const ts = useTranslations("startProject.submit");
+  const locale = useLocale();
   const { isDark } = useTheme();
 
-  const fixes = submission.requiredFixes || [];
-  const totalChecks = fixes.length + passedChecks.length;
-  const hashtags = campaign?.hashtags || (campaign ? [campaign.hashtag] : []);
-  const values = { tag: hashtags[0] || "", account: campaign?.account || "" };
+  const reviewChecks = Array.isArray(submission.checks) ? submission.checks : [];
+  const failedChecks = reviewChecks.filter((check) => check.status === "FAILED");
+  const passedChecks = reviewChecks.filter((check) => check.status === "PASSED");
+  const fixes = failedChecks.length ? failedChecks : (Array.isArray(submission.rejectionReasons) ? submission.rejectionReasons : []);
 
   const theme = {
     surface: isDark ? "bg-[#121617] border-[#1e2425]" : "bg-white border-[#e1e7e4]",
@@ -44,12 +35,8 @@ export default function RejectedView({ submission, campaign }) {
     secondaryText: isDark ? "text-gray-400" : "text-[#5f6a66]",
   };
 
-  const redBadge = isDark
-    ? "border-red-500/40 bg-red-500/10 text-red-300"
-    : "border-red-200 bg-red-50 text-red-700";
-  const greenBadge = isDark
-    ? "border-emerald-500/30 bg-emerald-500/10 text-#94D3C1"
-    : "border-emerald-200 bg-emerald-50 text-emerald-800";
+  const redBadge = isDark ? "border-red-500/40 bg-red-500/10 text-red-300" : "border-red-200 bg-red-50 text-red-700";
+  const greenBadge = isDark ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800";
 
   return (
     <ResultShell
@@ -67,7 +54,7 @@ export default function RejectedView({ submission, campaign }) {
           <div className="min-w-0">
             <p className={`text-[10px] ${theme.secondaryText}`}>{tc("result.campaignLabel")}</p>
             <p className={`text-sm font-bold truncate ${theme.primaryText}`}>
-              {campaign ? tc(`campaigns.${campaign.title}`) : submission.campaignId}
+              {campaign?.title || submission.campaignId || "—"}
             </p>
           </div>
           <span
@@ -86,14 +73,10 @@ export default function RejectedView({ submission, campaign }) {
             </span>
             <div>
               <p className={`text-sm font-bold ${theme.primaryText}`}>{t("reportTitle")}</p>
-              <p className={`text-[10px] ${theme.secondaryText}`}>
-                {t("reportSubtitle", { passed: passedChecks.length, total: totalChecks })}
-              </p>
+              <p className={`text-[10px] ${theme.secondaryText}`}>{locale === "ar" ? `${passedChecks.length} اجتاز · ${fixes.length} لم يجتز` : `${passedChecks.length} passed · ${fixes.length} failed`}</p>
             </div>
           </div>
-          <span className={`text-[10px] font-bold rounded-full border px-2.5 py-1 ${theme.inset} ${theme.secondaryText}`}>
-            {t("instant")}
-          </span>
+          <span className={`text-[10px] font-bold rounded-full border px-2.5 py-1 ${redBadge}`}>{submission.displayStatus || submission.status}</span>
         </div>
 
         {/* المطلوب تعديله */}
@@ -108,11 +91,10 @@ export default function RejectedView({ submission, campaign }) {
             </span>
           </div>
 
-          {fixes.map((fix, i) => {
-            const Icon = fixIcons[fix.key] || AlertTriangle;
+          {fixes.length === 0 ? <p className={`rounded-xl border p-3 text-xs ${theme.inset} ${theme.secondaryText}`}>{locale === "ar" ? "لم تُحفظ تفاصيل أسباب الرفض مع هذا السجل." : "No saved rejection check details are available for this record."}</p> : fixes.map((fix, i) => {
             return (
               <div
-                key={fix.key}
+                key={`${fix.code || fix.reasonCode || "reason"}-${i}`}
                 className={`flex items-start justify-between gap-3 rounded-xl border p-4 ${theme.danger}`}
               >
                 <div className="flex items-start gap-3 min-w-0">
@@ -121,14 +103,14 @@ export default function RejectedView({ submission, campaign }) {
                       isDark ? "bg-red-500/15 text-red-400" : "bg-red-100 text-red-600"
                     }`}
                   >
-                    <Icon size={15} />
+                    <AlertTriangle size={15} />
                   </span>
                   <div className="min-w-0">
                     <p className={`text-xs font-bold mb-1 ${theme.primaryText}`}>
-                      {i + 1}. {t(`fixes.${fix.key}.title`)}
+                      {i + 1}. {fix.code || fix.reasonCode || (locale === "ar" ? "سبب الرفض" : "Review finding")}
                     </p>
                     <p className={`text-[11px] leading-relaxed ${theme.secondaryText}`}>
-                      {t(`fixes.${fix.key}.desc`, values)}
+                      {fix.message || fix.reason || (locale === "ar" ? "راجع متطلبات الحملة وتعليقات المراجع." : "Review the campaign requirements and reviewer feedback.")}
                     </p>
                   </div>
                 </div>
@@ -143,31 +125,28 @@ export default function RejectedView({ submission, campaign }) {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className={`flex items-center gap-2 text-sm font-bold ${theme.primaryText}`}>
               <CheckCircle2 size={16} className="text-[#94D3C1]" />
-              {t("passedTitle", { count: passedChecks.length })}
+              {locale === "ar" ? `الفحوصات التي اجتازت (${passedChecks.length})` : `Passed checks (${passedChecks.length})`}
             </p>
             <span className={`text-[10px] font-bold rounded-full border px-2.5 py-1 ${greenBadge}`}>
-              {t("passedBadge", { count: passedChecks.length })}
+              {passedChecks.length}
             </span>
           </div>
 
-          {passedChecks.map(({ key, icon: Icon }) => (
+          {passedChecks.map((check, index) => (
             <div
-              key={key}
+              key={`${check.code || "check"}-${index}`}
               className={`flex items-center justify-between gap-3 rounded-xl border p-3 ${theme.inset}`}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${theme.iconBox}`}>
-                  <Icon size={15} />
+                  <CheckCircle2 size={15} />
                 </span>
                 <div className="min-w-0">
                   <p className={`flex flex-wrap items-center gap-2 text-xs font-bold ${theme.primaryText}`}>
-                    {t(`passed.${key}.title`)}
-                    <span className={`text-[9px] font-bold rounded-full border px-2 py-0.5 ${greenBadge}`}>
-                      {t(`passed.${key}.tag`)}
-                    </span>
+                    {check.code || (locale === "ar" ? "فحص" : "Check")}
                   </p>
                   <p className={`text-[10px] ${theme.secondaryText}`}>
-                    {t(`passed.${key}.desc`, values)}
+                    {check.message || (locale === "ar" ? "اجتاز الفحص." : "Check passed.")}
                   </p>
                 </div>
               </div>
@@ -177,7 +156,8 @@ export default function RejectedView({ submission, campaign }) {
         </div>
       </div>
 
-     <SubmitForm campaign={campaign} campaignId={submission.campaignId} />
+      <AiResultCard score={submission.aiScore} checks={submission.checks} />
+      <SubmitForm campaign={campaign} campaignId={submission.campaignId} />
     </ResultShell>
   );
 }
