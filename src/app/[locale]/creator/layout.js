@@ -10,7 +10,7 @@ import PageLoader from "@/components/PageLoader";
  * Creator layout - only allows users with role CLIPPER.
  * - No token → redirect to /login
  * - BRAND user → redirect to /advertiser/dashboard
- * - Unknown role → stay here (prevent redirect loop)
+ * - Only CLIPPER users are admitted; the backend remains the authorization boundary.
  */
 export default function CreatorLayout({ children }) {
   const router = useRouter();
@@ -49,8 +49,10 @@ export default function CreatorLayout({ children }) {
       const role = (user?.role || "").toUpperCase();
       if (role === "BRAND") {
         router.replace(`/${locale}/advertiser/dashboard`);
-      } else {
+      } else if (role === "CLIPPER") {
         setAllowed(true);
+      } else {
+        router.replace(`/${locale}`);
       }
     };
 

@@ -7,7 +7,7 @@ import { useTheme } from "@/context/ThemeContext";
 import PageLoader from "@/components/PageLoader";
 import { getProfile, updateProfile } from "@/services/profile";
 import { getCampaigns, getCampaignStatistics } from "@/services/campaign";
-import { getSavedUser, getToken, saveAuthData } from "@/lib/axiosInstance";
+import { API_BASE_URL, getSavedUser, getToken, saveAuthData } from "@/lib/axiosInstance";
 import {
     FiEdit2, FiCopy, FiShare2, FiSettings,
     FiTarget, FiMapPin, FiCalendar, FiGlobe, FiPlus,
@@ -31,8 +31,7 @@ function getUserName(user, fallback) {
 function getProfileImageUrl(pic) {
     if (!pic) return null;
     if (pic.startsWith("http")) return pic;
-    const base = process.env.NEXT_PUBLIC_API_URL || "https://platform.apps.taqat.academy";
-    return `${base.replace(/\/$/, "")}/${pic.replace(/^\//, "")}`;
+    return `${API_BASE_URL}/${pic.replace(/^\//, "")}`;
 }
 
 function formatDate(value, locale, options) {

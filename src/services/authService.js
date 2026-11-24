@@ -1,5 +1,9 @@
 import axios from "axios";
-import axiosInstance, { clearAuthData, saveAuthData } from "@/lib/axiosInstance";
+import axiosInstance, {
+  clearAuthData,
+  handleError,
+  saveAuthData,
+} from "@/lib/axiosInstance";
 
 // ─── Auth (Login / Logout) ───────────────────────────────────────────────────
 
@@ -61,6 +65,20 @@ export const logout = async () => {
     clearAuthData();
   }
 };
+
+/** Change the authenticated user's password. */
+export async function changePassword({ currentPassword, newPassword, confirmPassword }) {
+  try {
+    const response = await axiosInstance.patch("/api/v1/auth/change-password", {
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+}
 
 /**
  * Resend verification email to the given email address.
