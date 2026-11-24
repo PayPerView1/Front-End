@@ -20,7 +20,7 @@ import { createPortal } from "react-dom";
 import { AiOutlineStar } from "react-icons/ai";
 import { useLocale, useMessages } from "next-intl";
 import { getProfile, updateProfile } from "@/services/profile";
-import { getSavedUser } from "@/lib/axiosInstance";
+import { API_BASE_URL, getSavedUser } from "@/lib/axiosInstance";
 import api from "@/lib/axios";
 import { useAssistant } from "@/context/AssistantContext";
 import { useNotifications } from "@/context/NotificationsContext";
@@ -50,8 +50,7 @@ function getUserName(user) {
 function getProfileImageUrl(profilePicture) {
     if (!profilePicture) return null;
     if (profilePicture.startsWith("http")) return profilePicture;
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://payperview-platform.onrender.com";
-    return `${baseUrl.replace(/\/$/, "")}/${profilePicture.replace(/^\//, "")}`;
+    return `${API_BASE_URL}/${profilePicture.replace(/^\//, "")}`;
 }
 
 export default function ProfileContent() {

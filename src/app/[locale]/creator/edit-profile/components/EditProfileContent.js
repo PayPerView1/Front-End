@@ -10,6 +10,7 @@ import { useLocale, useTranslations } from "next-intl";
 import worldCountries from "world-countries";
 import Select from "react-select";
 import PageLoader from "@/components/PageLoader";
+import { API_BASE_URL } from "@/lib/axiosInstance";
 
 const interests = [
   { id: "LIFESTYLE", label: "نمط الحياة" },
@@ -460,7 +461,7 @@ export default function EditProfileContent() {
           user.profilePicture &&
           user.profilePicture !== "default-avatar.png"
         ) {
-          const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://platform.apps.taqat.academy";
+          const baseUrl = API_BASE_URL;
           const imageUrl = user.profilePicture.startsWith("http")
             ? user.profilePicture
             : `${baseUrl.replace(/\/$/, "")}/${user.profilePicture.replace(/^\//, "")}`;
