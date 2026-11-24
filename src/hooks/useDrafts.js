@@ -58,6 +58,7 @@ function mapDraft(apiDraft) {
   const { statusBadge, statusBadgeColor } = getStatusBadge(apiDraft.expiresAt);
 
   const dateVal = apiDraft.lastSavedAt || apiDraft.updatedAt || apiDraft.createdAt;
+  const sortDate = dateVal ? new Date(dateVal).getTime() : 0;
   const lastSaved = dateVal
     ? (() => {
         const diffMs  = Date.now() - new Date(dateVal).getTime();
@@ -81,6 +82,7 @@ function mapDraft(apiDraft) {
     progress:         calcProgress(apiDraft),
     tags:             [],
     expiresAt:        apiDraft.expiresAt,
+    sortDate:         Number.isFinite(sortDate) ? sortDate : 0,
   };
 }
 
@@ -100,16 +102,17 @@ export function useDrafts() {
     setError(null);
     try {
       const data = await getDrafts(search ? { search } : {});
-const list =
-  data?.campaigns ||
-  data?.drafts ||
-  (Array.isArray(data) ? data : []);
-
-setRawDrafts(list);
-} catch (err) {
-  console.warn("Drafts API call failed:", err);
-  setError("حدث خطأ أثناء جلب المسودات");
-  setRawDrafts([]);
+      const list =
+        data?.data?.drafts ??
+        data?.data?.campaigns ??
+        data?.campaigns ??
+        data?.drafts ??
+        (Array.isArray(data) ? data : null);
+      if (!Array.isArray(list)) throw new Error(data?.message || "The drafts response is invalid.");
+      setRawDrafts(list);
+    } catch (err) {
+      setError(err?.message || "تعذر تحميل المسودات");
+      setRawDrafts([]);
     } finally {
       setLoading(false);
     }
@@ -139,10 +142,11 @@ d.title?.toLowerCase().includes(searchQuery.trim().toLowerCase())
     setDeletingId(id);
     try {
       await deleteDraft(id);
+      setRawDrafts((prev) => prev.filter((draft) => (draft._id || draft.id) !== id));
     } catch (err) {
-      console.warn("Delete API failed, removing from local state:", err);
+      setError(err?.message || "تعذر حذف المسودة");
+      throw err;
     } finally {
-      setRawDrafts((prev) => prev.filter((d) => d._id !== id));
       setDeletingId(null);
     }
   }, []);

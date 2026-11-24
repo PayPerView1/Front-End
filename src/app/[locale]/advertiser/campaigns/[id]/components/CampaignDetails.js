@@ -1,12 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
 import { useLocale, useTranslations } from "next-intl";
 import { MdOutlineFileDownload, MdOutlineChevronRight, MdOutlineBarChart } from "react-icons/md";
 import { HiOutlineDocumentDuplicate } from "react-icons/hi";
 import { MdTrendingUp, MdTrendingDown } from "react-icons/md";
-import { exportCampaign } from "@/services/campaign";
+import { exportCampaign, getCampaignAiReview, getCampaignApplicantRanking } from "@/services/campaign";
 
 // ===== helpers =====
 function formatDate(dateStr, locale) {
@@ -74,6 +74,42 @@ export default function CampaignDetails({ campaign }) {
   const t = useTranslations("campaigns");
   const isRTL = locale === "ar";
   const [exporting, setExporting] = useState(false);
+  const campaignId = campaign._id || campaign.id;
+  const [aiReviewState, setAiReviewState] = useState(null);
+  const aiReviewLoading = aiReviewState?.campaignId !== campaignId;
+  const aiReview = aiReviewLoading ? null : aiReviewState.review;
+  const aiReviewError = aiReviewLoading ? "" : aiReviewState.error;
+  const [applicantRanking, setApplicantRanking] = useState(null);
+  const [applicantRankingLoading, setApplicantRankingLoading] = useState(false);
+  const [applicantRankingError, setApplicantRankingError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    getCampaignAiReview(campaignId)
+      .then((review) => { if (active) setAiReviewState({ campaignId, review, error: "" }); })
+      .catch((error) => {
+        if (active) setAiReviewState({
+          campaignId,
+          review: null,
+          error: error?.response?.data?.message || error?.message || "Campaign review is unavailable.",
+        });
+      });
+    return () => { active = false; };
+  }, [campaignId]);
+
+  const loadApplicantRanking = async () => {
+    if (applicantRankingLoading) return;
+    setApplicantRankingLoading(true);
+    setApplicantRankingError("");
+    try {
+      setApplicantRanking(await getCampaignApplicantRanking(campaign._id || campaign.id));
+    } catch (error) {
+      setApplicantRanking(null);
+      setApplicantRankingError(error?.response?.data?.message || error?.message || "Applicant ranking is unavailable.");
+    } finally {
+      setApplicantRankingLoading(false);
+    }
+  };
 
   const th = {
     bg: isDark ? "bg-[#0D0D0D]" : "bg-[#F0F2F5]",
@@ -242,6 +278,52 @@ export default function CampaignDetails({ campaign }) {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <section aria-labelledby="campaign-ai-review-title" className="rounded-xl p-4" style={{ border: `1px solid ${th.cardBorder}`, background: th.cardBg }}>
+          <h2 id="campaign-ai-review-title" className={`text-sm font-bold ${th.text}`}>{isRTL ? "نتيجة مراجعة الحملة" : "Campaign AI review"}</h2>
+          <p className={`mt-1 text-[11px] ${th.subText}`}>{isRTL ? "حالة الحملة المسجلة:" : "Recorded campaign status:"} <strong>{campaign.status || "—"}</strong></p>
+          {aiReviewLoading ? <p role="status" className={`mt-2 text-xs ${th.subText}`}>{isRTL ? "جارٍ تحميل نتيجة المراجعة…" : "Loading saved review…"}</p>
+            : aiReviewError ? <p role="alert" className="mt-2 text-xs text-red-500">{aiReviewError}</p>
+              : aiReview ? <div className="mt-2 space-y-2 text-xs">
+                <p className={th.text}>{isRTL ? "قرار المراجعة المسجل:" : "Saved AI review result:"} <strong>{aiReview.result || "—"}</strong></p>
+                {Number.isFinite(aiReview.score) && <p className={th.subText}>{isRTL ? "درجة المراجعة:" : "Review score:"} {aiReview.score}/100</p>}
+                {aiReview.feedback && <p className={`leading-relaxed ${th.subText}`}>{aiReview.feedback}</p>}
+                {aiReview.reviewedAt && <p className={`text-[10px] ${th.subText}`}>{isRTL ? "تاريخ المراجعة:" : "Reviewed:"} {formatDate(aiReview.reviewedAt, locale)}</p>}
+                <p className={`text-[10px] ${th.subText}`}>{isRTL ? "قرار المراجعة محفوظ في السجل ولا يتم تغييره من هذه الواجهة." : "This is the saved review record; this display does not change campaign status."}</p>
+              </div> : <p role="status" className={`mt-2 text-xs ${th.subText}`}>{isRTL ? "لا توجد نتيجة مراجعة محفوظة." : "No saved AI review result is available."}</p>}
+        </section>
+
+        <section aria-labelledby="applicant-ranking-title" className="rounded-xl p-4" style={{ border: `1px solid ${th.cardBorder}`, background: th.cardBg }}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 id="applicant-ranking-title" className={`text-sm font-bold ${th.text}`}>{isRTL ? "توافق المتقدمين" : "Applicant matching"}</h2>
+              <p className={`mt-1 text-[11px] ${th.subText}`}>{isRTL ? "ترتيب إرشادي للطلبات المعلقة وفق ملاءمة المحتوى والجمهور وسجل الأداء المتحقق." : "Advisory ranking of pending applications by content, audience and validated performance fit."}</p>
+            </div>
+            <button type="button" onClick={loadApplicantRanking} disabled={applicantRankingLoading} className="rounded-lg border px-3 py-2 text-xs font-semibold transition hover:border-[#94D3C1] disabled:opacity-50" style={{ borderColor: th.btnBorder, color: th.btnText }}>
+              {applicantRankingLoading ? (isRTL ? "جارٍ الترتيب…" : "Ranking…") : (isRTL ? "ترتيب المتقدمين" : "Rank applicants")}
+            </button>
+          </div>
+          {applicantRankingLoading && <p role="status" className={`mt-3 text-xs ${th.subText}`}>{isRTL ? "جارٍ تحليل الطلبات المعلقة…" : "Analyzing pending applications…"}</p>}
+          {applicantRankingError && <p role="alert" className="mt-3 text-xs text-red-500">{applicantRankingError}</p>}
+          {applicantRanking && <div aria-live="polite" className="mt-3 space-y-2">
+            {applicantRanking.data.length === 0 ? <p role="status" className={`text-xs ${th.subText}`}>{isRTL ? "لا توجد طلبات معلقة قابلة للترتيب." : "There are no pending applications to rank."}</p>
+              : applicantRanking.data.map((item) => <div key={item.applicationId} className={`flex flex-wrap items-center justify-between gap-2 rounded-lg border p-2.5 ${isDark ? "border-white/10 bg-white/[0.02]" : "border-gray-200 bg-gray-50"}`}>
+                <div className="min-w-0">
+                  <p className={`truncate text-xs font-semibold ${th.text}`}>{item.creator?.fullName || (isRTL ? "صانع محتوى" : "Creator")}</p>
+                  <p className={`mt-0.5 text-[10px] ${th.subText}`}>{isRTL ? "حالة الطلب:" : "Application status:"} {item.status || "—"}</p>
+                  {!!item.aiMatch?.reasonCodes?.length && <p className={`mt-1 text-[10px] ${th.subText}`}>{item.aiMatch.reasonCodes.join(" · ")}</p>}
+                </div>
+                <div className="text-end">
+                  <p className={`text-xs font-bold ${th.text}`}>{Number.isFinite(item.aiMatch?.rank) ? `#${item.aiMatch.rank}` : "—"}</p>
+                  <p className={`text-[10px] ${th.subText}`}>{Number.isFinite(item.aiMatch?.compatibilityScore) ? `${Math.round(item.aiMatch.compatibilityScore * 100)}% fit` : (isRTL ? "بيانات أداء غير كافية" : "Limited match data")}</p>
+                </div>
+              </div>)}
+            {applicantRanking.meta?.truncated && <p className={`text-[10px] ${th.subText}`}>{isRTL ? "تم ترتيب أول 200 طلب معلق فقط." : "Only the first 200 pending applications were included."}</p>}
+            <p className={`text-[10px] ${th.subText}`}>{isRTL ? "التوافق لا يقرر قبول الطلب. بيانات العمر والنوع غير متاحة." : "Fit does not accept or reject an application. Age and gender demographics are unavailable."}</p>
+          </div>}
+        </section>
       </div>
 
       {/* Timeline */}

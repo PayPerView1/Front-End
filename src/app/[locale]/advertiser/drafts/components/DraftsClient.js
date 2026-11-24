@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
-import { getDrafts, getCampaigns, deleteDraft, submitDraft } from "@/services/campaign";
+import { getCampaignDraftAiAssistance } from "@/services/campaign";
+import { getDrafts, deleteDraft, submitDraft } from "@/services/drafts";
 import {
   MdOutlineDrafts,
   MdOutlineRocketLaunch,
@@ -58,81 +59,25 @@ export default function DraftsClient() {
   const [deletingId, setDeletingId] = useState(null);
   const [launchingId, setLaunchingId] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
-
-  const parseList = (res) => {
-    if (!res) return null;
-    const list =
-      res?.data?.drafts ??
-      res?.data?.campaigns ??
-      res?.data?.data ??
-      res?.drafts ??
-      res?.campaigns ??
-      (Array.isArray(res?.data) ? res.data : null) ??
-      (Array.isArray(res) ? res : null);
-    return Array.isArray(list) ? list : null;
-  };
+  const [draftAiResults, setDraftAiResults] = useState({});
+  const [draftAiErrors, setDraftAiErrors] = useState({});
+  const [draftAiLoadingId, setDraftAiLoadingId] = useState(null);
 
   const fetchDrafts = useCallback(async () => {
     setLoading(true);
     setFetchError("");
-    let lastError = null;
-    let apiDrafts = [];
-
-    // Try 1: /api/v1/campaigns/drafts
     try {
       const res = await getDrafts();
-      console.log("[Drafts] /drafts response:", res);
-      const list = parseList(res);
-      if (list !== null) {
-        apiDrafts = list;
-      }
+      const list = res?.data?.drafts ?? res?.data?.campaigns ?? res?.data?.data?.drafts ?? res?.drafts ?? res?.campaigns;
+      if (!Array.isArray(list)) throw new Error(res?.message || "The drafts response is invalid.");
+      setDrafts(list);
     } catch (err) {
-      console.warn("[Drafts] /drafts endpoint failed:", err.message);
-      lastError = err;
+      setDrafts([]);
+      setFetchError(err?.message || (locale === "ar" ? "تعذر تحميل المسودات" : "Failed to load drafts"));
+    } finally {
+      setLoading(false);
     }
-
-    // Try 2 if Try 1 failed: /api/v1/campaigns?status=DRAFT
-    if (apiDrafts.length === 0) {
-      try {
-        const res = await getCampaigns({ status: "DRAFT" });
-        console.log("[Drafts] /campaigns?status=DRAFT response:", res);
-        const list = parseList(res);
-        if (list !== null) {
-          apiDrafts = list;
-        }
-      } catch (err) {
-        console.error("[Drafts] Both endpoints failed:", err.message);
-        lastError = lastError || err;
-      }
-    }
-
-    // Fallback: Load from localStorage
-    let localDrafts = [];
-    try {
-      localDrafts = JSON.parse(localStorage.getItem("ppv_drafts") || "[]");
-    } catch (e) {
-      console.error("Failed to load local drafts", e);
-    }
-
-    // Merge and deduplicate by _id
-    const merged = [...localDrafts, ...apiDrafts];
-    const unique = [];
-    const seen = new Set();
-    for (const d of merged) {
-      if (!seen.has(d._id)) {
-        seen.add(d._id);
-        unique.push(d);
-      }
-    }
-
-    setDrafts(unique);
-
-    if (unique.length === 0 && lastError) {
-      setFetchError(lastError?.message || "Failed to load drafts");
-    }
-    
-    setLoading(false);
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     fetchDrafts();
@@ -148,43 +93,51 @@ export default function DraftsClient() {
   const handleDelete = async (id) => {
     setDeletingId(id);
     try {
-      if (id.toString().startsWith("local_")) {
-        // Delete from local storage
-        const existing = JSON.parse(localStorage.getItem("ppv_drafts") || "[]");
-        const updated = existing.filter(d => d._id !== id);
-        localStorage.setItem("ppv_drafts", JSON.stringify(updated));
-      } else {
-        // Delete from API
-        await deleteDraft(id);
-      }
-      setDrafts((prev) => prev.filter((d) => d._id !== id));
+      await deleteDraft(id);
+      setDrafts((prev) => prev.filter((draft) => (draft._id || draft.id) !== id));
+      setConfirmDelete(null);
     } catch (err) {
-      console.error("Failed to delete draft:", err);
+      setFetchError(err?.message || (locale === "ar" ? "تعذر حذف المسودة" : "Failed to delete the draft"));
     } finally {
       setDeletingId(null);
-      setConfirmDelete(null);
     }
   };
 
   const handleLaunch = async (id) => {
-    if (id.toString().startsWith("local_")) {
-      // Local drafts must be edited and launched through the normal create flow
-      router.push(`/${locale}/advertiser/campaigns/create?draftId=${id}`);
-      return;
-    }
-
     setLaunchingId(id);
     try {
-      await submitDraft(id);
+      const selectedDraft = drafts.find((draft) => (draft._id || draft.id) === id);
+      if (!selectedDraft?.halalDeclaration) throw new Error(locale === "ar" ? "المسودة لا تحتوي على إقرار الحلال المطلوب للإرسال." : "This draft is missing the required declaration.");
+      await submitDraft(id, { halalDeclaration: selectedDraft.halalDeclaration });
       await fetchDrafts();
       router.push(`/${locale}/advertiser/campaigns`);
+    } catch (err) {
+      setFetchError(err?.message || (locale === "ar" ? "تعذر إرسال الحملة" : "Failed to submit the campaign"));
     } finally {
       setLaunchingId(null);
     }
   };
 
+  const handleDraftAiAssistance = async (draft) => {
+    const draftId = draft?._id || draft?.id;
+    if (!draftId) return;
+    setDraftAiLoadingId(draftId);
+    setDraftAiErrors((current) => ({ ...current, [draftId]: "" }));
+    try {
+      const result = await getCampaignDraftAiAssistance(draftId);
+      setDraftAiResults((current) => ({ ...current, [draftId]: result }));
+    } catch (error) {
+      setDraftAiErrors((current) => ({
+        ...current,
+        [draftId]: error?.response?.data?.message || error?.message || (locale === "ar" ? "تعذر تحليل المسودة." : "Draft analysis is unavailable."),
+      }));
+    } finally {
+      setDraftAiLoadingId(null);
+    }
+  };
+
   const filtered = drafts.filter((d) =>
-    (d.name || "").toLowerCase().includes(search.toLowerCase())
+    (d.name || d.title || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const bg = isDark ? "#0f0f0f" : "#f8f8f8";
@@ -339,15 +292,18 @@ export default function DraftsClient() {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {filtered.map((draft) => {
+              const draftId = draft._id || draft.id;
+              const aiResult = draftAiResults[draftId];
+              const aiError = draftAiErrors[draftId];
               const ct = CONTENT_TYPE_META[draft.contentType] || CONTENT_TYPE_META.MIXED;
               const Icon = ct.icon;
-              const isDeleting = deletingId === draft._id;
-              const isLaunching = launchingId === draft._id;
-              const menuOpen = openMenu === draft._id;
+              const isDeleting = deletingId === draftId;
+              const isLaunching = launchingId === draftId;
+              const menuOpen = openMenu === draftId;
 
               return (
+                <div key={draftId}>
                 <div
-                  key={draft._id}
                   style={{
                     background: card,
                     border: `1px solid ${border}`,
@@ -382,7 +338,7 @@ export default function DraftsClient() {
                   {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ color: text, fontWeight: 700, fontSize: 15, marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {draft.name || "Untitled Draft"}
+                      {draft.name || draft.title || "Untitled Draft"}
                     </div>
                     <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
                       <span
@@ -410,13 +366,24 @@ export default function DraftsClient() {
                         {timeAgo(draft.updatedAt || draft.createdAt)}
                       </span>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDraftAiAssistance(draft)}
+                      disabled={draftAiLoadingId === draftId}
+                      className="mt-2 rounded-lg border px-3 py-1.5 text-xs font-semibold transition hover:border-[#94D3C1] disabled:cursor-not-allowed disabled:opacity-50"
+                      style={{ borderColor: inputBorder, color: isDark ? "#94D3C1" : "#28715f", background: "transparent" }}
+                    >
+                      {draftAiLoadingId === draftId
+                        ? (locale === "ar" ? "جارٍ التحليل…" : "Analyzing…")
+                        : (locale === "ar" ? "اقتراحات الذكاء الاصطناعي" : "AI suggestions")}
+                    </button>
                   </div>
 
                   {/* Actions */}
                   <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
                     {/* Launch */}
                     <button
-                      onClick={() => handleLaunch(draft._id)}
+                      onClick={() => handleLaunch(draftId)}
                       disabled={isLaunching || isDeleting}
                       title="Launch campaign"
                       style={{
@@ -437,7 +404,7 @@ export default function DraftsClient() {
 
                     {/* Edit */}
                     <button
-                      onClick={() => router.push(`/${locale}/advertiser/campaigns/create?draftId=${draft._id}`)}
+                      onClick={() => router.push(`/${locale}/advertiser/create-campaign?draftId=${encodeURIComponent(draftId)}`)}
                       title="Edit draft"
                       style={{
                         background: inputBg, border: `1px solid ${inputBorder}`,
@@ -452,7 +419,7 @@ export default function DraftsClient() {
 
                     {/* Delete */}
                     <button
-                      onClick={(e) => { e.stopPropagation(); setConfirmDelete(draft._id); }}
+                      onClick={(e) => { e.stopPropagation(); setConfirmDelete(draftId); }}
                       title="Delete draft"
                       disabled={isDeleting}
                       style={{
@@ -472,6 +439,24 @@ export default function DraftsClient() {
                       )}
                     </button>
                   </div>
+                </div>
+                {(draftAiLoadingId === draftId || aiError || aiResult) && <section aria-live="polite" className="mt-2 rounded-xl border p-4 text-xs" style={{ borderColor: border, background: card, color: text }}>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="font-bold">{locale === "ar" ? "مراجعة المسودة (إرشادية)" : "Draft review (advisory)"}</h3>
+                    {aiResult && <span className="rounded-full px-2.5 py-1 font-semibold" style={{ background: "rgba(148,211,193,0.12)", color: "#4a9b82" }}>{aiResult.policyDecision}</span>}
+                  </div>
+                  {draftAiLoadingId === draftId && <p role="status" className="mt-2" style={{ color: muted }}>{locale === "ar" ? "جارٍ فحص النص وإعداد الاقتراحات…" : "Checking the draft text and preparing suggestions…"}</p>}
+                  {aiError && <p role="alert" className="mt-2 text-red-500">{aiError}</p>}
+                  {aiResult && <div className="mt-2 space-y-2" style={{ color: muted }}>
+                    <p>{locale === "ar" ? "درجة الجودة:" : "Quality score:"} {Number.isFinite(aiResult.qualityScore) ? `${aiResult.qualityScore}/100` : (locale === "ar" ? "غير متاحة" : "Unavailable")}{aiResult.category ? ` · ${aiResult.category}` : ""}</p>
+                    {aiResult.feedback && <p>{aiResult.feedback}</p>}
+                    {!!aiResult.checks?.length && <ul className="list-disc space-y-1 ps-5">{aiResult.checks.map((check, index) => <li key={`${check.code}-${index}`}><strong>{check.status}:</strong> {check.message}</li>)}</ul>}
+                    {!!aiResult.suggestions?.length && <div><p className="font-semibold" style={{ color: text }}>{locale === "ar" ? "اقتراحات استكمال الحقول" : "Draft completion suggestions"}</p><ul className="mt-1 list-disc space-y-1 ps-5">{aiResult.suggestions.map((item, index) => <li key={`${item.field}-${index}`}><strong>{item.field}:</strong> {item.suggestion}</li>)}</ul></div>}
+                    <p>{locale === "ar" ? "التكرار:" : "Duplicate check:"} {aiResult.duplicateDrafts?.status === "AVAILABLE" ? (aiResult.duplicateDrafts.matches?.length ? `${aiResult.duplicateDrafts.matches.length} ${locale === "ar" ? "مسودة مشابهة مرشحة" : "similar draft candidate(s)"}` : (locale === "ar" ? "لم تُرصد مسودات مشابهة" : "No similar draft found")) : (locale === "ar" ? "بيانات غير كافية" : "Insufficient data")}</p>
+                    {aiResult.expiryPrediction && <p>{locale === "ar" ? "حالة انتهاء الصلاحية (تقدير):" : "Expiry (estimate):"} {aiResult.expiryPrediction.status}{Number.isFinite(aiResult.expiryPrediction.daysUntilExpiry) ? ` · ${aiResult.expiryPrediction.daysUntilExpiry} ${locale === "ar" ? "يوماً" : "days"}` : ""}</p>}
+                    <p className="opacity-75">{locale === "ar" ? "هذه النتيجة لا تغيّر حالة المسودة أو قرار مراجعة الحملة." : "This analysis does not change the draft or determine the campaign review status."}</p>
+                  </div>}
+                </section>}
                 </div>
               );
             })}

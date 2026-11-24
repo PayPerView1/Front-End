@@ -183,7 +183,7 @@ export default function ExpiredDraftCard({ draft, onDeleteRequest, onRenew }) {
           }}
         >
           <FiEdit2 size={14} color={renewColor} />
-          تجديد ومتابعة
+          تعديل المسودة
         </button>
       </div>
     </div>

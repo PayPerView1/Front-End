@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FiPlus, FiRefreshCw } from "react-icons/fi";
 import { useTheme } from "@/context/ThemeContext";
 import { useDrafts } from "@/hooks/useDrafts";
@@ -92,6 +92,7 @@ export default function DraftsContent() {
   /* ---- Modal state ---- */
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const [modalOpen, setModalOpen]             = useState(false);
+  const [sortLabel, setSortLabel] = useState("الأحدث تعديلاً");
 
   /* ---- Colors ---- */
   const pageBg     = isDark ? "#0C0F10" : "#F3F4F6";
@@ -114,7 +115,14 @@ export default function DraftsContent() {
   const handleEdit          = (id) => router.push(`/advertiser/create-campaign?draftId=${id}`);
   const handleNewCampaign   = ()   => router.push("/advertiser/create-campaign");
 
-  const handleReviewExpired = ()   => router.push("/advertiser/expired-drafts");
+  const handleReviewExpired = ()   => router.push("/advertiser/drafts/expired");
+
+  const sortedDrafts = useMemo(() => [...drafts].sort((a, b) => {
+    if (sortLabel === "الأقدم تعديلاً") return a.sortDate - b.sortDate;
+    if (sortLabel === "الأعلى إنجازاً") return b.progress - a.progress;
+    if (sortLabel === "الأقل إنجازاً") return a.progress - b.progress;
+    return b.sortDate - a.sortDate;
+  }), [drafts, sortLabel]);
 
   const pendingDraft = drafts.find((d) => d.id === pendingDeleteId);
 
@@ -202,7 +210,7 @@ export default function DraftsContent() {
       <div className="mb-6">
         <SearchFilterBar
           onSearch={setSearchQuery}
-          onSort={(opt) => console.log("Sort by:", opt)}
+          onSort={setSortLabel}
         />
       </div>
 
@@ -263,7 +271,7 @@ export default function DraftsContent() {
       )}
 
       {/* ── Empty State ── */}
-      {!loading && !error && drafts.length === 0 && (
+      {!loading && !error && sortedDrafts.length === 0 && (
         <div
           className="flex flex-col items-center justify-center py-20 gap-4"
           style={{ color: emptyColor }}
@@ -286,7 +294,7 @@ export default function DraftsContent() {
       )}
 
       {/* ── Drafts Grid ── */}
-      {!loading && !error && drafts.length > 0 && (
+      {!loading && !error && sortedDrafts.length > 0 && (
         <div
           style={{
             display: "grid",
@@ -294,7 +302,7 @@ export default function DraftsContent() {
             gap: "24px",
           }}
         >
-          {drafts.map((draft) => (
+          {sortedDrafts.map((draft) => (
             <DraftCard
               key={draft.id}
               draft={draft}

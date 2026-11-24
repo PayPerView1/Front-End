@@ -12,7 +12,7 @@ import {
   MdOutlineBadge,
   MdOutlineGridView,
 } from "react-icons/md";
-import { getCampaignById, getCampaignStatisticsById, getCampaignStatistics, exportCampaign } from "@/services/campaign";
+import { getCampaignById, getCampaignStatisticsById, getCampaignStatistics, getCampaignAiInsights, getCampaignAnalytics, exportCampaign } from "@/services/campaign";
 
 const donutColors = ["#94D3C1", "#E9C349", "#284943", "#3F4945"];
 
@@ -126,18 +126,40 @@ export default function CampaignStats({ campaignId }) {
   };
 
   const [campaign, setCampaign] = useState(null);
+  const [aiInsights, setAiInsights] = useState(null);
+  const [aiInsightsUnavailable, setAiInsightsUnavailable] = useState(false);
+  const [viewIntelligence, setViewIntelligence] = useState(null);
+  const [viewIntelligenceUnavailable, setViewIntelligenceUnavailable] = useState(false);
   const [loading, setLoading] = useState(!!campaignId);
   const [error, setError] = useState(null);
+  const [loadedCampaignId, setLoadedCampaignId] = useState(null);
 
   useEffect(() => {
     if (!campaignId) return;
-    setLoading(true);
+    let active = true;
 
     Promise.allSettled([
       getCampaignById(campaignId),
       getCampaignStatisticsById(campaignId),
+      getCampaignAiInsights(campaignId),
+      getCampaignAnalytics(campaignId),
     ])
-      .then(([campaignRes, statsRes]) => {
+      .then(([campaignRes, statsRes, insightsRes, analyticsRes]) => {
+        if (!active) return;
+        if (insightsRes.status === "fulfilled") {
+          const body = insightsRes.value?.data || insightsRes.value;
+          setAiInsights(body?.data || body || null);
+          setAiInsightsUnavailable(false);
+        } else {
+          setAiInsightsUnavailable(true);
+        }
+        if (analyticsRes.status === "fulfilled") {
+          setViewIntelligence(analyticsRes.value?.viewIntelligence || null);
+          setViewIntelligenceUnavailable(!analyticsRes.value?.viewIntelligence);
+        } else {
+          setViewIntelligence(null);
+          setViewIntelligenceUnavailable(true);
+        }
         const campaignData = campaignRes.status === "fulfilled"
           ? (campaignRes.value?.data?.campaign || campaignRes.value?.campaign || (campaignRes.value?.data && typeof campaignRes.value.data === "object" ? campaignRes.value.data : null))
           : null;
@@ -189,25 +211,39 @@ export default function CampaignStats({ campaignId }) {
             statistics,
             categoryBreakdown,
           });
+          setError(null);
+          setLoadedCampaignId(campaignId);
         } else {
           setError("لم يتم العثور على بيانات هذه الحملة في قاعدة البيانات");
+          setLoadedCampaignId(campaignId);
         }
       })
       .catch((err) => {
+        if (!active) return;
         console.error("Failed to load campaign stats:", err);
+        setAiInsightsUnavailable(true);
         // Fallback try loading campaign directly
-        getCampaignById(campaignId)
+        return getCampaignById(campaignId)
           .then((res) => {
+            if (!active) return;
             const cData = res?.data?.campaign || res?.campaign || (res?.data && typeof res.data === "object" ? res.data : null);
             if (cData) {
               setCampaign(cData);
+              setError(null);
             } else {
               setError("تعذر جلب إحصائيات الحملة");
             }
+            setLoadedCampaignId(campaignId);
           })
-          .catch(() => setError("حدث خطأ أثناء الاتصال بالسيرفر"));
+          .catch(() => {
+            if (!active) return;
+            setError("حدث خطأ أثناء الاتصال بالسيرفر");
+            setLoadedCampaignId(campaignId);
+          });
       })
-      .finally(() => setLoading(false));
+      .finally(() => { if (active) setLoading(false); });
+
+    return () => { active = false; };
   }, [campaignId]);
 
   const handleExport = async () => {
@@ -234,7 +270,7 @@ export default function CampaignStats({ campaignId }) {
     divider: isDark ? "#1E2D3D" : "#E2E6EA",
   };
 
-  if (loading)
+  if (loading || loadedCampaignId !== campaignId)
     return (
       <div className={`flex items-center justify-center min-h-screen ${th.bg}`}>
         <div className="w-8 h-8 border-2 border-[#94D3C1] border-t-transparent rounded-full animate-spin" />
@@ -493,6 +529,76 @@ export default function CampaignStats({ campaignId }) {
           })}
         </div>
       </div>
+
+      <section
+        aria-labelledby="campaign-ai-insights-title"
+        className="p-4 rounded-xl flex flex-col gap-3"
+        style={{ background: th.cardBg, border: `1px solid ${th.cardBorder}` }}
+      >
+        <h2 id="campaign-ai-insights-title" className={`text-sm font-bold ${th.text}`}>
+          {isRTL ? "رؤى الحملة الذكية" : "Campaign intelligence"}
+        </h2>
+        {aiInsightsUnavailable ? (
+          <p role="status" className={`text-xs ${th.subText}`}>
+            {isRTL ? "تعذر تحميل الرؤى الآن." : "Campaign insights are unavailable right now."}
+          </p>
+        ) : !aiInsights ? (
+          <p role="status" className={`text-xs ${th.subText}`}>
+            {isRTL ? "جارٍ تحميل الرؤى…" : "Loading campaign insights…"}
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className={`text-xs ${th.subText}`}>
+              <p className={`font-semibold mb-1 ${th.text}`}>{isRTL ? "توقع الأداء" : "Performance forecast"}</p>
+              {aiInsights.performancePrediction?.status === "ESTIMATED"
+                ? <p>{isRTL ? "المشاهدات المتوقعة:" : "Projected views:"} {Number(aiInsights.performancePrediction.predictedViews).toLocaleString(locale)} · {isRTL ? "الثقة:" : "confidence:"} {aiInsights.performancePrediction.confidence}</p>
+                : <p>{isRTL ? "بيانات الحملة السابقة غير كافية للتنبؤ." : "Insufficient completed-campaign history for a forecast."}</p>}
+              {(aiInsights.performancePrediction?.recommendations || []).map((item, index) => <p key={index} className="mt-1">• {item}</p>)}
+            </div>
+            <div className={`text-xs ${th.subText}`}>
+              <p className={`font-semibold mb-1 ${th.text}`}>{isRTL ? "الأنماط والسجل" : "History and patterns"}</p>
+              <p>{isRTL ? "الحملات المؤرشفة:" : "Archived campaigns:"} {aiInsights.archivedCampaignAnalysis?.archivedCampaigns ?? 0}</p>
+              {(aiInsights.successfulCampaignPatterns?.patterns || []).map((item, index) => <p key={index} className="mt-1">{item.category}: {item.explanation}</p>)}
+              <p className="mt-1">
+                {isRTL ? "معدل قبول الإقرار:" : "Policy acceptance:"} {aiInsights.policyAcceptanceAnalytics?.acceptanceRate == null
+                  ? (isRTL ? "بيانات غير كافية" : "insufficient data")
+                  : `${Math.round(aiInsights.policyAcceptanceAnalytics.acceptanceRate * 100)}%`}
+              </p>
+              <p className="mt-1">{isRTL ? "مؤشر إرشادي؛ لا يثبت الامتثال." : "Advisory only; acceptance does not establish policy compliance."}</p>
+            </div>
+          </div>
+        )}
+        <div className="mt-1 border-t pt-3" style={{ borderColor: th.cardBorder }}>
+          <h3 className={`text-xs font-bold ${th.text}`}>{isRTL ? "المشاهدات ونزاهة الجمهور" : "Views and audience integrity"}</h3>
+          {viewIntelligenceUnavailable ? <p role="status" className={`mt-2 text-xs ${th.subText}`}>{isRTL ? "بيانات ذكاء المشاهدات غير متاحة حالياً." : "View intelligence is unavailable right now."}</p>
+            : !viewIntelligence ? <p role="status" className={`mt-2 text-xs ${th.subText}`}>{isRTL ? "جارٍ تحميل تحليل المشاهدات…" : "Loading view analysis…"}</p>
+              : <div className="mt-2 space-y-2 text-xs">
+                <p className={th.subText}>{isRTL ? "الحالة والنافذة:" : "Status and window:"} {viewIntelligence.status || "—"} · {Number.isFinite(viewIntelligence.windowDays) ? `${viewIntelligence.windowDays} ${isRTL ? "أيام" : "days"}` : "—"}</p>
+                <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+                  {[[isRTL ? "مرصودة" : "Observed", viewIntelligence.observedViews], [isRTL ? "متحققة" : "Validated", viewIntelligence.validatedViewsInWindow], [isRTL ? "بانتظار التحقق" : "Pending validation", viewIntelligence.pendingValidationViewsInWindow], [isRTL ? "إشارات للمراجعة" : "Flagged for review", viewIntelligence.flaggedViewsPendingReview]].map(([label, value]) => <div key={label} className={`rounded-lg border p-2 ${isDark ? "border-white/10 bg-white/[0.02]" : "border-gray-200 bg-gray-50"}`}><p className={th.subText}>{label}</p><p className={`mt-1 font-bold ${th.text}`}>{Number.isFinite(value) ? value.toLocaleString(locale) : "—"}</p></div>)}
+                </div>
+                <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                  <div className={`rounded-lg border p-3 ${isDark ? "border-white/10 bg-white/[0.02]" : "border-gray-200 bg-gray-50"}`}>
+                    <p className={`font-semibold ${th.text}`}>{isRTL ? "إشارات النشاط" : "Activity signals"}</p>
+                    <p className={`mt-1 ${th.subText}`}>{isRTL ? "مؤشرات مشاهدات غير طبيعية:" : "Potential invalid-view activity:"} {viewIntelligence.botAndFakeViewAssessment?.status || "—"}{Number.isFinite(viewIntelligence.botAndFakeViewAssessment?.confidence) ? ` · ${Math.round(viewIntelligence.botAndFakeViewAssessment.confidence * 100)}%` : ""}</p>
+                    {!!viewIntelligence.botAndFakeViewAssessment?.reasonCodes?.length && <p className={`mt-1 ${th.subText}`}>{viewIntelligence.botAndFakeViewAssessment.reasonCodes.join(" · ")}</p>}
+                    <p className={`mt-1 ${th.subText}`}>{isRTL ? "ارتفاع غير معتاد:" : "Abnormal spike:"} {viewIntelligence.abnormalViewSpike?.status === "ASSESSED" ? (viewIntelligence.abnormalViewSpike.detected ? (isRTL ? "مرصود" : "Detected") : (isRTL ? "غير مرصود" : "Not detected")) : (viewIntelligence.abnormalViewSpike?.status || "—")}</p>
+                    <p className={`mt-1 ${th.subText}`}>{isRTL ? "هبوط مفاجئ:" : "Sudden drop:"} {viewIntelligence.suddenViewDrop?.status === "ASSESSED" ? (viewIntelligence.suddenViewDrop.detected ? (isRTL ? "مرصود" : "Detected") : (isRTL ? "غير مرصود" : "Not detected")) : (viewIntelligence.suddenViewDrop?.status || "—")}</p>
+                  </div>
+                  <div className={`rounded-lg border p-3 ${isDark ? "border-white/10 bg-white/[0.02]" : "border-gray-200 bg-gray-50"}`}>
+                    <p className={`font-semibold ${th.text}`}>{isRTL ? "التوقعات والجغرافيا" : "Forecast and geography"}</p>
+                    {viewIntelligence.futureViewPrediction?.status === "ESTIMATED" && Number.isFinite(viewIntelligence.futureViewPrediction.predictedNext7DaysViews) ? <p className={`mt-1 ${th.subText}`}>{isRTL ? "مشاهدات متوقعة خلال 7 أيام:" : "Estimated next 7 days:"} {viewIntelligence.futureViewPrediction.predictedNext7DaysViews.toLocaleString(locale)} · {Number.isFinite(viewIntelligence.futureViewPrediction.confidence) ? `${Math.round(viewIntelligence.futureViewPrediction.confidence * 100)}%` : "—"} {isRTL ? "ثقة" : "confidence"}</p> : <p className={`mt-1 ${th.subText}`}>{viewIntelligence.futureViewPrediction?.explanation || (isRTL ? "بيانات غير كافية للتوقع." : "Insufficient history for a forecast.")}</p>}
+                    <p className={`mt-1 ${th.subText}`}>{isRTL ? "شذوذ جغرافي خارج الاستهداف:" : "Non-target geography anomaly:"} {viewIntelligence.nonTargetGeographicAnomaly?.status === "ASSESSED" ? (viewIntelligence.nonTargetGeographicAnomaly.detected ? (isRTL ? "مرصود" : "Detected") : (isRTL ? "غير مرصود" : "Not detected")) : (viewIntelligence.nonTargetGeographicAnomaly?.status || "—")}</p>
+                    {!!viewIntelligence.geographicAudience?.countries?.length && <p className={`mt-1 ${th.subText}`}>{isRTL ? "أهم البلدان:" : "Top countries:"} {viewIntelligence.geographicAudience.countries.slice(0, 5).map((country) => `${country.countryCode} (${Number.isFinite(country.views) ? country.views.toLocaleString(locale) : "—"}${country.targeted === false ? ` · ${isRTL ? "غير مستهدف" : "non-targeted"}` : ""})`).join(" · ")}</p>}
+                    {viewIntelligence.countryGrowthPrediction?.status === "ESTIMATED" && <p className={`mt-1 ${th.subText}`}>{isRTL ? "توقع نمو البلدان خلال 7 أيام:" : "Estimated country views · next 7 days:"} {(viewIntelligence.countryGrowthPrediction.countries || []).map((country) => `${country.countryCode}: ${Number.isFinite(country.predictedNext7DaysViews) ? country.predictedNext7DaysViews.toLocaleString(locale) : "—"}`).join(" · ") || (isRTL ? "غير متاح" : "unavailable")}</p>}
+                    <p className={`mt-1 ${th.subText}`}>{isRTL ? "صافي الأرباح المؤكد:" : "Confirmed creator earnings:"} {Number.isFinite(viewIntelligence.confirmedCreatorNetEarningsCents) ? `$${(viewIntelligence.confirmedCreatorNetEarningsCents / 100).toFixed(2)}` : "—"}</p>
+                    {viewIntelligence.earningsPrediction?.status === "ESTIMATED" && <p className="mt-1 text-amber-500">{isRTL ? "تقدير صافي الأرباح (غير مؤكد):" : "Estimated creator net (not confirmed):"} {Number.isFinite(viewIntelligence.earningsPrediction.estimatedCreatorNetAmountCents) ? `$${(viewIntelligence.earningsPrediction.estimatedCreatorNetAmountCents / 100).toFixed(2)}` : "—"}</p>}
+                  </div>
+                </div>
+                <p className={`text-[10px] ${th.subText}`}>{isRTL ? "هذه الإشارات لا تثبت نشاطاً آلياً أو احتيالاً. اختلاف الموقع الجغرافي هو شذوذ استهداف فقط." : "These signals do not prove automated activity or fraud. Geographic mismatch is a targeting anomaly only."}</p>
+              </div>}
+        </div>
+      </section>
     </div>
   );
 }

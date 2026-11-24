@@ -1,4 +1,7 @@
-import axiosInstance, { handleError } from "@/lib/axiosInstance";
+import axiosInstance, {
+  AI_REQUEST_TIMEOUT_MS,
+  handleError,
+} from "@/lib/axiosInstance";
 
 // 1. إنشاء حملة جديدة
 export const createCampaign = async (formData) => {
@@ -17,84 +20,81 @@ export const createCampaign = async (formData) => {
 // 2. جلب نتيجة مراجعة الـ AI
 export const getCampaignAiReview = async (campaignId) => {
   try {
-    const response = await axiosInstance.get(`/api/v1/campaigns/${campaignId}/ai-review`);
-    return response.data;
+    const response = await axiosInstance.get(`/api/v1/campaigns/${campaignId}/ai-review`, {
+      timeout: AI_REQUEST_TIMEOUT_MS,
+    });
+    const payload = response?.data;
+    if (payload?.success !== true || (payload.aiReview !== null && typeof payload.aiReview !== "object")) {
+      throw new Error(payload?.message || "The campaign AI review response is invalid.");
+    }
+    return payload.aiReview;
   } catch (error) {
     handleError(error);
   }
 };
 
-// 3. حفظ مسودة جديدة
-export const saveDraft = async (data) => {
+// Brand-owned persisted drafts only. The endpoint returns suggestions and does not
+// submit the draft or change campaign status.
+export const getCampaignDraftAiAssistance = async (draftId) => {
   try {
-    const response = await axiosInstance.post("/api/v1/campaigns/drafts", data);
-    return response.data;
+    const response = await axiosInstance.post(
+      `/api/v1/campaigns/drafts/${encodeURIComponent(draftId)}/ai-assistance`,
+      undefined,
+      { timeout: AI_REQUEST_TIMEOUT_MS }
+    );
+    const payload = response?.data;
+    const data = payload?.data;
+    if (
+      payload?.success !== true || !data ||
+      !["APPROVED", "REJECTED", "MANUAL_REVIEW_REQUIRED"].includes(data.policyDecision) ||
+      !(data.qualityScore === null || (Number.isFinite(data.qualityScore) && data.qualityScore >= 0 && data.qualityScore <= 100)) ||
+      !Array.isArray(data.checks) || !Array.isArray(data.suggestions)
+    ) {
+      throw new Error(payload?.message || "The campaign draft assistance response is invalid.");
+    }
+    return data;
   } catch (error) {
     handleError(error);
   }
 };
 
-// 4. جلب كل المسودات
-export const getDrafts = async (params = {}) => {
+export const getCampaignAnalytics = async (campaignId) => {
   try {
-    const response = await axiosInstance.get("/api/v1/campaigns/drafts", { params });
-    return response.data;
+    const response = await axiosInstance.get(
+      `/api/v1/campaigns/${encodeURIComponent(campaignId)}/analytics`,
+      { timeout: AI_REQUEST_TIMEOUT_MS }
+    );
+    const payload = response?.data;
+    if (payload?.success !== true || !payload.data || typeof payload.data !== "object") {
+      throw new Error(payload?.message || "The campaign analytics response is invalid.");
+    }
+    return payload.data;
   } catch (error) {
     handleError(error);
   }
 };
 
-// 4b. جلب مسودة محددة
-export const getDraftById = async (draftId) => {
+export const getCampaignApplicantRanking = async (campaignId) => {
   try {
-    const response = await axiosInstance.get(`/api/v1/campaigns/drafts/${draftId}`);
-    return response.data;
+    const response = await axiosInstance.get(
+      `/api/v1/campaigns/${encodeURIComponent(campaignId)}/applications/ai-ranking`,
+      { timeout: AI_REQUEST_TIMEOUT_MS }
+    );
+    const payload = response?.data;
+    const data = payload?.data;
+    if (
+      payload?.success !== true || !data || !["AVAILABLE", "INSUFFICIENT_DATA"].includes(data.status) ||
+      !Array.isArray(data.data)
+    ) {
+      throw new Error(payload?.message || "The applicant ranking response is invalid.");
+    }
+    return data;
   } catch (error) {
     handleError(error);
   }
 };
 
-// 5. تحديث مسودة
-export const updateDraft = async (draftId, data) => {
-  try {
-    const response = await axiosInstance.put(`/api/v1/campaigns/drafts/${draftId}`, data);
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-// 6. حذف مسودة
-export const deleteDraft = async (draftId) => {
-  try {
-    const response = await axiosInstance.delete(`/api/v1/campaigns/drafts/${draftId}`);
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-// 7. Auto-Save مسودة
-export const autoSaveDraft = async (draftId, data) => {
-  try {
-    const response = await axiosInstance.patch(`/api/v1/campaigns/drafts/${draftId}/auto-save`, data);
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-// 8. تحويل مسودة إلى حملة
-export const submitDraft = async (draftId) => {
-  try {
-    const response = await axiosInstance.post(`/api/v1/campaigns/drafts/${draftId}/submit`);
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-// 9. جلب قائمة الحملات
+// Campaign management
 export const getCampaigns = async (params = {}) => {
   try {
     const response = await axiosInstance.get("/api/v1/campaigns", { params });
@@ -109,34 +109,13 @@ export const getCreatorRecommendations = async (limit = 10) => {
   try {
     const response = await axiosInstance.get("/api/v1/campaigns/recommendations", {
       params: { limit },
-      _suppressInterceptorErrorLog: true,
     });
-    return response.data;
-  } catch (error) {
-    const errorData = (() => {
-      if (typeof error.response?.data !== "string") return error.response?.data || {};
-      try {
-        return JSON.parse(error.response.data);
-      } catch {
-        return {};
-      }
-    })();
-
-    if (error.response?.status === 403 && /only brand accounts/i.test(errorData.message || "")) {
-      try {
-        const response = await axiosInstance.get("/api/v1/campaigns/discover", {
-          params: { sort: "bestMatch", page: 1, perPage: Math.min(Math.max(Number(limit) || 10, 1), 20) },
-        });
-        return {
-          ...response.data,
-          meta: { ...response.data?.meta, hasPreferences: null },
-          recommendationSource: "discover",
-        };
-      } catch (fallbackError) {
-        handleError(fallbackError);
-      }
+    const payload = response?.data;
+    if (payload?.success !== true || !Array.isArray(payload.data)) {
+      throw new Error(payload?.message || "The campaign recommendations response is invalid.");
     }
-
+    return payload;
+  } catch (error) {
     handleError(error);
   }
 };
@@ -179,11 +158,12 @@ export const getCampaignById = async (campaignId) => {
 };
 
 // 11. نسخ حملة
-export const copyCampaign = async (campaignId, { newName, includeMaterials }) => {
+export const copyCampaign = async (campaignId, { newName, includeMaterials, includeTargetAudience }) => {
   try {
     const response = await axiosInstance.post(`/api/v1/campaigns/${campaignId}/copy`, {
       newName,
       includeMaterials,
+      includeTargetAudience,
     });
     return response.data;
   } catch (error) {
@@ -280,6 +260,18 @@ export const getCampaignStatisticsById = async (campaignId) => {
   }
 };
 
+// Owner-scoped AI insights for the existing campaign statistics view.
+export const getCampaignAiInsights = async (campaignId) => {
+  try {
+    const response = await axiosInstance.get(`/api/v1/campaigns/${campaignId}/ai-insights`, {
+      timeout: AI_REQUEST_TIMEOUT_MS,
+    });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 // 18c. جلب المسودات المنتهية الصلاحية
 export const getExpiredDrafts = async () => {
   try {
@@ -315,7 +307,7 @@ export const getSubCategories = async () => {
 /**
  * 3.1 Allocate / Update Campaign Budget
  * @param {string} id - Campaign ID
- * @param {{ amount: number }} data 
+ * @param {{ amount: number }} data
  */
 export const allocateCampaignBudget = async (id, data) => {
   try {
@@ -329,7 +321,7 @@ export const allocateCampaignBudget = async (id, data) => {
 /**
  * 3.2 Set / Update Daily Budget Limit
  * @param {string} id - Campaign ID
- * @param {{ dailyBudgetLimit: number | null }} data 
+ * @param {{ dailyBudgetLimit: number | null }} data
  */
 export const setDailyBudgetLimit = async (id, data) => {
   try {
@@ -343,7 +335,7 @@ export const setDailyBudgetLimit = async (id, data) => {
 /**
  * 3.3 Recharge Campaign Budget
  * @param {string} id - Campaign ID
- * @param {{ amount: number }} data 
+ * @param {{ amount: number }} data
  */
 export const rechargeCampaignBudget = async (id, data) => {
   try {
@@ -383,7 +375,7 @@ export const resumeCampaign = async (id) => {
 /**
  * 3.6 Configure Auto-Resume on Recharge
  * @param {string} id - Campaign ID
- * @param {{ autoResumeOnRecharge: boolean }} data 
+ * @param {{ autoResumeOnRecharge: boolean }} data
  */
 export const configureAutoResume = async (id, data) => {
   try {
@@ -392,4 +384,4 @@ export const configureAutoResume = async (id, data) => {
   } catch (error) {
     handleError(error);
   }
-};
+};
