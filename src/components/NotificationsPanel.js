@@ -81,13 +81,16 @@ export default function NotificationsPanel({ side = "left", stacked = false, top
   if (!isNotificationsOpen) return null;
 
   // Filter notifications based on chosen tab
-  const filteredNotifications =
-    activeTab === "mentions"
-      ? notifications.filter((n) => n.type === "mention" || n.kind)
-      : notifications; // All Activity
+  const isPrimaryNotification = (notification) =>
+    notification.type === "mention" ||
+    Boolean(notification.kind) ||
+    (Boolean(notification.type) && notification.type !== "activity");
+  const filteredNotifications = activeTab === "mentions"
+    ? notifications.filter(isPrimaryNotification)
+    : notifications;
 
   // Calculate unread count for mentions tab badge
-  const mentionsCount = notifications.filter((n) => (n.type === "mention" || n.kind) && n.unread).length;
+  const mentionsCount = notifications.filter((n) => isPrimaryNotification(n) && n.unread).length;
 
   // Format message text to highlight @everyone
   const formatMessage = (msg) => {
@@ -308,7 +311,7 @@ export default function NotificationsPanel({ side = "left", stacked = false, top
                         alt={notif.sender}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.target.src = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&q=80";
+                          e.currentTarget.style.visibility = "hidden";
                         }}
                       />
                     </div>

@@ -30,9 +30,9 @@ function getNotificationList(payload) {
       throw new Error("أحد الإشعارات لا يحتوي على معرّف");
     }
 
-    const kind =
-      notification.kind ??
-      (KIND_META[notification.type] ? notification.type : undefined);
+    const hasTemplateParams = notification.params != null || notification.metadata != null;
+    const kind = notification.kind ??
+      (hasTemplateParams && KIND_META[notification.type] ? notification.type : undefined);
     const unread =
       typeof notification.unread === "boolean"
         ? notification.unread
