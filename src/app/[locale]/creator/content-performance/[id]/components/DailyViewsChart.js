@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import { FiZap, FiRefreshCw } from "react-icons/fi";
@@ -53,7 +52,6 @@ const lightTheme = {
   },
 };
 
-const rangeKeys = ["24h", "7d", "30d"];
 const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
 const W = 800;
@@ -70,67 +68,38 @@ const smooth = (pts) =>
     return `${d} C${cx},${prev.y} ${cx},${p.y} ${p.x},${p.y}`;
   }, "");
 
-export default function DailyViewsChart({ anomaly = false, daily = [] }) {
+export default function DailyViewsChart({ daily = [] }) {
   const tr = useTranslations("contentPerformance.details.chart");
   const { isDark } = useTheme();
   const t = isDark ? darkTheme : lightTheme;
 
-  const [range, setRange] = useState(null); // للعرض فقط حالياً
-
   if (!daily.length) return null;
 
-  // اليوم أولاً ثم الأيام السابقة، وأسماء الأيام بتنحسب من تاريخ اليوم
-  const todayIdx = new Date().getDay();
-  const data = daily.map((views, i) => ({
+  const data = daily.map(({ date, views }) => ({
     views,
-    key: dayKeys[(todayIdx - i + 7) % 7],
+    key: dayKeys[new Date(date).getDay()],
+    date,
   }));
-
-  // كشف الطفرة (بس بحالة الـ anomaly)
-  const sorted = [...daily].sort((a, b) => a - b);
-  const median = sorted[Math.floor(sorted.length / 2)];
-  const isSpike = (v) => anomaly && v > median * 1.6;
-
-  // القيم "المتوقعة": الطفرة بتنستبدل بمتوسط جيرانها
-  const expected = daily.map((v, i) => {
-    if (!isSpike(v)) return v;
-    const near = [daily[i - 1], daily[i + 1]].filter(
-      (n) => n !== undefined && !isSpike(n)
-    );
-    return near.length
-      ? Math.round(near.reduce((s, n) => s + n, 0) / near.length)
-      : median;
-  });
-
-  const max = Math.max(...daily); // للمقياس (بيشمل الطفرة)
+  const max = Math.max(...data.map(({ views }) => views));
   const lo = max * 0.15;
-  const peakValue = Math.max(...expected); // الذروة المعتمدة (بدون الطفرة)
-  const peakIndex = expected.indexOf(peakValue);
-  const spikeIndex = daily.findIndex(isSpike);
+  const scale = Math.max(max - lo, 1);
+  const peakValue = max;
+  const peakIndex = data.findIndex(({ views }) => views === peakValue);
   const avg = Math.round(data.reduce((s, d) => s + d.views, 0) / data.length);
-  const markIndex =
-    anomaly && spikeIndex !== -1 ? spikeIndex : Math.min(5, data.length - 1);
 
   const x = (i) => PX + (i * (W - 2 * PX)) / Math.max(data.length - 1, 1);
   const y = (v, k = 1) => {
-    const ratio = Math.max(0, Math.min(1, (v * k - lo) / (max - lo)));
+    const ratio = Math.max(0, Math.min(1, (v * k - lo) / scale));
     return H - PB - ratio * (H - PT - PB);
   };
 
   const viewsPts = data.map((d, i) => ({ x: x(i), y: y(d.views) }));
-  const earnPts = expected.map((v, i) => ({ x: x(i), y: y(v, 0.82) }));
-
   const viewsLine = smooth(viewsPts);
   const area = `${viewsLine} L${viewsPts[viewsPts.length - 1].x},${H - PB} L${viewsPts[0].x},${H - PB} Z`;
 
-  // منطقة "المتوقع" الرمادية
-  const bandPts = expected.map((v, i) => ({ x: x(i), y: y(v) - 10 }));
-  const band = `${smooth(bandPts)} L${bandPts[bandPts.length - 1].x},${H - PB} L${bandPts[0].x},${H - PB} Z`;
-
   return (
     <div className={`space-y-5 rounded-2xl border p-5 ${t.card}`}>
-      {/* العنوان + النطاق الزمني */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      <div>
         <div>
           <h2
             className={`flex items-center gap-2 text-lg font-extrabold ${t.title}`}
@@ -145,19 +114,6 @@ export default function DailyViewsChart({ anomaly = false, daily = [] }) {
           <p className={`mt-1 text-xs ${t.muted}`}>{tr("subtitle")}</p>
         </div>
 
-        <div className={`flex w-fit gap-1 rounded-xl p-1 ${t.sub}`}>
-          {rangeKeys.map((key) => (
-            <button
-              key={key}
-              onClick={() => setRange(range === key ? null : key)}
-              className={`rounded-lg px-3 py-1.5 text-xs transition ${
-                range === key ? t.tabActive : t.tabIdle
-              }`}
-            >
-              {tr(`ranges.${key}`)}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* مفتاح الألوان + أعلى يوم */}
@@ -166,10 +122,6 @@ export default function DailyViewsChart({ anomaly = false, daily = [] }) {
           <span className="flex items-center gap-1.5">
             <i className={`h-2 w-2 rounded-full ${t.mintBg}`} />
             {tr("legend.views")}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <i className={`h-2 w-2 rounded-full ${t.goldBg}`} />
-            {tr("legend.earnings")}
           </span>
         </div>
 
@@ -207,22 +159,12 @@ export default function DailyViewsChart({ anomaly = false, daily = [] }) {
 
           <path d={area} fill="url(#viewsFill)" />
 
-          {anomaly && <path d={band} fill={t.svg.muted} opacity="0.15" />}
-
           <path
             d={viewsLine}
             fill="none"
             stroke={t.svg.views}
             strokeWidth="2.5"
           />
-          <path
-            d={smooth(earnPts)}
-            fill="none"
-            stroke={t.svg.earn}
-            strokeWidth="2"
-            strokeDasharray="5 5"
-          />
-
           {/* نقطة الذروة */}
           <circle
             cx={viewsPts[peakIndex].x}
@@ -232,17 +174,6 @@ export default function DailyViewsChart({ anomaly = false, daily = [] }) {
             stroke={t.svg.peak}
             strokeWidth="2.5"
           />
-          {/* نقطة ثانوية (الطفرة بحالة الـ anomaly) */}
-          {markIndex !== peakIndex && (
-            <circle
-              cx={viewsPts[markIndex].x}
-              cy={viewsPts[markIndex].y}
-              r="5"
-              fill={t.svg.marker}
-              stroke={anomaly ? t.svg.views : t.svg.muted}
-              strokeWidth="2"
-            />
-          )}
         </svg>
 
         {/* أسماء الأيام (dir=ltr لأن الرسم من اليسار لليمين) */}
@@ -262,8 +193,7 @@ export default function DailyViewsChart({ anomaly = false, daily = [] }) {
               }
             >
               {tr(`days.${d.key}`)}
-              {i === 0 && ` ${tr("today")}`}
-              {i === peakIndex && i !== 0 && ` ${tr("peakTag")}`}
+              {i === peakIndex && ` ${tr("peakTag")}`}
             </span>
           ))}
         </div>
@@ -275,7 +205,7 @@ export default function DailyViewsChart({ anomaly = false, daily = [] }) {
       >
         <span className="flex items-center gap-1.5">
           <FiRefreshCw size={12} />
-          {tr("refresh")}
+          {tr("snapshotCount", { count: data.length })}
         </span>
         <span>{tr("average", { value: avg.toLocaleString("en-US") })}</span>
       </div>

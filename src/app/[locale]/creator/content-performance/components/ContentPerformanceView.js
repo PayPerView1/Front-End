@@ -6,17 +6,13 @@ import { useTheme } from "@/context/ThemeContext";
 import { getMySubmissions } from "@/services/submissions";
 import {
   FiDownload,
-  FiPlayCircle,
+  FiEye,
   FiSearch,
-  FiTrendingUp,
   FiCheckCircle,
   FiAlertCircle,
+  FiFileText,
+  FiBarChart2,
 } from "react-icons/fi";
-import {
-  MdOutlineVideoLibrary,
-  MdOutlineVerifiedUser,
-  MdOutlineSpeed,
-} from "react-icons/md";
 import { Loader2 } from "lucide-react";
 import ClipCard from "./ClipCard";
 
@@ -29,9 +25,11 @@ const PLATFORM_MAP = {
 
 /** تحويل displayStatus (API) → status محلي يُفهم من ClipCard/ClipDetailsView */
 function mapDisplayStatus(ds) {
-  if (ds === "PROCESSING" || ds === "MANUAL_REVIEW") return "waiting";
-  if (ds === "AI_REJECTED" || ds === "REJECTED") return "error";
-  return "normal"; // APPROVED, AWAITING_ADVERTISER, WITHDRAWN
+  if (["PROCESSING", "MANUAL_REVIEW", "AWAITING_ADVERTISER"].includes(ds)) return "waiting";
+  if (["AI_REJECTED", "REJECTED", "CHANGES_REQUESTED"].includes(ds)) return "error";
+  if (ds === "WITHDRAWN") return "withdrawn";
+  if (ds === "APPROVED") return "normal";
+  return "unknown";
 }
 
 function formatDuration(sec) {
@@ -50,23 +48,23 @@ function mapSubmission(s) {
     code: s.code,
     displayStatus: s.displayStatus,
     status: mapDisplayStatus(s.displayStatus),
-    platform: PLATFORM_MAP[s.platform] || "tiktok",
+    platform: PLATFORM_MAP[s.platform] || "unknown",
     title: s.campaign?.name || "—",
     campaign: s.campaign?.brand?.name || "—",
     publishedAgo: s.submittedAt
-      ? new Date(s.submittedAt).toLocaleDateString("ar-SA")
+      ? new Date(s.submittedAt).toLocaleDateString()
       : "",
     publishedLabel: s.submittedAt
-      ? new Date(s.submittedAt).toLocaleString("ar-SA")
+      ? new Date(s.submittedAt).toLocaleString()
       : "",
     completion: null,
-    earnings: null,
+    earnings: s.reward ?? null,
     rate: null,
     views: s.preview?.stats?.viewCount ?? null,
     duration: formatDuration(s.preview?.durationSec),
     seconds: s.preview?.durationSec ?? null,
     thumbnail: s.preview?.thumbnailUrl || null,
-    url: s.postUrl || "#",
+    url: s.postUrl || s.canonicalUrl || null,
     daily: null,
     aiScore: s.aiScore ?? null,
   };
@@ -149,10 +147,14 @@ export default function ContentPerformanceView() {
 
   // ─── إحصائيات محسوبة من البيانات الحقيقية ─────────────────
   const totalViews = useMemo(
-    () => clips.reduce((sum, c) => sum + (c.views || 0), 0),
+    () => clips.reduce((sum, c) => sum + (Number.isFinite(c.views) ? c.views : 0), 0),
     [clips]
   );
-  const activeClips = useMemo(
+  const availableViewsCount = useMemo(
+    () => clips.filter((clip) => Number.isFinite(clip.views)).length,
+    [clips]
+  );
+  const approvedSubmissions = useMemo(
     () => clips.filter((c) => c.status === "normal").length,
     [clips]
   );
@@ -181,7 +183,11 @@ export default function ContentPerformanceView() {
     try {
       const XLSX = await import("xlsx");
       const col = (key) => tr(`export.columns.${key}`);
-      const toNumber = (v) => parseFloat(String(v || "0").replace(/,/g, "")) || 0;
+      const toNumber = (v) => {
+        if (v === null || v === undefined || v === "") return null;
+        const value = Number(String(v).replace(/,/g, ""));
+        return Number.isFinite(value) ? value : null;
+      };
 
       const rows = filtered.map((c) => ({
         [col("clip")]: c.title,
@@ -189,15 +195,19 @@ export default function ContentPerformanceView() {
         [col("campaign")]: c.campaign,
         [col("published")]: c.publishedAgo,
         [col("completion")]: c.completion ?? "",
-        [col("earnings")]: toNumber(c.earnings),
+        [col("earnings")]: toNumber(c.earnings) ?? "",
         [col("views")]: c.views ?? "",
         [col("url")]: c.url,
       }));
 
       rows.push({
         [col("clip")]: tr("export.total"),
-        [col("earnings")]: filtered.reduce((s, c) => s + toNumber(c.earnings), 0),
-        [col("views")]: filtered.reduce((s, c) => s + (c.views || 0), 0),
+        [col("earnings")]: filtered.some((c) => toNumber(c.earnings) !== null)
+          ? filtered.reduce((s, c) => s + (toNumber(c.earnings) ?? 0), 0)
+          : "",
+        [col("views")]: filtered.some((c) => Number.isFinite(c.views))
+          ? filtered.reduce((s, c) => s + (Number.isFinite(c.views) ? c.views : 0), 0)
+          : "",
       });
 
       const ws = XLSX.utils.json_to_sheet(rows);
@@ -219,59 +229,54 @@ export default function ContentPerformanceView() {
 
   const stats = [
     {
-      key: "liveViews",
-      value: loading ? "—" : totalViews.toLocaleString("en-US"),
-      Icon: FiPlayCircle,
+      key: "recordedViews",
+      value: loading || !availableViewsCount ? "—" : totalViews.toLocaleString("en-US"),
+      Icon: FiEye,
       valueColor: t.title,
       unitColor: t.muted,
       footer: (
         <div className="flex items-center gap-2 text-xs">
-          <span className={`flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] ${t.mintBadge}`}>
-            <FiTrendingUp size={11} />
-            <span dir="ltr">Live</span>
+          <span className={t.muted}>
+            {tr("stats.recordedViews.note", { count: availableViewsCount, total: clips.length })}
           </span>
-          <span className={t.muted}>{tr("stats.liveViews.note")}</span>
         </div>
       ),
     },
     {
-      key: "activeClips",
-      value: loading ? "—" : String(activeClips),
-      Icon: MdOutlineVideoLibrary,
+      key: "approvedSubmissions",
+      value: loading ? "—" : String(approvedSubmissions),
+      Icon: FiCheckCircle,
       valueColor: t.title,
       unitColor: `font-bold ${t.gold}`,
       footer: (
         <div className={`flex items-center gap-2 text-xs ${t.muted}`}>
           <span className={`h-2 w-2 rounded-full ${t.dot}`} />
-          {tr("stats.activeClips.note")}
+          {tr("stats.approvedSubmissions.note")}
         </div>
       ),
     },
     {
-      key: "verifiedViews",
-      value: loading ? "—" : totalViews.toLocaleString("en-US"),
-      Icon: MdOutlineVerifiedUser,
+      key: "viewsAvailable",
+      value: loading ? "—" : availableViewsCount.toLocaleString("en-US"),
+      Icon: FiFileText,
       valueColor: t.title,
       unitColor: t.muted,
       footer: (
         <div className={`flex items-center gap-1.5 text-xs ${t.mint}`}>
           <FiCheckCircle size={13} />
-          {tr("stats.verifiedViews.note")}
+          {tr("stats.viewsAvailable.note")}
         </div>
       ),
     },
     {
-      key: "flowSpeed",
-      value: loading ? "—" : `~${clips.length > 0 ? Math.round(totalViews / Math.max(clips.length, 1) / 1000) : 0}K`,
-      Icon: MdOutlineSpeed,
+      key: "averageViews",
+      value: loading || !availableViewsCount ? "—" : Math.round(totalViews / availableViewsCount).toLocaleString("en-US"),
+      Icon: FiBarChart2,
       valueColor: t.gold,
       unitColor: t.muted,
       footer: (
         <div className="flex w-full items-center justify-between text-xs">
-          <span className={t.muted}>{tr("stats.flowSpeed.note")}</span>
-          <span className={`rounded-md px-2 py-0.5 text-[10px] ${t.mintBadge}`}>
-            {tr("stats.flowSpeed.badge")}
-          </span>
+          <span className={t.muted}>{tr("stats.averageViews.note")}</span>
         </div>
       ),
     },
@@ -385,11 +390,6 @@ export default function ContentPerformanceView() {
       <div className="flex items-center justify-between">
         <h2 className={`flex items-center gap-2 text-sm font-bold ${t.title}`}>
           {tr("listTitle")}
-          <span
-            className={`rounded-md px-2 py-0.5 text-[10px] font-medium ${t.live}`}
-          >
-            {tr("liveNow")}
-          </span>
         </h2>
         <p className={`text-xs ${t.faint}`}>
           {tr("showing", { count: filtered.length })}

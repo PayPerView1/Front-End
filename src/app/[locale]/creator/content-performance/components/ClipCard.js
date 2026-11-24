@@ -1,10 +1,10 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import { Link } from "@/i18n/navigation";
 import { FaTiktok, FaYoutube, FaInstagram } from "react-icons/fa";
-import { FiExternalLink } from "react-icons/fi";
+import { FiExternalLink, FiVideo } from "react-icons/fi";
 import { MdBarChart, MdOutlineCampaign } from "react-icons/md";
 
 // ─── ألوان الثيمين ───────────────────────────────────────────
@@ -38,13 +38,23 @@ const platforms = {
   tiktok: { Icon: FaTiktok, color: "#00F2FE" },
   shorts: { Icon: FaYoutube, color: "#FF0000" },
   reels: { Icon: FaInstagram, color: "#E1306C" },
+  unknown: { Icon: FiVideo, color: "#9CA3AF" },
 };
 
 export default function ClipCard({ clip }) {
   const tr = useTranslations("contentPerformance.card");
+  const isAr = useLocale() === "ar";
   const { isDark } = useTheme();
   const t = isDark ? darkTheme : lightTheme;
-  const { Icon, color } = platforms[clip.platform] || platforms.tiktok;
+  const { Icon, color } = platforms[clip.platform] || platforms.unknown;
+  const statusLabels = {
+    waiting: isAr ? "قيد المعالجة" : "Processing",
+    error: isAr ? "لم تتم الموافقة" : "Not approved",
+    withdrawn: isAr ? "مسحوب" : "Withdrawn",
+    normal: isAr ? "معتمد" : "Approved",
+    unknown: isAr ? "حالة غير متاحة" : "Status unavailable",
+  };
+  const status = statusLabels[clip.status] ? clip.status : "unknown";
 
   return (
     <div
@@ -80,6 +90,9 @@ export default function ClipCard({ clip }) {
           <h3 className={`text-sm font-bold md:text-base ${t.title}`}>
             {clip.title}
           </h3>
+          <span className={`inline-flex w-fit rounded-full px-2 py-1 text-[10px] font-bold ${status === "error" ? "bg-red-500/10 text-red-500" : status === "waiting" ? "bg-amber-500/10 text-amber-600" : status === "withdrawn" ? "bg-white/10 text-gray-500" : status === "normal" ? "bg-emerald-500/10 text-emerald-600" : "bg-gray-500/10 text-gray-500"}`}>
+            {statusLabels[status]}
+          </span>
 
           <p
             className={`flex flex-wrap items-center gap-x-2 gap-y-1 text-xs ${t.muted}`}
@@ -93,13 +106,13 @@ export default function ClipCard({ clip }) {
             className={`flex flex-wrap items-center gap-3 text-xs ${t.muted}`}
           >
             <span>
-              {tr("completion")} <b className={t.mint}>{clip.completion}%</b>
+              {tr("completion")} <b className={t.mint}>{Number.isFinite(clip.completion) ? `${clip.completion}%` : "—"}</b>
             </span>
             <span className={`h-3 w-px ${t.divider}`} />
             <span>
               {tr("earnings")}{" "}
               <b className={t.earn}>
-                {clip.earnings} {tr("currency")}
+                {Number.isFinite(clip.earnings) ? `${Number(clip.earnings).toFixed(2)} ${tr("currency")}` : "—"}
               </b>
             </span>
           </div>
@@ -114,7 +127,7 @@ export default function ClipCard({ clip }) {
             <span
               className={`text-2xl font-extrabold leading-none md:text-3xl ${t.mint}`}
             >
-              {clip.views.toLocaleString("en-US")}
+              {Number.isFinite(clip.views) ? clip.views.toLocaleString("en-US") : "—"}
             </span>
             <span className={`pb-0.5 text-xs font-bold ${t.gold}`}>
               {tr("views")}
@@ -131,15 +144,17 @@ export default function ClipCard({ clip }) {
             {tr("details")}
           </Link>
 
-          <a
-            href={clip.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition ${t.pill}`}
-          >
-            <FiExternalLink size={14} />
-            {tr("openClip")}
-          </a>
+          {clip.url && (
+            <a
+              href={clip.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition ${t.pill}`}
+            >
+              <FiExternalLink size={14} />
+              {tr("openClip")}
+            </a>
+          )}
         </div>
       </div>
     </div>

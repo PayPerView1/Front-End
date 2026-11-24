@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
-import { FiX, FiCheckCircle, FiPaperclip } from "react-icons/fi";
+import { FiX, FiPaperclip } from "react-icons/fi";
 
 const darkTheme = {
   overlay: "bg-black/70",
@@ -35,13 +35,12 @@ const MAX_FILE_MB = 5;
 
 export default function ExplanationModal({ clip, onClose }) {
   const tr = useTranslations("contentPerformance.details.explain");
+  const locale = useLocale();
   const { isDark } = useTheme();
   const t = isDark ? darkTheme : lightTheme;
 
   const [text, setText] = useState("");
   const [file, setFile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
   const [error, setError] = useState("");
 
   const onFile = (e) => {
@@ -60,26 +59,11 @@ export default function ExplanationModal({ clip, onClose }) {
       setError(tr("tooShort"));
       return;
     }
-    setError("");
-    setLoading(true);
-    try {
-      const body = new FormData();
-      body.append("clipId", clip.id);
-      body.append("message", text.trim());
-      if (file) body.append("file", file);
-
-      // غيّري الرابط لـ API الحقيقي عندك
-      const res = await fetch("/api/clips/explanation", {
-        method: "POST",
-        body,
-      });
-      if (!res.ok) throw new Error("failed");
-      setDone(true);
-    } catch {
-      setError(tr("failed"));
-    } finally {
-      setLoading(false);
-    }
+    setError(
+      locale === "ar"
+        ? "طلب التفسير غير متاح من الخادم حالياً. لم يتم إرسال النص أو الملف."
+        : "Explanation requests are not available from the Main Backend yet. Your text and file were not sent."
+    );
   };
 
   return (
@@ -109,15 +93,7 @@ export default function ExplanationModal({ clip, onClose }) {
           </button>
         </div>
 
-        {done ? (
-          <div
-            className={`flex items-center gap-3 rounded-xl p-4 text-sm ${t.success}`}
-          >
-            <FiCheckCircle size={20} />
-            {tr("success")}
-          </div>
-        ) : (
-          <>
+        <>
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
@@ -150,14 +126,12 @@ export default function ExplanationModal({ clip, onClose }) {
               </button>
               <button
                 onClick={submit}
-                disabled={loading}
-                className="rounded-xl bg-[linear-gradient(90deg,#FB8B03_0%,#FA6203_100%)] px-5 py-2 text-sm font-bold text-white transition disabled:opacity-60"
+                className="rounded-xl bg-[linear-gradient(90deg,#FB8B03_0%,#FA6203_100%)] px-5 py-2 text-sm font-bold text-white transition"
               >
-                {loading ? tr("sending") : tr("send")}
+                {tr("send")}
               </button>
             </div>
-          </>
-        )}
+        </>
       </div>
     </div>
   );
