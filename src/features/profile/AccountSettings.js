@@ -1,5 +1,7 @@
 "use client";
 
+"use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -37,6 +39,7 @@ import { HiOutlineSparkles } from "react-icons/hi2";
 import { SiTiktok, SiInstagram, SiYoutube, SiX } from "react-icons/si";
 import { IoShieldCheckmarkOutline } from "react-icons/io5";
 import { BiPodcast } from "react-icons/bi";
+import { changePassword } from "@/services/authService";
 import {
   TbMicrophone,
   TbChartCandle,
@@ -58,6 +61,14 @@ export default function AccountSettings({
   const tabFromQuery = searchParams?.get("tab");
   const [activeTab, setActiveTab] = useState(tabFromQuery || initialTab);
   const [activeNav, setActiveNav] = useState("profile");
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [passwordSubmitting, setPasswordSubmitting] = useState(false);
+  const [passwordFeedback, setPasswordFeedback] = useState(null);
+  const isArabic = locale === "ar";
 
   useEffect(() => {
     if (tabFromQuery) {
@@ -71,6 +82,56 @@ export default function AccountSettings({
       const url = new URL(window.location.href);
       url.searchParams.set("tab", tabId);
       window.history.replaceState({}, "", url.toString());
+    }
+  };
+
+  const handlePasswordChange = async (event) => {
+    event.preventDefault();
+    setPasswordFeedback(null);
+
+    const { currentPassword, newPassword, confirmPassword } = passwordForm;
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordFeedback({
+        type: "error",
+        message: isArabic ? "أكمل جميع حقول كلمة المرور." : "Complete all password fields.",
+      });
+      return;
+    }
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(newPassword)) {
+      setPasswordFeedback({
+        type: "error",
+        message: isArabic
+          ? "استخدم 8 أحرف على الأقل مع حرف كبير وصغير ورقم ورمز خاص."
+          : "Use at least 8 characters with uppercase and lowercase letters, a number, and a supported symbol.",
+      });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordFeedback({
+        type: "error",
+        message: isArabic ? "كلمتا المرور الجديدتان غير متطابقتين." : "The new passwords do not match.",
+      });
+      return;
+    }
+
+    setPasswordSubmitting(true);
+    try {
+      const response = await changePassword(passwordForm);
+      if (response?.success === false) {
+        throw new Error(response.message || (isArabic ? "تعذر تغيير كلمة المرور." : "Could not change the password."));
+      }
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      setPasswordFeedback({
+        type: "success",
+        message: response?.message || (isArabic ? "تم تغيير كلمة المرور." : "Password changed."),
+      });
+    } catch (error) {
+      setPasswordFeedback({
+        type: "error",
+        message: error?.message || (isArabic ? "تعذر تغيير كلمة المرور." : "Could not change the password."),
+      });
+    } finally {
+      setPasswordSubmitting(false);
     }
   };
 
@@ -762,6 +823,72 @@ export default function AccountSettings({
                   </div>
                 </div>
               </div>
+            )}
+
+            {activeTab === "security" && (
+              <section className="max-w-2xl space-y-5 rounded-2xl border border-[#1F2634] bg-[#121620] p-5 sm:p-7">
+                <div>
+                  <h2 className="text-lg font-bold text-white">
+                    {isArabic ? "تغيير كلمة المرور" : "Change password"}
+                  </h2>
+                  <p className="mt-1 text-xs leading-6 text-[#8E95A2]">
+                    {isArabic
+                      ? "سيتم التحقق من كلمة المرور الحالية بواسطة الخادم."
+                      : "The Main Backend verifies your current password before saving the change."}
+                  </p>
+                </div>
+
+                <form onSubmit={handlePasswordChange} className="space-y-4">
+                  {[
+                    ["currentPassword", isArabic ? "كلمة المرور الحالية" : "Current password", "current-password"],
+                    ["newPassword", isArabic ? "كلمة المرور الجديدة" : "New password", "new-password"],
+                    ["confirmPassword", isArabic ? "تأكيد كلمة المرور الجديدة" : "Confirm new password", "new-password"],
+                  ].map(([name, label, autoComplete]) => (
+                    <label key={name} className="block space-y-1.5">
+                      <span className="text-xs font-semibold text-[#CBD5E1]">{label}</span>
+                      <input
+                        type="password"
+                        autoComplete={autoComplete}
+                        value={passwordForm[name]}
+                        onChange={(event) => {
+                          setPasswordForm((current) => ({ ...current, [name]: event.target.value }));
+                          setPasswordFeedback(null);
+                        }}
+                        required
+                        className="w-full rounded-xl border border-[#262C38] bg-[#0A0C10] px-3.5 py-3 text-sm text-white outline-none transition focus:border-[#2DD4BF]"
+                      />
+                    </label>
+                  ))}
+
+                  <p className="text-[11px] leading-5 text-[#64748B]">
+                    {isArabic
+                      ? "8 أحرف على الأقل، مع حرف كبير وصغير ورقم ورمز من @$!%*?&."
+                      : "At least 8 characters, including uppercase and lowercase letters, a number, and one of @$!%*?&."}
+                  </p>
+
+                  {passwordFeedback && (
+                    <p
+                      role={passwordFeedback.type === "error" ? "alert" : "status"}
+                      className={`rounded-xl border px-3 py-2.5 text-xs ${passwordFeedback.type === "error"
+                        ? "border-red-500/20 bg-red-500/10 text-red-300"
+                        : "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
+                      }`}
+                    >
+                      {passwordFeedback.message}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={passwordSubmitting}
+                    className="rounded-xl bg-gradient-to-r from-[#FF6B00] to-[#FFA800] px-5 py-3 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {passwordSubmitting
+                      ? (isArabic ? "جارٍ الحفظ…" : "Saving…")
+                      : (isArabic ? "تحديث كلمة المرور" : "Update password")}
+                  </button>
+                </form>
+              </section>
             )}
 
             {/* ─────────────────────────────────────────────────────────────

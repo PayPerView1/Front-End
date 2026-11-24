@@ -1,4 +1,5 @@
 import axiosInstance, {
+  API_BASE_URL,
   saveAuthData,
   clearAuthData,
   getToken,
@@ -74,9 +75,6 @@ export async function logout() {
     clearAuthData();
   }
 }
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://platform.apps.taqat.academy";
 
 /**
  * تسجيل الدخول أو إنشاء حساب عبر Google.
