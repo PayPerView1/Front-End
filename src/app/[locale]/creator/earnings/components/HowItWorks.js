@@ -1,11 +1,10 @@
 "use client";
 import { useTheme } from "@/context/ThemeContext";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { REVIEW_DAYS } from "@/lib/Payout";
 import { FiCheck, FiRefreshCw, FiClock } from "react-icons/fi";
 import { RiShieldCheckLine } from "react-icons/ri";
 
-const DEFAULT_REVIEW = { day: 4, daysLeft: 4, completed: false };
 
 const STEPS = [
   { id: 1, activeIcon: FiCheck },
@@ -14,8 +13,9 @@ const STEPS = [
   { id: 4, activeIcon: FiCheck },
 ];
 
-export default function HowItWorks({ review = DEFAULT_REVIEW }) {
+export default function HowItWorks({ review = { completed: false } }) {
   const { isDark } = useTheme();
+  const isAr = useLocale() === "ar";
   const t = useTranslations("Earnings.how");
 
   // ألوان: [دارك] / [لايت أغمق]
@@ -123,7 +123,7 @@ export default function HowItWorks({ review = DEFAULT_REVIEW }) {
                 <span
                   className={`inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded-full font-bold ${badgeCls}`}
                 >
-                  {t(`steps.${s.id}.badge.${state}`, { day: review.day })}
+                  {state === "active" ? (isAr ? "قيد التنفيذ" : "In progress") : t(`steps.${s.id}.badge.${state}`)}
                   {state === "done" && <FiCheck size={9} />}
                   {state === "active" && <FiClock size={9} />}
                 </span>

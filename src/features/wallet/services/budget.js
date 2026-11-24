@@ -13,10 +13,7 @@ async function call(fn) {
 const V1 = "/api/v1";
 
 // ── Wallet ──
-export const getWallet = () =>
-  process.env.NEXT_PUBLIC_BUDGET_MOCK === "true"
-    ? Promise.resolve({ balance: 24500 })
-    : call(() => axiosInstance.get(`${V1}/wallet`));
+export const getWallet = () => call(() => axiosInstance.get(`${V1}/wallet`));
 export const fundWallet = ({ amount, paymentMethod }) =>
   call(() =>
     axiosInstance.post(`${V1}/wallet/fund`, { amount, paymentMethod }),

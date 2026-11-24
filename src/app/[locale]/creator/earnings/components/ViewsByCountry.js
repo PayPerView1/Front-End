@@ -11,14 +11,6 @@ const PERCENT_COLORS = {
 };
 const DEFAULT_PERCENT_COLOR = ["#9A9A9A", "#666666"];
 
-// النسب = المبلغ ÷ الإجمالي (1670): 60 / 20 / 10 / 10
-const DEFAULT_DATA = [
-  { code: "SA", percent: 60, amount: 1002 },
-  { code: "EG", percent: 20, amount: 334 },
-  { code: "AE", percent: 10, amount: 167 },
-  { code: "OT", percent: 10, amount: 167 },
-];
-
 export default function ViewsByCountry({ countries }) {
   const { isDark } = useTheme();
   const isAr = useLocale() === "ar";
@@ -29,14 +21,18 @@ export default function ViewsByCountry({ countries }) {
     : "bg-white border-[#E5E5E5]";
   const sub = isDark ? "text-[#9A9A9A]" : "text-[#666666]";
 
-  const data = countries || DEFAULT_DATA;
+  const data = countries || [];
 
   return (
     <div className={`rounded-2xl border p-4 sm:p-6 ${card}`}>
       <h2 className="text-lg sm:text-xl font-bold">{t("title")}</h2>
       <p className={`text-xs mt-1 mb-5 ${sub}`}>{t("subtitle")}</p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      {data.length === 0 ? (
+        <p className={`py-6 text-sm ${sub}`}>
+          {isAr ? "لا تتوفر بيانات موثقة حسب الدولة حالياً." : "Verified country breakdown is not available yet."}
+        </p>
+      ) : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {data.map((c, index) => {
           const isTop = index === 0;
           const [pDark, pLight] =
@@ -109,7 +105,7 @@ export default function ViewsByCountry({ countries }) {
             </div>
           );
         })}
-      </div>
+      </div>}
     </div>
   );
 }

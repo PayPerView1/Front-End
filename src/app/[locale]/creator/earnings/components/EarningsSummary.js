@@ -1,19 +1,16 @@
 "use client";
 import { useTheme } from "@/context/ThemeContext";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { FiEye, FiStar, FiCheckCircle } from "react-icons/fi";
 
-const usd = (n) =>
-  n === 0
-    ? "$0"
-    : `$${n.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+const usd = (n) => Number.isFinite(Number(n))
+  ? `$${Number(n).toLocaleString("en-US", { minimumFractionDigits: 2 })}`
+  : "—";
 
 export default function EarningsSummary({ data }) {
   const d = data;
   const { isDark } = useTheme();
-  const isAr = useLocale() === "ar";
   const t = useTranslations("Earnings.summary");
-  const tc = useTranslations("Earnings.common");
 
   const card = isDark
     ? "bg-[#191C1D] border-[#191C1D]"
@@ -50,15 +47,12 @@ export default function EarningsSummary({ data }) {
 
           <div className="flex flex-wrap items-baseline gap-3">
             <span dir="ltr" className="text-4xl sm:text-5xl font-extrabold">
-              {isEmpty ? "0" : usd(d.total)}
-            </span>
-            <span dir={isAr ? "rtl" : "ltr"} className={`text-base ${sub}`}>
-              {tc("sar", { amount: d.totalSar.toLocaleString("en-US") })}
+              {isEmpty ? "$0.00" : usd(d.total)}
             </span>
           </div>
 
           <p className={`text-[11px] ${sub}`}>
-            {t("clipsNote", { clips: d.clips })}
+            {t("clipsNote", { clips: Number.isFinite(d.clips) ? d.clips : "—" })}
           </p>
         </div>
 
@@ -70,10 +64,10 @@ export default function EarningsSummary({ data }) {
                 <FiEye size={14} color={mintIcon} />
               </div>
               <p className="text-xl sm:text-2xl font-bold mt-1">
-                {d.views.toLocaleString("en-US")}
+                {Number.isFinite(d.views) ? d.views.toLocaleString("en-US") : "—"}
               </p>
               <p className={`text-[11px] mt-0.5 ${mint}`}>
-                {t("viewsFrom", { clips: d.clips })}
+                {t("viewsFrom", { clips: Number.isFinite(d.clips) ? d.clips : "—" })}
               </p>
             </div>
 
@@ -83,15 +77,15 @@ export default function EarningsSummary({ data }) {
                 <FiStar size={14} color={mintIcon} />
               </div>
               <p className={`text-xl sm:text-2xl font-bold mt-1 ${mint}`}>
-                {d.ecpm === 0 ? "$0" : `$${d.ecpm.toFixed(2)}`}
+                {Number.isFinite(d.ecpm) ? `$${d.ecpm.toFixed(2)}` : "—"}
               </p>
               <p className={`text-[11px] mt-0.5 ${mint}`}>
-                {t("topClip", { cpm: d.topCpm.toFixed(2) })}
+                {Number.isFinite(d.topCpm) ? t("topClip", { cpm: d.topCpm.toFixed(2) }) : "—"}
               </p>
             </div>
           </div>
 
-          <div>
+          {Number.isFinite(d.progress) && <div>
             <div className="flex justify-between text-xs mb-1.5">
               <span className={sub}>{t("cycleProgress")}</span>
               <span className={`${mint} font-bold`}>
@@ -108,7 +102,7 @@ export default function EarningsSummary({ data }) {
                 style={{ width: `${d.progress}%` }}
               />
             </div>
-          </div>
+          </div>}
         </div>
       </div>
     </div>

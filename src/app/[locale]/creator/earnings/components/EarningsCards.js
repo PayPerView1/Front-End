@@ -1,7 +1,6 @@
 "use client";
 import { useTheme } from "@/context/ThemeContext";
 import { useLocale, useTranslations } from "next-intl";
-import { REVIEW_DAYS } from "@/lib/Payout";
 import { FiCheckCircle, FiArrowLeft, FiArrowRight } from "react-icons/fi";
 import {
   RiHourglassLine,
@@ -9,28 +8,20 @@ import {
   RiShieldCheckLine,
 } from "react-icons/ri";
 
-const usd = (n) =>
-  n === 0
-    ? "$0"
-    : `$${n.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+const usd = (n) => Number.isFinite(Number(n))
+  ? `$${Number(n).toLocaleString("en-US", { minimumFractionDigits: 2 })}`
+  : "—";
 
-export default function EarningsCards({ data, review, onWithdraw }) {
+export default function EarningsCards({ data, onWithdraw }) {
   const { isDark } = useTheme();
   const isAr = useLocale() === "ar";
   const t = useTranslations("Earnings.cards");
-  const tc = useTranslations("Earnings.common");
   const Arrow = isAr ? FiArrowLeft : FiArrowRight;
-
-  const sarText = (n) =>
-    tc("sar", {
-      amount: n.toLocaleString("en-US", { minimumFractionDigits: n ? 2 : 0 }),
-    });
 
   const card = isDark
     ? "bg-[#191C1D] border-[#191C1D]"
     : "bg-white border-[#E5E5E5]";
   const sub = isDark ? "text-[#9A9A9A]" : "text-[#666666]";
-  const sarCls = isDark ? "text-[#C7CBD1]" : "text-[#444444]";
 
   // ألوان مشتركة (أخضر / محايد) — لايت أغمق لوضوح أكبر
   const greenBadge = isDark
@@ -43,11 +34,7 @@ export default function EarningsCards({ data, review, onWithdraw }) {
   const mint = isDark ? "text-[#94D3C1]" : "text-[#0B7A5A]";
   const greenIcon = isDark ? "#94D3C1" : "#0F9D75";
 
-  // الزر يشتغل فقط بعد انتهاء تدقيق الأمان ووجود رصيد
-  const canWithdraw = review.completed && data.ready > 0;
-
-  // أيام متبقية بعد اليوم الحالي (اليوم 4 → باقي 3)
-  const remaining = Math.max(REVIEW_DAYS - review.day, 0);
+  const canWithdraw = Number(data.ready) > 0;
 
   const cards = [
     {
@@ -60,7 +47,7 @@ export default function EarningsCards({ data, review, onWithdraw }) {
       badgeCls: greenBadge,
       boxCls: greenBox,
       amountCls: "",
-      desc: t("ready.desc", { days: REVIEW_DAYS }),
+      desc: t("ready.desc", { days: 7 }),
     },
     {
       key: "review",
@@ -72,28 +59,22 @@ export default function EarningsCards({ data, review, onWithdraw }) {
       badgeCls: greenBadge,
       boxCls: greenBox,
       amountCls: mint,
-      desc: t("review.desc", { days: REVIEW_DAYS }),
+      desc: t("review.desc", { days: 7 }),
       footer: (
-        <div className="flex items-center justify-between">
-          <span
-            className={`flex items-center gap-1.5 text-[11px] font-bold ${
-              isDark ? "text-[#94D3C1]" : "text-[#444444]"
-            }`}
-          >
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                isDark ? "bg-[#94D3C1]" : "bg-[#0F9D75]"
-              }`}
-            />
-            {review.completed
-              ? t("review.complete")
-              : remaining > 0
-                ? t("review.daysLeft", { days: remaining })
-                : t("review.availableSoon")}
-          </span>
-          <span className={`text-[11px] ${sub}`}>
-            {t("review.dayOf", { day: review.day, total: REVIEW_DAYS })}
-          </span>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <span className={`flex items-center gap-1.5 text-[11px] font-bold ${isDark ? "text-[#94D3C1]" : "text-[#444444]"}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${isDark ? "bg-[#94D3C1]" : "bg-[#0F9D75]"}`} />
+              {Number(data.review) > 0 ? (isAr ? "قيد التحقق" : "Pending verification") : t("review.complete")}
+            </span>
+            <span className={`text-[11px] ${sub}`}>{Number.isFinite(data.review) ? `$${Number(data.review).toFixed(2)}` : "—"}</span>
+          </div>
+          {Number(data.reserved) > 0 && (
+            <div className={`flex items-center justify-between text-[11px] ${sub}`}>
+              <span>{isAr ? "سحب قيد المعالجة" : "Withdrawal in progress"}</span>
+              <span>${Number(data.reserved).toFixed(2)}</span>
+            </div>
+          )}
         </div>
       ),
     },
@@ -113,7 +94,7 @@ export default function EarningsCards({ data, review, onWithdraw }) {
           className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1.5 rounded-lg ${greenBadge}`}
         >
           <RiShieldCheckLine size={14} />
-          {t("received.payouts", { count: data.payouts })}
+          {Number.isFinite(data.payouts) ? t("received.payouts", { count: data.payouts }) : (isAr ? "طلبات السحب" : "Withdrawal history")}
         </span>
       ),
     },
@@ -149,13 +130,6 @@ export default function EarningsCards({ data, review, onWithdraw }) {
             >
               {usd(c.amount)}
             </p>
-            <p
-              dir={isAr ? "rtl" : "ltr"}
-              className={`text-xs font-bold mt-1 ${sarCls}`}
-            >
-              {sarText(c.sar)}
-            </p>
-
             <p className={`text-xs mt-3 leading-relaxed ${sub}`}>{c.desc}</p>
 
             <div className="mt-auto pt-4">
@@ -167,7 +141,7 @@ export default function EarningsCards({ data, review, onWithdraw }) {
                   title={
                     canWithdraw
                       ? undefined
-                      : t("withdrawLocked", { days: REVIEW_DAYS })
+                      : (isAr ? "لا يوجد رصيد متاح للسحب" : "No earnings are available to withdraw")
                   }
                   className="
                     w-full flex items-center justify-center gap-2

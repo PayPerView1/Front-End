@@ -4,6 +4,14 @@
 // ============================================================
 
 export {
+  getCreatorEarnings,
+  getCreatorEarningsPrediction,
+  getCreatorEarningsTransactions,
+  getCreatorPaymentMethods,
+  addCreatorPaymentMethod,
+  requestCreatorWithdrawal,
+  getCreatorWithdrawalIntelligence,
+  getAdvertiserWalletIntelligence,
   getWalletBalance,
   getPlatformBankDetails,
   fundWallet,

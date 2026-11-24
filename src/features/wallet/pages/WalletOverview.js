@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import { useWallet } from "../WalletProvider";
+import { useUser } from "@/context/UserContext";
+import { getAdvertiserWalletIntelligence } from "@/services/wallet";
 
 export default function WalletOverview() {
   const locale = useLocale();
@@ -11,6 +14,12 @@ export default function WalletOverview() {
   const t = useTranslations("Analytics");
   const budgetT = useTranslations("budgetManagement");
   const { balance, status, error, refresh } = useWallet();
+  const { user } = useUser() || {};
+  const [intelligence, setIntelligence] = useState(null);
+  const [intelligenceLoading, setIntelligenceLoading] = useState(false);
+  const [intelligenceError, setIntelligenceError] = useState("");
+  const isBrand = ["BRAND", "BRAND_OWNER"].includes(String(user?.role || "").toUpperCase());
+  const isAr = locale === "ar";
   const money = new Intl.NumberFormat(locale, { style: "currency", currency: "USD" });
   const styles = {
     page: isDark ? "bg-[#0B0D0E] text-white" : "bg-[#F1F4F3] text-[#191C1D]",
@@ -30,6 +39,25 @@ export default function WalletOverview() {
     { href: "/advertiser/wallet/budget", title: budgetT("title"), description: budgetT("subtitle") },
     { href: "/advertiser/wallet/transactions", title: t("transactions.title"), description: t("manageGuide") },
   ];
+  const loadIntelligence = async () => {
+    if (!isBrand || intelligenceLoading) return;
+    setIntelligenceLoading(true);
+    setIntelligenceError("");
+    try {
+      setIntelligence(await getAdvertiserWalletIntelligence());
+    } catch (requestError) {
+      setIntelligence(null);
+      setIntelligenceError(requestError?.response?.data?.message || requestError?.message || (isAr ? "تعذر تحميل ذكاء المحفظة." : "Wallet intelligence is unavailable."));
+    } finally {
+      setIntelligenceLoading(false);
+    }
+  };
+  const statusLabel = (value) => value === "INSUFFICIENT_DATA"
+    ? (isAr ? "بيانات غير كافية" : "Insufficient data")
+    : value === "ESTIMATED" ? (isAr ? "تقديري" : "Estimated")
+      : value === "ASSESSED" ? (isAr ? "تم التقييم" : "Assessed")
+        : value === "RECOMMENDED" ? (isAr ? "موصى به" : "Recommended") : (value || "—");
+  const riskLabel = (value) => ({ UNKNOWN: isAr ? "غير معروف" : "Unknown", LOW: isAr ? "منخفض" : "Low", MEDIUM: isAr ? "متوسط" : "Medium", HIGH: isAr ? "مرتفع" : "High" })[value] || (value || "—");
 
   return (
     <main dir={locale === "ar" ? "rtl" : "ltr"} className={`min-h-screen px-4 py-8 sm:px-8 ${styles.page}`}>
@@ -66,6 +94,32 @@ export default function WalletOverview() {
             يتم تحميل الرصيد من حسابك الحالي.
           </p>
         </section>
+        {isBrand && <section aria-labelledby="wallet-intelligence-title" className={`mb-6 rounded-2xl border p-5 sm:p-6 ${styles.card}`}>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 id="wallet-intelligence-title" className="text-lg font-semibold">{isAr ? "ذكاء المدفوعات والميزانية" : "Payment and budget intelligence"}</h2>
+              <p className={`mt-1 max-w-2xl text-xs ${styles.muted}`}>{isAr ? "تحليل إرشادي لسجل المدفوعات والميزانيات المملوكة لهذا الحساب. لا يغيّر حالة معاملة أو استرداد." : "Advisory analysis of this account’s payment and campaign budget history. It does not change transaction or refund status."}</p>
+            </div>
+            <button type="button" onClick={loadIntelligence} disabled={intelligenceLoading} className={`rounded-xl border px-4 py-2 text-sm transition-colors disabled:opacity-50 ${styles.button}`}>
+              {intelligenceLoading ? (isAr ? "جارٍ التحليل…" : "Analyzing…") : intelligence ? (isAr ? "تحديث التحليل" : "Refresh analysis") : (isAr ? "تحليل المحفظة" : "Analyze wallet")}
+            </button>
+          </div>
+          {intelligenceError && <div role="alert" className="mt-4 flex flex-wrap items-center gap-3 text-sm text-red-500"><span>{intelligenceError}</span><button type="button" onClick={loadIntelligence} className="underline">{isAr ? "إعادة المحاولة" : "Retry"}</button></div>}
+          {intelligenceLoading && <p role="status" className={`mt-4 text-sm ${styles.muted}`}>{isAr ? "جارٍ تحليل السجل المالي المتاح…" : "Analyzing available finance history…"}</p>}
+          {intelligence && <div aria-live="polite" className="mt-4 space-y-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className={`rounded-xl border p-3 ${styles.card}`}><p className={`text-xs ${styles.muted}`}>{isAr ? "مخاطر الدفع" : "Payment risk"}</p><p className="mt-1 font-semibold">{riskLabel(intelligence.paymentFraud?.risk)} · {statusLabel(intelligence.paymentFraud?.status)}</p>{!!intelligence.paymentFraud?.reasonCodes?.length && <p className={`mt-1 text-[11px] ${styles.muted}`}>{intelligence.paymentFraud.reasonCodes.join(" · ")}</p>}</div>
+              <div className={`rounded-xl border p-3 ${styles.card}`}><p className={`text-xs ${styles.muted}`}>{isAr ? "توصية الحد اليومي" : "Daily budget recommendation"}</p><p className="mt-1 font-semibold">{intelligence.dailyBudgetRecommendation?.status === "ESTIMATED" && Number.isFinite(intelligence.dailyBudgetRecommendation.recommendedLimit) ? money.format(intelligence.dailyBudgetRecommendation.recommendedLimit) : statusLabel(intelligence.dailyBudgetRecommendation?.status)}</p>{intelligence.dailyBudgetRecommendation?.basis && <p className={`mt-1 text-[11px] ${styles.muted}`}>{intelligence.dailyBudgetRecommendation.basis}</p>}</div>
+              <div className={`rounded-xl border p-3 ${styles.card}`}><p className={`text-xs ${styles.muted}`}>{isAr ? "شذوذ الإنفاق" : "Spending anomaly"}</p><p className="mt-1 font-semibold">{riskLabel(intelligence.spendingAnomaly?.risk)} · {statusLabel(intelligence.spendingAnomaly?.status)}</p>{!!intelligence.spendingAnomaly?.reasonCodes?.length && <p className={`mt-1 text-[11px] ${styles.muted}`}>{intelligence.spendingAnomaly.reasonCodes.join(" · ")}</p>}</div>
+              <div className={`rounded-xl border p-3 ${styles.card}`}><p className={`text-xs ${styles.muted}`}>{isAr ? "طريقة الدفع المقترحة" : "Payment method recommendation"}</p><p className="mt-1 font-semibold">{intelligence.paymentMethodRecommendation?.method || statusLabel(intelligence.paymentMethodRecommendation?.status)}</p>{intelligence.paymentMethodRecommendation?.basis && <p className={`mt-1 text-[11px] ${styles.muted}`}>{intelligence.paymentMethodRecommendation.basis}</p>}</div>
+              <div className={`rounded-xl border p-3 ${styles.card}`}><p className={`text-xs ${styles.muted}`}>{isAr ? "مبلغ الإيداع المقترح" : "Estimated deposit amount"}</p><p className="mt-1 font-semibold">{intelligence.depositAmountPrediction?.status === "ESTIMATED" && Number.isFinite(intelligence.depositAmountPrediction.amount) ? money.format(intelligence.depositAmountPrediction.amount) : statusLabel(intelligence.depositAmountPrediction?.status)}</p>{intelligence.depositAmountPrediction?.basis && <p className={`mt-1 text-[11px] ${styles.muted}`}>{intelligence.depositAmountPrediction.basis}</p>}</div>
+              <div className={`rounded-xl border p-3 ${styles.card}`}><p className={`text-xs ${styles.muted}`}>{isAr ? "مؤشرات الاسترداد" : "Refund risk signals"}</p><p className="mt-1 font-semibold">{riskLabel(intelligence.refundFraud?.risk)} · {statusLabel(intelligence.refundFraud?.status)}</p>{intelligence.refundLikelihoodPrediction?.status === "ESTIMATED" && Number.isFinite(intelligence.refundLikelihoodPrediction.probability) && <p className={`mt-1 text-[11px] ${styles.muted}`}>{isAr ? "احتمال الاسترداد التقديري:" : "Estimated refund likelihood:"} {Math.round(intelligence.refundLikelihoodPrediction.probability * 100)}%</p>}</div>
+              <div className={`rounded-xl border p-3 ${styles.card}`}><p className={`text-xs ${styles.muted}`}>{isAr ? "طريقة الاسترداد" : "Refund method"}</p><p className="mt-1 font-semibold">{intelligence.refundMethodRecommendation?.method || statusLabel(intelligence.refundMethodRecommendation?.status)}</p>{intelligence.refundMethodRecommendation?.basis && <p className={`mt-1 text-[11px] ${styles.muted}`}>{intelligence.refundMethodRecommendation.basis}</p>}</div>
+            </div>
+            {intelligence.paymentFraud?.status === "INSUFFICIENT_DATA" && intelligence.spendingAnomaly?.status === "INSUFFICIENT_DATA" && <p role="status" className={`text-xs ${styles.muted}`}>{isAr ? "بعض المؤشرات غير متاحة لعدم كفاية السجل التاريخي." : "Some signals are unavailable because there is not enough history."}</p>}
+            <p className={`text-[10px] ${styles.subtle}`}>{isAr ? "هذه مؤشرات وتوقعات إرشادية؛ لا تثبت الاحتيال ولا تؤكد معاملة أو مبلغاً مستقبلياً." : "These are advisory signals and estimates; they do not prove fraud or confirm a transaction or future amount."}</p>
+          </div>}
+        </section>}
         <nav aria-label="إدارة المحفظة" className="grid gap-4 sm:grid-cols-2">
           {actions.map((action) => (
             <Link
