@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "@/i18n/navigation";
 import { FiSearch, FiChevronDown, FiSliders, FiArrowRight } from "react-icons/fi";
 import { useTheme } from "@/context/ThemeContext";
 import { Link } from "@/i18n/navigation";
@@ -9,7 +10,7 @@ import DeleteDraftModal from "@/app/[locale]/advertiser/drafts/components/Delete
 import { getExpiredDrafts, deleteDraft } from "@/services/drafts";
 
 /* ------------------------------------------------------------------ */
-/* Mock data                                                            */
+/* Empty until the backend returns expired drafts. */
 /* ------------------------------------------------------------------ */
 
 const INITIAL_EXPIRED = [];
@@ -24,6 +25,8 @@ const SORT_OPTIONS = [
 export default function ExpiredDraftsContent() {
   const [drafts, setDrafts] = useState(INITIAL_EXPIRED);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
+  const [reloadIndex, setReloadIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortLabel, setSortLabel] = useState("الأحدث تعديلاً");
   const [sortOpen, setSortOpen] = useState(false);
@@ -33,32 +36,48 @@ export default function ExpiredDraftsContent() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const { isDark } = useTheme();
+  const router = useRouter();
 
   /* ---- Fetch Expired Drafts from DB ---- */
   useEffect(() => {
     async function loadExpired() {
       setLoading(true);
+      setFetchError("");
       try {
         const res = await getExpiredDrafts();
-        const list = res?.campaigns || res?.drafts || (Array.isArray(res) ? res : null);
-        if (list && Array.isArray(list) && list.length > 0) {
-          const mapped = list.map((item) => ({
+        const list = res?.data?.drafts ?? res?.data?.campaigns ?? res?.drafts ?? res?.campaigns ?? (Array.isArray(res) ? res : null);
+        if (!Array.isArray(list)) throw new Error(res?.message || "The expired drafts response is invalid.");
+        setDrafts(list.map((item) => {
+          const modifiedAt = item.lastSavedAt || item.updatedAt || item.createdAt || null;
+          const completedFields = [
+            Boolean(item.name || item.title),
+            Boolean(item.contentType || item.category),
+            Boolean(item.targetCountries?.length),
+            Number(item.totalBudget) > 0 || Number(item.cpm) > 0,
+            Boolean(item.halalDeclared || item.halalDeclaration),
+          ];
+          const expiresAt = item.expiresAt ? new Date(item.expiresAt) : null;
+          const expiredDays = expiresAt && !Number.isNaN(expiresAt.valueOf())
+            ? Math.max(0, Math.ceil((Date.now() - expiresAt.getTime()) / 86_400_000))
+            : null;
+          return {
             id: item._id || item.id,
             title: item.name || item.title || "مسودة منتهية",
-            lastModified: item.updatedAt ? `آخر تعديل: ${new Date(item.updatedAt).toLocaleDateString("ar-EG")}` : "منذ فترة",
-            progress: item.totalBudget ? 50 : 20,
-            expiredDays: 30,
-          }));
-          setDrafts(mapped);
-        }
+            lastModified: modifiedAt ? `آخر تعديل: ${new Date(modifiedAt).toLocaleDateString("ar-EG")}` : "—",
+            sortDate: modifiedAt ? new Date(modifiedAt).getTime() : 0,
+            progress: Math.round((completedFields.filter(Boolean).length / completedFields.length) * 100),
+            expiredDays,
+          };
+        }));
       } catch (err) {
-        console.warn("Failed to fetch expired drafts from DB, using fallback mock:", err);
+        setDrafts([]);
+        setFetchError(err?.message || "تعذر تحميل المسودات منتهية الصلاحية");
       } finally {
         setLoading(false);
       }
     }
     loadExpired();
-  }, []);
+  }, [reloadIndex]);
 
   /* ---- ألوان حسب الثيم ---- */
   const pageBg = isDark ? "#0C0F10" : "#F3F4F6";
@@ -75,8 +94,15 @@ export default function ExpiredDraftsContent() {
   /* ---- Filtered drafts ---- */
   const filteredDrafts = useMemo(() => {
     if (!searchQuery.trim()) return drafts;
-    return drafts.filter((d) => d.title.includes(searchQuery.trim()));
-  }, [drafts, searchQuery]);
+    return drafts
+      .filter((d) => d.title.includes(searchQuery.trim()))
+      .sort((a, b) => {
+        if (sortLabel === "الأقدم تعديلاً") return a.sortDate - b.sortDate;
+        if (sortLabel === "الأعلى إنجازاً") return b.progress - a.progress;
+        if (sortLabel === "الأقل إنجازاً") return a.progress - b.progress;
+        return b.sortDate - a.sortDate;
+      });
+  }, [drafts, searchQuery, sortLabel]);
 
   /* ---- Handlers ---- */
   const handleDeleteRequest = (id) => {
@@ -89,10 +115,11 @@ export default function ExpiredDraftsContent() {
     if (targetId) {
       try {
         await deleteDraft(targetId);
-      } catch (err) {
-        console.warn("Delete draft error:", err);
-      } finally {
         setDrafts((prev) => prev.filter((d) => d.id !== targetId && d._id !== targetId));
+        handleCloseModal();
+      } catch (err) {
+        setFetchError(err?.message || "تعذر حذف المسودة");
+        throw err;
       }
     }
   };
@@ -102,7 +129,7 @@ export default function ExpiredDraftsContent() {
     setPendingDeleteId(null);
   };
 
-  const handleRenew = (id) => console.log("Renew draft:", id);
+  const handleRenew = (id) => router.push(`/advertiser/create-campaign?draftId=${encodeURIComponent(id)}`);
 
   const pendingDraft = drafts.find((d) => d.id === pendingDeleteId);
 
@@ -291,7 +318,14 @@ export default function ExpiredDraftsContent() {
       {/* ============================================================ */}
       {/* 4. Expired Drafts Grid                                        */}
       {/* ============================================================ */}
-      {filteredDrafts.length === 0 ? (
+      {fetchError ? (
+        <div role="alert" className="flex flex-col items-center gap-3 py-16 text-center" style={{ color: emptyColor }}>
+          <p>{fetchError}</p>
+          <button type="button" onClick={() => setReloadIndex((value) => value + 1)} className="rounded-lg bg-[#155D4B] px-4 py-2 text-white">إعادة المحاولة</button>
+        </div>
+      ) : loading ? (
+        <p role="status" className="py-16 text-center" style={{ color: emptyColor }}>جارٍ تحميل المسودات…</p>
+      ) : filteredDrafts.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center py-24 gap-4"
           style={{ color: emptyColor }}

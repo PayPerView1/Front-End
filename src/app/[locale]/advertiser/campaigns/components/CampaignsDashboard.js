@@ -178,10 +178,10 @@ export default function CampaignsDashboard() {
 
   const [campaigns, setCampaigns] = useState([]);
   const [apiStats, setApiStats] = useState({
-    totalCampaigns: 0,
-    activeCampaigns: 0,
-    completedCampaigns: 0,
-    totalBudgetSpent: 0,
+    totalCampaigns: null,
+    activeCampaigns: null,
+    completedCampaigns: null,
+    totalBudgetSpent: null,
   });
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -190,6 +190,8 @@ export default function CampaignsDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [refreshIndex, setRefreshIndex] = useState(0);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
@@ -290,33 +292,29 @@ export default function CampaignsDashboard() {
   const statsData = [
     {
       labelKey: "totalCampaigns",
-      value: apiStats.totalCampaigns?.toLocaleString() || "0",
-      change: "+12%",
-      positive: true,
+      value: apiStats.totalCampaigns == null ? "—" : Number(apiStats.totalCampaigns).toLocaleString(),
+      change: null,
       icon: MdOutlineAnalytics,
       color: "#94D3C1",
     },
     {
       labelKey: "activeCampaigns",
-      value: apiStats.activeCampaigns?.toLocaleString() || "0",
-      change: "+5%",
-      positive: true,
+      value: apiStats.activeCampaigns == null ? "—" : Number(apiStats.activeCampaigns).toLocaleString(),
+      change: null,
       icon: Discovery,
       color: "#E9C349",
     },
     {
       labelKey: "completed",
-      value: apiStats.completedCampaigns?.toLocaleString() || "0",
-      change: tc("stable"),
-      positive: null,
+      value: apiStats.completedCampaigns == null ? "—" : Number(apiStats.completedCampaigns).toLocaleString(),
+      change: null,
       icon: TickSquare,
       color: "#AACEC6",
     },
     {
       labelKey: "totalBudget",
-      value: `$${Number(apiStats.totalBudgetSpent || 0).toLocaleString()}`,
-      change: "+2.4%",
-      positive: true,
+      value: apiStats.totalBudgetSpent == null ? "—" : `$${Number(apiStats.totalBudgetSpent).toLocaleString()}`,
+      change: null,
       icon: BsWallet2,
       color: "#94D3C1",
     },
@@ -406,6 +404,7 @@ export default function CampaignsDashboard() {
   useEffect(() => {
     async function loadCampaigns() {
       setLoading(true);
+      setLoadError("");
       try {
         const params = {
           page: currentPage,
@@ -414,44 +413,33 @@ export default function CampaignsDashboard() {
           sortOrder: "desc",
           ...(statusFilter !== "ALL" && { status: statusFilter }),
           ...(search.trim() && { search: search.trim() }),
-          ...(startDate && { startDate }),
-          ...(startDate && { endDate: endDate || startDate }), // يوم واحد = نفس التاريخ
+          ...(startDate && { dateFrom: startDate }),
+          ...(startDate && { dateTo: endDate || startDate }),
         };
 
-        const [campaignsRes, statsRes] = await Promise.all([
+        const [campaignsResult, statsResult] = await Promise.allSettled([
           getCampaigns(params),
           getCampaignStatistics(),
         ]);
+        if (campaignsResult.status === "rejected") throw campaignsResult.reason;
+        const campaignsRes = campaignsResult.value;
+        const campaignsBody = campaignsRes?.data ?? campaignsRes;
+        const fetchedCampaigns = campaignsBody?.campaigns ?? campaignsBody?.data?.campaigns ?? campaignsBody?.items ?? campaignsBody?.data?.items ?? (Array.isArray(campaignsBody) ? campaignsBody : null);
+        if (!Array.isArray(fetchedCampaigns)) throw new Error(campaignsBody?.message || "The campaigns response is invalid.");
+        setCampaigns(fetchedCampaigns);
+        setPagination(campaignsBody?.pagination ?? campaignsBody?.data?.pagination ?? {
+          currentPage: 1,
+          totalPages: 1,
+          totalCampaigns: fetchedCampaigns.length,
+        });
 
-        console.log("📋 [Campaigns API Response]:", JSON.stringify(campaignsRes, null, 2));
-
-        // campaigns
-        if (campaignsRes?.data?.campaigns) {
-          const fetchedCampaigns = campaignsRes.data.campaigns;
-          console.log(`🗂️ [Campaigns Count]: ${fetchedCampaigns.length} حملة`);
-          fetchedCampaigns.forEach((c, i) => {
-            console.log(`📌 [Campaign #${i + 1}] ID: ${c._id} | Name: ${c.name} | Status: ${c.status}`);
-          });
-          setCampaigns(fetchedCampaigns);
-          setPagination(
-            campaignsRes.data.pagination || {
-              currentPage: 1,
-              totalPages: 1,
-              totalCampaigns: 0,
-            },
-          );
-        } else {
-          console.warn("⚠️ [Campaigns] لا توجد حملات في الاستجابة:", campaignsRes);
-        }
-
-        // stats cards
-        if (statsRes?.data?.statistics) {
-          setApiStats(statsRes.data.statistics);
+        if (statsResult.status === "fulfilled") {
+          const statsBody = statsResult.value?.data ?? statsResult.value;
+          const statistics = statsBody?.statistics ?? statsBody?.data?.statistics;
+          if (statistics) setApiStats(statistics);
         }
       } catch (error) {
-        console.error("❌ Error:", error.message);
-        setCampaigns([]);
-        setPagination({ currentPage: 1, totalPages: 1, totalCampaigns: 0 });
+        setLoadError(error?.message || (isRtl ? "تعذر تحميل الحملات" : "Failed to load campaigns"));
       } finally {
         setLoading(false);
         setInitialLoad(false);
@@ -461,9 +449,20 @@ export default function CampaignsDashboard() {
     // debounce 400ms للبحث بس
     const delay = setTimeout(loadCampaigns, search ? 400 : 0);
     return () => clearTimeout(delay);
-  }, [currentPage, statusFilter, search, startDate, endDate]);
+  }, [currentPage, statusFilter, search, startDate, endDate, refreshIndex, isRtl]);
 
   if (initialLoad) return <PageLoader />;
+
+  if (loadError) {
+    return (
+      <div dir={dir} className={`flex min-h-screen flex-col items-center justify-center gap-4 p-6 ${t.bg}`}>
+        <p role="alert" className={t.subText}>{loadError}</p>
+        <button type="button" onClick={() => setRefreshIndex((value) => value + 1)} className="rounded-lg bg-[#155D4B] px-4 py-2 font-semibold text-white">
+          {isRtl ? "إعادة المحاولة" : "Retry"}
+        </button>
+      </div>
+    );
+  }
 
   if (
     !initialLoad &&
@@ -514,7 +513,7 @@ export default function CampaignsDashboard() {
                   >
                     <Icon size={18} color={stat.color} />
                   </div>
-                  {stat.positive !== null ? (
+                  {stat.change != null && stat.positive !== null ? (
                     <span
                       className="text-xs font-bold px-2 py-0.5 rounded-full"
                       style={{
@@ -530,11 +529,11 @@ export default function CampaignsDashboard() {
                     >
                       {stat.change}
                     </span>
-                  ) : (
+                  ) : stat.change != null ? (
                     <span className="text-xs font-bold px-2 py-0.5 rounded-full text-[#BFC9C4]">
                       {stat.change}
                     </span>
-                  )}
+                  ) : null}
                 </div>
                 <div className={isRtl ? "text-right" : "text-left"}>
                   <p className={`text-xs ${t.subText}`}>{tc(stat.labelKey)}</p>

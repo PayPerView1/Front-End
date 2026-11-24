@@ -18,26 +18,28 @@ export default function CopyModal({ campaign }) {
   const [copyMedia, setCopyMedia] = useState(false);
   const [copyTargeting, setCopyTargeting] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleCopy() {
-  setLoading(true);
-  try {
-    const res = await copyCampaign(campaign._id, {
-      newName: copyName,
-      includeMaterials: copyMedia,
-      includeTargeting: copyTargeting,
-    });
-
-    // الـ API بيرجع draft جديد ← نروح لصفحة الحملات
-    // res = { success, message, data: { draft: { _id, name, status } } }
-    console.log("Copied draft:", res?.data?.draft);
-    router.push(`/${locale}/advertiser/campaigns`);
-
-  } catch (err) {
-    console.error("Copy failed:", err);
-    setLoading(false); // ← بس في الـ catch لأن success رح تنتقل للصفحة
+    if (loading) return;
+    setLoading(true);
+    setError("");
+    try {
+      const result = await copyCampaign(campaign?._id || campaign?.id, {
+        newName: copyName,
+        includeMaterials: copyMedia,
+        includeTargetAudience: copyTargeting,
+      });
+      const draft = result?.data?.draft ?? result?.draft;
+      if (result?.success !== true || !draft) {
+        throw new Error(result?.message || "The campaign copy response is invalid.");
+      }
+      router.push(`/${locale}/advertiser/drafts`);
+    } catch (cause) {
+      setError(cause?.message || (locale === "ar" ? "تعذر نسخ الحملة" : "Could not copy the campaign"));
+      setLoading(false);
+    }
   }
-}
 
   return (
     <div
@@ -50,6 +52,7 @@ export default function CopyModal({ campaign }) {
         boxShadow: isDark ? "0 8px 32px rgba(0,0,0,0.4)" : "0 8px 32px rgba(0,0,0,0.12)",
       }}
     >
+      {error && <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{error}</p>}
       {/* الهيدر */}
       <div className="flex items-center justify-between">
         <div className={`flex items-center gap-2 ${locale === "ar" ? "" : "flex-row-reverse"}`}>

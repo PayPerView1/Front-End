@@ -5,23 +5,9 @@ import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import { useRouter } from "@/i18n/navigation";
 import { FiCalendar, FiFileText } from "react-icons/fi";
-import {
-  saveDraft,
-  autoSaveDraft,
-  createCampaignJson,
-  uploadCoverImage,
-} from "@/services/campaignApi";
-import { getDraftById, deleteDraft } from "@/services/drafts";
-import { submitDraft as submitDraftToCampaign, getCampaignAiReview } from "@/services/campaign";
+import { createCampaign } from "@/services/campaignApi";
+import { saveDraft, autoSaveDraft, getDraftById, submitDraft } from "@/services/drafts";
 import { toast } from "@/components/ui/Toast";
-
-// Helper: trigger AI review in the background (fire-and-forget)
-function triggerAiReview(campaignId) {
-  if (!campaignId) return;
-  getCampaignAiReview(campaignId)
-    .then((res) => console.log("🤖 [AI Review] تم تشغيل المراجعة:", res))
-    .catch((err) => console.warn("⚠️ [AI Review] فشل تشغيل المراجعة:", err?.message));
-}
 
 import {
   MdVolumeUp,
@@ -59,7 +45,23 @@ const ALL_PLATFORMS = [
   { key: "x",         icon: FaXTwitter,   label: "X (Twitter)", color: "#E7E9EA" },
 ];
 
-const ASPECT_RATIOS = ["9:16", "1:1", "4:5", "16:9", "3:4"];
+const TARGET_COUNTRIES_LIST = [
+  { code: "SAU", labelAr: "السعودية", labelEn: "Saudi Arabia", flag: "🇸🇦" },
+  { code: "ARE", labelAr: "الإمارات", labelEn: "UAE", flag: "🇦🇪" },
+  { code: "EGY", labelAr: "مصر", labelEn: "Egypt", flag: "🇪🇬" },
+  { code: "KWT", labelAr: "الكويت", labelEn: "Kuwait", flag: "🇰🇼" },
+  { code: "QAT", labelAr: "قطر", labelEn: "Qatar", flag: "🇶🇦" },
+  { code: "BHR", labelAr: "البحرين", labelEn: "Bahrain", flag: "🇧🇭" },
+  { code: "OMN", labelAr: "عُمان", labelEn: "Oman", flag: "🇴🇲" },
+  { code: "JOR", labelAr: "الأردن", labelEn: "Jordan", flag: "🇯🇴" },
+  { code: "IRQ", labelAr: "العراق", labelEn: "Iraq", flag: "🇮🇶" },
+  { code: "MAR", labelAr: "المغرب", labelEn: "Morocco", flag: "🇲🇦" },
+  { code: "DZA", labelAr: "الجزائر", labelEn: "Algeria", flag: "🇩🇿" },
+  { code: "USA", labelAr: "الولايات المتحدة", labelEn: "United States", flag: "🇺🇸" },
+  { code: "GBR", labelAr: "المملكة المتحدة", labelEn: "United Kingdom", flag: "🇬🇧" },
+];
+
+const ASPECT_RATIOS = ["9:16", "1:1", "4:5", "16:9"];
 
 const CONTENT_TYPE_IDS = [
   "CLIPPING",
@@ -454,6 +456,7 @@ function Step1({
                   setForm((p) => ({
                     ...p,
                     contentType: id,
+                    subCategories: id === "MIXED" ? p.subCategories : [],
                   }))
                 }
                 className={`flex flex-col items-center gap-2 py-[18px] px-3 rounded-xl border transition-all cursor-pointer
@@ -498,6 +501,37 @@ function Step1({
             );
           })}
         </div>
+        {form.contentType === "MIXED" && (
+          <div className="mt-3 rounded-xl border border-[#E5E5E5] p-3 dark:border-white/10">
+            <p className={`mb-2 text-xs font-semibold ${dark ? "text-white" : "text-[#333]"}`}>
+              {t("step1.contentType")}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {CONTENT_TYPE_IDS.filter((id) => id !== "MIXED").map((id) => {
+                const selected = form.subCategories.includes(id);
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => setForm((current) => ({
+                      ...current,
+                      subCategories: selected
+                        ? current.subCategories.filter((item) => item !== id)
+                        : [...current.subCategories, id],
+                    }))}
+                    className={`rounded-lg border px-3 py-2 text-xs ${selected ? "border-[#FF8C00] bg-[#FF8C00]/10 text-[#FF8C00]" : dark ? "border-white/10 text-gray-300" : "border-[#E5E5E5] text-[#555]"}`}
+                  >
+                    {t(`step1.contentTypes.${id}`)}
+                  </button>
+                );
+              })}
+            </div>
+            {attempted && form.subCategories.length === 0 && (
+              <p className="mt-2 text-xs text-[#E53535]">{t("step1.required")}</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* الجمهور */}
@@ -1632,6 +1666,7 @@ export default function NewCampaignPage() {
   const MAX_MB = 20;
 
   const [draftId, setDraftId] = useState(null);
+  const [draftVersion, setDraftVersion] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // ─── Load Draft ─────────────────────────────────────────────
@@ -1659,6 +1694,7 @@ export default function NewCampaignPage() {
           res;
 
         if (d) {
+          setDraftVersion(Number(d.version) || 1);
           const budgetVal =
             d.totalBudget != null
               ? String(d.totalBudget)
@@ -1703,24 +1739,24 @@ export default function NewCampaignPage() {
             subCategories: d.subCategories || [],
             targetCountries: d.targetCountries || [],
             // ── الحقول الجديدة ──
-            platforms: Array.isArray(d.platforms)
-              ? d.platforms.map((p) => (typeof p === "string" ? p.toLowerCase() : p?.key ?? ""))
+            platforms: Array.isArray(d.submissionRequirements?.platforms || d.platforms)
+              ? (d.submissionRequirements?.platforms || d.platforms).map((p) => (typeof p === "string" ? p.toLowerCase() : p?.key ?? ""))
               : [],
-            requiredHashtags: Array.isArray(d.requiredHashtags)
-              ? d.requiredHashtags.join(" ")
-              : (d.requiredHashtags || ""),
-            requiredKeywords: Array.isArray(d.requiredKeywords)
-              ? d.requiredKeywords.join(", ")
-              : (d.requiredKeywords || ""),
-            requiredMentions: Array.isArray(d.requiredMentions)
-              ? d.requiredMentions.join(" ")
-              : (d.requiredMentions || ""),
-            aspectRatio: d.aspectRatio || "",
-            minDurationSec: d.minDurationSec != null ? String(d.minDurationSec) : "",
-            maxDurationSec: d.maxDurationSec != null ? String(d.maxDurationSec) : "",
-            shariaNote: d.shariaNote || "",
-            offerCondition: d.offerCondition || "",
-            clipIdea: d.clipIdea || "",
+            requiredHashtags: Array.isArray(d.submissionRequirements?.requiredHashtags || d.requiredHashtags)
+              ? (d.submissionRequirements?.requiredHashtags || d.requiredHashtags).join(" ")
+              : d.submissionRequirements?.requiredHashtags || d.requiredHashtags || "",
+            requiredKeywords: Array.isArray(d.submissionRequirements?.requiredKeywords || d.requiredKeywords)
+              ? (d.submissionRequirements?.requiredKeywords || d.requiredKeywords).join(", ")
+              : d.submissionRequirements?.requiredKeywords || d.requiredKeywords || "",
+            requiredMentions: Array.isArray(d.submissionRequirements?.requiredMentions || d.requiredMentions)
+              ? (d.submissionRequirements?.requiredMentions || d.requiredMentions).join(" ")
+              : d.submissionRequirements?.requiredMentions || d.requiredMentions || "",
+            aspectRatio: d.submissionRequirements?.aspectRatio || d.aspectRatio || "",
+            minDurationSec: (d.submissionRequirements?.minDurationSec ?? d.minDurationSec) != null ? String(d.submissionRequirements?.minDurationSec ?? d.minDurationSec) : "",
+            maxDurationSec: (d.submissionRequirements?.maxDurationSec ?? d.maxDurationSec) != null ? String(d.submissionRequirements?.maxDurationSec ?? d.maxDurationSec) : "",
+            shariaNote: d.submissionRequirements?.shariaNote || d.shariaNote || "",
+            offerCondition: d.submissionRequirements?.offerCondition || d.offerCondition || "",
+            clipIdea: d.submissionRequirements?.clipIdea || d.clipIdea || "",
             brief: {
               ...prev.brief,
               mainIdea: mainIdeaVal,
@@ -1775,7 +1811,8 @@ export default function NewCampaignPage() {
       form.cpm &&
       form.startDate &&
       form.endDate &&
-      form.contentType
+      form.contentType &&
+      (form.contentType !== "MIXED" || form.subCategories.length > 0)
   );
 
   const step2Valid =
@@ -1834,56 +1871,67 @@ export default function NewCampaignPage() {
     });
   }
 
-  // ─── Save Draft ─────────────────────────────────────────────
-  const handleSaveDraft = async () => {
+  const buildCampaignPayload = () => {
     const payload = {
-      name: form.name,
-      contentType: form.contentType || undefined,
-      category:
-        form.category ||
-        form.contentType ||
-        undefined,
-
-      totalBudget: form.totalBudget
-        ? Number(form.totalBudget)
-        : undefined,
-
-      cpm: form.cpm
-        ? Number(form.cpm)
-        : undefined,
-
-      startDate: form.startDate || undefined,
-      endDate: form.endDate || undefined,
-
-      targetCountries: normalizeCountryCodes(
-        form.targetCountries
-      ),
-
-      brief: {
-        ...form.brief,
-        mainIdea:
-          description ||
-          form.brief.mainIdea,
-        audience: form.audience,
-      },
-
+      name: (form.name || "").trim(),
       halalDeclaration: checked,
+      halalDeclared: Object.values(checked).every(Boolean),
+    };
 
-      halalDeclared:
-        Object.values(checked).every(Boolean),
+    if (form.contentType) {
+      payload.contentType = form.contentType;
+      payload.category = form.category || form.contentType;
+      if (form.contentType === "MIXED" && form.subCategories?.length) {
+        payload.subCategories = form.subCategories;
+      }
+    }
 
-      // ── الحقول الجديدة ──
-      platforms: form.platforms,
-      requiredHashtags: form.requiredHashtags
-        ? form.requiredHashtags.split(/[\s,]+/).filter(Boolean)
-        : undefined,
-      requiredKeywords: form.requiredKeywords
-        ? form.requiredKeywords.split(/[,،]+/).map((k) => k.trim()).filter(Boolean)
-        : undefined,
-      requiredMentions: form.requiredMentions
-        ? form.requiredMentions.split(/\s+/).filter(Boolean)
-        : undefined,
-      aspectRatio: form.aspectRatio || undefined,
+    if (form.totalBudget && Number(form.totalBudget) > 0) {
+      payload.totalBudget = Number(form.totalBudget);
+    }
+
+    if (form.cpm && Number(form.cpm) > 0) {
+      payload.cpm = Number(form.cpm);
+    }
+
+    if (form.startDate) {
+      payload.startDate = form.startDate;
+    }
+
+    if (form.endDate) {
+      payload.endDate = form.endDate;
+    }
+
+    if (form.targetCountries?.length) {
+      payload.targetCountries = normalizeCountryCodes(form.targetCountries);
+    }
+
+    const mainIdea = (description || form.brief?.mainIdea || "").trim();
+    if (mainIdea || form.audience) {
+      payload.brief = {
+        ...form.brief,
+        mainIdea: mainIdea || undefined,
+        audience: form.audience || undefined,
+      };
+    }
+
+    const platforms = (form.platforms || []).map((platform) => platform.toUpperCase()).filter(Boolean);
+    const requiredHashtags = form.requiredHashtags
+      ? form.requiredHashtags.split(/[\s,]+/).filter(Boolean)
+      : [];
+    const requiredKeywords = form.requiredKeywords
+      ? form.requiredKeywords.split(/[,،]+/).map((keyword) => keyword.trim()).filter(Boolean)
+      : [];
+    const requiredMentions = form.requiredMentions
+      ? form.requiredMentions.split(/\s+/).map((mention) => mention.replace(/^@/, "")).filter(Boolean)
+      : [];
+
+    payload.submissionRequirements = {
+      platforms,
+      requiredHashtags,
+      requiredKeywords,
+      requiredMentions,
+      aspectRatio: form.aspectRatio || "9:16",
       minDurationSec: form.minDurationSec ? Number(form.minDurationSec) : undefined,
       maxDurationSec: form.maxDurationSec ? Number(form.maxDurationSec) : undefined,
       shariaNote: form.shariaNote || undefined,
@@ -1891,258 +1939,64 @@ export default function NewCampaignPage() {
       clipIdea: form.clipIdea || undefined,
     };
 
-    try {
-      if (draftId) {
-        await autoSaveDraft(
-          draftId,
-          payload
-        );
-      } else {
-        const res = await saveDraft(payload);
+    return payload;
+  };
 
-        if (res?.data?.draft?._id) {
-          setDraftId(res.data.draft._id);
-        }
+  const getCampaignAssets = () => ({
+    coverImage,
+    materials: files.filter((item) => item.status === "success" && item.file instanceof File).map((item) => item.file),
+  });
+
+  // ─── Save Draft ─────────────────────────────────────────────
+  const handleSaveDraft = async () => {
+    if (!form.name.trim()) {
+      toast.warning(isRtl ? "يرجى إدخال اسم الحملة أولاً لحفظ المسودة" : "Please enter a campaign name first to save draft");
+      setAttempted(true);
+      return;
+    }
+    const payload = buildCampaignPayload();
+    const assets = getCampaignAssets();
+    try {
+      const response = draftId
+        ? await autoSaveDraft(draftId, { ...payload, clientVersion: draftVersion }, assets)
+        : await saveDraft(payload, assets);
+      const draft = response?.draft || response?.data?.draft;
+      if (draft?._id || draft?.id) {
+        setDraftId(draft._id || draft.id);
+        setDraftVersion(Number(draft.version) || 1);
       }
-    } catch (err) {
-      console.error(
-        "خطأ في حفظ المسودة:",
-        err
-      );
-    } finally {
+      toast.success("تم حفظ المسودة بنجاح");
       router.push("/advertiser/drafts");
+    } catch (error) {
+      toast.error(error?.message || "تعذر حفظ المسودة");
     }
   };
 
   // ─── Submit Campaign ───────────────────────────────────────
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    const payload = buildCampaignPayload();
+    const assets = getCampaignAssets();
 
     try {
-      // رفع صورة الحملة أولاً (إن وُجدت)
-      let coverImageUrl;
-
-      if (coverImage) {
-        try {
-          coverImageUrl = await uploadCoverImage(coverImage);
-        } catch (uploadErr) {
-          console.warn(
-            "⚠️ [Cover Upload Error]:",
-            uploadErr?.message || uploadErr
-          );
-          toast.warning("تعذّر رفع صورة الحملة، سيتم الإرسال بدونها.");
-        }
-      }
-
-      const payload = {
-        name: form.name,
-        contentType: form.contentType,
-        category:
-          form.category ||
-          form.contentType,
-
-        totalBudget: Number(
-          form.totalBudget
-        ),
-
-        rewardPerView: Number(form.cpm),
-        cpm: Number(form.cpm),
-
-        startDate: form.startDate,
-        endDate: form.endDate,
-
-        currency: "USD",
-        clientVersion: "1.0.0",
-
-        targetCountries:
-          normalizeCountryCodes(
-            form.targetCountries
-          ),
-
-        halalDeclaration: checked,
-
-        halalDeclared:
-          Object.values(checked).every(Boolean),
-
-        brief: {
-          ...form.brief,
-          mainIdea:
-            description ||
-            form.brief.mainIdea,
-          audience: form.audience,
-        },
-
-        // ── الحقول الجديدة ──
-        platforms: form.platforms,
-        requiredHashtags: form.requiredHashtags
-          ? form.requiredHashtags.split(/[\s,]+/).filter(Boolean)
-          : [],
-        requiredKeywords: form.requiredKeywords
-          ? form.requiredKeywords.split(/[,،]+/).map((k) => k.trim()).filter(Boolean)
-          : [],
-        requiredMentions: form.requiredMentions
-          ? form.requiredMentions.split(/\s+/).filter(Boolean)
-          : [],
-        aspectRatio: form.aspectRatio || undefined,
-        minDurationSec: form.minDurationSec ? Number(form.minDurationSec) : undefined,
-        maxDurationSec: form.maxDurationSec ? Number(form.maxDurationSec) : undefined,
-        shariaNote: form.shariaNote || undefined,
-        offerCondition: form.offerCondition || undefined,
-        clipIdea: form.clipIdea || undefined,
-      };
-
-      if (coverImageUrl) {
-        payload.coverImage = coverImageUrl;
-      }
-
-      console.log(
-        "📤 [Payload] البيانات المرسلة:",
-        JSON.stringify(
-          payload,
-          null,
-          2
-        )
-      );
-
-      // ========================================================
-      // الحالة الأولى:
-      // المستخدم داخل Draft موجود
-      // ========================================================
       if (draftId) {
-        // 1. تحديث الـ Draft أولاً
-        try {
-          await autoSaveDraft(
-            draftId,
-            payload
-          );
-
-          console.log(
-            "✅ [Draft Updated] تم حفظ التعديلات"
-          );
-        } catch (updateErr) {
-          console.warn(
-            "⚠️ [Draft Update Error]:",
-            updateErr
-          );
+        const saved = await autoSaveDraft(draftId, { ...payload, clientVersion: draftVersion }, assets);
+        setDraftVersion(Number(saved?.draft?.version) || draftVersion + 1);
+        const submitted = await submitDraft(draftId, { halalDeclaration: checked }, assets);
+        if (submitted?.success !== true || !submitted?.campaign) {
+          throw new Error(submitted?.message || "استجابة تسليم المسودة غير صالحة");
         }
-
-        // 2. محاولة تحويل الـ Draft إلى Campaign
-        try {
-          const res =
-            await submitDraftToCampaign(
-              draftId
-            );
-
-          if (
-            res &&
-            (
-              res.success === "true" ||
-              res.success === true ||
-              res.data
-            )
-          ) {
-            toast.success("تم إرسال الحملة للمراجعة بنجاح ✅");
-
-            router.push("/advertiser/campaigns");
-
-            return;
-          }
-        } catch (submitErr) {
-          console.warn(
-            "⚠️ [Submit Draft Error]:",
-            submitErr?.message ||
-              submitErr
-          );
+      } else {
+        const created = await createCampaign(payload, assets);
+        if (created?.success !== true || !created?.campaign) {
+          throw new Error(created?.message || "استجابة إنشاء الحملة غير صالحة");
         }
-
-        // 3. Fallback
-        // إذا فشل تحويل الـ Draft
-        // ننشئ Campaign جديدة
-        console.log(
-          "🚀 [Fallback] جاري إنشاء حملة جديدة..."
-        );
-
-        payload.status =
-          "PENDING_REVIEW";
-
-        const result =
-          await createCampaignJson(
-            payload
-          );
-
-        console.log(
-          "✅ [Campaign Response]:",
-          JSON.stringify(
-            result,
-            null,
-            2
-          )
-        );
-
-        // 🤖 تشغيل AI Review بعد إنشاء الحملة
-        const createdId = result?.data?.id || result?.data?.campaign?.id || result?.id;
-        triggerAiReview(createdId);
-
-        // 4. حذف الـ Draft القديم
-        try {
-          await deleteDraft(
-            draftId
-          );
-
-          console.log(
-            "🗑️ [Draft Deleted] تم حذف المسودة القديمة"
-          );
-        } catch (deleteErr) {
-          console.warn(
-            "⚠️ [Draft Delete Error]:",
-            deleteErr?.message ||
-              deleteErr
-          );
-        }
-
-        toast.success("تم إرسال الحملة للمراجعة بنجاح ✅");
-
-        router.push("/advertiser/campaigns");
-
-        return;
       }
-
-      // ========================================================
-      // الحالة الثانية:
-      // إنشاء Campaign جديدة من البداية
-      // ========================================================
-
-      payload.status =
-        "PENDING_REVIEW";
-
-      const result =
-        await createCampaignJson(
-          payload
-        );
-
-      console.log(
-        "✅ [Campaign Response]:",
-        JSON.stringify(
-          result,
-          null,
-          2
-        )
-      );
-
-      // 🤖 تشغيل AI Review بعد إنشاء الحملة
-      const createdId = result?.data?.id || result?.data?.campaign?.id || result?.id;
-      triggerAiReview(createdId);
 
       toast.success("تم إرسال الحملة للمراجعة بنجاح ✅");
-
       router.push("/advertiser/campaigns");
-    } catch (err) {
-      console.error(
-        "❌ خطأ في الإرسال:",
-        err
-      );
-
-      toast.error(err?.message || "حدث خطأ، حاول مرة أخرى");
+    } catch (error) {
+      toast.error(error?.message || "حدث خطأ، حاول مرة أخرى");
     } finally {
       setIsSubmitting(false);
     }
