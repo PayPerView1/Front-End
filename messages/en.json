@@ -999,9 +999,12 @@
     "disclaimer": "The assistant may occasionally make mistakes. Please verify important information.",
     "viewConversations": "View conversations",
     "conversations": "Conversations",
+    "emptyConversations": "No saved conversations yet.",
+    "retry": "Retry",
     "newConversation": "New conversation",
     "loading": "Loading",
     "errors": {
+      "loadThreads": "Failed to load conversations",
       "loadMessages": "Failed to load messages",
       "createThread": "Failed to create conversation",
       "sendMessage": "Failed to send message",
@@ -1226,7 +1229,8 @@
         "deposit": "Balance deposit",
         "adSpend": "Budget deduction",
         "refund": "Refund / surplus",
-        "audit": "Review fee"
+        "audit": "Review fee",
+        "unknown": "Other transaction"
       },
       "dates": {
         "all": "All time",
@@ -1253,7 +1257,10 @@
       },
       "status": {
         "verified": "Completed and verified",
-        "pending": "Processing"
+        "pending": "Processing",
+        "failed": "Failed",
+        "cancelled": "Cancelled",
+        "unknown": "Unknown"
       },
       "viewDetails": "View details",
       "printInvoice": "Print invoice",
@@ -2305,8 +2312,10 @@
         "goldTitle": "Gulf Digital Gold Platform - Saving in Pure Gold"
       },
       "ai": {
-        "label": "AI check result",
-        "subtitle": "The clip was analyzed and verified against the requirements",
+        "label": "Saved AI review checks",
+        "subtitle": "Recorded check results and guidance. Some checks may require human review.",
+        "scoreLabel": "AI review score",
+        "unavailable": "Not available",
         "excellent": "Excellent",
         "items": {
           "sharia": {
@@ -2329,9 +2338,9 @@
       }
     },
     "approved": {
-      "title": "The clip was checked and automatically approved by AI!",
-      "description": "All campaign criteria and the specified Sharia rules were verified at 100%. Current submission status: awaiting the advertiser's final approval for payout. The amount is protected by escrow and secured for transfer.",
-      "scoreLabel": "Overall match score",
+      "title": "Submission approved",
+      "description": "The backend records this submission as approved. Review the saved AI checks below; they do not replace the advertiser's recorded decision.",
+      "scoreLabel": "AI review score",
       "reportTitle": "Full AI check results report",
       "reportSubtitle": "{passed} of {total} requirements verified successfully",
       "instant": "Instant check",
@@ -2428,9 +2437,9 @@
       }
     },
     "rejected": {
-      "title": "AI check complete: the clip does not meet the requirements",
-      "description": "Review the reasons for rejection below, fix the clip on your platform, then re-check with one click.",
-      "reportTitle": "Full AI check results report",
+      "title": "Submission rejected",
+      "description": "The backend has recorded this submission as rejected. Review the saved findings below; they do not change the recorded status.",
+      "reportTitle": "Saved review findings",
       "reportSubtitle": "{passed} of {total} requirements verified successfully",
       "instant": "Instant check",
       "fixesTitle": "Only this needs fixing ({count} required)",
@@ -2541,30 +2550,29 @@
     }
   },
   "contentPerformance": {
-    "title": "My Published Clips Views",
-    "subtitle": "Track the live views your approved clips are getting, clearly and in real time",
+    "title": "My submissions",
+    "subtitle": "Submission, reward, and view data returned by the Main Backend.",
     "downloadReport": "Download report (Excel)",
     "stats": {
-      "liveViews": {
-        "label": "Total live views",
+      "recordedViews": {
+        "label": "Recorded views",
         "unit": "views",
-        "note": "Growth this week"
+        "note": "View counts available for {count} of {total} submissions"
       },
-      "activeClips": {
-        "label": "Active clips",
-        "unit": "videos",
-        "note": "Earning active, live revenue"
+      "approvedSubmissions": {
+        "label": "Approved submissions",
+        "unit": "submissions",
+        "note": "Counted from the submission status returned by the backend"
       },
-      "verifiedViews": {
-        "label": "Verified views",
+      "viewsAvailable": {
+        "label": "Submissions with view counts",
+        "unit": "submissions",
+        "note": "Counted where the backend returned a view count"
+      },
+      "averageViews": {
+        "label": "Average recorded views per submission",
         "unit": "views",
-        "note": "100% real human visits"
-      },
-      "flowSpeed": {
-        "label": "Current flow rate",
-        "unit": "views / second",
-        "note": "During current peak hours",
-        "badge": "Excellent flow"
+        "note": "Calculated from submissions with returned view counts"
       }
     },
     "tabs": {
@@ -2574,26 +2582,27 @@
       "reels": "Instagram Reels"
     },
     "searchPlaceholder": "Search by clip or campaign name...",
-    "listTitle": "Approved clips and current view rate",
-    "liveNow": "Live now",
-    "showing": "Showing {count} active clips earning revenue",
+    "listTitle": "Submissions",
+    "liveNow": "Backend data",
+    "showing": "Showing {count} submissions",
     "noResults": "No clips match your search",
     "info": {
-      "title": "How are your views and earnings updated?",
-      "text": "The system updates the view counter and calculates your earnings automatically every 10 to 15 minutes through a direct connection to the platforms, with no need to refresh the page manually. All views go through automated verification to protect your financial rights with the highest Sharia-compliance integrity standards."
+      "title": "About these values",
+      "text": "This page displays the submission and view fields returned by the Main Backend when the page loads. A missing value means the backend did not return that field."
     },
     "card": {
       "platform": {
         "tiktok": "TikTok",
         "shorts": "Shorts",
-        "reels": "Reels"
+        "reels": "Reels",
+        "unknown": "Unknown platform"
       },
       "campaign": "{name} campaign",
-      "published": "Published: {time} ago",
+      "published": "Submitted: {time}",
       "completion": "Completion rate:",
-      "earnings": "Estimated earnings:",
+      "earnings": "Reward amount:",
       "currency": "SAR",
-      "verifiedViews": "Current verified views",
+      "verifiedViews": "Recorded views",
       "views": "views",
       "details": "Stats details",
       "openClip": "Open clip"
@@ -2608,8 +2617,8 @@
         "campaign": "Campaign",
         "published": "Publish date",
         "completion": "Completion rate %",
-        "earnings": "Estimated earnings (SAR)",
-        "views": "Verified views",
+        "earnings": "Reward amount (SAR)",
+        "views": "Recorded views",
         "url": "Clip URL"
       }
     },
@@ -2620,7 +2629,8 @@
         "platform": {
           "tiktok": "TikTok",
           "shorts": "YouTube Shorts",
-          "reels": "Instagram • Reels"
+          "reels": "Instagram • Reels",
+          "unknown": "Unknown platform"
         },
         "verifiedLink": "Link and hashtags verified successfully",
         "campaign": "Official campaign:",
@@ -2630,31 +2640,31 @@
         "downloadReport": "Download report",
         "stats": {
           "views": {
-            "label": "Approved views",
+            "label": "Recorded views",
             "labelEmpty": "Recorded views",
             "unit": "views",
-            "note": "100% verified real visits",
-            "noteEmpty": "The counter starts as soon as the first viewer arrives"
+            "note": "View count returned by the backend",
+            "noteEmpty": "No view count is available"
           },
           "earnings": {
-            "label": "Net earnings calculated",
+            "label": "Reward amount",
             "unit": "SAR",
-            "note": "Ready for automatic transfer to your wallet",
-            "noteEmpty": "Calculation starts: {rate} SAR per 1,000 views"
+            "note": "Reward amount returned by the backend",
+            "noteEmpty": "No reward amount is available"
           },
           "watch": {
             "label": "Average watch time",
             "unit": "seconds of {total}",
             "unitEmpty": "seconds",
-            "noteUp": "{percent}% above the platform average",
-            "noteDown": "{percent}% below the platform average",
-            "noteEmpty": "Will be measured automatically once it starts"
+            "noteUp": "{percent}% above the comparison value returned by the backend",
+            "noteDown": "{percent}% below the comparison value returned by the backend",
+            "noteEmpty": "No watch-time comparison is available"
           },
           "engagement": {
             "label": "Engagement rate",
             "unit": "({count} interactions)",
-            "note": "Very high likes and shares",
-            "noteEmpty": "Based on likes, shares and comments"
+            "note": "Engagement value returned by the backend",
+            "noteEmpty": "No engagement value is available"
           }
         }
       },
@@ -2674,31 +2684,32 @@
           }
         },
         "waiting": {
-          "title": "No views recorded yet. Please wait a moment",
-          "desc": "Your clip was linked successfully and views are being verified automatically. The first views usually appear within 5 to 15 minutes of posting on TikTok, and the system will update everything instantly with no effort from you."
+          "title": "Submission is being processed",
+          "desc": "The backend reports that this submission is still being processed. Refresh the page to check for an updated status."
         },
         "error": {
-          "title": "Unable to fetch views right now. Retrying automatically",
-          "desc": "A temporary connection interruption occurred with TikTok. Don't worry, your clip is registered and your previously confirmed earnings are completely safe. The system retries the connection automatically every minute to fetch the latest approved update."
+          "title": "Submission was not approved",
+          "desc": "The backend reports that this submission did not pass review. See the review details below for any available feedback."
         }
       },
       "chart": {
-        "title": "Daily views activity (last 7 days)",
-        "subtitle": "Precise, powerful tracking of daily traffic volume and spread pace analysis",
+        "title": "Daily view changes",
+        "subtitle": "Daily view deltas grouped by the date of backend snapshots.",
         "ranges": {
           "24h": "Last 24 hours",
           "7d": "Last 7 days",
           "30d": "Last 30 days"
         },
         "legend": {
-          "views": "Total daily views",
+          "views": "Views recorded in backend snapshots",
           "earnings": "Views approved for earnings"
         },
-        "peakBadge": "Top day: {day} ({views} views)",
+        "peakBadge": "Highest recorded change: {day} ({views} views)",
         "today": "(Today)",
-        "peakTag": "(Peak)",
-        "refresh": "Continuous automatic refresh every 15 minutes directly from the platform",
-        "average": "Daily average views: {value} views",
+        "peakTag": "(Highest)",
+        "snapshotCount": "Showing {count} days with backend snapshot data",
+        "refresh": "Backend snapshot data",
+        "average": "Average change across days with snapshots: {value} views",
         "days": {
           "sat": "Sat",
           "sun": "Sun",
