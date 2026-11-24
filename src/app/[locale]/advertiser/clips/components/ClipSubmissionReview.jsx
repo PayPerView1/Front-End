@@ -32,14 +32,20 @@ const platformIcons = {
   YOUTUBE: { Icon: SiYoutube, label: "YouTube Shorts", color: "text-[#FF0000]" },
 };
 
-export default function ClipSubmissionReview({ campaignId = "" }) {
+export default function ClipSubmissionReview({ campaignId = "", focusedSubmissionId = "" }) {
   const locale = useLocale();
   const { isDark } = useTheme();
   const isRTL = locale === "ar";
 
   const [campaigns, setCampaigns] = useState([]);
+  const [campaignsLoading, setCampaignsLoading] = useState(true);
+  const [campaignsError, setCampaignsError] = useState(null);
   const [selectedCampaignId, setSelectedCampaignId] = useState(campaignId || "");
-  const [statusFilter, setStatusFilter] = useState("AWAITING_ADVERTISER");
+  const [statusFilter, setStatusFilter] = useState(
+    focusedSubmissionId ? "ALL" : "AWAITING_ADVERTISER",
+  );
+  const [activeSubmissionId, setActiveSubmissionId] = useState(focusedSubmissionId || "");
+  const [previousFocusedSubmissionId, setPreviousFocusedSubmissionId] = useState(focusedSubmissionId);
   const [searchQuery, setSearchQuery] = useState("");
 
   const [submissions, setSubmissions] = useState([]);
@@ -53,6 +59,12 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
   const [submittingDecision, setSubmittingDecision] = useState(false);
   const [viewingChecksSubmission, setViewingChecksSubmission] = useState(null);
   const [feedbackToast, setFeedbackToast] = useState(null);
+  const viewingChecks = Array.isArray(viewingChecksSubmission?.checks) ? viewingChecksSubmission.checks : [];
+  const requirementChecks = viewingChecks.filter((check) => ["REQUIRED_KEYWORD", "REQUIRED_HASHTAG"].includes(check.code));
+  const missingRequirementChecks = requirementChecks.filter((check) => check.status === "FAILED");
+  const viewingPassed = viewingChecks.filter((check) => check.status === "PASSED").length;
+  const viewingNeedsReview = viewingChecks.filter((check) => check.status === "NEEDS_REVIEW").length;
+  const viewingFailed = viewingChecks.filter((check) => check.status === "FAILED").length;
 
   // Sync selectedCampaignId when campaignId prop changes (React recommended pattern)
   const [prevPropCampaignId, setPrevPropCampaignId] = useState(campaignId);
@@ -60,11 +72,18 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
     setPrevPropCampaignId(campaignId);
     setSelectedCampaignId(campaignId);
   }
+  if (focusedSubmissionId !== previousFocusedSubmissionId) {
+    setPreviousFocusedSubmissionId(focusedSubmissionId);
+    setActiveSubmissionId(focusedSubmissionId || "");
+    setStatusFilter(focusedSubmissionId ? "ALL" : "AWAITING_ADVERTISER");
+  }
 
   // 1. Fetch advertiser campaigns on mount
   useEffect(() => {
     let cancelled = false;
     const fetchAdvCampaigns = async () => {
+      setCampaignsLoading(true);
+      setCampaignsError(null);
       try {
         const res = await getCampaigns();
         const raw =
@@ -85,17 +104,20 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
             return "";
           });
         }
-      } catch {
+      } catch (err) {
         if (!cancelled) {
           setCampaigns([]);
+          setCampaignsError(err?.message || (locale === "ar" ? "تعذر تحميل الحملات" : "Failed to load campaigns"));
         }
+      } finally {
+        if (!cancelled) setCampaignsLoading(false);
       }
     };
     fetchAdvCampaigns();
     return () => {
       cancelled = true;
     };
-  }, [campaignId]);
+  }, [campaignId, locale]);
 
   const refreshSubmissions = useCallback(() => {
     setRefreshIndex((v) => v + 1);
@@ -120,9 +142,10 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
     const fetchSubmissions = async () => {
       try {
         const res = await getCampaignSubmissions(selectedCampaignId, {
-          displayStatus: statusFilter === "ALL" ? undefined : statusFilter,
+          displayStatus: activeSubmissionId ? "ALL" : statusFilter,
           perPage: 50,
         });
+        if (res?.success !== true) throw new Error(res?.message || "The submissions response is invalid.");
         if (!cancelled) {
           const raw =
             res?.data?.submissions ??
@@ -153,7 +176,7 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
     return () => {
       cancelled = true;
     };
-  }, [selectedCampaignId, statusFilter, refreshIndex, locale]);
+  }, [selectedCampaignId, statusFilter, activeSubmissionId, refreshIndex, locale]);
 
   // Handle Approve
   const handleApprove = async (submissionId) => {
@@ -226,16 +249,19 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
 
   // Filtered by search
   const filteredSubmissions = useMemo(() => {
-    if (!searchQuery.trim()) return submissionList;
+    const focused = activeSubmissionId
+      ? submissionList.filter((submission) => String(submission?.id || submission?._id) === String(activeSubmissionId))
+      : submissionList;
+    if (!searchQuery.trim()) return focused;
     const q = searchQuery.toLowerCase();
-    return submissionList.filter(
+    return focused.filter(
       (s) =>
         s?.creator?.fullName?.toLowerCase().includes(q) ||
         s?.creator?.name?.toLowerCase().includes(q) ||
         s?.code?.toLowerCase().includes(q) ||
         s?.postUrl?.toLowerCase().includes(q)
     );
-  }, [submissionList, searchQuery]);
+  }, [submissionList, searchQuery, activeSubmissionId]);
 
   // Stats computed from current data
   const stats = useMemo(() => {
@@ -309,7 +335,11 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
         <div className="relative min-w-[260px]">
           <select
             value={selectedCampaignId}
-            onChange={(e) => setSelectedCampaignId(e.target.value)}
+            onChange={(e) => {
+              setSelectedCampaignId(e.target.value);
+              setActiveSubmissionId("");
+            }}
+            disabled={campaignsLoading || campaignList.length === 0}
             className={`w-full appearance-none rounded-xl border px-4 py-2.5 text-xs font-bold transition focus:outline-none focus:border-[#94D3C1] ${theme.input}`}
           >
             {!selectedCampaignId && (
@@ -333,6 +363,14 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
             size={15}
             className={`pointer-events-none absolute ${isRTL ? "left-3" : "right-3"} top-3 text-gray-400`}
           />
+          {campaignsLoading && (
+            <p className={`mt-2 text-[11px] ${theme.secondaryText}`}>
+              {locale === "ar" ? "جاري تحميل الحملات..." : "Loading campaigns..."}
+            </p>
+          )}
+          {campaignsError && (
+            <p role="alert" className="mt-2 text-[11px] text-red-400">{campaignsError}</p>
+          )}
         </div>
       </div>
 
@@ -346,9 +384,13 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
             {locale === "ar" ? "يرجى تحديد حملة لمراجعة مقاطعها" : "Please select a campaign to review clips"}
           </h3>
           <p className={`text-xs max-w-sm mx-auto ${theme.secondaryText}`}>
-            {locale === "ar"
-              ? "اختر إحدى الحملات الإعلانية من القائمة المنسدلة بالأعلى لعرض المقاطع المسلمة والتفاصيل."
-              : "Choose an advertising campaign from the dropdown above to display submitted clips and details."}
+            {campaignsError
+              ? (locale === "ar" ? "أعد تحميل الصفحة بعد استعادة الاتصال بالخادم." : "Reload after the server connection is restored.")
+              : campaignList.length === 0 && !campaignsLoading
+                ? (locale === "ar" ? "لا توجد حملات متاحة لهذا الحساب." : "No campaigns are available for this account.")
+                : locale === "ar"
+                  ? "اختر إحدى الحملات الإعلانية من القائمة المنسدلة بالأعلى لعرض المقاطع المسلمة والتفاصيل."
+                  : "Choose an advertising campaign from the dropdown above to display submitted clips and details."}
           </p>
         </div>
       ) : (
@@ -392,7 +434,10 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
                 return (
                   <button
                     key={tab.key}
-                    onClick={() => setStatusFilter(tab.key)}
+                    onClick={() => {
+                      setActiveSubmissionId("");
+                      setStatusFilter(tab.key);
+                    }}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
                       isActive
                         ? "bg-[#94D3C1] text-[#0A261F] shadow-sm"
@@ -550,7 +595,7 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
                         <div className="flex items-center gap-1 text-[#94D3C1]">
                           <Sparkles size={13} />
                           <span className="font-bold">
-                            {locale === "ar" ? "فحص AI:" : "AI Score:"} {sub.aiScore ?? 96}%
+                            {locale === "ar" ? "فحص AI:" : "AI Score:"} {Number.isFinite(sub.aiScore) ? `${sub.aiScore}%` : (locale === "ar" ? "غير متاح" : "Unavailable")}
                           </span>
                         </div>
                         {sub.preview?.durationSec && (
@@ -722,63 +767,41 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
                   {locale === "ar" ? "درجة المطابقة الكلية" : "Overall Compliance Score"}
                 </p>
                 <p className="text-2xl font-black text-[#94D3C1]">
-                  {viewingChecksSubmission.aiScore ?? 96}%
+                  {Number.isFinite(viewingChecksSubmission.aiScore)
+                    ? `${viewingChecksSubmission.aiScore}%`
+                    : (locale === "ar" ? "غير متاح" : "Unavailable")}
                 </p>
               </div>
               <div className={`${isRTL ? "text-left" : "text-right"} text-xs space-y-0.5`}>
                 <p className="text-emerald-400 font-bold">
-                  {viewingChecksSubmission.summary?.passed ?? 3}{" "}
+                  {viewingPassed}{" "}
                   {locale === "ar" ? "متطابق" : "passed"}
                 </p>
-                <p className="text-red-400 font-bold">
-                  {viewingChecksSubmission.summary?.failed ?? 0}{" "}
-                  {locale === "ar" ? "تنبيهات" : "warnings"}
+                <p className="text-amber-400 font-bold">
+                  {viewingFailed + viewingNeedsReview}{" "}
+                  {locale === "ar" ? "تحتاج مراجعة" : "need review"}
                 </p>
               </div>
             </div>
 
             {/* Checks list */}
             <div className="space-y-2.5">
+              {requirementChecks.length > 0 && <section className={`rounded-xl border p-3 ${theme.inset}`} aria-label={locale === "ar" ? "الكلمات والوسوم المطلوبة" : "Required keywords and hashtags"}>
+                <h4 className={`text-xs font-bold ${theme.primaryText}`}>{locale === "ar" ? "الكلمات والوسوم المطلوبة" : "Required keywords and hashtags"}</h4>
+                {missingRequirementChecks.length > 0 ? <ul className="mt-2 list-disc space-y-1 ps-5 text-[11px] text-red-400">{missingRequirementChecks.map((check, index) => <li key={`${check.code}-${index}`}>{check.message || check.code}</li>)}</ul>
+                  : <p className={`mt-2 text-[11px] ${theme.secondaryText}`}>{locale === "ar" ? "اجتازت جميع الكلمات والوسوم المطلوبة الفحص الحتمي." : "All supplied required keywords and hashtags passed deterministic checks."}</p>}
+              </section>}
               <h4 className={`text-xs font-bold ${theme.primaryText}`}>
                 {locale === "ar" ? "عناصر الفحص التقني:" : "Technical Inspection Items:"}
               </h4>
-              {(
-                viewingChecksSubmission.checks || [
-                  {
-                    code: "VIDEO_FORMAT",
-                    status: "PASSED",
-                    message:
-                      locale === "ar"
-                        ? "تنسيق الفيديو عمودي 9:16 وبدقة مناسبة"
-                        : "Vertical 9:16 aspect ratio with appropriate resolution",
-                  },
-                  {
-                    code: "AUDIO_COMPLIANCE",
-                    status: "PASSED",
-                    message:
-                      locale === "ar"
-                        ? "خلو تام من المعازف والموسيقى غير المتوافقة"
-                        : "Fully compliant audio free of restricted music",
-                  },
-                  {
-                    code: "REQUIRED_HASHTAGS",
-                    status: "PASSED",
-                    message:
-                      locale === "ar"
-                        ? "تم العثور على كافة الهاشتاقات التعاقدية"
-                        : "All required contractual hashtags verified",
-                  },
-                  {
-                    code: "OFFICIAL_MENTION",
-                    status: "PASSED",
-                    message:
-                      locale === "ar"
-                        ? "تمت الإشارة لحساب المعلن الرسمي"
-                        : "Official advertiser account tagged correctly",
-                  },
-                ]
-              ).map((check, idx) => {
+              {viewingChecks.length === 0 ? (
+                <p className={`rounded-xl border p-4 text-xs ${theme.inset} ${theme.secondaryText}`}>
+                  {locale === "ar" ? "لا توجد نتائج فحص متاحة لهذا التسليم." : "No inspection results are available for this submission."}
+                </p>
+              ) : viewingChecks.map((check, idx) => {
                 const passed = check.status === "PASSED";
+                const failed = check.status === "FAILED";
+                const needsReview = check.status === "NEEDS_REVIEW";
                 return (
                   <div
                     key={idx}
@@ -787,16 +810,24 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
                         ? isDark
                           ? "bg-emerald-950/20 border-emerald-500/20"
                           : "bg-emerald-50 border-emerald-200"
-                        : isDark
-                        ? "bg-red-950/20 border-red-500/20"
-                        : "bg-red-50 border-red-200"
+                        : failed
+                          ? isDark
+                            ? "bg-red-950/20 border-red-500/20"
+                            : "bg-red-50 border-red-200"
+                          : isDark
+                            ? "bg-amber-950/20 border-amber-500/20"
+                            : "bg-amber-50 border-amber-200"
                     }`}
                   >
                     <div className="flex items-start gap-2.5 min-w-0">
                       {passed ? (
                         <CheckCircle2 size={16} className="text-[#94D3C1] shrink-0 mt-0.5" />
-                      ) : (
+                      ) : failed ? (
                         <XCircle size={16} className="text-red-400 shrink-0 mt-0.5" />
+                      ) : needsReview ? (
+                        <Clock size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                      ) : (
+                        <AlertCircle size={16} className="text-gray-400 shrink-0 mt-0.5" />
                       )}
                       <div className="min-w-0">
                         <p className={`text-xs font-bold ${theme.primaryText}`}>{check.code}</p>
@@ -815,6 +846,7 @@ export default function ClipSubmissionReview({ campaignId = "" }) {
                             {locale === "ar" ? "توجيه:" : "Guidance:"} {check.fixHint}
                           </p>
                         )}
+                        {Number.isFinite(check.score) && <p className="mt-1 text-[10px] text-[#94D3C1]">{locale === "ar" ? "درجة هذا الفحص:" : "Check score:"} {check.score}/100</p>}
                       </div>
                     </div>
                   </div>
