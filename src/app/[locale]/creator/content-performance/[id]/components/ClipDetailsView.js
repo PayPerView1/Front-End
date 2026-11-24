@@ -1,32 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import { Link } from "@/i18n/navigation";
-import { getSubmission, withdrawSubmission } from "@/services/submissions";
-import {
-  FiArrowRight,
-  FiArrowLeft,
-  FiCheck,
-  FiRefreshCw,
-  FiZap,
-  FiAlertTriangle,
-  FiShield,
-  FiRepeat,
-  FiInfo,
-  FiActivity,
-  FiFileText,
-} from "react-icons/fi";
-import { FaTiktok } from "react-icons/fa";
-import { MdOutlineLightbulb } from "react-icons/md";
+import { getSubmission, getSubmissionViews, withdrawSubmission } from "@/services/submissions";
+import { FiArrowRight, FiArrowLeft } from "react-icons/fi";
 import { Loader2 } from "lucide-react";
 import ClipHeader from "./ClipHeader";
 import StatusBanner from "./StatusBanner";
 import DailyViewsChart from "./DailyViewsChart";
 import InsightsRow from "./InsightsRow";
-import PulseRings from "./PulseRings";
 
 // ─── ألوان الثيمين ───────────────────────────────────────────
 const darkTheme = {
@@ -79,9 +64,6 @@ const lightTheme = {
   handshake: "border-[#D9A400]/40 bg-[#D9A400]/10 text-[#B7860B]",
 };
 
-const cta =
-  "bg-[linear-gradient(90deg,#FB8B03_0%,#FA6203_100%)] text-white font-bold";
-
 // ─── تحويل SubmissionDetail → شكل clip المحلي ─────────────────────────────────
 const PLATFORM_MAP = {
   TIKTOK: "tiktok",
@@ -90,10 +72,11 @@ const PLATFORM_MAP = {
 };
 
 function mapDisplayStatus(ds) {
-  if (ds === "PROCESSING" || ds === "MANUAL_REVIEW") return "waiting";
-  if (ds === "AI_REJECTED" || ds === "REJECTED") return "error";
-  if (ds === "APPROVED" || ds === "AWAITING_ADVERTISER") return "normal";
-  return "normal";
+  if (["PROCESSING", "MANUAL_REVIEW", "AWAITING_ADVERTISER"].includes(ds)) return "waiting";
+  if (["AI_REJECTED", "REJECTED", "CHANGES_REQUESTED"].includes(ds)) return "error";
+  if (ds === "WITHDRAWN") return "withdrawn";
+  if (ds === "APPROVED") return "normal";
+  return "unknown";
 }
 
 function formatDuration(sec) {
@@ -109,7 +92,7 @@ function mapToClip(sub) {
     code: sub.code,
     displayStatus: sub.displayStatus,
     status: mapDisplayStatus(sub.displayStatus),
-    platform: PLATFORM_MAP[sub.platform] || "tiktok",
+    platform: PLATFORM_MAP[sub.platform] || "unknown",
     title: sub.campaign?.name || "—",
     campaign: sub.campaign?.brand?.name || "—",
     publishedAgo: sub.submittedAt
@@ -125,11 +108,11 @@ function mapToClip(sub) {
     duration: formatDuration(sub.preview?.durationSec),
     seconds: sub.preview?.durationSec ?? null,
     thumbnail: sub.preview?.thumbnailUrl || null,
-    url: sub.postUrl || sub.canonicalUrl || "#",
+    url: sub.postUrl || sub.canonicalUrl || null,
     daily: null,
     aiScore: sub.aiScore ?? null,
     checks: sub.checks || [],
-    rejectionReasons: sub.rejectionReasons || [],
+    rejectionReasons: Array.isArray(sub.rejectionReasons) ? sub.rejectionReasons : [],
     rejectedBy: sub.rejectedBy || null,
     reviewNote: sub.reviewNote || null,
     canWithdraw: sub.canWithdraw ?? false,
@@ -141,233 +124,9 @@ function mapToClip(sub) {
   };
 }
 
-/* ---------- حالة الانتظار ---------- */
-function WaitingSection({ t, tr, isDark }) {
-  const steps = tr.raw("waiting.steps");
-  const stateOf = (i) => (i === 0 ? "done" : i === 1 ? "active" : "pending");
-
-  return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-      <div
-          className={`flex flex-col items-center justify-center gap-5 rounded-2xl border p-8 text-center lg:col-span-2 ${t.card}`}
-          style={{
-            backgroundImage: isDark
-              ? "radial-gradient(ellipse 45% 55% at 50% 30%, rgba(143,227,200,0.10) 0%, rgba(143,227,200,0.04) 50%, transparent 75%)"
-              : "radial-gradient(ellipse 45% 55% at 50% 30%, rgba(47,158,131,0.12) 0%, rgba(47,158,131,0.04) 50%, transparent 75%)",
-          }}
-        >
-        <PulseRings color="#FF7A00">
-          <FiZap size={22} />
-        </PulseRings>
-        <h3 className={`text-lg font-extrabold ${t.title}`}>
-          {tr("waiting.title")}
-        </h3>
-        <p className={`max-w-lg text-sm leading-7 ${t.muted}`}>
-          {tr("waiting.desc")}
-        </p>
-        <button
-          onClick={() => window.location.reload()}
-          className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm ${cta}`}
-        >
-          <FiRefreshCw size={16} />
-          {tr("waiting.cta")}
-        </button>
-      </div>
-
-      <div className={`space-y-4 rounded-2xl border p-5 ${t.card}`}>
-        <div className="flex items-center justify-between">
-          <h3 className={`text-base font-extrabold ${t.title}`}>
-            {tr("waiting.stepsTitle")}
-          </h3>
-          <span className={`rounded-md px-2 py-1 text-[11px] ${t.chip}`}>
-            {tr("waiting.stepOf", { current: 2, total: steps.length })}
-          </span>
-        </div>
-
-        {steps.map((s, i) => {
-          const state = stateOf(i);
-          return (
-            <div
-              key={s.title}
-              className={`flex items-start gap-3 rounded-xl border p-3 ${
-                state === "active"
-                  ? t.stepActive
-                  : state === "done"
-                  ? t.stepDoneBox
-                  : t.stepIdle
-              }`}
-            >
-              <span
-                className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs ${
-                  state === "done"
-                    ? t.stepDone
-                    : state === "active"
-                    ? t.stepNow
-                    : t.stepPending
-                }`}
-              >
-                {state === "done" ? (
-                  <FiCheck size={14} />
-                ) : state === "active" ? (
-                  <FiRefreshCw size={13} />
-                ) : (
-                  i + 1
-                )}
-              </span>
-              <div>
-                <p
-                  className={`text-sm font-bold ${
-                    state === "pending" ? t.faint : t.title
-                  }`}
-                >
-                  {s.title}
-                </p>
-                <p className={`text-xs ${t.faint}`}>{s.note}</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-
-/* ---------- حالة الخطأ ---------- */
-function ErrorSection({ t, tr, clip }) {
-  const rows = [
-    { key: "tiktok", Icon: FiAlertTriangle, tone: t.gold, amount: null },
-    { key: "funds", Icon: FiShield, tone: t.green, amount: clip.earnings },
-    { key: "retry", Icon: FiRepeat, tone: t.neutral, amount: null },
-  ];
-
-  return (
-    <div className={`grid grid-cols-1 gap-4 rounded-2xl border p-5 lg:grid-cols-5 ${t.card}`}>
-      <div
-        className={`flex flex-col items-center justify-center gap-4 rounded-xl p-6 text-center lg:col-span-2 ${t.sub}`}
-      >
-        <PulseRings color="#94D3C1" size={190}>
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0F3830] text-[#94D3C1] border border-[#94D3C1]/50">
-              <FiCheck size={16} />
-            </div>
-            <div className="w-5 border-t border-dashed border-[#94D3C1]/40" />
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FA6203]/20 text-[#FA6203] border-2 border-[#FA6203]">
-              <FiRefreshCw size={18} className="animate-spin" />
-            </div>
-            <div className="w-5 border-t border-dashed border-[#94D3C1]/40" />
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1A1C1D] text-[#E9C349] border border-[#E9C349]/50">
-              <FaTiktok size={14} />
-            </div>
-          </div>
-        </PulseRings>
-
-        <span className="flex items-center gap-2 rounded-full border border-[#E9C349]/30 bg-[#1A1C1D] px-4 py-1.5 text-xs font-medium text-[#E9C349]">
-          Handshake pending... <span className="h-2 w-2 rounded-full bg-[#AF8D11]" />
-        </span>
-
-        <div className="space-y-1">
-          <p className={`text-sm font-bold ${t.title}`}>
-            خوادم الزمرد تعمل بكفاءة 100%
-          </p>
-          <p className={`text-xs leading-6 ${t.muted}`}>
-            العطل محصور في استجابة نقطة اتصال TikTok الخارجية
-          </p>
-        </div>
-      </div>
-
-      <div className="space-y-4 lg:col-span-3">
-        <h3 className={`text-lg font-extrabold ${t.title}`}>
-          {tr("error.title")}
-        </h3>
-
-        {rows.map(({ key, Icon, tone, amount }) => (
-          <div
-            key={key}
-            className={`flex flex-col gap-3 rounded-xl p-4 md:flex-row md:items-center md:justify-between ${t.sub}`}
-          >
-            <div className="flex items-start gap-3">
-              <span
-                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tone}`}
-              >
-                <Icon size={16} />
-              </span>
-              <div>
-                <p className={`text-sm font-bold ${t.title}`}>
-                  {tr(`error.${key}.title`)}
-                </p>
-                <p className={`text-xs ${t.muted}`}>
-                  {tr(`error.${key}.desc`, { amount: amount ?? "" })}
-                </p>
-              </div>
-            </div>
-            <span className={`w-fit shrink-0 rounded-md px-2 py-1 text-[11px] ${tone}`}>
-              {tr(`error.${key}.badge`)}
-            </span>
-          </div>
-        ))}
-
-        <div className="flex w-full items-center justify-between gap-2">
-          <button
-            onClick={() => window.location.reload()}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs transition ${t.btnGhost}`}
-          >
-            <FiRefreshCw size={14} />
-            {tr("error.recheck")}
-          </button>
-          <a
-            href="#"
-            className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-xs transition ${t.btnLink}`}
-          >
-            <FiFileText size={14} />
-            {tr("error.statusPage")}
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- النصائح ---------- */
-function Tips({ t, tr, type }) {
-  const items = tr.raw(`tips.${type}.items`);
-  const TitleIcon = type === "error" ? FiInfo : MdOutlineLightbulb;
-
-  return (
-    <div className={`space-y-4 rounded-2xl border p-5 ${t.card}`}>
-      <h3 className={`flex items-center gap-2 text-base font-extrabold ${t.title}`}>
-        <span className={`flex h-9 w-9 items-center justify-center rounded-full ${t.sub} ${t.mint}`}>
-          <TitleIcon size={18} />
-        </span>
-        {tr(`tips.${type}.title`)}
-      </h3>
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        {items.map((item, i) => (
-          <div key={item.title} className={`space-y-2 rounded-xl p-4 ${t.sub}`}>
-            <p className={`flex items-center gap-2 text-sm font-bold ${t.title}`}>
-              <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${t.num}`}>
-                {i + 1}
-              </span>
-              {item.title}
-            </p>
-            <p className={`text-xs leading-6 ${t.muted}`}>{item.text}</p>
-            {item.footer && (
-              <p className={`flex items-center gap-1.5 pt-2 text-[11px] ${t.mint}`}>
-                <FiCheck size={12} />
-                {item.footer}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 /* ---------- الصفحة الرئيسية ---------- */
 export default function ClipDetailsView() {
   const { id } = useParams();
-  const searchParams = useSearchParams();
   const locale = useLocale();
   const tr = useTranslations("contentPerformance.details");
   const { isDark } = useTheme();
@@ -378,6 +137,7 @@ export default function ClipDetailsView() {
   const [error, setError] = useState(null);
   const [withdrawing, setWithdrawing] = useState(false);
   const [actionAlert, setActionAlert] = useState(null);
+  const [viewsError, setViewsError] = useState(null);
 
   const handleWithdraw = async () => {
     if (!window.confirm("هل أنت متأكد من سحب هذا التسليم لتحرير الرابط وتعديله؟")) return;
@@ -398,10 +158,46 @@ export default function ClipDetailsView() {
     const fetchSubmission = async () => {
       setLoading(true);
       setError(null);
+      setViewsError(null);
       try {
-        const data = await getSubmission(id);
+        const [data, viewsResponse] = await Promise.all([
+          getSubmission(id),
+          getSubmissionViews(id, { page: 1, perPage: 100 }).catch((viewError) => {
+            if (!cancelled) setViewsError(viewError?.response?.data?.message || viewError?.message || "View analytics are unavailable.");
+            return null;
+          }),
+        ]);
         if (!cancelled && data) {
-          setClip(mapToClip(data));
+          const mapped = mapToClip(data);
+          let snapshots = viewsResponse?.data || [];
+          const totalPages = Number(viewsResponse?.pagination?.totalPages) || 1;
+          if (totalPages > 1) {
+            const remainingPages = await Promise.all(Array.from({ length: totalPages - 1 }, (_, index) =>
+              getSubmissionViews(id, { page: index + 2, perPage: 100 })
+            ));
+            snapshots = [...snapshots, ...remainingPages.flatMap((page) => page.data || [])];
+          }
+          if (snapshots.length) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const firstDay = new Date(today);
+            firstDay.setDate(firstDay.getDate() - 6);
+            const dayKey = (date) => `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+            const dailyTotals = new Map();
+            snapshots.forEach((snapshot) => {
+              const capturedAt = new Date(snapshot.capturedAt);
+              if (Number.isNaN(capturedAt.getTime()) || capturedAt < firstDay || capturedAt > new Date()) return;
+              const key = dayKey(capturedAt);
+              const day = dailyTotals.get(key) || { date: capturedAt, views: 0 };
+              day.views += Number(snapshot.deltaViews) || 0;
+              dailyTotals.set(key, day);
+            });
+            mapped.daily = [...dailyTotals.values()].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const latestSnapshot = [...snapshots].sort((a, b) => new Date(b.capturedAt) - new Date(a.capturedAt))[0];
+            const latestViews = Number(latestSnapshot.views);
+            mapped.views = Number.isFinite(latestViews) ? latestViews : mapped.views;
+          }
+          setClip(mapped);
         } else if (!cancelled) {
           setError("لم يُعثر على التسليم");
         }
@@ -416,9 +212,7 @@ export default function ClipDetailsView() {
     return () => { cancelled = true; };
   }, [id]);
 
-  // ?status=anomaly | waiting | error للتجربة، تُلغى عند الربط الكامل بالـ API
-  const statusOverride = searchParams.get("status");
-  const status = statusOverride || clip?.status || "normal";
+  const status = clip?.status || "unknown";
   const showAnalytics = status === "normal" || status === "anomaly";
   const BackIcon = locale === "ar" ? FiArrowRight : FiArrowLeft;
 
@@ -507,27 +301,37 @@ export default function ClipDetailsView() {
       )}
 
       <StatusBanner status={status} clip={clip} />
+      {status === "withdrawn" && <div role="status" className={`rounded-xl border p-4 text-sm ${t.card}`}>{locale === "ar" ? "تم سحب هذا التسليم ولم يعد ضمن المحتوى النشط." : "This submission was withdrawn and is no longer active."}</div>}
       <ClipHeader clip={clip} status={status} />
+
+      {viewsError && <p role="status" className={`text-xs ${t.muted}`}>{locale === "ar" ? "بيانات المشاهدات غير متاحة حالياً." : "View analytics are currently unavailable."}</p>}
 
       {showAnalytics && (
         <>
-          <DailyViewsChart anomaly={status === "anomaly"} daily={clip.daily} />
+          <DailyViewsChart daily={clip.daily} />
           <InsightsRow clip={clip} />
         </>
       )}
 
-      {status === "waiting" && (
-        <>
-          <WaitingSection t={t} tr={tr} isDark={isDark} />
-          <Tips t={t} tr={tr} type="waiting" />
-        </>
+      {(clip.reviewNote || clip.rejectionReasons.length > 0) && (
+        <section className={`space-y-3 rounded-2xl border p-5 ${t.card}`}>
+          <h2 className={`text-base font-bold ${t.title}`}>
+            {locale === "ar" ? "ملاحظات المراجعة" : "Review details"}
+          </h2>
+          {clip.reviewNote && <p className={`text-sm leading-7 ${t.muted}`}>{clip.reviewNote}</p>}
+          {clip.rejectionReasons.length > 0 && (
+            <ul className={`list-inside list-disc space-y-1 text-sm ${t.muted}`}>
+              {clip.rejectionReasons.map((reason, index) => (
+                <li key={`${index}-${reason}`}>{typeof reason === "string" ? reason : reason.message || reason.reason || JSON.stringify(reason)}</li>
+              ))}
+            </ul>
+          )}
+        </section>
       )}
-
-      {status === "error" && (
-        <>
-          <ErrorSection t={t} tr={tr} clip={clip} />
-          <Tips t={t} tr={tr} type="error" />
-        </>
+      {status === "unknown" && (
+        <p role="status" className={`rounded-xl border p-4 text-sm ${t.card} ${t.muted}`}>
+          {locale === "ar" ? "حالة التسليم غير متاحة حالياً." : "Submission status is currently unavailable."}
+        </p>
       )}
     </div>
   );

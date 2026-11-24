@@ -347,13 +347,27 @@ export const getMySubmissions = async (params = {}) => {
  * 5.3 تفاصيل التسليم وحالة المراجعة (Submission Details)
  * GET /api/v1/submissions/:id
  * @param {string} id
- * @param {string} [mockStatus] Optional status override for testing
  */
-export const getSubmission = async (id, mockStatus) => {
+export const getSubmission = async (id) => {
   try {
-    const params = mockStatus ? { mockStatus } : {};
-    const response = await axiosInstance.get(`/api/v1/submissions/${id}`, { params });
+    const response = await axiosInstance.get(`/api/v1/submissions/${id}`);
     return unwrap(response);
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+/**
+ * Get owner-scoped verified view snapshots for one submission.
+ * GET /api/v1/submissions/:id/views
+ */
+export const getSubmissionViews = async (id, params = {}) => {
+  try {
+    const response = await axiosInstance.get(`/api/v1/submissions/${encodeURIComponent(id)}/views`, { params });
+    if (response.data?.success !== true || !Array.isArray(response.data.data)) {
+      throw new Error(response.data?.message || "The submission views response is invalid.");
+    }
+    return response.data;
   } catch (error) {
     handleError(error);
   }
@@ -429,6 +443,7 @@ const submissionsService = {
   createSubmission,
   getMySubmissions,
   getSubmission,
+  getSubmissionViews,
   withdrawSubmission,
   updateSubmissionLink,
   resubmit,

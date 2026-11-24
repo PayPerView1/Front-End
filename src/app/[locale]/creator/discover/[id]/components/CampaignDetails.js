@@ -505,63 +505,6 @@ function openCampaignBrief(campaign, isRtl, autoPrint = false) {
   return true;
 }
 
-// ── بيانات تجريبية (بدون ربط API) ───────────────────────────────────────────
-const MOCK_DETAILS = {
-  c1: {
-    id: "c1",
-    code: "ACAM-2026-038",
-    cover: null,
-    gradient: "linear-gradient(135deg,#0f2b3d,#0b1620)",
-    filesCount: 14,
-    packSize: "3.8 GB",
-    status: "active",
-    title: {
-      ar: "قص ونشر مقاطع توعوية عن الاستثمار الحلال والادخار بالسبائك الذهبية",
-      en: "Clip and publish awareness videos on halal investing and gold-bar saving",
-    },
-    brand: { ar: "الزمرد للتمويل والاستثمار", en: "Emerald Wealth & FinTech" },
-    brandLegal: "Emerald Wealth & FinTech LTD",
-    category: {
-      ar: "مالية وتقنية واستثمار",
-      en: "Finance, fintech & investing",
-    },
-    description: {
-      ar: [
-        "تسعى شركة الزمرد لإدارة الثروات والادخار الذهبي إلى تمكين الشباب والمستثمرين في منطقة الخليج العربي من حماية مدخراتهم عبر التصدع عبر حلول الادخار الآمن بالسبائك الذهبية المتوافقة 100% مع الشريعة الإسلامية بدون رسوم تبييت (Rollover) أو فوائد ربوية.",
-        "المهمة المطلوبة من صناع ومقصي المحتوى (Clippers) هي استخلاص اللحظات الأكثر إلهاماً وتأثيراً من سلسلة بودكاست «أمانة الثروة» وإعادة تحريرها في مقاطع عمودية احترافية بهدف تثقيف الجيل الجديد بالاستثمار الأخلاقي وتشجيعهم على تنزيل التطبيق والبدء بادخار أول جرام ذهب لهم.",
-      ],
-      en: [
-        "Emerald Wealth & Gold Savings helps young people and investors across the Gulf protect their savings through safe gold-bar saving solutions that are 100% Shariah-compliant, with no rollover fees or interest.",
-        "Clippers are asked to pull the most inspiring moments from the 'Amanat Al-Tharwa' podcast series and re-edit them into professional vertical clips that educate a new generation about ethical investing and encourage them to download the app and save their first gram of gold.",
-      ],
-    },
-    platforms: [
-      { key: "tiktok", ratio: "9:16" },
-      { key: "instagram", ratio: "9:16" },
-      { key: "youtube", ratio: "9:16" },
-    ],
-    contentTypes: [
-      { key: "clips", ar: "قص مقاطع بودكاست", en: "Podcast clipping" },
-      {
-        key: "vertical",
-        ar: "مونتاج فيديو عمودي (9:16)",
-        en: "Vertical video editing (9:16)",
-      },
-      {
-        key: "motion",
-        ar: "موشن جرافيكس توضيحي",
-        en: "Explanatory motion graphics",
-      },
-    ],
-    cpm: 12,
-    remaining: 54800,
-    total: 100000,
-    startsAt: { ar: "15 أكتوبر 2025", en: "Oct 15, 2025" },
-    endsAt: { ar: "05 نوفمبر 2025", en: "Nov 5, 2025" },
-    acceptance: 94,
-  },
-};
-
 // ── بطاقة عامة ──────────────────────────────────────────────────────────────
 function Card({ t, isDark, className = "", children }) {
   return (
@@ -614,16 +557,14 @@ export default function CampaignDetails({ id, campaign }) {
   const [applied, setApplied] = useState(false);
   const [previewNotified, setPreviewNotified] = useState(false);
   const [campaignRequest, setCampaignRequest] = useState(null);
-  const isMockCampaign = !campaign && Boolean(MOCK_DETAILS[id]);
   const currentRequest =
     campaignRequest?.id === id ? campaignRequest : null;
   const campaignLoading =
-    !campaign && !isMockCampaign && (!currentRequest || currentRequest.status === "loading");
+    !campaign && (!currentRequest || currentRequest.status === "loading");
   const campaignError =
     currentRequest?.status === "error" ? currentRequest.error : "";
   const c =
     campaign ??
-    MOCK_DETAILS[id] ??
     (currentRequest?.status === "success" ? currentRequest.campaign : null);
   const existingApplication = c ? getExistingApplication(c) : null;
   const currentApplication =
@@ -637,7 +578,7 @@ export default function CampaignDetails({ id, campaign }) {
   const hasApplied = Boolean(currentApplication || applied);
 
   useEffect(() => {
-    if (campaign || MOCK_DETAILS[id]) return;
+    if (campaign) return;
 
     let active = true;
     getCampaignDetails(id)
@@ -700,15 +641,6 @@ export default function CampaignDetails({ id, campaign }) {
   const pct = c.total > 0 ? Math.round((c.remaining / c.total) * 100) : 0;
 
   const handleApply = () => {
-    if (isMockCampaign) {
-      toast.info("", {
-        title: isRtl ? "التقديم التجريبي غير متاح" : "Demo application unavailable",
-        description: isRtl
-          ? "هذه حملة تجريبية ولا يمكن إرسالها إلى الخادم."
-          : "This is a demo campaign and cannot be submitted to the server.",
-      });
-      return;
-    }
     if (currentApplication) {
       setApplyAlreadyOpen(true);
       return;
@@ -871,7 +803,6 @@ export default function CampaignDetails({ id, campaign }) {
           <button
             type="button"
             onClick={handleApply}
-            disabled={isMockCampaign}
             className="inline-flex h-12 min-h-12 w-full shrink-0 items-center justify-center rounded-xl px-4 text-base font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:flex-1 sm:text-sm"
             style={{ background: ORANGE }}
           >

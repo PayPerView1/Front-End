@@ -1,11 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import {
-  MonitorPlay,
-  Hash,
-  AtSign,
   Headphones,
   ExternalLink,
   Check,
@@ -16,12 +13,6 @@ import {
   HelpCircle,
 } from "lucide-react";
 import ResultShell from "./ResultShell";
-
-const checks = [
-  { key: "videoSpecs", icon: MonitorPlay },
-  { key: "hashtags", icon: Hash },
-  { key: "mention", icon: AtSign },
-];
 
 const flow = [
   { key: "received", state: "done", icon: Check },
@@ -34,13 +25,14 @@ const faqKeys = ["edit", "reward"];
 export default function ReviewView({ submission, campaign }) {
   const t = useTranslations("startProject.review");
   const ts = useTranslations("startProject.submit");
+  const locale = useLocale();
   const { isDark } = useTheme();
 
   const platformLabel = ts(`platforms.${submission.platform}`);
-  const hashtags = campaign?.hashtags || (campaign ? [campaign.hashtag] : []);
-  const amount = String(submission.rewardAmount ?? 0);
-  const minH = submission.review?.etaMinHours ?? 4;
-  const maxH = submission.review?.etaMaxHours ?? 8;
+  const reviewChecks = Array.isArray(submission.checks) ? submission.checks : [];
+  const amount = Number.isFinite(submission.rewardAmount) ? String(submission.rewardAmount) : "—";
+  const minH = submission.manualReview?.expectedHours?.min;
+  const maxH = submission.manualReview?.expectedHours?.max;
 
   const theme = {
     surface: isDark ? "bg-[#121617] border-[#1e2425]" : "bg-white border-[#e1e7e4]",
@@ -84,7 +76,7 @@ export default function ReviewView({ submission, campaign }) {
           <div className="flex items-center justify-between">
             <span className={`text-[10px] ${theme.secondaryText}`}>{t("etaLabel")}</span>
             <span className="text-xs font-bold text-[#94D3C1]">
-              {t("etaValue", { min: minH, max: maxH })}
+              {Number.isFinite(minH) && Number.isFinite(maxH) ? t("etaValue", { min: minH, max: maxH }) : (locale === "ar" ? "قيد المراجعة" : "In review")}
             </span>
           </div>
           <div className={`h-1.5 rounded-full overflow-hidden ${isDark ? "bg-[#1c2223]" : "bg-[#e8eeeb]"}`}>
@@ -150,48 +142,13 @@ export default function ReviewView({ submission, campaign }) {
           </a>
         </div>
 
-        <div className="space-y-2">
-          {checks.map(({ key, icon: Icon }) => (
-            <div
-              key={key}
-              className={`flex items-center justify-between gap-3 rounded-xl border p-3 ${theme.inset}`}
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${theme.iconBox}`}>
-                  <Icon size={15} />
-                </span>
-                <div className="min-w-0">
-                  <p className={`text-xs font-bold ${theme.primaryText}`}>{t(`checks.${key}.title`)}</p>
-                  <p className={`text-[10px] ${theme.secondaryText}`}>
-                    {t(`checks.${key}.desc`, {
-                      tags: hashtags.join(" "),
-                      account: campaign?.account || "",
-                    })}
-                  </p>
-                </div>
-              </div>
-              <span className={`flex items-center gap-1 text-[10px] font-bold rounded-full border px-2.5 py-1 shrink-0 ${greenBadge}`}>
-                <Check size={11} />
-                {t(`checks.${key}.badge`)}
-              </span>
+        <div className="space-y-2" aria-live="polite">
+          {reviewChecks.length === 0 ? <p role="status" className={`rounded-xl border p-3 text-xs ${theme.inset} ${theme.secondaryText}`}>{locale === "ar" ? "لم تُحفظ تفاصيل فحوص بعد. راجع الحالة المسجلة أعلاه." : "No review checks have been saved yet. See the recorded status above."}</p> : reviewChecks.map((check, index) => (
+            <div key={`${check.code || "check"}-${index}`} className={`flex items-start justify-between gap-3 rounded-xl border p-3 ${theme.inset}`}>
+              <div className="min-w-0"><p className={`text-xs font-bold ${theme.primaryText}`}>{check.code || (locale === "ar" ? "فحص" : "Check")}</p><p className={`mt-1 text-[10px] ${theme.secondaryText}`}>{check.message || "—"}</p>{check.fixHint && <p className="mt-1 text-[10px] text-amber-500">{locale === "ar" ? "توجيه:" : "Guidance:"} {check.fixHint}</p>}</div>
+              <span className={`shrink-0 rounded-full border px-2 py-1 text-[10px] font-bold ${check.status === "PASSED" ? greenBadge : check.status === "FAILED" ? "border-red-500/30 bg-red-500/10 text-red-400" : goldBadge}`}>{check.status || "—"}</span>
             </div>
           ))}
-
-          {/* الصوت: تحت المراجعة اليدوية */}
-          <div className={`flex items-center justify-between gap-3 rounded-xl border p-3 ${theme.gold}`}>
-            <div className="flex items-center gap-3 min-w-0">
-              <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${goldBadge}`}>
-                <Headphones size={15} />
-              </span>
-              <div className="min-w-0">
-                <p className={`text-xs font-bold ${theme.primaryText}`}>{t("audio.title")}</p>
-                <p className={`text-[10px] leading-relaxed ${theme.secondaryText}`}>{t("audio.desc")}</p>
-              </div>
-            </div>
-            <span className={`text-[10px] font-bold rounded-full border px-2.5 py-1 shrink-0 ${goldBadge}`}>
-              {t("audio.badge")}
-            </span>
-          </div>
         </div>
       </div>
 

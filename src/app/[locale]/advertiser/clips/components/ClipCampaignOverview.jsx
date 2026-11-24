@@ -3,6 +3,8 @@ import { useMemo, useRef, useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useTheme } from "@/context/ThemeContext";
+import { getCampaigns } from "@/services/campaign";
+import { getCampaignSubmissions } from "@/services/submissions";
 import {
   MdSearch,
   MdOutlineExpandMore,
@@ -27,33 +29,11 @@ import {
 const PAGE_SIZE = 6;
 const MINT = "#94D3C1";
 
-/* ───────────── بيانات تجريبية (استبدلها بالـ API) ───────────── */
-// pendingClips = مقاطع جديدة بانتظار المراجعة، deliveredClips = كل المقاطع المسلّمة
-const MOCK_CAMPAIGNS = [
-  { id: "ACAM-2026-038", image: "", brand: { ar: "مؤسسة الذهب العالمية المالية", en: "Global Gold Financial" }, title: { ar: "حملة تطبيق الذهب الرقمي الذكي", en: "Smart Digital Gold App Campaign" }, deliveredClips: 9, pendingClips: 9, cpm: 8.0, views: 710650, escrow: 24500, createdAt: "2026-09-28" },
-  { id: "ACAM-2026-054", image: "", brand: { ar: "دار الأزياء الراقية", en: "Haute Couture House" }, title: { ar: "حملة أزياء صيف الدانة الراقية", en: "Al-Dana Summer Fashion Campaign" }, deliveredClips: 11, pendingClips: 11, cpm: 7.2, views: 142800, escrow: 12400, createdAt: "2026-10-02" },
-  { id: "ACAM-2026-061", image: "", brand: { ar: "شركة عطور الأصالة الطبيعية", en: "Al-Asala Natural Perfumes" }, title: { ar: "حملة عطر مسك الأصيل 2026", en: "Original Musk Perfume 2026" }, deliveredClips: 14, pendingClips: 14, cpm: 6.5, views: 184320, escrow: 8500, createdAt: "2026-10-05" },
-  { id: "ACAM-2026-027", image: "", brand: { ar: "توافل لنقل السفر الذكية", en: "Tawafel Smart Travel" }, title: { ar: "حملة حقائب السفر الذكية", en: "Smart Travel Bags Campaign" }, deliveredClips: 16, pendingClips: 0, cpm: 6.0, views: 245190, escrow: 16000, createdAt: "2026-09-12" },
-  { id: "ACAM-2026-035", image: "", brand: { ar: "مجوهرات النخبة السياسية", en: "Elite Jewelry" }, title: { ar: "حملة ساعات النخبة الماسية", en: "Elite Diamond Watches Campaign" }, deliveredClips: 18, pendingClips: 0, cpm: 9.5, views: 312190, escrow: 18900, createdAt: "2026-09-18" },
-  { id: "ACAM-2026-052", image: "", brand: { ar: "مطاعم القمة المتخصصة", en: "Al-Qimma Restaurants" }, title: { ar: "حملة قهوة البن الخولاني الفاخر", en: "Premium Khawlani Coffee Campaign" }, deliveredClips: 8, pendingClips: 8, cpm: 5.5, views: 95400, escrow: 6200, createdAt: "2026-10-08" },
-];
-
-const MOCK_STATS = {
-  activeCampaigns: 6,
-  deliveryRate: 94, // معدل التسليم %
-  pendingClips: 42,
-  pendingCampaigns: 4, // عدد الحملات المعنية بالمراجعة
-  approvedClips: 128,
-  weeklyGrowth: 18, // نمو الأسبوع %
-  reservedBudget: 86500,
-  securedPercent: 100, // نسبة المؤمّن %
-};
-
 /* ───────────── مساعدات ───────────── */
 const pick = (v, locale) =>
   v && typeof v === "object" ? v[locale] ?? v.ar ?? v.en ?? "" : v ?? "";
 
-const num = (n) => Number(n).toLocaleString("en-US");
+const num = (n) => n === null || n === undefined || !Number.isFinite(Number(n)) ? "—" : Number(n).toLocaleString("en-US");
 
 function pageList(current, totalPages) {
   if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -208,7 +188,7 @@ function StatCard({
 /* ───────────── كارد الحملة ───────────── */
 function ClipCampaignCard({ t, s, c, locale, isDark, isRtl, listView, href }) {
   const Arrow = isRtl ? MdOutlineArrowBack : MdOutlineArrowForward;
-  const hasPending = c.pendingClips > 0;
+  const hasPending = Number(c.pendingClips) > 0;
 
   return (
     <article
@@ -275,7 +255,7 @@ function ClipCampaignCard({ t, s, c, locale, isDark, isRtl, listView, href }) {
           <div>
             <p className={t.subText}>{s.cpmRate}</p>
             <p className="mt-0.5 font-bold" style={{ color: "#E9C349" }}>
-              {c.cpm.toFixed(2)} <span className="text-[10px] font-medium">{s.currency}</span>
+              {Number.isFinite(c.cpm) ? c.cpm.toFixed(2) : "—"} <span className="text-[10px] font-medium">{s.currency}</span>
             </p>
           </div>
         </div>
@@ -292,7 +272,7 @@ function ClipCampaignCard({ t, s, c, locale, isDark, isRtl, listView, href }) {
           className="mt-auto flex h-11 items-center justify-center gap-2 rounded-xl text-xs font-bold text-white transition-opacity hover:opacity-90"
           style={{ background: "linear-gradient(90deg, #FFA600, #FF4B04)" }}
         >
-          <span>{s.reviewClips(c.deliveredClips)}</span>
+          <span>{s.reviewClips(c.pendingClips)}</span>
           <Arrow size={16} />
         </Link>
       </div>
@@ -302,14 +282,80 @@ function ClipCampaignCard({ t, s, c, locale, isDark, isRtl, listView, href }) {
 
 /* ───────────── الصفحة ───────────── */
 export default function ClipCampaignOverview({
-  campaigns = MOCK_CAMPAIGNS,
-  stats = MOCK_STATS,
+  campaigns: campaignsProp,
+  stats: statsProp,
   getCampaignHref = (c) => `/advertiser/analytics/clips/campaign/${c.id || c._id}`,
 }) {
   const { isDark } = useTheme();
   const locale = useLocale();
   const tr = useTranslations("clipManagement");
   const isRtl = locale === "ar";
+
+  const [serverCampaigns, setServerCampaigns] = useState([]);
+  const [serverStats, setServerStats] = useState(null);
+  const [loading, setLoading] = useState(!Array.isArray(campaignsProp));
+  const [loadError, setLoadError] = useState("");
+
+  useEffect(() => {
+    if (Array.isArray(campaignsProp)) return;
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setLoadError("");
+      try {
+        const response = await getCampaigns({ page: 1, limit: 50 });
+        const payload = response?.data?.campaigns ? response.data : response?.data?.data || response;
+        const rows = payload?.campaigns;
+        if (!Array.isArray(rows)) throw new Error(response?.message || "Campaign list response is invalid.");
+        const counts = await Promise.all(rows.map((campaign) =>
+          getCampaignSubmissions(campaign._id, { displayStatus: "AWAITING_ADVERTISER", page: 1, perPage: 1 })
+        ));
+        const normalized = rows.map((campaign, index) => {
+          const pendingClips = Number(counts[index]?.pagination?.total ?? counts[index]?.data?.length ?? 0);
+          const approvedClips = Number(campaign.stats?.totalApprovedVideos) || 0;
+          return {
+            id: campaign._id,
+            title: campaign.name || "",
+            brand: "",
+            image: campaign.coverImage || "",
+            createdAt: campaign.createdAt,
+            pendingClips,
+            deliveredClips: pendingClips + approvedClips,
+            cpm: Number.isFinite(Number(campaign.cpm)) ? Number(campaign.cpm) : null,
+            views: Number(campaign.stats?.totalViews) || 0,
+            escrow: Number(campaign.remainingBudget) || 0,
+            approvedClips,
+          };
+        });
+        const summary = payload.summary || {};
+        if (!cancelled) {
+          setServerCampaigns(normalized);
+          setServerStats({
+            activeCampaigns: Number(summary.active) || 0,
+            deliveryRate: null,
+            pendingClips: normalized.reduce((sum, item) => sum + item.pendingClips, 0),
+            pendingCampaigns: normalized.filter((item) => item.pendingClips > 0).length,
+            approvedClips: normalized.reduce((sum, item) => sum + item.approvedClips, 0),
+            weeklyGrowth: null,
+            reservedBudget: normalized.reduce((sum, item) => sum + item.escrow, 0),
+            securedPercent: null,
+          });
+        }
+      } catch (error) {
+        if (!cancelled) setLoadError(error?.response?.data?.message || error.message || "Unable to load campaign analytics.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [campaignsProp]);
+
+  const campaigns = Array.isArray(campaignsProp) ? campaignsProp : serverCampaigns;
+  const stats = statsProp || serverStats || {
+    activeCampaigns: null, deliveryRate: null, pendingClips: null, pendingCampaigns: null,
+    approvedClips: null, weeklyGrowth: null, reservedBudget: null, securedPercent: null,
+  };
 
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("mostPending");
@@ -382,6 +428,8 @@ export default function ClipCampaignOverview({
         <h1 className={`text-2xl font-extrabold ${t.text}`}>{tr("title")}</h1>
         <p className={`mt-1 max-w-3xl text-xs leading-relaxed ${t.subText}`}>{tr("subtitle")}</p>
       </header>
+      {loading && <p role="status" className={`text-sm ${t.subText}`}>{locale === "ar" ? "جارٍ تحميل بيانات الحملات…" : "Loading campaign analytics…"}</p>}
+      {loadError && <p role="alert" className="rounded-xl border border-red-500/40 p-4 text-sm text-red-500">{loadError}</p>}
 
       {/* الإحصائيات */}
       <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -389,32 +437,32 @@ export default function ClipCampaignOverview({
           t={t}
           icon={MdOutlineCampaign}
           label={tr("stats.activeCampaigns")}
-          value={stats.activeCampaigns}
+          value={num(stats.activeCampaigns)}
           suffix={tr("stats.activeSuffix")}
           footerIcon={MdOutlineTrendingUp}
-          footer={tr("stats.activeFooter", { percent: stats.deliveryRate })}
-          footerEnd={tr("stats.activeFooterEnd")}
+          footer={stats.deliveryRate === null ? "—" : tr("stats.activeFooter", { percent: stats.deliveryRate })}
+          footerEnd={stats.deliveryRate === null ? "—" : tr("stats.activeFooterEnd")}
         />
         <StatCard
           t={t}
           icon={MdOutlineNotificationsActive}
           label={tr("stats.pendingClips")}
-          value={stats.pendingClips}
+          value={num(stats.pendingClips)}
           valueColor={MINT}
           suffix={tr("stats.pendingSuffix")}
           footerIcon={MdOutlineAccessTime}
           footer={tr("stats.pendingFooter")}
-          footerEnd={tr("stats.pendingFooterEnd", { count: stats.pendingCampaigns })}
+          footerEnd={stats.pendingCampaigns === null ? "—" : tr("stats.pendingFooterEnd", { count: stats.pendingCampaigns })}
         />
         <StatCard
           t={t}
           icon={MdOutlineVerified}
           label={tr("stats.approvedClips")}
-          value={stats.approvedClips}
+          value={num(stats.approvedClips)}
           suffix={tr("stats.approvedSuffix")}
           footerIcon={MdOutlineTaskAlt}
           footer={tr("stats.approvedFooter")}
-          footerEnd={tr("stats.approvedFooterEnd", { percent: stats.weeklyGrowth })}
+          footerEnd={stats.weeklyGrowth === null ? "—" : tr("stats.approvedFooterEnd", { percent: stats.weeklyGrowth })}
         />
         <StatCard
           t={t}
@@ -424,8 +472,8 @@ export default function ClipCampaignOverview({
           suffix={tr("currency")}
           suffixColor="#9A9A9A"
           footerIcon={MdOutlineShield}
-          footer={tr("stats.reservedFooter")}
-          footerEnd={tr("stats.reservedFooterEnd", { percent: stats.securedPercent })}
+          footer={stats.securedPercent === null ? "—" : tr("stats.reservedFooter")}
+          footerEnd={stats.securedPercent === null ? "—" : tr("stats.reservedFooterEnd", { percent: stats.securedPercent })}
           footerEndColor="#E9C349"
         />
       </section>

@@ -1,5 +1,12 @@
-import ClipDetails from "./components/ClipDetails";
-export default async function ClipDetailsPage({ params }) {
-  const { id, clipId } = await params;
-  return <ClipDetails campaignId={id} clipId={clipId} />;
+import ClipSubmissionReview from "@/app/[locale]/advertiser/clips/components/ClipSubmissionReview";
+
+export default async function ClipDetailsPage({ params, searchParams }) {
+  const { clipId } = await params;
+  const query = await searchParams;
+  return (
+    <ClipSubmissionReview
+      campaignId={query?.campaignId || ""}
+      focusedSubmissionId={clipId}
+    />
+  );
 }

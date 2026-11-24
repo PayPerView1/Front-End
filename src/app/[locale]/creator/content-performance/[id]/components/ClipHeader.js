@@ -14,6 +14,7 @@ import {
   FiAlertCircle,
   FiTrendingUp,
   FiTrendingDown,
+  FiVideo,
 } from "react-icons/fi";
 import { FaTiktok, FaYoutube, FaInstagram } from "react-icons/fa";
 
@@ -21,6 +22,7 @@ const platformIcons = {
   tiktok: FaTiktok,
   shorts: FaYoutube,
   reels: FaInstagram,
+  unknown: FiVideo,
 };
 
 const darkTheme = {
@@ -76,7 +78,7 @@ const handleDownload = async () => {
       [c.platform]: tr(`platform.${clip.platform}`),
       [c.campaign]: clip.campaign,
       [c.published]: clip.publishedLabel,
-      [c.completion]: clip.retention?.end ?? 0,
+      [c.completion]: clip.retention?.end ?? "",
       [c.earnings]: clip.earnings,
       [c.views]: clip.views,
       [c.url]: clip.url,
@@ -90,76 +92,74 @@ const handleDownload = async () => {
 
   XLSX.writeFile(wb, `${trExport("fileName")}-${clip.id ?? "clip"}.xlsx`);
 };
-  const PlatformIcon = platformIcons[clip.platform] || FaTiktok;
-  const empty = status === "waiting" || status === "error";
-  const error = status === "error";
+  const PlatformIcon = platformIcons[clip.platform] || FiVideo;
+  const empty = status !== "normal" && status !== "anomaly";
+  const hasComparison = Number.isFinite(clip.vsPlatform);
   const anomaly = status === "anomaly";
   const dash = "—";
 
   const stats = [
     {
       key: "views",
-      label: tr(empty ? "stats.views.labelEmpty" : "stats.views.label"),
-      value: error ? dash : empty ? "0" : clip.views.toLocaleString("en-US"),
-      unit: error ? tr("updating") : tr("stats.views.unit"),
+      label: tr("stats.views.label"),
+      value: Number.isFinite(clip.views) ? clip.views.toLocaleString("en-US") : dash,
+      unit: tr("stats.views.unit"),
       Icon: FiEye,
       valueColor: t.title,
       footer: {
-        Icon: empty ? FiAlertCircle : FiCheckCircle,
-        text: tr(empty ? "stats.views.noteEmpty" : "stats.views.note"),
-        color: empty ? t.gold : t.mint,
+        Icon: FiAlertCircle,
+        text: tr(Number.isFinite(clip.views) ? "stats.views.note" : "stats.views.noteEmpty"),
+        color: Number.isFinite(clip.views) ? t.mint : t.gold,
       },
     },
     {
       key: "earnings",
       label: tr("stats.earnings.label"),
-      value: error ? dash : empty ? "0.00" : clip.earnings,
+      value: Number.isFinite(clip.earnings) ? Number(clip.earnings).toFixed(2) : dash,
       unit: tr("stats.earnings.unit"),
       Icon: FiCreditCard,
       valueColor: empty ? t.title : t.mint,
       footer: {
         Icon: FiClock,
-        text: empty
-          ? tr("stats.earnings.noteEmpty", { rate: clip.rate })
-          : tr("stats.earnings.note"),
-        color: empty ? t.gold : t.mint,
+        text: Number.isFinite(clip.earnings)
+          ? tr("stats.earnings.note")
+          : tr("stats.earnings.noteEmpty"),
+        color: Number.isFinite(clip.earnings) ? t.mint : t.gold,
       },
     },
     {
       key: "watch",
       label: tr("stats.watch.label"),
-      value: empty ? dash : String(clip.watch),
+      value: Number.isFinite(clip.watch) ? String(clip.watch) : dash,
       unit: empty
         ? tr("stats.watch.unitEmpty")
-        : tr("stats.watch.unit", { total: clip.seconds }),
+        : Number.isFinite(clip.seconds) ? tr("stats.watch.unit", { total: clip.seconds }) : "",
       Icon: FiClock,
       valueColor: t.title,
       danger: anomaly,
       footer: {
         Icon: empty ? FiClock : anomaly ? FiTrendingDown : FiTrendingUp,
-        text: empty
+        text: !hasComparison
           ? tr("stats.watch.noteEmpty")
           : anomaly
           ? tr("stats.watch.noteDown", { percent: Math.abs(clip.vsPlatform) })
           : tr("stats.watch.noteUp", { percent: Math.abs(clip.vsPlatform) }),
-        color: anomaly ? t.red : t.mint,
+        color: !hasComparison ? t.gold : anomaly ? t.red : t.mint,
       },
     },
     {
       key: "engagement",
       label: tr("stats.engagement.label"),
-      value: error ? dash : empty ? "0%" : clip.engagement,
+      value: clip.engagement ?? dash,
       unit: empty
         ? ""
-        : tr("stats.engagement.unit", { count: clip.engagementCount }),
+        : Number.isFinite(clip.engagementCount) ? tr("stats.engagement.unit", { count: clip.engagementCount }) : "",
       Icon: FiThumbsUp,
       valueColor: empty ? t.title : t.mint,
       footer: {
         Icon: FiHeart,
-        text: tr(
-          empty ? "stats.engagement.noteEmpty" : "stats.engagement.note"
-        ),
-        color: t.mint,
+        text: tr(clip.engagement == null ? "stats.engagement.noteEmpty" : "stats.engagement.note"),
+        color: clip.engagement == null ? t.gold : t.mint,
       },
     },
   ];
@@ -201,14 +201,6 @@ const handleDownload = async () => {
                 <PlatformIcon size={11} />
                 {tr(`platform.${clip.platform}`)}
               </span>
-              {empty && (
-                <span
-                  className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] ${t.verified}`}
-                >
-                  <FiCheckCircle size={11} />
-                  {tr("verifiedLink")}
-                </span>
-              )}
             </div>
 
             <h1
@@ -234,15 +226,17 @@ const handleDownload = async () => {
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
-          <a
-            href={clip.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition ${t.btn}`}
-          >
-            <FiExternalLink size={16} />
-            {tr("openOriginal")}
-          </a>
+          {clip.url && (
+            <a
+              href={clip.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition ${t.btn}`}
+            >
+              <FiExternalLink size={16} />
+              {tr("openOriginal")}
+            </a>
+          )}
           <button
               onClick={handleDownload}
               className="flex items-center gap-2 rounded-xl bg-[linear-gradient(90deg,#FB8B03_0%,#FA6203_100%)] px-3 py-2 text-sm font-bold text-white transition"

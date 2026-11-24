@@ -3,26 +3,21 @@ import AiResultCard from "./AiResultCard";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/context/ThemeContext";
 import {
-  CheckCircle2,
-  BadgeCheck,
   Info,
-  ShieldCheck,
-  Eye,
-  MonitorPlay,
-  Mic2,
 } from "lucide-react";
 import ResultShell from "./ResultShell";
 
 
 export default function ReceivedView({ submission, campaign }) {
   const t = useTranslations("startProject.result");
-  const tc = useTranslations("startProject");
   const ts = useTranslations("startProject.submit");
   const locale = useLocale();
   const { isDark } = useTheme();
 
   const link = submission.link;
-  const hashtags = campaign?.hashtags || (campaign ? [campaign.hashtag] : []);
+  const requirementChecks = (Array.isArray(submission.checks) ? submission.checks : []).filter((check) => ["REQUIRED_KEYWORD", "REQUIRED_HASHTAG"].includes(check.code));
+  const linkCheck = (Array.isArray(submission.checks) ? submission.checks : []).find((check) => check.code === "POST_LINK_STATUS");
+  const processing = ["PROCESSING", "SUBMITTED"].includes(String(submission.displayStatus || submission.status || "").toUpperCase());
 
   const theme = {
     surface: isDark ? "bg-[#121617] border-[#1e2425]" : "bg-white border-[#e1e7e4]",
@@ -34,9 +29,9 @@ export default function ReceivedView({ submission, campaign }) {
 
   return (
     <ResultShell
-      tone="success"
-      title={t("title")}
-      description={t("description")}
+      tone="warning"
+      title={processing ? (locale === "ar" ? "جارٍ فحص التسليم" : "Submission is processing") : (locale === "ar" ? "التسليم بانتظار المعلن" : "Submission is awaiting advertiser review")}
+      description={processing ? (locale === "ar" ? "يتم فحص التسليم. ستظهر نتائج الفحوص المسجلة هنا عند توفرها." : "Your submission is being checked. Saved review results will appear here when available.") : (locale === "ar" ? "تم حفظ نتيجة الفحص، والتسليم بانتظار قرار المعلن." : "Review results are saved, and the submission is awaiting the advertiser's decision.")}
       steps={["done", "active", "pending"]}
       link={link}
       image={campaign?.image}
@@ -57,7 +52,7 @@ export default function ReceivedView({ submission, campaign }) {
             <div className="min-w-0">
               <p className={`text-[10px] ${green}`}>{t("campaignLabel")}</p>
               <p className={`text-sm font-bold truncate ${theme.primaryText}`}>
-                {campaign ? tc(`campaigns.${campaign.title}`) : submission.campaignId}
+                {campaign?.title || submission.campaignId || "—"}
               </p>
             </div>
           </div>
@@ -77,39 +72,13 @@ export default function ReceivedView({ submission, campaign }) {
     <span dir="ltr" className={`min-w-0 text-xs font-mono truncate ${theme.primaryText}`}>
       {link || "—"}
     </span>
-    <span
-      className={`flex items-center justify-center gap-1.5 text-center text-[10px] font-bold rounded-lg border px-3 py-1.5 sm:shrink-0 ${
-        isDark
-          ? "border-[#94D3C1]/30 bg-[#94D3C1]/10 text-[#94D3C1]"
-          : "border-emerald-200 bg-emerald-50 text-emerald-700"
-      }`}
-    >
-      {t("linkConfirmed")}
-      <BadgeCheck size={14} />
-    </span>
+      {linkCheck?.status === "PASSED" ? (locale === "ar" ? "تم التحقق من بيانات الرابط" : "Link metadata verified") : (locale === "ar" ? "حالة الرابط غير مؤكدة" : "Link status unverified")}
   </div>
 </div>
 
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <p className={`text-xs font-bold ${theme.primaryText}`}>
-                {t("hashtagsLabel", { count: hashtags.length })}
-            </p>
-            <span className="text-[10px] font-bold text-[#94D3C1]">
-              {t("hashtagsDone", { done: hashtags.length, total: hashtags.length })}
-            </span>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {hashtags.map((tag) => (
-              <div
-                key={tag}
-                className={`flex items-center justify-center gap-1.5 py-2.5 rounded-lg border text-xs font-bold ${theme.inset} ${theme.primaryText}`}
-              >
-                <CheckCircle2 size={12} className="text-[#94D3C1]" />
-                {tag}
-              </div>
-            ))}
-          </div>
+          <p className={`text-xs font-bold ${theme.primaryText}`}>{locale === "ar" ? "فحوص الكلمات والوسوم المطلوبة" : "Required keyword and hashtag checks"}</p>
+          {requirementChecks.length ? <ul className="space-y-2">{requirementChecks.map((check, index) => <li key={`${check.code}-${index}`} className={`flex items-start justify-between gap-3 rounded-lg border p-3 ${theme.inset}`}><div><p className={`text-[10px] font-semibold ${theme.primaryText}`}>{check.code}</p><p className={`mt-1 text-[10px] ${theme.secondaryText}`}>{check.message || "—"}</p></div><span className={`shrink-0 text-[10px] font-bold ${check.status === "PASSED" ? "text-emerald-500" : check.status === "FAILED" ? "text-red-400" : "text-amber-500"}`}>{check.status || "—"}</span></li>)}</ul> : <p role="status" className={`rounded-lg border p-3 text-xs ${theme.inset} ${theme.secondaryText}`}>{locale === "ar" ? "لا توجد نتائج محفوظة للكلمات والوسوم بعد." : "No keyword or hashtag results have been saved yet."}</p>}
         </div>
 
         <div className={`rounded-xl border p-3 flex items-start gap-2 ${theme.inset}`}>
@@ -124,7 +93,7 @@ export default function ReceivedView({ submission, campaign }) {
       </div>
 
       {/* نتيجة الفحص الذكي */}
-      <AiResultCard score={submission.aiScore} />
+      <AiResultCard score={submission.aiScore} checks={submission.checks} />
     </ResultShell>
   );
 }
