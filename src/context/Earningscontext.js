@@ -6,31 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
-
-export const WITH_EARNINGS = {
-  total: 1670,
-  totalSar: 6260,
-  views: 238400,
-  clips: 5,
-  ecpm: 7,
-  topCpm: 9,
-  progress: 65,
-  ready: 250,
-  readySar: 937.5,
-  review: 180,
-  reviewSar: 675,
-  received: 1240,
-  receivedSar: 4650,
-  payouts: 5,
-  reviewStartedAt: "2026-10-25T00:00:00Z", // تاريخ حديث (لم تمر 7 أيام بعد - تحت المراجعة)
-  topClipTitle: "استثمار الذكاء الاصطناعي",
-};
-
-// نموذج بعد مرور 7 أيام كاملة (تفعيل زر السحب وظهور البانر)
-export const WITH_EARNINGS_COMPLETED = {
-  ...WITH_EARNINGS,
-  reviewStartedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(), // قبل 8 أيام
-};
+import { getCreatorEarnings } from "@/services/wallet";
 
 export const EMPTY = {
   total: 0,
@@ -53,7 +29,7 @@ export const EMPTY = {
 
 const EarningsContext = createContext(null);
 
-export function EarningsProvider({ children, initialData = WITH_EARNINGS }) {
+export function EarningsProvider({ children, initialData = EMPTY }) {
   // كائن بيانات الأرباح كامل
   const [earningsData, setEarningsDataState] = useState(initialData);
 
@@ -78,16 +54,19 @@ export function EarningsProvider({ children, initialData = WITH_EARNINGS }) {
   }, []);
 
   const refresh = useCallback(async () => {
+    setLoading(true);
     try {
-      // مستقبلاً: جلب الأرباح من الـ API
-      // const { data } = await axiosInstance.get("/creator/earnings/summary");
-      // setEarningsData(data);
-    } catch (e) {
-      console.error("Failed to load balance", e);
+      const wallet = await getCreatorEarnings();
+      setEarningsData({
+        total: Number(wallet?.totalEarnings) || 0,
+        ready: Number(wallet?.availableBalance) || 0,
+      });
+    } catch {
+      // The page that initiated refresh owns user-facing error reporting.
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [setEarningsData]);
 
   const total = Number(earningsData?.total ?? 0);
   const ready = Number(earningsData?.ready ?? 0);
@@ -129,7 +108,7 @@ export function useEarnings() {
   const ctx = useContext(EarningsContext);
   return (
     ctx || {
-      earningsData: WITH_EARNINGS,
+      earningsData: EMPTY,
       setEarningsData: () => { },
       balance: 0,
       setBalance: () => { },

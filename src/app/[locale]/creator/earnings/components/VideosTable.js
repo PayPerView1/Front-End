@@ -1,49 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { FiCheck } from "react-icons/fi";
-
-// بيانات تجريبية: بدّليها ببيانات الـ API (العناوين/الحملات/التواريخ تجي جاهزة من الباك)
-const VIDEOS = [
-  {
-    id: 1,
-    title: "قصة عطر الزمرد الملكي",
-    campaign: "لافيرن للعطور",
-    publishedAt: "12 مايو",
-    platform: "TikTok",
-    thumb: "/images/fashion.jpg",
-    views: 17142,
-    cpm: 7,
-    earning: 120,
-    status: "ready",
-  },
-  {
-    id: 2,
-    title: "أسرار القهوة المختصة",
-    campaign: "محمصة الرياض",
-    publishedAt: "15 مايو",
-    platform: "Reels",
-    thumb: "/images/fashion.jpg",
-    views: 10625,
-    cpm: 8,
-    earning: 85,
-    status: "review",
-    daysLeft: 3,
-  },
-  {
-    id: 3,
-    title: "تطبيق الاستثمار الذكي الحلال",
-    campaign: "منصة دراهم",
-    publishedAt: "28 أبريل",
-    platform: "Shorts",
-    thumb: "/images/fashion.jpg",
-    views: 50000,
-    cpm: 9,
-    earning: 450,
-    status: "paid",
-  },
-];
 
 // [دارك, لايت]
 const PLATFORM_TEXT = {
@@ -52,8 +11,9 @@ const PLATFORM_TEXT = {
   Shorts: ["text-[#EF4444]", "text-[#B91C1C]"],
 };
 
-export default function VideosTable({ videos = VIDEOS, onWithdraw }) {
+export default function VideosTable({ videos = [], onWithdraw }) {
   const { isDark } = useTheme();
+  const isAr = useLocale() === "ar";
   const t = useTranslations("Earnings.videos");
   const [filter, setFilter] = useState("all");
 
@@ -178,11 +138,14 @@ export default function VideosTable({ videos = VIDEOS, onWithdraw }) {
 
           <tbody>
             {rows.map((v) => {
-              const st = statusMap[v.status];
+              const st = statusMap[v.status] || statusMap.review;
               const statusLabel =
-                v.status === "review"
-                  ? t("status.review", { days: v.daysLeft })
-                  : st.label;
+                v.status === "review" ? t("status.review", { days: 7 })
+                  : v.status === "ready" ? t("status.ready")
+                    : v.status === "paid" ? t("status.paid")
+                      : v.status === "reserved" ? (isAr ? "السحب قيد المعالجة" : "Withdrawal pending")
+                        : v.status === "rejected" ? (isAr ? "مرفوض" : "Rejected")
+                          : st.label;
               const platformCls =
                 (PLATFORM_TEXT[v.platform] || ["", ""])[isDark ? 0 : 1];
 
@@ -226,7 +189,7 @@ export default function VideosTable({ videos = VIDEOS, onWithdraw }) {
 
                   <td className="py-5 px-2 text-center font-bold leading-tight">
                     <span className="block text-sm">
-                      {v.views.toLocaleString("en-US")}
+                      {Number.isFinite(v.views) ? v.views.toLocaleString("en-US") : "—"}
                     </span>
                     <span className={`block text-[10px] font-medium ${sub}`}>
                       {t("viewsWord")}
@@ -234,16 +197,15 @@ export default function VideosTable({ videos = VIDEOS, onWithdraw }) {
                   </td>
 
                   <td className="py-5 px-2 text-center text-xs">
-                    ${v.cpm.toFixed(2)}
+                    {Number.isFinite(v.cpm) ? `$${v.cpm.toFixed(2)}` : "—"}
                   </td>
 
                   <td
                     className={`py-5 px-2 text-center font-bold text-sm ${st.earningCls}`}
                   >
-                    $
-                    {v.earning.toLocaleString("en-US", {
+                    {`$${Number(v.earning || 0).toLocaleString("en-US", {
                       minimumFractionDigits: 2,
-                    })}
+                    })}`}
                   </td>
 
                   <td className="py-5 px-2 text-center">
@@ -272,14 +234,7 @@ export default function VideosTable({ videos = VIDEOS, onWithdraw }) {
                       <span className={`text-[11px] ${sub}`}>
                         {t("actions.autoAvailable")}
                       </span>
-                    ) : (
-                      <button
-                        type="button"
-                        className="text-[11px] font-bold bg-transparent border-none cursor-pointer hover:opacity-80"
-                      >
-                        {t("actions.viewReceipt")}
-                      </button>
-                    )}
+                    ) : null}
                   </td>
                 </tr>
               );
