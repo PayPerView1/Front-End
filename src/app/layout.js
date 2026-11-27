@@ -54,6 +54,10 @@ export default async function RootLayout({ children, params }) {
       className={`${geistSans.variable} ${geistMono.variable} ${tajawal.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <head>
+        <meta
+          name="spaceremit-verification"
+          content="NA8JR9JTI242MNKO22PU2N979RLRA4HM2IA8KTEQGH1OXRLLNB"
+        />
         {/*
           تطبيق الثيم فوراً قبل أول render لمنع وميض الألوان (Flash of Unstyled Theme).
           هذا الـ script يقرأ localStorage ويضيف/يزيل class="dark" على <html>
