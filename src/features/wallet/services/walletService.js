@@ -198,7 +198,7 @@ export const getPlatformBankDetails = async () => {
 /**
  * 2.1 بدء عملية شحن المحفظة
  * POST /api/v1/wallet/fund
- * @param {{ amount: number, paymentMethod: "PAYPAL" | "BANK_TRANSFER" | "MOYASAR" }} data
+ * @param {{ amount: number, paymentMethod: "PAYPAL" | "BANK_TRANSFER" | "MOYASAR" | "SPACEREMIT" }} data
  */
 export const fundWallet = async (data) => {
   try {
@@ -210,6 +210,25 @@ export const fundWallet = async (data) => {
 };
 
 export const initiateWalletFunding = fundWallet;
+
+/**
+ * التحقق من دفعة Spaceremit عبر الخادم
+ * POST /api/v1/wallet/spaceremit/verify (أو verifyUrl المرجع من الخادم)
+ * @param {{ paymentCode: string, transactionId: string, verifyUrl?: string }} data
+ */
+export const verifySpaceremitPayment = async ({ paymentCode, transactionId, verifyUrl } = {}) => {
+  try {
+    const rawUrl = typeof verifyUrl === "string" ? verifyUrl.trim() : "";
+    const endpoint = rawUrl || "/api/v1/wallet/spaceremit/verify";
+    const response = await axiosInstance.post(endpoint, {
+      paymentCode,
+      transactionId,
+    });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
 
 /**
  * تأكيد طلب PayPal بعد عودة المستخدم من صفحة الموافقة

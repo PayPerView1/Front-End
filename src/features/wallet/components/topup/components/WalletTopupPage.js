@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FiCheck,
   FiCreditCard,
@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { fundWallet } from "@/features/wallet/services/walletService";
 import { useWallet } from "@/features/wallet/WalletProvider";
+import SpaceremitCheckout, { SPACEREMIT_SESSION_KEY } from "./SpaceremitCheckout";
 
 /* ─────────────────────────────────────────────
    Design Tokens — MacBook Pro 16_ - 136
@@ -114,6 +115,25 @@ export default function WalletTopupPage({
   const [selectedMethod, setSelectedMethod] = useState("paypal");
   const [toastMessage, setToastMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [spaceremitSession, setSpaceremitSession] = useState(null);
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("spaceremit") === "1") {
+        const saved = sessionStorage.getItem(SPACEREMIT_SESSION_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed?.transactionId && parsed?.spaceremit?.publicKey) {
+            // Defer setState to avoid calling it synchronously inside an effect body
+            const t = window.setTimeout(() => setSpaceremitSession(parsed), 0);
+            return () => window.clearTimeout(t);
+          }
+        }
+      }
+    } catch {}
+    return undefined;
+  }, []);
 
   const quickAmounts = [1000, 2500, 5000, 10000];
   const sarRate = 3.75;
@@ -158,11 +178,31 @@ export default function WalletTopupPage({
     }
     setIsProcessing(true);
     try {
-      const paymentMethod = selectedMethod === "bank_transfer" ? "BANK_TRANSFER" : selectedMethod === "moyasar" ? "MOYASAR" : "PAYPAL";
+      const paymentMethod =
+        selectedMethod === "bank_transfer"
+          ? "BANK_TRANSFER"
+          : selectedMethod === "moyasar"
+          ? "MOYASAR"
+          : selectedMethod === "spaceremit"
+          ? "SPACEREMIT"
+          : "PAYPAL";
       const response = await fundWallet({ amount, paymentMethod });
       if (response?.success === false) throw new Error(response.message || "تعذّر بدء عملية الشحن.");
       const data = response?.data ?? response;
-      if (data.invoiceUrl) {
+      if (paymentMethod === "SPACEREMIT") {
+        const sp = data?.spaceremit;
+        if (!sp?.publicKey || !data?.transactionId) {
+          throw new Error("بيانات تهيئة Spaceremit غير مكتملة من الخادم.");
+        }
+        try {
+          localStorage.setItem("pendingTransactionId", data.transactionId);
+          sessionStorage.setItem(
+            SPACEREMIT_SESSION_KEY,
+            JSON.stringify({ transactionId: data.transactionId, spaceremit: sp })
+          );
+        } catch {}
+        setSpaceremitSession({ transactionId: data.transactionId, spaceremit: sp });
+      } else if (data.invoiceUrl) {
         if (data.transactionId) {
           try { localStorage.setItem("pendingTransactionId", data.transactionId); } catch {}
         }
@@ -189,6 +229,25 @@ export default function WalletTopupPage({
       setIsProcessing(false);
     }
   };
+
+  if (spaceremitSession) {
+    return (
+      <SpaceremitCheckout
+        transactionId={spaceremitSession.transactionId}
+        spaceremit={spaceremitSession.spaceremit}
+        onBack={() => {
+          setSpaceremitSession(null);
+          try {
+            const url = new URL(window.location.href);
+            if (url.searchParams.has("spaceremit")) {
+              url.searchParams.delete("spaceremit");
+              window.history.replaceState({}, "", url.toString());
+            }
+          } catch {}
+        }}
+      />
+    );
+  }
 
   return (
     <div
@@ -518,6 +577,21 @@ export default function WalletTopupPage({
                   }
                   title="Moyasar"
                   subtitle="بطاقات ومدى وApple Pay"
+                />
+                <PaymentCard
+                  id="spaceremit"
+                  selected={selectedMethod}
+                  onSelect={setSelectedMethod}
+                  icon={
+                    <span
+                      className="text-[10px] font-extrabold tracking-tight"
+                      style={{ color: selectedMethod === "spaceremit" ? T.accent : "#8A9490" }}
+                    >
+                      SP
+                    </span>
+                  }
+                  title="Spaceremit"
+                  subtitle="البطاقات البنكية وطرق الدفع المحلية"
                 />
                 <PaymentCard
                   id="apple_pay"

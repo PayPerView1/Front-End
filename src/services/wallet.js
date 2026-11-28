@@ -16,6 +16,7 @@ export {
   getPlatformBankDetails,
   fundWallet,
   capturePayPalOrder,
+  verifySpaceremitPayment,
   initiateWalletFunding,
   uploadBankTransferReceipt,
   adminReviewBankTransfer,
